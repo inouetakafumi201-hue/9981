@@ -4,6 +4,29 @@
 
 本计划把 `requirements.md` 的 19 项需求与 `design.md` 的组件、Op 映射、事务边界和 41 条正确性属性，转成可增量执行、可机械验证的编码任务。实现语言为 **TypeScript**（仓库既有语言，`design.md` 全篇以 TypeScript 表达接口，无需再选语言）。
 
+> ## ⚠️ D-062 冻结提示（PT-03 对齐，2026-08-09）
+>
+> **本 Spec 的实现线（`src/play/core-mechanics/`）已被 `docs/访谈决策记录.md` 的 D-062 认定为与
+> `src/play/action-turn/`（`playpack.json`，纯声明式数据，已有 30 + 若干集成测试全绿）存在
+> 结构性重复，且结论互相矛盾（例如单人投点 U-002：`core-mechanics/allocation.ts` 按
+> requirements.md 5.11/D-037 实现为单人 2 AP，而 `action-turn/playpack.json` 的
+> `resolutionPolicy.singleParticipant` 反过来声称"以 wakeup-core-mechanics 为完全权威"应
+> abort 阻塞——两者互相指向对方为权威，形成循环矛盾）。
+>
+> D-062 裁决草案：声明式 `playpack` 数据是机制内容权威形态，`core-mechanics` 的价值收缩为
+> "装载期治理层"（玩法层 Linter），而不是内嵌第二份机制 `Def`。**该裁决尚待项目所有者复核批准**，
+> 批准前 `core-mechanics` 并行线**冻结**，不得向下写新实现（执行/收敛工作列为并行任务 PT-07，
+> 🔒 未就绪）。
+>
+> 因此，以下复选框状态**仅反映"对应 `.ts` 文件里是否存在代码"，不代表"是否可信完成"**：
+> - `core-mechanics/` 下**没有任何 `__tests__/` 目录、零测试**（本 Spec"必交付"的 41 条属性测试
+>   一条也没有写），任何标 `[x]` 的任务都只有静态代码存在、没有测试证明其正确性或可装载性；
+> - 检查点任务（5、8）与属性测试任务（9.2、10.1–10.41）因此一律标 `[ ]`；
+> - 过载机制（任务 6）与行动轮排名/窗口期机制（任务 7）在 `core-mechanics` 侧**完全未声明**，
+>   但在 `action-turn/playpack.json` 里已有等价机制且通过测试——这正是 D-062 描述的重复现实。
+>
+> 可信的"完成"判定需等 D-062 收敛执行（PT-07）落地后才能重新评估。
+
 ### 与仓库实际情况对齐的三条硬约束（覆盖 design.md 中的过时表述）
 
 1. **测试必须与源码同目录**：全部测试落在 `src/play/core-mechanics/**/*.test.ts`。`design.md` 8.2 写的 `test/play/core-mechanics/**` 在本仓库**永远不会被执行**——`vitest.config.ts` 的 `include` 只有 `src/**/*.test.ts`，`tsconfig.json` 的 `include` 只有 `src`，`npm run lint` 是 `eslint src --ext .ts`。任务 6.3 用真实断言把这条路径风险钉死。

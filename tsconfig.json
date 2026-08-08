@@ -1,4 +1,11 @@
 {
+  // 默认 typecheck 范围 = 源码 + 全部测试目录。
+  // 为什么 include 写整个 "test" 而不是逐个子目录（PT-06）：
+  //   历史上 include 是 ["src", "test/properties"]，漏掉 test/l2，导致"测试引用已删除字段"
+  //   这类错误 tsc 抓不到，只在运行期暴露（2026-08-08 删除 ActionDescriptor.attackShape 后，
+  //   test/l2/integration/end-to-end.integration.test.ts 的陈旧断言就是这样漏到运行期的）。
+  //   写目录而非枚举子目录，保证以后新增 test/<新子目录> 自动进入检查范围，不会再出现盲区。
+  //   与 vitest.config.ts 的 include（src/**、test/l2/**、test/properties/**）保持"检查范围 ⊇ 运行范围"。
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -17,5 +24,5 @@
     "resolveJsonModule": true,
     "types": ["vitest/globals", "node"]
   },
-  "include": ["src", "test/properties"]
+  "include": ["src", "test"]
 }

@@ -6,10 +6,12 @@
   "description": "MetaKernel: 元机制内核 - 零渲染依赖的纯 TypeScript 状态机库",
   "scripts": {
     "test": "vitest run",
+    "verify": "npm run typecheck && npm run lint && npm run test",
     "verify:docs": "bash scripts/verify-doc-consistency.sh",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
+    "typecheck:l2": "tsc --noEmit -p tsconfig.l2.json",
+    "lint": "eslint src test --ext .ts,.tsx",
     "mutation": "node scripts/mutation-run.mjs",
     "mutation:isolate": "node scripts/mutation-isolate.mjs"
   },

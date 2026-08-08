@@ -1,4 +1,8 @@
 {
+  // L2 隔离门禁：只编译基类层自身 + 其显式依赖的引擎层 Op 入口。
+  // 用途是证明"基类层不靠仓库其余部分也能独立通过类型检查"（src/l2/决策与风险记录.md 引用本配置）。
+  // 注意：这是**窄范围补充门禁**，不替代 tsconfig.json 的全域 typecheck（后者已含 src + test 全部）。
+  // 由 `npm run typecheck:l2` 运行。
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "types": ["vitest/globals", "node"]
