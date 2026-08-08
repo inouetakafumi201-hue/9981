@@ -1,0 +1,545 @@
+[
+  {
+    "id": "M01",
+    "desc": "scene_create 不再拒绝重复 sceneId",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#4 重复 sceneId 必须拒绝（否则原场景下节点全部悬空）"
+    ]
+  },
+  {
+    "id": "M02",
+    "desc": "node_create 不再拒绝重复 nodeId",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#1 同场景重复 nodeId 必须拒绝"
+    ]
+  },
+  {
+    "id": "M03",
+    "desc": "link_create 不再拒绝重复 linkId",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M04",
+    "desc": "scene_create 不校验 parentId 是否存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "parentId 不存在时 scene_create 抛 E_REF_INVALID 且不留下场景"
+    ]
+  },
+  {
+    "id": "M05",
+    "desc": "node_create 不校验 sceneId 是否存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "任意操作序列：不变量恒成立 + 与影子模型逐字段一致 (600 次)"
+    ]
+  },
+  {
+    "id": "M06",
+    "desc": "link_create 不校验所属 Scene 是否存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#8 link_create 校验顺序：场景不存在报 E_REF_INVALID"
+    ]
+  },
+  {
+    "id": "M07",
+    "desc": "link_create 不校验 from 端 Node 存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "无操作序列导致栈溢出或异常崩溃 (5000 次, 长序列)"
+    ]
+  },
+  {
+    "id": "M08",
+    "desc": "link_create 不校验 to 端 Node 存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "无操作序列导致栈溢出或异常崩溃 (5000 次, 长序列)"
+    ]
+  },
+  {
+    "id": "M09",
+    "desc": "link_create 不再拒绝跨 Scene 的 Link",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "跨场景 Link 被拒绝且无部分写入"
+    ]
+  },
+  {
+    "id": "M10",
+    "desc": "link_create 只检查 from 端的场景归属（漏检 to 端）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "跨场景 Link 被拒绝且无部分写入"
+    ]
+  },
+  {
+    "id": "M11",
+    "desc": "link_create 只检查 to 端的场景归属（漏检 from 端）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "场景归属校验对称：from 端不匹配也必须拒绝"
+    ]
+  },
+  {
+    "id": "M12",
+    "desc": "node_delete 对不存在 ID 静默返回而非抛错",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "link_delete 幂等，node/scene delete 对不存在 ID 抛 E_REF_INVALID"
+    ]
+  },
+  {
+    "id": "M13",
+    "desc": "scene_delete 对不存在 ID 静默返回而非抛错",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "link_delete 幂等，node/scene delete 对不存在 ID 抛 E_REF_INVALID"
+    ]
+  },
+  {
+    "id": "M14",
+    "desc": "link_delete 丧失幂等性，对不存在 ID 抛错",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "scene 删除级联清除深层子孙的场景/节点/Link"
+    ]
+  },
+  {
+    "id": "M15",
+    "desc": "entity_remove 丧失幂等性",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "未落位的实体不能 move，entity_remove 幂等"
+    ]
+  },
+  {
+    "id": "M16",
+    "desc": "node_delete 不级联删除关联 Link（INV-6 原始违反）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M17",
+    "desc": "node_delete 不清除其上实体占位",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "节点删除清除其上实体占位"
+    ]
+  },
+  {
+    "id": "M18",
+    "desc": "node_delete 不从全局 nodes 移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#4 重复 sceneId 必须拒绝（否则原场景下节点全部悬空）"
+    ]
+  },
+  {
+    "id": "M19",
+    "desc": "node_delete 不从所属 Scene 的索引移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M20",
+    "desc": "scene_delete 不级联删除子场景",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#7 场景父子环不再可能"
+    ]
+  },
+  {
+    "id": "M21",
+    "desc": "scene_delete 不级联删除其下 Node",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#4 重复 sceneId 必须拒绝（否则原场景下节点全部悬空）"
+    ]
+  },
+  {
+    "id": "M22",
+    "desc": "scene_delete 不从父场景的 childScenes 摘除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "删除中间层场景只清除其子树，父级不受损"
+    ]
+  },
+  {
+    "id": "M23",
+    "desc": "scene_delete 先递归后摘除自身（重入导致无限递归）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#6 场景自环父引用不再可能，删除不栈溢出"
+    ]
+  },
+  {
+    "id": "M24",
+    "desc": "link_delete 不从 from 端 Node 的 links 移除（留下陈旧引用）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "link_delete 幂等，node/scene delete 对不存在 ID 抛 E_REF_INVALID"
+    ]
+  },
+  {
+    "id": "M25",
+    "desc": "link_delete 不从 to 端 Node 的 links 移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M26",
+    "desc": "link_delete 不从 Scene 的 links 索引移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M27",
+    "desc": "link_delete 不从全局 links 移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#5 重复 linkId 必须拒绝（否则节点持有陈旧 linkId）"
+    ]
+  },
+  {
+    "id": "M28",
+    "desc": "link_create 不把 Link 加进 from 端 Node",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#3 跨场景重复 nodeId 必须拒绝（否则旧节点与其 Link 成为孤儿）",
+      "健康拓扑无违反"
+    ]
+  },
+  {
+    "id": "M29",
+    "desc": "link_create 不把 Link 加进 to 端 Node",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#3 跨场景重复 nodeId 必须拒绝（否则旧节点与其 Link 成为孤儿）",
+      "健康拓扑无违反"
+    ]
+  },
+  {
+    "id": "M30",
+    "desc": "link_create 不写 Scene 的 links 索引",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#3 跨场景重复 nodeId 必须拒绝（否则旧节点与其 Link 成为孤儿）",
+      "健康拓扑无违反"
+    ]
+  },
+  {
+    "id": "M31",
+    "desc": "node_create 不写 Scene 的 nodes 索引",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#1 同场景重复 nodeId 必须拒绝",
+      "健康拓扑无违反"
+    ]
+  },
+  {
+    "id": "M32",
+    "desc": "scene_create 不把自己加进父的 childScenes",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#7 场景父子环不再可能",
+      "健康拓扑无违反"
+    ]
+  },
+  {
+    "id": "M33",
+    "desc": "are_adjacent 忽略 directed（基线原始 BUG#2）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#2 有向 Link 反向不相邻"
+    ]
+  },
+  {
+    "id": "M34",
+    "desc": "are_adjacent 无向 Link 也只单向可达",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "无向 Link 双向相邻"
+    ]
+  },
+  {
+    "id": "M35",
+    "desc": "are_adjacent 丢掉正向判定",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#2 有向 Link 反向不相邻",
+      "are_adjacent 遇陈旧 linkId 不抛 TypeError"
+    ]
+  },
+  {
+    "id": "M36",
+    "desc": "neighbors 忽略 directed",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#2 有向 Link 反向不相邻",
+      "neighbors 覆盖有向/无向 × from端/to端 四种组合"
+    ]
+  },
+  {
+    "id": "M37",
+    "desc": "neighbors 丢掉无向反向邻居",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "neighbors 覆盖有向/无向 × from端/to端 四种组合"
+    ]
+  },
+  {
+    "id": "M38",
+    "desc": "neighbors 丢掉正向邻居",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#2 有向 Link 反向不相邻",
+      "neighbors 遇陈旧 linkId 不抛 TypeError"
+    ]
+  },
+  {
+    "id": "M39",
+    "desc": "entity_place 不摘除实体在旧 Node 的占位（一实体多处）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#9 实体操作已实现，且同一实体只占一个 Node"
+    ]
+  },
+  {
+    "id": "M40",
+    "desc": "entity_place 摘除条件反转（把自己刚放的摘掉）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#9 实体操作已实现，且同一实体只占一个 Node"
+    ]
+  },
+  {
+    "id": "M41",
+    "desc": "entity_place 不写 entityIndex",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#9 实体操作已实现，且同一实体只占一个 Node",
+      "索引指向的 Node 上没有该实体 → E_INV_INCONSISTENT"
+    ]
+  },
+  {
+    "id": "M42",
+    "desc": "entity_place 不写 node.entities",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#9 实体操作已实现，且同一实体只占一个 Node"
+    ]
+  },
+  {
+    "id": "M43",
+    "desc": "entity_remove 不从 node.entities 移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "未落位的实体不能 move，entity_remove 幂等"
+    ]
+  },
+  {
+    "id": "M44",
+    "desc": "entity_remove 不从 entityIndex 移除",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "未落位的实体不能 move，entity_remove 幂等"
+    ]
+  },
+  {
+    "id": "M45",
+    "desc": "entity_move 不校验相邻（允许瞬移）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "entity_move 只能沿 Link 移动，遵循有向性"
+    ]
+  },
+  {
+    "id": "M46",
+    "desc": "entity_move 不校验实体已落位",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "entity_move 三种失败模式错误码互不相同"
+    ]
+  },
+  {
+    "id": "M47",
+    "desc": "entity_move 不校验目标 Node 存在",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "entity_move 三种失败模式错误码互不相同"
+    ]
+  },
+  {
+    "id": "M48",
+    "desc": "checkInvariants 恒返回空数组（oracle 被掏空）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "from 端 Node 消失 → E_INV_DANGLING"
+    ]
+  },
+  {
+    "id": "M49",
+    "desc": "checkInvariants 去掉环检测",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "场景自环父引用 → E_INV_CYCLE"
+    ]
+  },
+  {
+    "id": "M50",
+    "desc": "checkInvariants 去掉 Node 持有陈旧 Link 的检测",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "Node 持有已不存在的 linkId → E_INV_STALE_REF"
+    ]
+  },
+  {
+    "id": "M51",
+    "desc": "checkInvariants 去掉实体索引反向一致性检测",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "索引指向不存在的 Node → E_INV_DANGLING"
+    ]
+  },
+  {
+    "id": "M52",
+    "desc": "link_create 跨场景校验挪到写入之后（部分写入）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "跨场景 Link 被拒绝且无部分写入"
+    ]
+  },
+  {
+    "id": "M53",
+    "desc": "[预期等价] scene_delete 迭代 childScenes 不做快照",
+    "status": "SURVIVED",
+    "expectEquivalent": true,
+    "killedBy": []
+  },
+  {
+    "id": "M54",
+    "desc": "[预期等价] scene_delete 迭代 nodes 不做快照",
+    "status": "SURVIVED",
+    "expectEquivalent": true,
+    "killedBy": []
+  },
+  {
+    "id": "M55",
+    "desc": "[预期等价] node_delete 迭代 links 不做快照",
+    "status": "SURVIVED",
+    "expectEquivalent": true,
+    "killedBy": []
+  },
+  {
+    "id": "M56",
+    "desc": "entity_move 未落位时错报 E_REF_INVALID（错误码退化）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "entity_move 三种失败模式错误码互不相同"
+    ]
+  },
+  {
+    "id": "M57",
+    "desc": "entity_move 不相邻时错报 E_REF_INVALID（错误码退化）",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "entity_move 只能沿 Link 移动，遵循有向性"
+    ]
+  },
+  {
+    "id": "M58",
+    "desc": "link_create 跨场景时错报 E_REF_INVALID 而非 E_LINK_CROSS_SCENE",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "跨场景 Link 被拒绝且无部分写入"
+    ]
+  },
+  {
+    "id": "M59",
+    "desc": "node_create 重复 ID 时错报 E_REF_INVALID 而非 E_ID_DUPLICATE",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#1 同场景重复 nodeId 必须拒绝"
+    ]
+  },
+  {
+    "id": "M60",
+    "desc": "scene_create 重复 ID 时错报 E_REF_INVALID 而非 E_ID_DUPLICATE",
+    "status": "KILLED",
+    "expectEquivalent": false,
+    "killedBy": [
+      "BUG#4 重复 sceneId 必须拒绝（否则原场景下节点全部悬空）"
+    ]
+  }
+]

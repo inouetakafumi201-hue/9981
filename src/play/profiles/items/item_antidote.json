@@ -1,0 +1,67 @@
+{
+  "id": "item_antidote_001",
+  "name": "解毒剂",
+  "category": "consumable",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": [
+      "item.capability.cure"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "医疗",
+    "解毒",
+    "消耗品",
+    "状态解除"
+  ],
+  "stackable": true,
+  "grantedStates": [],
+  "description": "专门中和各类毒素的药剂。在零和睡眠协议规定的危险区域内必备。",
+  "actions": [
+    {
+      "name": "使用解毒剂",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP使用，立即解除中毒状态",
+      "effects": [
+        {
+          "op": "attach.del",
+          "id": "{attachment_poisoned}",
+          "description": "移除中毒状态附件"
+        }
+      ],
+      "kernelOps": [
+        "attach.del"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "attach.del"
+  ],
+  "pendingKernelOps": [
+    "list.remove"
+  ],
+  "pendingKernelOpsNote": "消耗品用后从背包移除仍未建模：需要先确定背包容器的列表路径，才能给出 list.remove 的完整参数。",
+  "mvp": true,
+  "weight": "light",
+  "source": [
+    "地图生成",
+    "商店"
+  ],
+  "breakCondition": {
+    "status": "status_poisoned",
+    "condition": "present",
+    "description": "仅当目标处于中毒状态时有效"
+  },
+  "itemParameters": {
+    "item.capability.cure": {
+      "targetSelector": "self",
+      "statusSelector": "status_poisoned",
+      "applicationTiming": "on-use",
+      "operation": "attach.del"
+    }
+  }
+}

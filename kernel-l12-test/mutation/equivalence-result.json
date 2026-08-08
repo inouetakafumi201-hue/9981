@@ -1,0 +1,52 @@
+{
+  "sentinels": 17,
+  "sentinelBlind": 0,
+  "sequences": 3000,
+  "sentinelSequences": 400,
+  "targets": 6,
+  "equivalent": 6,
+  "report": [
+    {
+      "id": "M27",
+      "desc": "props 内非数字不再报错（typeof 前置判断冗余）",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M34",
+      "desc": "trim(0) 由提前清空改为落入 slice 分支",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M35",
+      "desc": "trim 边界用 >=（相等时多做一次整份 slice）",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M59",
+      "desc": "段数取 min 而非 max",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M60",
+      "desc": "parseInt 去掉 || 0 兜底",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M81",
+      "desc": "命中判定移到 visited 之后（起点等于终点时失效）",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+﻿
+> kernel-l8-test@1.0.0 mutation
+> tsx mutation/run.ts
+
+基线校验中...
+基线全绿。
+
+M01 杀死   去掉重复 id 守卫（回到静默覆盖，孤立旧关系）
+M02 杀死   重复 id 守卫取反（首次创建就抛错）
+M03 杀死   createEntity 返回内部 stub（调用方可绕过 Op 改索引）
+M04 杀死   createEntity 抛错前先写入（失败调用留下痕迹）
+M05 杀死   destroyEntity 不存在时静默返回（不抛 E_REF_INVALID）
+M06 杀死   级联只收 out 边（in 边留下悬空关系）
+M07 杀死   级联只收 in 边（out 边留下悬空关系）
+M08 杀死   完全不级联删关系（INV-6 失效）
+M09 杀死   不级联删 target 为该实体的 attachment（INV-13 失效）
+M10 杀死   不级联删 grantedBy 为该实体的 attachment
+M11 杀死   grantedBy 级联判据取反（删错对象）
+M12 杀死   不做 dep 级联（dep 被销毁后 attachment 悬空）
+M13 杀死   destroyEntity 末尾不从 entities 删除（实体删不掉）
+M14 存活(预期) 等价：先删实体再级联——被删实体自己的索引无人再读，另一端仍被清理
+M15 存活(预期) 等价：级联时不快照 attachments——循环内只删当前元素，Set 迭代对此安全
+M16 杀死   relation_add 不校验 from 存在
+M17 杀死   relation_add 不校验 to 存在
+M18 杀死   from 校验取反（合法端点被拒）
+M19 杀死   同 id 重复添加时不先清旧（旧索引项残留）
+M20 杀死   attrs 按引用存（调用方事后可绕过校验改内部状态）
+M21 杀死   relation_add 返回内部对象（可改 from 让索引脱钩）
+M22 杀死   不写 out 索引（单向索引）
+M23 杀死   不写 in 索引（单向索引）
+M24 杀死   out 索引用 unshift（桶内顺序反转，get 可观测）
+M25 杀死   out 索引写死 type 键（按类型查询错位）
+M26 杀死   out/in 索引写到同一端（from 端写两次）
+M27 杀死   索引里存 type 而不是 id（反向校验应发现主表查不到）
+M28 杀死   relation_del 对不存在的 id 抛错（破坏幂等；自环级联会二次调用）
+M29 杀死   relation_del 不清 out 索引（残留索引项）
+M30 杀死   relation_del 不清 in 索引（残留索引项）
+M31 杀死   relation_del 不从主表删除（主表残留，索引已清）
+M32 杀死   清 out 索引时过滤条件取反（删掉所有其他项，留下自己）
+M33 杀死   清索引时用错类型键（清了别的桶）
+M34 杀死   attachment_add 不校验 target 存在
+M35 杀死   attachment_add 不校验 grantedBy 存在
+M36 杀死   attachment_add 不校验 deps 存在
+M37 杀死   deps 校验只看第一个（后续 dep 不校验）
+M38 杀死   同 id 重复 add 时不先清旧（登记与主表脱钩）
+M39 杀死   attachment 按引用入库（事后改 deps/target 可绕过校验）
+M40 杀死   attachment_add 返回内部对象
+M41 杀死   不在 target 上登记 attachment（反向校验应发现）
+M42 杀死   登记到 grantedBy 而不是 target
+M43 杀死   attachment_del 对不存在的 id 抛错（破坏幂等）
+M44 杀死   attachment_del 不从 target 的集合里注销（entity 残留 attId）
+M45 杀死   attachment_del 不从主表删除
+M46 杀死   dep 级联判据取反（删掉不含该 dep 的 attachment）
+M47 杀死   dep 级联只看第一个 dep
+M48 杀死   不报 from 端悬空
+M49 杀死   不报 to 端悬空
+M50 杀死   hasOut 判据取反（对称的报不对称）
+M51 杀死   不报 out 索引缺失
+M52 杀死   不报 in 索引缺失
+M53 杀死   hasOut 忽略类型（跨桶也算命中）
+M54 杀死   不报 att.target 悬空
+M55 杀死   不报 att.grantedBy 悬空
+M56 杀死   不报 dep 悬空
+M57 杀死   不报 entity 引用了不存在的 att
+M58 杀死   反向 out 索引校验整段删除（回到单向检查）
+M59 杀死   不校验 out 索引项的 from 端是否为所在 entity
+M60 杀死   out 索引 from 端校验取反
+M61 杀死   不校验 out 索引项的 type 是否与桶键一致
+M62 杀死   不校验 out 桶内重复
+M63 杀死   out 桶重复判据取反（无重复时误报）
+M64 杀死   反向 in 索引不校验主表存在
+M65 杀死   不校验 in 索引项的 to 端是否为所在 entity
+M66 杀死   不校验 in 桶内重复
+M67 杀死   反向 attachment 登记校验整段删除
+M68 杀死   反向 attachment 登记校验取反
+M69 杀死   STALE_INDEX 报成 ASYMMETRIC（两类问题混为一谈）
+M70 杀死   DANGLING 报成 INCONSISTENT
+M71 杀死   DUPLICATE_INDEX 报成 STALE_INDEX
+M72 杀死   detail 抹掉定位信息（只留码，无法定位）
+M73 杀死   checkInvariants 恒返回空（检查器彻底失效）
+M74 杀死   get entity 交出内部 stub
+M75 杀死   get relation 交出内部对象
+M76 杀死   get attachment 交出内部对象
+M77 杀死   get 不存在时返回空对象而非 undefined
+M78 杀死   dump 对索引桶排序（抹掉可观测的插入顺序）
+M79 杀死   dump 保留空桶（删除留下的空数组伪装成状态差异）
+M80 杀死   dump 的 entities 不排序（顺序随插入变化）
+M81 杀死   dump 漏掉 attachments 索引字段
+M82 杀死   dump 的 effectCount 恒为 0
+M83 杀死   dump 交出 attrs 引用（快照可被事后篡改）
+M84 杀死   dump 漏掉 in 索引
+M85 杀死   cloneRelation 浅拷 attrs（仍共享同一对象）
+M86 杀死   cloneAttachment 不拷 deps 数组
+M87 杀死   cloneAttachment 不拷 effects 数组
+M88 杀死   cloneAttachment 拷 effects 但不拷每个 args（浅一层不够）
+M89 杀死   cloneEntityStub 复用原 Map（索引可被外部改）
+M90 杀死   cloneEntityStub 拷 Map 但桶内数组共享
+M91 杀死   cloneEntityStub 复用原 attachments Set
+M92 杀死   cloneEntityStub 复用原 in Map
+M93 存活(预期) 等价：attrs 默认值去掉——展开 undefined 得空对象，行为不变
+M94 存活(预期) 等价：dump 内 relations 遍历改用 entries——同一迭代顺序
+M95 存活(预期) 等价：grantedBy 级联的快照数组换成 Array.from——同语义
+M96 存活(预期) 等价：hasIn 的多余空格删掉——纯格式
+
+========================================
+变异体总数：96
+无效（find 未唯一命中）：0
+计分变异体：90  杀死：90  存活：0
+预期等价（存活为正确）：6
+变异得分：100.00%

@@ -1,0 +1,10 @@
+{
+  "id": "status_downed",
+  "name": "零血倒地",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["downed", "critical", "incapacitated"],
+  "description": "表示实体进入危急倒地阶段的语义状态。",
+  "capabilityIds": ["status.capability.survival_stage", "status.capability.action_eligibility"],
+  "configurableParameters": ["eligibleActionPolicy", "resolutionPolicy", "participationPolicy", "presentationPolicy"]
+}

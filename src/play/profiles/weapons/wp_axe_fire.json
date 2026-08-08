@@ -1,0 +1,99 @@
+{
+  "id": "wp_axe_fire",
+  "name": "消防斧",
+  "category": "melee",
+  "meleeType": "axe",
+  "description": "零和睡眠协议的标准破门装备，斧刃锋利，破坏力极强。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.melee",
+    "damageClassId": "damage-class.physical",
+    "capabilityIds": [
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile"
+    ]
+  },
+  "weightClass": "heavy",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 3,
+  "range": 1,
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "劈砍",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "强力劈砍，造成3点伤害，是霰弹枪之外最高的单次伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -3
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "破门",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "破坏门锁或障碍物",
+      "effects": [
+        {
+          "op": "prop.set",
+          "path": "links.{target}.props.open",
+          "value": true
+        }
+      ],
+      "kernelOps": [
+        "prop.set"
+      ],
+      "kernelEvents": [
+        "OnBreach"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add",
+    "prop.set"
+  ],
+  "kernelEvents": [
+    "OnDamage",
+    "OnBreach"
+  ],
+  "tags": [
+    "melee",
+    "axe",
+    "heavy",
+    "breaching",
+    "sharp"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害3，与霰弹枪和狙击步枪并列最高伤害",
+    "volumeRationale": "占2格双手，体现消防斧的体积和重量",
+    "twoHanded": "双手持用，无法同时持盾",
+    "breaching": "可破坏门锁，是破门专用工具"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.physical",
+      "damageTypeIds": [
+        "DMG_01"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.heavy",
+      "handedness": "two-handed"
+    }
+  },
+  "maxTargets": 1
+}

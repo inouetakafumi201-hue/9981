@@ -1,0 +1,10 @@
+{
+  "id": "status_weak",
+  "name": "虚弱",
+  "category": "negative",
+  "type": "numeric",
+  "tags": ["weakness", "output-impairment", "adverse"],
+  "description": "表示实体的效果输出能力受到削弱的语义状态。",
+  "capabilityIds": ["status.capability.output_modulation"],
+  "configurableParameters": ["affectedOutputScope", "adjustmentPolicy", "stackingPolicy", "presentationPolicy"]
+}

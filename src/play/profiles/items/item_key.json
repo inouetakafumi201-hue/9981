@@ -1,0 +1,87 @@
+{
+  "id": "item_key_001",
+  "name": "钥匙",
+  "category": "tool",
+  "classComposition": {
+    "classIds": [
+      "item.class.tool"
+    ],
+    "capabilityIds": [
+      "item.capability.lock_interaction"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "工具",
+    "钥匙",
+    "开锁",
+    "特定门"
+  ],
+  "stackable": true,
+  "grantedStates": [],
+  "description": "通用钥匙，可以打开对应的锁具。每个钥匙对应特定的容器。",
+  "actions": [
+    {
+      "name": "使用钥匙",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "使用钥匙直接开锁，无需检定",
+      "effects": [
+        {
+          "op": "prop.set",
+          "path": "containers.{target}.props.locked",
+          "value": false,
+          "description": "解除容器锁定状态"
+        }
+      ],
+      "kernelOps": [
+        "prop.set"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.set"
+  ],
+  "mvp": true,
+  "source": [
+    "NPC掉落",
+    "搜刮",
+    "任务奖励"
+  ],
+  "note": "钥匙具有唯一性：每把钥匙只能打开对应的锁（通过标签或ID匹配）",
+  "variants": [
+    {
+      "id": "item_key_door_001",
+      "name": "门钥匙",
+      "tags": [
+        "门锁"
+      ],
+      "description": "可以打开普通门的钥匙"
+    },
+    {
+      "id": "item_key_vehicle_001",
+      "name": "车钥匙",
+      "tags": [
+        "载具"
+      ],
+      "description": "可以解锁并启动对应车辆的钥匙"
+    },
+    {
+      "id": "item_key_safe_001",
+      "name": "保险柜钥匙",
+      "tags": [
+        "保险柜"
+      ],
+      "description": "可以打开保险柜的专用钥匙"
+    }
+  ],
+  "itemParameters": {
+    "item.capability.lock_interaction": {
+      "lockSelector": "adjacent-locked-container",
+      "interactionMode": "direct-unlock",
+      "prerequisite": "matching-key-tag",
+      "completionRule": "single-step-immediate",
+      "operation": "prop.set"
+    }
+  }
+}

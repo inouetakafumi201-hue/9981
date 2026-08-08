@@ -1,0 +1,72 @@
+{
+  "id": "wp_fists",
+  "name": "拳头",
+  "category": "melee",
+  "meleeType": "fists",
+  "description": "每个人的默认武器。零和睡眠协议允许在任何情况下使用。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.melee",
+    "damageClassId": "damage-class.physical",
+    "capabilityIds": [
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile"
+    ]
+  },
+  "weightClass": "light",
+  "volume": 1,
+  "twoHanded": false,
+  "damage": 1,
+  "range": 1,
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "拳击",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "近距离攻击，造成1点伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnDamage"
+  ],
+  "tags": [
+    "melee",
+    "fists",
+    "default",
+    "unarmed"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害1，所有武器伤害的基准值",
+    "alwaysAvailable": "玩家和NPC在无武器时默认使用拳头"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.physical",
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.light",
+      "handedness": "one-handed"
+    }
+  },
+  "maxTargets": 1
+}

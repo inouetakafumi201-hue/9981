@@ -1,0 +1,780 @@
+{
+  "total": 96,
+  "valid": 96,
+  "scored": 90,
+  "killed": 90,
+  "survived": 0,
+  "invalid": 0,
+  "expectEquivalent": 6,
+  "score": 100,
+  "outcomes": [
+    {
+      "id": "M01",
+      "file": "relation.ts",
+      "desc": "去掉重复 id 守卫（回到静默覆盖，孤立旧关系）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#1: createEntity 用已存在的 id 会静默孤立旧关系 > 重复 id 抛 E_ENTITY_EXISTS，且旧关系与索引完好 14ms"
+    },
+    {
+      "id": "M02",
+      "file": "relation.ts",
+      "desc": "重复 id 守卫取反（首次创建就抛错）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 13ms"
+    },
+    {
+      "id": "M03",
+      "file": "relation.ts",
+      "desc": "createEntity 返回内部 stub（调用方可绕过 Op 改索引）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#9: createEntity 的返回值也是内部 stub（M03 倒推） > 改 createEntity 返回的 stub 不影响库内索引 17ms"
+    },
+    {
+      "id": "M04",
+      "file": "relation.ts",
+      "desc": "createEntity 抛错前先写入（失败调用留下痕迹）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#1: createEntity 用已存在的 id 会静默孤立旧关系 > 重复 id 抛 E_ENTITY_EXISTS，且旧关系与索引完好 24ms"
+    },
+    {
+      "id": "M05",
+      "file": "relation.ts",
+      "desc": "destroyEntity 不存在时静默返回（不抛 E_REF_INVALID）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > destroyEntity 不存在的实体抛 E_REF_INVALID 且不改变状态 14ms"
+    },
+    {
+      "id": "M06",
+      "file": "relation.ts",
+      "desc": "级联只收 out 边（in 边留下悬空关系）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 54ms"
+    },
+    {
+      "id": "M07",
+      "file": "relation.ts",
+      "desc": "级联只收 in 边（out 边留下悬空关系）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 52ms"
+    },
+    {
+      "id": "M08",
+      "file": "relation.ts",
+      "desc": "完全不级联删关系（INV-6 失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 自环关系的 destroyEntity 不留残索引 11ms"
+    },
+    {
+      "id": "M09",
+      "file": "relation.ts",
+      "desc": "不级联删 target 为该实体的 attachment（INV-13 失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 一个实体同时是 A 的 target 和 B 的 dep 时两者都删 13ms"
+    },
+    {
+      "id": "M10",
+      "file": "relation.ts",
+      "desc": "不级联删 grantedBy 为该实体的 attachment",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 49ms"
+    },
+    {
+      "id": "M11",
+      "file": "relation.ts",
+      "desc": "grantedBy 级联判据取反（删错对象）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 49ms"
+    },
+    {
+      "id": "M12",
+      "file": "relation.ts",
+      "desc": "不做 dep 级联（dep 被销毁后 attachment 悬空）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 一个实体同时是 A 的 target 和 B 的 dep 时两者都删 19ms"
+    },
+    {
+      "id": "M13",
+      "file": "relation.ts",
+      "desc": "destroyEntity 末尾不从 entities 删除（实体删不掉）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 27ms"
+    },
+    {
+      "id": "M14",
+      "file": "relation.ts",
+      "desc": "等价：先删实体再级联——被删实体自己的索引无人再读，另一端仍被清理",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M15",
+      "file": "relation.ts",
+      "desc": "等价：级联时不快照 attachments——循环内只删当前元素，Set 迭代对此安全",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M16",
+      "file": "relation.ts",
+      "desc": "relation_add 不校验 from 存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 34ms"
+    },
+    {
+      "id": "M17",
+      "file": "relation.ts",
+      "desc": "relation_add 不校验 to 存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#8（测试缺陷）: 删除类 op 曾全程不可达 > uuid 造的 entity 无法被后续 op 引用（原生成器的第二处空转） 14ms"
+    },
+    {
+      "id": "M18",
+      "file": "relation.ts",
+      "desc": "from 校验取反（合法端点被拒）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 11ms"
+    },
+    {
+      "id": "M19",
+      "file": "relation.ts",
+      "desc": "同 id 重复添加时不先清旧（旧索引项残留）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 61ms"
+    },
+    {
+      "id": "M20",
+      "file": "relation.ts",
+      "desc": "attrs 按引用存（调用方事后可绕过校验改内部状态）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#6: relation_add 按引用存 attrs / 返回内部对象 > 调用方事后改 attrs 不影响库内那份 19ms"
+    },
+    {
+      "id": "M21",
+      "file": "relation.ts",
+      "desc": "relation_add 返回内部对象（可改 from 让索引脱钩）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#6: relation_add 按引用存 attrs / 返回内部对象 > 改返回值的 from 不影响库内那份（原实现可借此让索引脱钩） 13ms"
+    },
+    {
+      "id": "M22",
+      "file": "relation.ts",
+      "desc": "不写 out 索引（单向索引）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 19ms"
+    },
+    {
+      "id": "M23",
+      "file": "relation.ts",
+      "desc": "不写 in 索引（单向索引）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 20ms"
+    },
+    {
+      "id": "M24",
+      "file": "relation.ts",
+      "desc": "out 索引用 unshift（桶内顺序反转，get 可观测）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 78ms"
+    },
+    {
+      "id": "M25",
+      "file": "relation.ts",
+      "desc": "out 索引写死 type 键（按类型查询错位）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#1: createEntity 用已存在的 id 会静默孤立旧关系 > 重复 id 抛 E_ENTITY_EXISTS，且旧关系与索引完好 21ms"
+    },
+    {
+      "id": "M26",
+      "file": "relation.ts",
+      "desc": "out/in 索引写到同一端（from 端写两次）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 20ms"
+    },
+    {
+      "id": "M27",
+      "file": "relation.ts",
+      "desc": "索引里存 type 而不是 id（反向校验应发现主表查不到）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 23ms"
+    },
+    {
+      "id": "M28",
+      "file": "relation.ts",
+      "desc": "relation_del 对不存在的 id 抛错（破坏幂等；自环级联会二次调用）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 自环关系的 destroyEntity 不留残索引 9ms"
+    },
+    {
+      "id": "M29",
+      "file": "relation.ts",
+      "desc": "relation_del 不清 out 索引（残留索引项）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#2: 检查器单向——索引里的残留项不可见 > relation_del 后索引两侧都干净（正向确认删除路径本身正确） 12ms"
+    },
+    {
+      "id": "M30",
+      "file": "relation.ts",
+      "desc": "relation_del 不清 in 索引（残留索引项）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#2: 检查器单向——索引里的残留项不可见 > relation_del 后索引两侧都干净（正向确认删除路径本身正确） 16ms"
+    },
+    {
+      "id": "M31",
+      "file": "relation.ts",
+      "desc": "relation_del 不从主表删除（主表残留，索引已清）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#2: 检查器单向——索引里的残留项不可见 > relation_del 后索引两侧都干净（正向确认删除路径本身正确） 16ms"
+    },
+    {
+      "id": "M32",
+      "file": "relation.ts",
+      "desc": "清 out 索引时过滤条件取反（删掉所有其他项，留下自己）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#2: 检查器单向——索引里的残留项不可见 > relation_del 后索引两侧都干净（正向确认删除路径本身正确） 12ms"
+    },
+    {
+      "id": "M33",
+      "file": "relation.ts",
+      "desc": "清索引时用错类型键（清了别的桶）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 45ms"
+    },
+    {
+      "id": "M34",
+      "file": "relation.ts",
+      "desc": "attachment_add 不校验 target 存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 50ms"
+    },
+    {
+      "id": "M35",
+      "file": "relation.ts",
+      "desc": "attachment_add 不校验 grantedBy 存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 61ms"
+    },
+    {
+      "id": "M36",
+      "file": "relation.ts",
+      "desc": "attachment_add 不校验 deps 存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 43ms"
+    },
+    {
+      "id": "M37",
+      "file": "relation.ts",
+      "desc": "deps 校验只看第一个（后续 dep 不校验）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 55ms"
+    },
+    {
+      "id": "M38",
+      "file": "relation.ts",
+      "desc": "同 id 重复 add 时不先清旧（登记与主表脱钩）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 43ms"
+    },
+    {
+      "id": "M39",
+      "file": "relation.ts",
+      "desc": "attachment 按引用入库（事后改 deps/target 可绕过校验）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#5: attachment_add 按引用存 def > 调用方事后改 deps 不影响库内那份 17ms"
+    },
+    {
+      "id": "M40",
+      "file": "relation.ts",
+      "desc": "attachment_add 返回内部对象",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#5: attachment_add 按引用存 def > 返回值也是副本：改返回值不影响库内那份 11ms"
+    },
+    {
+      "id": "M41",
+      "file": "relation.ts",
+      "desc": "不在 target 上登记 attachment（反向校验应发现）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 23ms"
+    },
+    {
+      "id": "M42",
+      "file": "relation.ts",
+      "desc": "登记到 grantedBy 而不是 target",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 17ms"
+    },
+    {
+      "id": "M43",
+      "file": "relation.ts",
+      "desc": "attachment_del 对不存在的 id 抛错（破坏幂等）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 每一步的错误码都与模型一致（不是只比末态） 32ms"
+    },
+    {
+      "id": "M44",
+      "file": "relation.ts",
+      "desc": "attachment_del 不从 target 的集合里注销（entity 残留 attId）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 一个实体同时是 A 的 target 和 B 的 dep 时两者都删 16ms"
+    },
+    {
+      "id": "M45",
+      "file": "relation.ts",
+      "desc": "attachment_del 不从主表删除",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#8（测试缺陷）: 删除类 op 曾全程不可达 > 同池取 id 时 attachment_del 确实删得到 24ms"
+    },
+    {
+      "id": "M46",
+      "file": "relation.ts",
+      "desc": "dep 级联判据取反（删掉不含该 dep 的 attachment）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× 级联删除语义（原有测试已覆盖，此处补全组合情形） > 一个实体同时是 A 的 target 和 B 的 dep 时两者都删 16ms"
+    },
+    {
+      "id": "M47",
+      "file": "relation.ts",
+      "desc": "dep 级联只看第一个 dep",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 51ms"
+    },
+    {
+      "id": "M48",
+      "file": "relation.ts",
+      "desc": "不报 from 端悬空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > rel.from 指向不存在的 entity → 正向 DANGLING + 反向 STALE_INDEX 17ms"
+    },
+    {
+      "id": "M49",
+      "file": "relation.ts",
+      "desc": "不报 to 端悬空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 注入一处损坏就必须报一条——证明检查器会被\"叫醒\" 19ms"
+    },
+    {
+      "id": "M50",
+      "file": "relation.ts",
+      "desc": "hasOut 判据取反（对称的报不对称）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#1: createEntity 用已存在的 id 会静默孤立旧关系 > 重复 id 抛 E_ENTITY_EXISTS，且旧关系与索引完好 17ms"
+    },
+    {
+      "id": "M51",
+      "file": "relation.ts",
+      "desc": "不报 out 索引缺失",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > out 索引缺了该 rel → E_INV_ASYMMETRIC 15ms"
+    },
+    {
+      "id": "M52",
+      "file": "relation.ts",
+      "desc": "不报 in 索引缺失",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > in 索引缺了该 rel → E_INV_ASYMMETRIC 14ms"
+    },
+    {
+      "id": "M53",
+      "file": "relation.ts",
+      "desc": "hasOut 忽略类型（跨桶也算命中）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > 索引桶的 type 键与 rel.type 不符 → E_INV_STALE_INDEX（两侧各一条） 18ms"
+    },
+    {
+      "id": "M54",
+      "file": "relation.ts",
+      "desc": "不报 att.target 悬空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：attachment 正向子句 > att.target 不存在 → E_INV_DANGLING 16ms"
+    },
+    {
+      "id": "M55",
+      "file": "relation.ts",
+      "desc": "不报 att.grantedBy 悬空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：attachment 正向子句 > att.grantedBy 不存在 → E_INV_DANGLING 18ms"
+    },
+    {
+      "id": "M56",
+      "file": "relation.ts",
+      "desc": "不报 dep 悬空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：attachment 正向子句 > att.deps 里有不存在的 entity → 每个坏 dep 各报一条 19ms"
+    },
+    {
+      "id": "M57",
+      "file": "relation.ts",
+      "desc": "不报 entity 引用了不存在的 att",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：attachment 正向子句 > entity.attachments 引用了主表没有的 att → E_INV_INCONSISTENT 13ms"
+    },
+    {
+      "id": "M58",
+      "file": "relation.ts",
+      "desc": "反向 out 索引校验整段删除（回到单向检查）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > out 索引残留已删 rel → E_INV_STALE_INDEX 14ms"
+    },
+    {
+      "id": "M59",
+      "file": "relation.ts",
+      "desc": "不校验 out 索引项的 from 端是否为所在 entity",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > rel.from 指向不存在的 entity → 正向 DANGLING + 反向 STALE_INDEX 15ms"
+    },
+    {
+      "id": "M60",
+      "file": "relation.ts",
+      "desc": "out 索引 from 端校验取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 16ms"
+    },
+    {
+      "id": "M61",
+      "file": "relation.ts",
+      "desc": "不校验 out 索引项的 type 是否与桶键一致",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > 索引桶的 type 键与 rel.type 不符 → E_INV_STALE_INDEX（两侧各一条） 16ms"
+    },
+    {
+      "id": "M62",
+      "file": "relation.ts",
+      "desc": "不校验 out 桶内重复",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > 同一索引桶里同一 relId 出现两次 → E_INV_DUPLICATE_INDEX 13ms"
+    },
+    {
+      "id": "M63",
+      "file": "relation.ts",
+      "desc": "out 桶重复判据取反（无重复时误报）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 23ms"
+    },
+    {
+      "id": "M64",
+      "file": "relation.ts",
+      "desc": "反向 in 索引不校验主表存在",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > out 索引残留已删 rel → E_INV_STALE_INDEX 16ms"
+    },
+    {
+      "id": "M65",
+      "file": "relation.ts",
+      "desc": "不校验 in 索引项的 to 端是否为所在 entity",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > rel.to 指向不存在的 entity → 正向 DANGLING + 反向 STALE_INDEX 16ms"
+    },
+    {
+      "id": "M66",
+      "file": "relation.ts",
+      "desc": "不校验 in 桶内重复",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > in 桶重复同样被查出（不是只查了 out） 12ms"
+    },
+    {
+      "id": "M67",
+      "file": "relation.ts",
+      "desc": "反向 attachment 登记校验整段删除",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > att 存在但 target 未登记它 → E_INV_INCONSISTENT 15ms"
+    },
+    {
+      "id": "M68",
+      "file": "relation.ts",
+      "desc": "反向 attachment 登记校验取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器自证：先证明它不是恒空 > 干净状态下确实为空（否则后续注入的阳性结果无意义） 23ms"
+    },
+    {
+      "id": "M69",
+      "file": "relation.ts",
+      "desc": "STALE_INDEX 报成 ASYMMETRIC（两类问题混为一谈）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：反向子句（索引 → 主表）— 重建前这一组全部无人看守 > out 索引残留已删 rel → E_INV_STALE_INDEX 13ms"
+    },
+    {
+      "id": "M70",
+      "file": "relation.ts",
+      "desc": "DANGLING 报成 INCONSISTENT",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 检查器：正向子句（relations → 索引） > rel.from 指向不存在的 entity → 正向 DANGLING + 反向 STALE_INDEX 12ms"
+    },
+    {
+      "id": "M71",
+      "file": "relation.ts",
+      "desc": "DUPLICATE_INDEX 报成 STALE_INDEX",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#4: 索引桶内重复 id 不可见 > 同一桶内重复 relId → E_INV_DUPLICATE_INDEX 13ms"
+    },
+    {
+      "id": "M72",
+      "file": "relation.ts",
+      "desc": "detail 抹掉定位信息（只留码，无法定位）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#3: 检查器单向——attachment 未登记在 target 上不可见 > map 有 att 但 target 未登记 → E_INV_INCONSISTENT 15ms"
+    },
+    {
+      "id": "M73",
+      "file": "relation.ts",
+      "desc": "checkInvariants 恒返回空（检查器彻底失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#2: 检查器单向——索引里的残留项不可见 > 主表已删、索引残留 → E_INV_STALE_INDEX 14ms"
+    },
+    {
+      "id": "M74",
+      "file": "relation.ts",
+      "desc": "get entity 交出内部 stub",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 entity stub 不影响库内索引 21ms"
+    },
+    {
+      "id": "M75",
+      "file": "relation.ts",
+      "desc": "get relation 交出内部对象",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 relation 不影响库内那份 17ms"
+    },
+    {
+      "id": "M76",
+      "file": "relation.ts",
+      "desc": "get attachment 交出内部对象",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 attachment 不影响库内那份 18ms"
+    },
+    {
+      "id": "M77",
+      "file": "relation.ts",
+      "desc": "get 不存在时返回空对象而非 undefined",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#10: get 的兜底分支返回空对象也无人看守（M77 倒推） > 未知 type 返回 undefined，而不是空对象 17ms"
+    },
+    {
+      "id": "M78",
+      "file": "relation.ts",
+      "desc": "dump 对索引桶排序（抹掉可观测的插入顺序）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 101ms"
+    },
+    {
+      "id": "M79",
+      "file": "relation.ts",
+      "desc": "dump 保留空桶（删除留下的空数组伪装成状态差异）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 31ms"
+    },
+    {
+      "id": "M80",
+      "file": "relation.ts",
+      "desc": "dump 的 entities 不排序（顺序随插入变化）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 37ms"
+    },
+    {
+      "id": "M81",
+      "file": "relation.ts",
+      "desc": "dump 漏掉 attachments 索引字段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 31ms"
+    },
+    {
+      "id": "M82",
+      "file": "relation.ts",
+      "desc": "dump 的 effectCount 恒为 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 39ms"
+    },
+    {
+      "id": "M83",
+      "file": "relation.ts",
+      "desc": "dump 交出 attrs 引用（快照可被事后篡改）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#11: dump 交出 attrs 引用（M83 倒推） > 改 dump 结果里的 attrs 不影响库内那份 17ms"
+    },
+    {
+      "id": "M84",
+      "file": "relation.ts",
+      "desc": "dump 漏掉 in 索引",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L8 影子模型：全量状态逐字段对照 > 任意 op 序列后，主表与双向索引与独立推导的模型完全一致 31ms"
+    },
+    {
+      "id": "M85",
+      "file": "relation.ts",
+      "desc": "cloneRelation 浅拷 attrs（仍共享同一对象）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#6: relation_add 按引用存 attrs / 返回内部对象 > 改返回值的 from 不影响库内那份（原实现可借此让索引脱钩） 14ms"
+    },
+    {
+      "id": "M86",
+      "file": "relation.ts",
+      "desc": "cloneAttachment 不拷 deps 数组",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#5: attachment_add 按引用存 def > 调用方事后改 deps 不影响库内那份 14ms"
+    },
+    {
+      "id": "M87",
+      "file": "relation.ts",
+      "desc": "cloneAttachment 不拷 effects 数组",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#5: attachment_add 按引用存 def > 调用方事后改 effects 不影响库内那份 16ms"
+    },
+    {
+      "id": "M88",
+      "file": "relation.ts",
+      "desc": "cloneAttachment 拷 effects 但不拷每个 args（浅一层不够）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#12: cloneAttachment 未拷 effects 内层 args（M88 倒推） > 改返回值的 effect.args 不影响库内那份 15ms"
+    },
+    {
+      "id": "M89",
+      "file": "relation.ts",
+      "desc": "cloneEntityStub 复用原 Map（索引可被外部改）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 entity stub 不影响库内索引 16ms"
+    },
+    {
+      "id": "M90",
+      "file": "relation.ts",
+      "desc": "cloneEntityStub 拷 Map 但桶内数组共享",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 entity stub 不影响库内索引 17ms"
+    },
+    {
+      "id": "M91",
+      "file": "relation.ts",
+      "desc": "cloneEntityStub 复用原 attachments Set",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#7: get 交出内部对象，可绕过 Op 边界改坏索引 > 改 get 到的 entity stub 不影响库内索引 22ms"
+    },
+    {
+      "id": "M92",
+      "file": "relation.ts",
+      "desc": "cloneEntityStub 复用原 in Map",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L8#13: cloneEntityStub 的 in 索引桶共享（M92 倒推） > 改 get 到的 in 索引桶不影响库内那份 17ms"
+    },
+    {
+      "id": "M93",
+      "file": "relation.ts",
+      "desc": "等价：attrs 默认值去掉——展开 undefined 得空对象，行为不变",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M94",
+      "file": "relation.ts",
+      "desc": "等价：dump 内 relations 遍历改用 entries——同一迭代顺序",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M95",
+      "file": "relation.ts",
+      "desc": "等价：grantedBy 级联的快照数组换成 Array.from——同语义",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M96",
+      "file": "relation.ts",
+      "desc": "等价：hasIn 的多余空格删掉——纯格式",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    }
+  ]
+}

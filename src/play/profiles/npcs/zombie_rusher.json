@@ -1,0 +1,136 @@
+{
+  "id": "npc_zombie_rusher",
+  "name": "冲锋僵尸",
+  "type": "zombie",
+  "hp": 2,
+  "perception": {
+    "vision": 2,
+    "hearing": 2,
+    "alertThreshold": 3
+  },
+  "fsm": {
+    "initialState": "sleeping",
+    "states": {
+      "sleeping": {
+        "onEnter": ["SetIdle"],
+        "transitions": [
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "Zombie_Awakened"
+          },
+          {
+            "event": "OnNoise",
+            "condition": "soundLevel >= perception.alertThreshold",
+            "target": "chasing",
+            "kernelEvent": "Zombie_Awakened"
+          }
+        ]
+      },
+      "chasing": {
+        "onEnter": ["LockOnTarget", "BeginChase"],
+        "transitions": [
+          {
+            "event": "OnPlayerEnter",
+            "condition": "sameMicroScene",
+            "target": "attacking",
+            "kernelEvent": "Zombie_Attacking"
+          }
+        ],
+        "noDistractions": true
+      },
+      "attacking": {
+        "onEnter": ["MeleeAttack"],
+        "transitions": [
+          {
+            "event": "OnTargetDowned",
+            "condition": "target.hp <= 0",
+            "target": "chasing",
+            "kernelEvent": "Zombie_ResumeSearch"
+          },
+          {
+            "event": "OnTargetLeft",
+            "condition": "!sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "Zombie_ResumeSearch"
+          }
+        ]
+      }
+    },
+    "memory": {
+      "lastKnownPosition": null,
+      "wakeSource": null
+    }
+  },
+  "initialEquipment": ["weapon_claws"],
+  "resources": {
+    "actionPoints": 1,
+    "staminaMax": 3,
+    "initialStamina": 0,
+    "usesStaminaActively": false,
+    "participatesInActionTurn": false,
+    "canSpendStaminaOnInitiative": false,
+    "description": "D-052：NPC 没有轮次，全部在玩家轮次结束后顺序行动；体力上限 3 低于玩家的 5，正是「去杀僵尸」能练习弱点与过载压制的收益来源。"
+  },
+  "behaviors": [
+    {
+      "id": "chase_behavior",
+      "trigger": "State: chasing",
+      "action": "MoveTowardsTarget",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "melee_combat",
+      "trigger": "State: attacking",
+      "action": "MeleeAttack",
+      "apCost": 1,
+      "repeatable": true
+    }
+  ],
+  "kernelEvents": [
+    "OnNoise",
+    "OnPlayerEnter",
+    "OnTargetDowned",
+    "OnTargetLeft",
+    "Zombie_Awakened",
+    "Zombie_Attacking",
+    "Zombie_ResumeSearch"
+  ],
+  "tags": ["ai-significant", "hostile", "zombie", "fast"],
+  "description": "冲锋僵尸，反应更快、更激进。看到或听到玩家后会立即冲锋，放弃潜伏。",
+  "designNotes": {
+    "n004Resolution": "hp=2遵循1-5约束。",
+    "n013Resolution": "sleeping状态有意义：初始睡眠，被视觉或声音唤醒。",
+    "n007Resolution": "简化版FSM。",
+    "n010Resolution": "通过kernelEvents触发。",
+    "alertThresholdNote": "alertThreshold=3比普通僵尸低，更容易唤醒"
+  },
+  "zombieSpecific": {
+    "speed": 2,
+    "canBeExecuted": true,
+    "dropsDeathBackpack": true,
+    "cannotRespawn": true
+  },
+  "classComposition": {
+    "behaviorClassId": "npc.class.zombie",
+    "capabilityIds": [
+      "npc.capability.sleep",
+      "npc.capability.perceive",
+      "npc.capability.chase",
+      "npc.capability.attack",
+      "npc.capability.remember",
+      "npc.capability.event_driven"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "NPC-EQUIPMENT-DANGLING-CLAWS",
+      "status": "unresolved",
+      "issue": "initialEquipment 引用的 weapon_claws 在玩法层没有对应实例，也没有任何近似候选。",
+      "decision": "保留原引用不改。补齐需要新增一个「爪击」武器实例并为其设定伤害、体积等玩法数值，属新增玩法内容而非引用修正，不由审计代为裁决。"
+    }
+  ],
+  "version": "1.0"
+}

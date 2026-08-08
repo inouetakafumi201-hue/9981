@@ -1,0 +1,904 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/invariants.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">src</a> invariants.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">87.02% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>161/185</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">76.25% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>106/139</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">97.43% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>38/39</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">92.08% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>128/139</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">51486x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1200117x</span>
+<span class="cline-any cline-yes">6000041x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">322658x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">2000013x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">379162x</span>
+<span class="cline-any cline-yes">379162x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">2000013x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">2000015x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">600011x</span>
+<span class="cline-any cline-yes">224061x</span>
+<span class="cline-any cline-yes">224061x</span>
+<span class="cline-any cline-yes">224061x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">600014x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400040x</span>
+<span class="cline-any cline-yes">400040x</span>
+<span class="cline-any cline-yes">400040x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400040x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400040x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">600011x</span>
+<span class="cline-any cline-yes">600011x</span>
+<span class="cline-any cline-yes">600011x</span>
+<span class="cline-any cline-yes">600011x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">800020x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">600014x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">600014x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">600014x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">200002x</span>
+<span class="cline-any cline-yes">679140x</span>
+<span class="cline-any cline-yes">200002x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">500039x</span>
+<span class="cline-any cline-yes">100001x</span>
+<span class="cline-any cline-yes">100001x</span>
+<span class="cline-any cline-yes">100001x</span>
+<span class="cline-any cline-yes">200001x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">455664x</span>
+<span class="cline-any cline-yes">911269x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">379163x</span>
+<span class="cline-any cline-yes">379163x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-yes">800019x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">400039x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6400608x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/** Sixteen independent L3 invariant checks. */
+import type { Id, World, WorldSnapshot } from './world.js';
+import type { Violation } from './transaction.js';
+&nbsp;
+export interface InvariantContext {
+  baseline?: WorldSnapshot;
+  now?: number;
+}
+&nbsp;
+export type CheckFn = (world: World, context?: InvariantContext) =&gt; Violation[];
+&nbsp;
+const violation = (code: string, detail: string): Violation =&gt; ({ code, detail });
+&nbsp;
+function allSlots(world: World) {
+  return [...world.containers.values()].flatMap((container) =&gt;
+    container.slots.filter((slot): slot is NonNullable&lt;typeof slot&gt; =&gt; slot !== null),
+  );
+}
+&nbsp;
+function targetExists(world: World, id: Id): boolean {
+  return world.entities.has(id) || world.items.has(id) || world.nodes.has(id) || world.links.has(id);
+}
+&nbsp;
+/** INV-1: every stored reference resolves. */
+export const checkINV_1_ReferenceIntegrity: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  const slots = new Set(allSlots(world).map((slot) =&gt; slot.id));
+  for (const entity of world.entities.values()) {
+    if (entity.node &amp;&amp; !world.nodes.has(entity.node)) result.push(violation('E_INV_DANGLING', `Entity ${entity.id} -&gt; node ${entity.node}`));
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (entity.slot &amp;&amp; !slots.has(entity.slot)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Entity ${entity.id} -&gt; slot ${entity.slot}`));</span>
+    for (const containerId of entity.containers.values()) {
+<span class="cstat-no" title="statement not covered" >      if (!world.containers.has(containerId)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Entity ${entity.id} -&gt; container ${containerId}`));</span></span>
+    }
+    for (const [kind, relation] of entity.relations) {
+<span class="cstat-no" title="statement not covered" >      for (const id of [...relation.out, ...relation.in]) {</span>
+<span class="cstat-no" title="statement not covered" >        if (!world.entities.has(id)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Entity ${entity.id} relation ${kind} -&gt; ${id}`));</span></span>
+      }
+    }
+  }
+  for (const item of world.items.values()) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (item.slot &amp;&amp; !slots.has(item.slot)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Item ${item.id} -&gt; slot ${item.slot}`));</span>
+    for (const containerId of item.containers.values()) {
+<span class="cstat-no" title="statement not covered" >      if (!world.containers.has(containerId)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Item ${item.id} -&gt; container ${containerId}`));</span></span>
+    }
+  }
+  for (const slot of allSlots(world)) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (slot.holds &amp;&amp; !targetExists(world, slot.holds.id)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_DANGLING', `Slot ${slot.id} -&gt; ${slot.holds.id}`));</span>
+  }
+  return result;
+};
+&nbsp;
+/** INV-2: an object is held by at most one slot. */
+export const checkINV_2_SingleContainment: CheckFn = (world) =&gt; {
+  const counts = new Map&lt;Id, number&gt;();
+  for (const slot of allSlots(world)) if (slot.holds) counts.set(slot.holds.id, (counts.get(slot.holds.id) ?? 0) + 1);
+  return [...counts].filter(([, count]) =&gt; count &gt; 1).map(([id, count]) =&gt; violation('E_INV_SINGLE_CONTAINMENT', `${id} held by ${count} slots`));
+};
+&nbsp;
+/** INV-3: node membership is bidirectionally unique. */
+export const checkINV_3_SingleLocation: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  const counts = new Map&lt;Id, number&gt;();
+  for (const node of world.nodes.values()) {
+    for (const entityId of node.entities) {
+      counts.set(entityId, (counts.get(entityId) ?? 0) + 1);
+      const entity = world.entities.get(entityId);
+      if (!entity || entity.node !== node.id) result.push(violation('E_INV_SINGLE_LOCATION', `Node ${node.id} membership ${entityId} is not mirrored`));
+    }
+  }
+  for (const entity of world.entities.values()) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (entity.node &amp;&amp; !world.nodes.get(entity.node)?.entities.has(entity.id)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_SINGLE_LOCATION', `Entity ${entity.id} node ${entity.node} is not mirrored`));</span>
+  }
+  for (const [id, count] of counts) <span class="missing-if-branch" title="if path not taken" >I</span>if (count &gt; 1) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_SINGLE_LOCATION', `Entity ${id} belongs to ${count} nodes`));</span>
+  return result;
+};
+&nbsp;
+/** INV-4: entity.node and entity.slot are mutually exclusive. */
+export const checkINV_4_LocationMutex: CheckFn = (world) =&gt;
+  [...world.entities.values()]
+    .filter((entity) =&gt; entity.node !== undefined &amp;&amp; entity.slot !== undefined)
+    .map((entity) =&gt; violation('E_INV_LOCATION_EXCLUSIVE', `Entity ${entity.id} has node and slot`));
+&nbsp;
+/** INV-5: owned-container containment graph is acyclic. */
+export const checkINV_5_NoContainmentCycle: CheckFn = (world) =&gt; {
+  const children = new Map&lt;Id, Id[]&gt;();
+  for (const container of world.containers.values()) {
+    if (!container.owner) continue;
+    const held = container.slots.flatMap((slot) =&gt; (slot?.holds ? [slot.holds.id] : <span class="branch-1 cbranch-no" title="branch not covered" >[]))</span>;
+    children.set(container.owner, [...(children.get(container.owner) ?? []), ...held]);
+  }
+  const result: Violation[] = [];
+  const visiting = new Set&lt;Id&gt;();
+  const visited = new Set&lt;Id&gt;();
+  const visit = (id: Id): boolean =&gt; {
+    if (visiting.has(id)) return true;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (visited.has(id)) <span class="cstat-no" title="statement not covered" >return false;</span>
+    visiting.add(id);
+    for (const child of children.get(id) ?? <span class="branch-1 cbranch-no" title="branch not covered" >[]) <span class="missing-if-branch" title="else path not taken" >E</span>i</span>f (visit(child)) return true;
+<span class="cstat-no" title="statement not covered" >    visiting.delete(id);</span>
+<span class="cstat-no" title="statement not covered" >    visited.add(id);</span>
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  };
+  for (const id of children.keys()) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (visit(id)) {
+      result.push(violation('E_INV_CONTAINMENT_CYCLE', `Containment cycle reaches ${id}`));
+      break;
+    }
+  }
+  return result;
+};
+&nbsp;
+/** INV-6: every link endpoint exists and node degree never exceeds five. */
+export const checkINV_6_TopologyConsistency: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  const degrees = new Map&lt;Id, number&gt;();
+  for (const link of world.links.values()) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!world.nodes.has(link.a)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_TOPOLOGY_CONSISTENCY', `Link ${link.id}.a=${link.a}`));</span>
+    if (!world.nodes.has(link.b)) result.push(violation('E_INV_TOPOLOGY_CONSISTENCY', `Link ${link.id}.b=${link.b}`));
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (world.nodes.has(link.a)) degrees.set(link.a, (degrees.get(link.a) ?? 0) + 1);
+    if (world.nodes.has(link.b)) degrees.set(link.b, (degrees.get(link.b) ?? 0) + 1);
+  }
+  for (const [nodeId, degree] of degrees) {
+    if (degree &gt; 5) result.push(violation('E_INV_TOPOLOGY_CONSISTENCY', `Node ${nodeId} degree=${degree} exceeds 5`));
+  }
+  return result;
+};
+&nbsp;
+/** INV-7: node parents exist and parent chains are acyclic. */
+export const checkINV_7_ParentChild: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  for (const node of world.nodes.values()) {
+    if (node.parent &amp;&amp; !world.nodes.has(node.parent)) result.push(violation('E_INV_PARENT_CHILD', `Node ${node.id}.parent=${node.parent}`));
+    const seen = new Set&lt;Id&gt;([node.id]);
+    let cursor = node.parent;
+    while (cursor) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (seen.has(cursor)) {
+<span class="cstat-no" title="statement not covered" >        result.push(violation('E_INV_PARENT_CHILD', `Parent cycle reaches ${cursor}`));</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+      }
+      seen.add(cursor);
+      cursor = world.nodes.get(cursor)?.parent;
+    }
+  }
+  return result;
+};
+&nbsp;
+/** INV-8: relation out/in entries mirror one another. */
+export const checkINV_8_RelationSymmetry: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  for (const entity of world.entities.values()) {
+    for (const [kind, relation] of entity.relations) {
+      for (const targetId of relation.out) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (!world.entities.get(targetId)?.relations.get(kind)?.in.has(entity.id)) result.push(violation('E_INV_RELATION_SYMMETRY', `${entity.id} -${kind}-&gt; ${targetId}`));
+      }
+      for (const sourceId of relation.in) {
+<span class="cstat-no" title="statement not covered" >        if (!world.entities.get(sourceId)?.relations.get(kind)?.out.has(entity.id)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_RELATION_SYMMETRY', `${sourceId} -${kind}-&gt; ${entity.id}`));</span></span>
+      }
+    }
+  }
+  return result;
+};
+&nbsp;
+/** INV-9: container owner and owner index point to each other. */
+export const checkINV_9_ContainerBidirectional: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  for (const container of world.containers.values()) {
+    if (!container.owner || !container.name) continue;
+    const owner = world.entities.get(container.owner) ?? <span class="branch-1 cbranch-no" title="branch not covered" >world.items.get(container.owner);</span>
+    if (!owner || owner.containers.get(container.name) !== container.id) result.push(violation('E_INV_CONTAINER_BIDIRECTIONAL', `Container ${container.id} owner/index mismatch`));
+  }
+  return result;
+};
+&nbsp;
+/** INV-10: shift containers have no null holes. */
+export const checkINV_10_SlotIndexContinuity: CheckFn = (world) =&gt;
+  [...world.containers.values()].flatMap((container) =&gt;
+    container.insert === 'shift' &amp;&amp; container.slots.some((slot) =&gt; slot === null)
+      ? [violation('E_INV_SLOT_INDEX_CONTINUITY', `Container ${container.id} has a hole`)]
+      : [],
+  );
+&nbsp;
+function itemCounts(items: Map&lt;Id, { def: Id; stack: number }&gt;): Map&lt;Id, number&gt; {
+  const counts = new Map&lt;Id, number&gt;();
+  for (const item of items.values()) counts.set(item.def, (counts.get(item.def) ?? 0) + item.stack);
+  return counts;
+}
+&nbsp;
+/** INV-11: when a baseline is supplied, total stack per Def is conserved. */
+export const checkINV_11_StackConservation: CheckFn = (world, context) =&gt; {
+  if (!context?.baseline) return [];
+  const before = itemCounts(context.baseline.items);
+  const after = itemCounts(world.items);
+  const defs = new Set([...before.keys(), ...after.keys()]);
+  return [...defs].flatMap((def) =&gt;
+    (before.get(def) ?? <span class="branch-1 cbranch-no" title="branch not covered" >0) !== (a</span>fter.get(def) ?? <span class="branch-1 cbranch-no" title="branch not covered" >0)</span>
+      ? [violation('E_INV_STACK_LEAK', `${def}: before=${before.get(def) ?? <span class="branch-1 cbranch-no" title="branch not covered" >0},</span> after=${after.get(def) ?? <span class="branch-1 cbranch-no" title="branch not covered" >0}`)</span>]
+      : [],
+  );
+};
+&nbsp;
+/** INV-12: no unresolved reservation survives outer commit. */
+export const checkINV_12_CostConservation: CheckFn = (world) =&gt;
+  [...world.entities.values()].flatMap((entity) =&gt;
+    entity.frozenResources.size &gt; 0
+      ? [violation('E_COST_LEAK', `Entity ${entity.id} has ${entity.frozenResources.size} frozen resource(s)`)]
+      : [],
+  );
+&nbsp;
+/** INV-13: attachment targets and grant parents exist. */
+export const checkINV_13_AttachmentConsistency: CheckFn = (world) =&gt;
+  [...world.attachments.values()].flatMap((attachment) =&gt; [
+    ...(!targetExists(world, attachment.target) ? [violation('E_INV_ATTACHMENT_CONSISTENCY', `Attachment ${attachment.id}.target=${attachment.target}`)] : <span class="branch-1 cbranch-no" title="branch not covered" >[]),</span>
+    ...(attachment.grantedBy &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >!world.attachments.has(attachment.grantedBy) ? <span class="branch-0 cbranch-no" title="branch not covered" >[</span>violation('E_INV_ATTACHMENT_CONSISTENCY', `Attachment ${attachment.id}.grantedBy=${attachment.grantedBy}`)] : [</span>]),
+  ]);
+&nbsp;
+/** INV-14: every item stack is an integer in [1, stackMax]. */
+export const checkINV_14_StackBounded: CheckFn = (world) =&gt;
+  [...world.items.values()].flatMap((item) =&gt; {
+    const max = world.getDef(item.def)?.stackMax;
+    return !Number.isInteger(item.stack) || item.stack &lt; 1 || max === undefined || item.stack &gt; max
+      ? [violation('E_INV_STACK_BOUNDED', `Item ${item.id}: stack=${item.stack}, max=${String(max)}`)]
+      : [];
+  });
+&nbsp;
+/** INV-15: expired open decisions must be resolved by commit time. */
+export const checkINV_15_DecisionTermination: CheckFn = (world, context) =&gt; {
+  const now = context?.now ?? Date.now();
+  return [...world.decisions.values()].flatMap((decision) =&gt;
+    decision.status === 'open' &amp;&amp; decision.deadline !== undefined &amp;&amp; decision.deadline &lt;= now
+      ? [violation('E_INV_DECISION_TERMINATION', `Decision ${decision.id} expired at ${decision.deadline}`)]
+      : <span class="branch-1 cbranch-no" title="branch not covered" >[],</span>
+  );
+};
+&nbsp;
+/** INV-16: all runtime numbers are finite. */
+export const checkINV_16_NumericBounded: CheckFn = (world) =&gt; {
+  const result: Violation[] = [];
+  for (const item of world.items.values()) <span class="missing-if-branch" title="if path not taken" >I</span>if (!Number.isFinite(item.stack)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_NAN_OR_INFINITY', `Item ${item.id}.stack`));</span>
+  for (const entity of world.entities.values()) {
+    for (const [key, value] of Object.entries(entity.attr)) if (!Number.isFinite(value)) result.push(violation('E_INV_NAN_OR_INFINITY', `Entity ${entity.id}.attr.${key}`));
+    for (const [key, value] of entity.frozenResources) <span class="missing-if-branch" title="if path not taken" >I</span>if (!Number.isFinite(value)) <span class="cstat-no" title="statement not covered" >result.push(violation('E_INV_NAN_OR_INFINITY', `Entity ${entity.id}.frozen.${key}`));</span>
+  }
+  return result;
+};
+&nbsp;
+export const ALL_INVARIANT_CHECKS: readonly CheckFn[] = [
+  checkINV_1_ReferenceIntegrity,
+  checkINV_2_SingleContainment,
+  checkINV_3_SingleLocation,
+  checkINV_4_LocationMutex,
+  checkINV_5_NoContainmentCycle,
+  checkINV_6_TopologyConsistency,
+  checkINV_7_ParentChild,
+  checkINV_8_RelationSymmetry,
+  checkINV_9_ContainerBidirectional,
+  checkINV_10_SlotIndexContinuity,
+  checkINV_11_StackConservation,
+  checkINV_12_CostConservation,
+  checkINV_13_AttachmentConsistency,
+  checkINV_14_StackBounded,
+  checkINV_15_DecisionTermination,
+  checkINV_16_NumericBounded,
+];
+&nbsp;
+export function checkAllInvariants(world: World, context?: InvariantContext): Violation[] {
+  return ALL_INVARIANT_CHECKS.flatMap((check) =&gt; check(world, context));
+}
+&nbsp;
+export class InvariantChecker {
+<span class="fstat-no" title="function not covered" >  checkAll(w</span>orld: World, context?: InvariantContext): Violation[] {
+<span class="cstat-no" title="statement not covered" >    return checkAllInvariants(world, context);</span>
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-08-07T09:28:42.874Z
+            </div>
+        <script src="../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../sorter.js"></script>
+        <script src="../block-navigation.js"></script>
+    </body>
+</html>
+    

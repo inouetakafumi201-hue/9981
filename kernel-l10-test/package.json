@@ -1,0 +1,23 @@
+{
+  "name": "kernel-l10-test",
+  "version": "1.0.0",
+  "description": "L10 Intent意图系统 属性测试",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "fast-check": "3.18.0",
+    "tsx": "4.19.2",
+    "typescript": "5.3.3",
+    "vitest": "1.6.0"
+  },
+  "keywords": ["intent", "property-testing", "fast-check"],
+  "author": "",
+  "license": "MIT"
+}

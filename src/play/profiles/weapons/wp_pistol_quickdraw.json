@@ -1,0 +1,93 @@
+{
+  "id": "wp_pistol_quickdraw",
+  "name": "快拔手枪",
+  "category": "firearm",
+  "gunType": "pistol",
+  "description": "专为快速拔枪设计的紧凑型手枪，换弹速度快。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile"
+    ]
+  },
+  "weightClass": "light",
+  "rangeClass": "medium",
+  "volume": 1,
+  "twoHanded": false,
+  "damage": 1,
+  "range": 2,
+  "ammoCost": 1,
+  "ammoType": "9mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "快速射击",
+      "apCost": 1,
+      "description": "快速拔枪，在2格射程内选择目标并消耗1发弹药",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "pistol",
+    "quickdraw"
+  ],
+  "mvp": false,
+  "designNotes": {
+    "damageRationale": "伤害1，与标准手枪持平",
+    "rangeRationale": "中距(2格)，动作目标由射程和效果中的目标绑定共同确定",
+    "specialRationale": "MVP后扩展：可能提供先手攻击加成"
+  },
+  "unresolvedIssues": [
+    "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
+  ],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.light",
+      "handedness": "one-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.medium",
+      "effectiveRangeField": "range"
+    }
+  },
+  "maxTargets": 1
+}

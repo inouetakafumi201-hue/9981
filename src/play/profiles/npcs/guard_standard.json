@@ -1,0 +1,173 @@
+{
+  "id": "npc_guard_standard",
+  "name": "普通守卫",
+  "type": "guard",
+  "hp": 3,
+  "perception": {
+    "vision": 3,
+    "hearing": 3,
+    "alertThreshold": 3
+  },
+  "fsm": {
+    "initialState": "patrolling",
+    "states": {
+      "patrolling": {
+        "onEnter": ["PatrolRoute", "StartPatrol"],
+        "transitions": [
+          {
+            "event": "OnNoise",
+            "condition": "perception.hearing >= perception.alertThreshold",
+            "target": "listening",
+            "kernelEvent": "NPC_Alert"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "NPC_DetectedPlayer"
+          }
+        ]
+      },
+      "listening": {
+        "onEnter": ["InvestigateSound"],
+        "transitions": [
+          {
+            "event": "OnArriveAtSoundSource",
+            "condition": "!playerInSight",
+            "target": "patrolling",
+            "kernelEvent": "NPC_ReturnToPatrol"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "NPC_DetectedPlayer"
+          }
+        ]
+      },
+      "chasing": {
+        "onEnter": ["LockTarget", "MoveToLastKnownPosition"],
+        "transitions": [
+          {
+            "event": "OnArriveAtLastSeen",
+            "condition": "!playerInSight",
+            "target": "patrolling",
+            "kernelEvent": "NPC_LostTarget"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "sameMicroScene",
+            "target": "attacking",
+            "kernelEvent": "NPC_Engaging"
+          }
+        ]
+      },
+      "attacking": {
+        "onEnter": ["SelectWeapon", "AttackTarget"],
+        "transitions": [
+          {
+            "event": "OnTargetDowned",
+            "condition": "target.hp <= 0",
+            "target": "patrolling",
+            "kernelEvent": "NPC_ReturnToPatrol"
+          },
+          {
+            "event": "OnPlayerLeft",
+            "condition": "!sameMicroScene && distance > 1",
+            "target": "chasing",
+            "kernelEvent": "NPC_ResumeChase"
+          }
+        ]
+      }
+    },
+    "memory": {
+      "patrolRoute": [],
+      "currentPatrolIndex": 0,
+      "lastSeenPosition": null,
+      "lastKnownSoundSource": null
+    }
+  },
+  "initialEquipment": ["wp_fists", "item_bulletproof_vest_light"],
+  "resources": {
+    "actionPoints": 1,
+    "staminaMax": 3,
+    "initialStamina": 0,
+    "usesStaminaActively": false,
+    "participatesInActionTurn": false,
+    "canSpendStaminaOnInitiative": false,
+    "description": "D-052：NPC 没有轮次，全部在玩家轮次结束后顺序行动；体力池只用于承受弱点命中与过载压制，不可用于逆转或超逆转。"
+  },
+  "behaviors": [
+    {
+      "id": "patrol_behavior",
+      "trigger": "State: patrolling",
+      "action": "MoveToNextPatrolPoint",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "investigate_behavior",
+      "trigger": "State: listening",
+      "action": "MoveTowardsSound",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "chase_behavior",
+      "trigger": "State: chasing",
+      "action": "MoveTowardsTarget",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "combat_behavior",
+      "trigger": "State: attacking",
+      "action": "MeleeOrRangedAttack",
+      "apCost": 1,
+      "repeatable": true
+    }
+  ],
+  "kernelEvents": [
+    "OnNoise",
+    "OnPlayerEnter",
+    "OnArriveAtSoundSource",
+    "OnArriveAtLastSeen",
+    "OnTargetDowned",
+    "OnPlayerLeft",
+    "NPC_Alert",
+    "NPC_DetectedPlayer",
+    "NPC_ReturnToPatrol",
+    "NPC_LostTarget",
+    "NPC_Engaging",
+    "NPC_ResumeChase"
+  ],
+  "tags": ["ai-significant", "hostile", "guard"],
+  "description": "标准守卫，使用五状态守卫范式巡逻，发现玩家后追逐并攻击。",
+  "designNotes": {
+    "n001Resolution": "NPC FSM是AI行为状态，与实体的StateComponent(状态效果)完全分离。FSM控制AI决策，StateComponent控制游戏状态效果。",
+    "n013Resolution": "MVP不实现sleeping状态，守卫出生即为patrolling状态。sleeping作为可选扩展。",
+    "n010Resolution": "所有状态转换通过kernelEvents触发，确保与UGC事件系统一致。",
+    "hpConstraint": "遵循1-5铁律：hp=3"
+  },
+  "classComposition": {
+    "behaviorClassId": "npc.class.guard",
+    "capabilityIds": [
+      "npc.capability.patrol",
+      "npc.capability.perceive",
+      "npc.capability.investigate",
+      "npc.capability.chase",
+      "npc.capability.attack",
+      "npc.capability.remember",
+      "npc.capability.event_driven"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "NPC-GUARD-STATE-NAMING",
+      "status": "unresolved",
+      "issue": "原说明称“五状态守卫范式”，当前 FSM 实际仅定义 patrolling、listening、chasing、attacking 四个状态。",
+      "decision": "保留现有四状态定义，不擅自补充缺失状态；需后续明确第五状态是否为 sleeping，以及是否属于当前玩法配置。"
+    }
+  ],
+  "version": "1.0"
+}

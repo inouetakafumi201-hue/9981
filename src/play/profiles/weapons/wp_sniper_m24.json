@@ -1,0 +1,118 @@
+{
+  "id": "wp_sniper_m24",
+  "name": "M24狙击步枪",
+  "category": "firearm",
+  "gunType": "sniper",
+  "description": "远程精确射击武器，需要瞄准才能发挥最大威力。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile"
+    ]
+  },
+  "weightClass": "heavy",
+  "rangeClass": "extreme",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 3,
+  "range": 5,
+  "ammoCost": 1,
+  "ammoType": "7.62mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "狙击射击",
+      "apCost": 1,
+      "description": "消耗1发弹药，在5格射程内选择目标并造成3点伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -3,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "瞄准",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP瞄准，使下回合狙击射击必定命中",
+      "effects": [
+        {
+          "op": "attach.add",
+          "def": "status_aiming",
+          "target": "{actor}",
+          "durationTurns": 1,
+          "description": "进入瞄准准备态"
+        }
+      ],
+      "kernelOps": [
+        "attach.add"
+      ],
+      "kernelEvents": [
+        "OnAim"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add",
+    "attach.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage",
+    "OnAim"
+  ],
+  "tags": [
+    "firearm",
+    "sniper",
+    "long-range",
+    "precision"
+  ],
+  "mvp": false,
+  "designNotes": {
+    "damageRationale": "伤害3，与霰弹枪持平的最高伤害",
+    "rangeRationale": "超远距(5格)，动作目标由射程和效果中的目标绑定共同确定",
+    "volumeRationale": "占2格双手，体现狙击步枪的长枪管"
+  },
+  "unresolvedIssues": [
+    "原基类目录说明射程与伤害呈反比且高伤害武器消耗更多弹药，但本实例同时为伤害3、射程5、弹药消耗1；迁移时保留实例原值。",
+    "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
+  ],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.heavy",
+      "handedness": "two-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.extreme",
+      "effectiveRangeField": "range"
+    }
+  },
+  "maxTargets": 1
+}

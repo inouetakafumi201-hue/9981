@@ -1,0 +1,31 @@
+{
+  "id": "status_poisoned",
+  "name": "中毒",
+  "category": "negative",
+  "type": "numeric",
+  "classComposition": {
+    "sourceClass": "status_poisoned"
+  },
+  "duration": 3,
+  "durationUnit": "turns",
+  "stacking": "none",
+  "stackBehavior": "extend",
+  "effects": {
+    "onTurnStart": {"op": "prop.add", "path": "entities.{self}.props.hp", "delta": -1, "description": "每回合开始扣1生命"}
+  },
+  "breakConditions": [
+    {"type": "item", "itemId": "antidote", "action": "use", "effect": "cure", "description": "解毒剂"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_weak", "type": "amplify", "description": "虚弱状态下中毒伤害不变，但生存压力叠加"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnDamage", "OnItemUsed"],
+  "kernelOps": ["prop.add"],
+  "icon": "poison",
+  "color": "green",
+  "priority": 10,
+  "description": "持续性毒素伤害，每回合开始时受到1点伤害，持续3回合",
+  "tags": ["damage-over-time", "dot", "debuff"],
+  "source": ["物品: 毒针"],
+  "mvp": true
+}

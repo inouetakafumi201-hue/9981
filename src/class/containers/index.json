@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 容器族语义目录",
+  "description": "基类层容器语义最小单元目录：随宿主移动的携带容器与固定于空间节点的驻留容器按内容定位关系区分类型身份。容量、访问成本与解锁条件取值全部归玩法层。",
+  "category": "containers",
+  "semanticFamilies": ["container"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "容器按内容定位关系只有随宿主移动与驻留于节点两种，可有限列举。",
+    "composable": true,
+    "compositionRationale": "容器类与容量声明、访问条件、存入、取出、上锁、禁止存入、内容来源等能力组合成背包、箱子、货舱、遗留容器等实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "容器类不知道自己是背包还是宝箱；容量、访问成本与解锁条件取值全部由玩法层绑定。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": "docs/L0_规范宪法.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "section": "三、基类层的判定标准与已知类别 / 3.2 容器类"
+      },
+      "precedence": "l0-constitution",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l0:known-base-categories:container-class"
+    },
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 12: 引用完整性、依赖和原子装载 / 12.1"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:reference-integrity:container-and-slot-references-must-resolve"
+    }
+  ],
+  "classes": [
+    {
+      "id": "container.class.carried",
+      "name": "携带容器类",
+      "description": "绑定到实体或物品宿主、内容随宿主位置变化的容器类。",
+      "defKind": "item",
+      "semanticFamily": "container",
+      "abstract": true,
+      "contentLocality": "follows-host",
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "携带容器的不变量是内容定位跟随宿主：宿主移动时内容不需要额外的空间操作；驻留容器不满足该不变量。"
+      },
+      "requiredCapabilityIds": [
+        "container.capability.host_binding",
+        "container.capability.capacity_declaration",
+        "container.capability.deposit",
+        "container.capability.withdraw"
+      ],
+      "optionalCapabilityIds": [
+        "container.capability.access_condition",
+        "container.capability.lockable",
+        "container.capability.deposit_disabled",
+        "container.capability.derived_content_source"
+      ],
+      "parameters": [
+        { "key": "hostRef", "description": "宿主实体或物品引用。", "required": true, "valueShape": "reference<entity|item>" },
+        { "key": "capacityField", "description": "容量参数字段名；容量取值由玩法层绑定。", "required": true, "valueShape": "field-name" },
+        { "key": "contentRefs", "description": "内容物品引用集合。", "required": true, "valueShape": "array<reference<item>>" }
+      ],
+      "kernelOps": ["item.move", "item.create", "item.destroy", "slot.add", "slot.del", "relation.set", "relation.del", "stack.merge", "stack.split"]
+    },
+    {
+      "id": "container.class.stationary",
+      "name": "驻留容器类",
+      "description": "放置于空间节点或固定实体上、内容不随访问者移动的容器类。",
+      "defKind": "entity",
+      "semanticFamily": "container",
+      "abstract": true,
+      "contentLocality": "bound-to-node",
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "驻留容器与空间节点存在放置关系，访问需要访问者与该节点满足邻接或在场关系；携带容器不需要这种空间关系。"
+      },
+      "requiredCapabilityIds": [
+        "container.capability.node_placement",
+        "container.capability.capacity_declaration",
+        "container.capability.deposit",
+        "container.capability.withdraw",
+        "container.capability.access_condition"
+      ],
+      "optionalCapabilityIds": [
+        "container.capability.lockable",
+        "container.capability.deposit_disabled",
+        "container.capability.derived_content_source"
+      ],
+      "parameters": [
+        { "key": "nodeRef", "description": "放置该容器的空间节点引用。", "required": true, "valueShape": "reference<node>" },
+        { "key": "capacityField", "description": "容量参数字段名；容量取值由玩法层绑定。", "required": true, "valueShape": "field-name" },
+        { "key": "contentRefs", "description": "内容物品引用集合。", "required": true, "valueShape": "array<reference<item>>" },
+        { "key": "accessConditionRefs", "description": "访问条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["item.move", "item.create", "item.destroy", "entity.create", "entity.place", "relation.set", "relation.del", "stack.merge", "stack.split"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "container.capability.host_binding",
+      "name": "宿主绑定能力",
+      "description": "声明携带容器与其宿主的持有关系，使内容定位跟随宿主。",
+      "parameters": [
+        { "key": "hostRef", "description": "宿主实体或物品引用。", "required": true, "valueShape": "reference<entity|item>" },
+        { "key": "hostRelationRef", "description": "持有关系定义引用。", "required": true, "valueShape": "reference<rule>" }
+      ],
+      "kernelOps": ["relation.set", "relation.del", "slot.add", "slot.del"]
+    },
+    {
+      "id": "container.capability.node_placement",
+      "name": "节点放置能力",
+      "description": "声明驻留容器所放置的空间节点引用。",
+      "parameters": [
+        { "key": "nodeRef", "description": "空间节点引用。", "required": true, "valueShape": "reference<node>" }
+      ],
+      "kernelOps": ["entity.place"]
+    },
+    {
+      "id": "container.capability.capacity_declaration",
+      "name": "容量声明能力",
+      "description": "声明容量参数字段名与占位度量方式。容量取值由玩法层绑定，基类层不内嵌容量数值。",
+      "parameters": [
+        { "key": "capacityField", "description": "容量参数字段名。", "required": true, "valueShape": "field-name" },
+        { "key": "occupancyMetric", "description": "占位度量方式，取自 occupancy-metrics 值集。", "required": true, "valueShape": "enum<occupancy-metrics>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "container.capability.access_condition",
+      "name": "访问条件能力",
+      "description": "声明访问容器所需的条件引用与访问成本参数字段名；成本取值由玩法层绑定。",
+      "parameters": [
+        { "key": "accessConditionRefs", "description": "访问条件定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "accessCostField", "description": "访问成本参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "container.capability.deposit",
+      "name": "存入能力",
+      "description": "声明物品可被存入该容器，以及存入前的合法性条件引用。",
+      "parameters": [
+        { "key": "depositConditionRefs", "description": "存入条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["item.move", "stack.merge"]
+    },
+    {
+      "id": "container.capability.withdraw",
+      "name": "取出能力",
+      "description": "声明物品可从该容器取出，以及取出前的合法性条件引用。",
+      "parameters": [
+        { "key": "withdrawConditionRefs", "description": "取出条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["item.move", "stack.split"]
+    },
+    {
+      "id": "container.capability.lockable",
+      "name": "可上锁能力",
+      "description": "声明容器访问入口可受锁定状态约束，并引用解锁条件。解锁判据取值由玩法层绑定。",
+      "parameters": [
+        { "key": "lockStateProperty", "description": "表示锁定状态的属性选择器。", "required": true, "valueShape": "string" },
+        { "key": "unlockConditionRefs", "description": "解锁条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["prop.set", "tag.add", "tag.del"]
+    },
+    {
+      "id": "container.capability.deposit_disabled",
+      "name": "禁止存入能力",
+      "description": "声明容器只允许取出、不允许存入。该能力与存入能力互斥。",
+      "parameters": [
+        { "key": "depositEnabled", "description": "存入开关；具备该能力时恒为假。", "required": true, "valueShape": "boolean" }
+      ],
+      "mutuallyExclusiveWith": ["container.capability.deposit"],
+      "kernelOps": []
+    },
+    {
+      "id": "container.capability.derived_content_source",
+      "name": "派生内容来源能力",
+      "description": "声明容器的初始内容引用不是自行编造的，而是由一次已完成的引擎层变更派生得到；来源标识取自 content-sources 值集。",
+      "parameters": [
+        { "key": "contentSource", "description": "内容来源标识。", "required": true, "valueShape": "enum<content-sources>" },
+        { "key": "contentRefs", "description": "派生得到的内容物品引用集合。", "required": true, "valueShape": "array<reference<item>>" }
+      ],
+      "kernelOps": ["item.move", "item.create"]
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "container.valueset.content_localities",
+      "name": "内容定位关系",
+      "description": "容器内容的定位关系；定位关系是类型身份来源。",
+      "tokens": [
+        { "id": "follows-host", "name": "跟随宿主", "description": "内容定位随宿主位置变化。" },
+        { "id": "bound-to-node", "name": "绑定节点", "description": "内容定位绑定到放置节点。" }
+      ]
+    },
+    {
+      "id": "container.valueset.occupancy_metrics",
+      "name": "占位度量方式",
+      "description": "容量占位的度量方式；度量方式是语义，具体上限是玩法层取值。",
+      "tokens": [
+        { "id": "item-count", "name": "按件数", "description": "按内容件数计入容量。" },
+        { "id": "volume-sum", "name": "按体积和", "description": "按内容体积之和计入容量。" },
+        { "id": "slot-count", "name": "按槽位数", "description": "按占用槽位数计入容量。" }
+      ]
+    },
+    {
+      "id": "container.valueset.content_sources",
+      "name": "内容来源",
+      "description": "派生内容来源标识；基类层只声明来源类别，不编造内容。",
+      "tokens": [
+        { "id": "deceased-entity-transaction", "name": "死亡实体变更", "description": "内容引用由死亡实体的那一次已完成引擎层变更派生。" },
+        { "id": "authored-profile", "name": "玩法层编排", "description": "内容引用由玩法层 profile 显式编排。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.container.embedded_capacity_value",
+      "diagnosticCode": "SCHEMA_GAMEPLAY_TABLE_IN_L2",
+      "statement": "容器类不得内嵌具体容量、访问成本或解锁判据取值。",
+      "correction": "只声明参数字段名与度量方式，取值由玩法层提供。"
+    },
+    {
+      "id": "prohibition.container.deposit_conflict",
+      "diagnosticCode": "COMPOSE_DUPLICATE_COMPONENT",
+      "statement": "同一容器不得同时组合存入能力与禁止存入能力。",
+      "correction": "按用途选择其一；遗留容器应只组合禁止存入能力与取出能力。"
+    },
+    {
+      "id": "prohibition.container.invented_content",
+      "diagnosticCode": "ITEM_DEATH_CONTAINER_MISSING_TRANSACTION_SOURCE",
+      "statement": "派生内容容器不得在缺少来源标识时自行编造内容引用。",
+      "correction": "声明 contentSource 并使内容引用由该来源派生。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "containerParameters",
+    "playLayerOwnedFieldNames": ["capacity", "accessibleApCost", "unlockConditions", "volume"],
+    "description": "玩法层以 classComposition 引用容器类与能力，并在 containerParameters 与上列玩法层字段中提供容量、访问成本与解锁条件取值。"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "id": "item_shield_riot",
+  "name": "防爆盾",
+  "category": "equipment",
+  "classComposition": {
+    "classIds": [
+      "item.class.equipment"
+    ],
+    "capabilityIds": [
+      "item.capability.shield",
+      "item.capability.status_grant",
+      "item.capability.durability"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "防具",
+    "盾牌",
+    "格挡",
+    "装备",
+    "重型"
+  ],
+  "stackable": false,
+  "slot": "shield",
+  "grantedStates": [
+    "status_blocking"
+  ],
+  "description": "标准防爆盾牌，拥有独立血池，可以抵挡更强的攻击。",
+  "actions": [
+    {
+      "name": "举盾",
+      "apCost": 1,
+      "target": "self",
+      "description": "进入格挡状态，使用盾牌独立血池抵挡伤害",
+      "effects": [
+        {
+          "op": "attach.add",
+          "def": "status_blocking",
+          "target": "{actor}",
+          "grantedBy": "item_shield_riot",
+          "description": "获得格挡状态"
+        }
+      ],
+      "kernelOps": [
+        "attach.add"
+      ]
+    },
+    {
+      "name": "取消格挡",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP主动退出格挡状态",
+      "effects": [
+        {
+          "op": "attach.del",
+          "def": "status_blocking",
+          "target": "{actor}",
+          "description": "移除格挡状态"
+        }
+      ],
+      "kernelOps": [
+        "attach.del"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "attach.add",
+    "attach.del"
+  ],
+  "mvp": true,
+  "shieldStats": {
+    "type": "riot",
+    "blockPower": "enhanced",
+    "ownHealthPool": true,
+    "shieldHp": 5,
+    "durability": {
+      "max": 5,
+      "breakCondition": "shield_hp_depleted",
+      "description": "独立血池5点耗尽后破损"
+    }
+  },
+  "note": "防爆盾有独立5点血池（见02:355），每次格挡成功消耗1点，血池耗尽破损",
+  "source": [
+    "地图生成",
+    "商店"
+  ],
+  "rarity": "rare",
+  "itemParameters": {
+    "item.capability.durability": {
+      "resourceProperty": "shieldStats.shieldHp",
+      "changeTrigger": "on-block",
+      "depletionBehavior": "break-on-depleted",
+      "operation": "prop.add"
+    },
+    "item.capability.shield": {
+      "activationRule": "grantedActions:举盾",
+      "blockRule": "shieldStats.blockPower",
+      "resourcePool": "shieldStats.shieldHp",
+      "depletionBehavior": "break-on-depleted",
+      "operation": "attach.add"
+    },
+    "item.capability.status_grant": {
+      "targetSelector": "self",
+      "statusSelector": "status_blocking",
+      "lifecycle": "until-hit-or-cancel",
+      "operation": "attach.add"
+    }
+  },
+  "pendingKernelOps": [
+    "prop.add"
+  ],
+  "pendingKernelOpsNote": "格挡成功消耗独立血池（prop.add）尚未建模：需先确定伤害结算管线在哪一步扣减盾牌资源。"
+}

@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "1.0",
+  "version": "3.0.0",
+  "name": "WakeUp 状态族语义目录",
+  "description": "基类层语义状态类目录：每个状态声明类别、数值或标签形态、可解析的能力引用与可配置参数名。持续取值、叠加层数、优先级与交互结果由玩法层提供。",
+  "category": "statuses",
+  "semanticFamilies": ["status"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "语义状态在当前玩法范围内可有限列举，且新增状态需要与既有状态在能力组合或参数上有实质差异。",
+    "composable": true,
+    "compositionRationale": "状态类与状态能力、附件族、动作族的中断条件组合成具体状态实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "状态类不携带持续回合数、叠加上限、优先级与效果强度；这些全部由玩法层 profile 提供。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 9: 伤害、状态、技能、移动和附件契约 / 9.2, 9.8-9.10"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:status-family:duration-stack-trigger-interruption-effect-and-runtime-boundary"
+    },
+    {
+      "sourceFile": "docs/L2_基类层/02_游戏机制.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L2_基类层/02_游戏机制.md",
+        "section": "状态效果与行为状态机的分离"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:game-mechanics:status-effect-separated-from-behavior-state"
+    }
+  ],
+  "runtimeStateBoundary": {
+    "diagnosticCode": "LAYER_L1_RUNTIME_STATE",
+    "statement": "语义状态类只表达可复用的玩法语义。引擎层的运行时迁移与簿记（事务阶段、日志游标、钩子分发阶段、回合编号、快照与回放位置、随机流位置）不得伪装成语义状态类。",
+    "forbiddenConceptTokens": [
+      "transaction",
+      "journal",
+      "hook",
+      "tick",
+      "snapshot",
+      "replay",
+      "rewind",
+      "opregistry",
+      "dispatch",
+      "refprefix",
+      "randomstream",
+      "shadowstream",
+      "事务",
+      "日志游标",
+      "钩子",
+      "回合编号",
+      "快照",
+      "回放",
+      "分发阶段",
+      "随机流",
+      "影子流"
+    ],
+    "description": "禁用词表只作用于状态标识与状态名称；状态说明可以引用引擎层机制名以说明它消费了哪个接口。"
+  },
+  "interactionContract": {
+    "interactionField": "interactions",
+    "counterpartReferenceField": "interactions.counterpartRef",
+    "interactionRuleReferenceField": "interactions.interactionRuleRef",
+    "diagnosticCode": "STATUS_INTERACTION_WITHOUT_RULE",
+    "resultOwnership": "玩法层",
+    "description": "状态之间的交互必须显式声明交互规则引用；只声明对手方而不声明规则的交互被拒绝。交互结果取值归玩法层。"
+  },
+  "pseudoSubtypeContract": {
+    "diagnosticCode": "STATUS_PSEUDO_SUBTYPE",
+    "distinguishingFields": ["type", "category", "capabilityIds", "configurableParameters"],
+    "statement": "任意两个状态类不得在形态、类别、能力组合与可配置参数四项上完全一致；只靠改名或玩法取值差异产生的状态是伪子类型。",
+    "correction": "改为同一状态类加不同参数取值，取值由玩法层提供。"
+  },
+  "valueSets": [
+    {
+      "id": "status.valueset.categories",
+      "name": "状态类别",
+      "description": "状态的来源与效价类别。类别用于解除、免疫与展示分组判定。",
+      "tokens": [
+        { "id": "negative", "name": "负面", "description": "对持有者不利的状态。" },
+        { "id": "positive", "name": "正面", "description": "对持有者有利的状态。" },
+        { "id": "environmental", "name": "环境", "description": "由环境或行程条件产生的状态。" }
+      ]
+    },
+    {
+      "id": "status.valueset.forms",
+      "name": "状态形态",
+      "description": "状态的承载形态；形态决定是否需要数值载荷。",
+      "tokens": [
+        { "id": "numeric", "name": "数值型", "description": "承载数值载荷；载荷取值归玩法层。" },
+        { "id": "tag", "name": "标签型", "description": "只表达是否存在，不承载数值载荷。" }
+      ]
+    },
+    {
+      "id": "status.valueset.duration_modes",
+      "name": "持续模式",
+      "description": "状态持续模式轴。模式是语义，具体回合数与解除时点是玩法层取值；playLayerTokens 列出玩法层可用于表达该模式的既有取值。",
+      "tokens": [
+        { "id": "instant", "name": "瞬时", "description": "施加后立即结算并结束。", "playLayerTokens": [] },
+        { "id": "turns", "name": "按回合", "description": "按回合计数存续。", "playLayerTokens": ["turns"] },
+        { "id": "until-condition", "name": "直到条件成立", "description": "存续到声明的解除条件成立。", "playLayerTokens": ["until_event"] },
+        { "id": "permanent", "name": "永久", "description": "除显式移除外不自行结束。", "playLayerTokens": [] }
+      ]
+    },
+    {
+      "id": "status.valueset.stack_modes",
+      "name": "叠加模式",
+      "description": "状态叠加模式轴。模式是语义，层数上限是玩法层取值；playLayerTokens 列出玩法层可用于表达该模式的既有取值。",
+      "tokens": [
+        { "id": "none", "name": "不叠加", "description": "已存在时忽略新的施加。", "playLayerTokens": ["none"] },
+        { "id": "refresh", "name": "刷新", "description": "已存在时刷新其持续。", "playLayerTokens": ["refresh"] },
+        { "id": "stack", "name": "累加", "description": "已存在时累加层数或延长持续。", "playLayerTokens": ["extend"] },
+        { "id": "independent", "name": "独立并存", "description": "每次施加形成互不影响的独立实例。", "playLayerTokens": ["unique"] }
+      ]
+    }
+  ],
+  "modeSelectionContract": {
+    "durationModeField": "durationUnit",
+    "stackModeField": "stackBehavior",
+    "ownership": "玩法层",
+    "description": "持续模式与叠加模式的轴由基类层声明，具体模式选择与取值由玩法层在上列字段中提供。玩法层取值必须能解析到本目录声明的某个模式。"
+  },
+  "capabilities": [
+    { "id": "status.capability.action_eligibility", "name": "行动资格能力", "description": "声明状态影响持有者可执行哪些动作。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.action_efficiency", "name": "行动效率能力", "description": "声明状态调整持有者的行动或移动效率；调整方向与幅度取值归玩法层。", "kernelOps": ["prop.add", "prop.set"] },
+    { "id": "status.capability.movement_restriction", "name": "移动限制能力", "description": "声明状态限制持有者的移动能力。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.output_modulation", "name": "输出调整能力", "description": "声明状态调整持有者产生效果的输出能力。", "kernelOps": ["prop.add", "prop.set"] },
+    { "id": "status.capability.ongoing_effect", "name": "持续作用能力", "description": "声明状态按周期对持有者施加效果；周期与幅度取值归玩法层。", "kernelOps": ["prop.add", "attach.expire"] },
+    { "id": "status.capability.propagation", "name": "传播能力", "description": "声明状态可向其他实体或目标传播。", "kernelOps": ["attach.add"] },
+    { "id": "status.capability.environment_exposure", "name": "环境暴露能力", "description": "声明状态关联环境暴露来源，其存续依赖暴露条件。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.detection_modulation", "name": "侦测调整能力", "description": "声明状态参与可见性与被发现性判定。", "kernelOps": ["tag.add", "tag.del"] },
+    { "id": "status.capability.preparation", "name": "准备态能力", "description": "声明状态承载可被执行或可被失效的准备态。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.preparation_invalidation", "name": "准备失效能力", "description": "声明状态可使他方准备态失效。", "kernelOps": ["attach.del"] },
+    { "id": "status.capability.defense_response", "name": "防护响应能力", "description": "声明状态在持有者受作用时参与防护响应。", "kernelOps": ["attach.add", "prop.add"] },
+    { "id": "status.capability.target_binding", "name": "目标绑定能力", "description": "声明状态绑定一个目标或目的地引用，并在其失效时随之失效。", "kernelOps": ["relation.set", "relation.del"] },
+    { "id": "status.capability.interaction_progress", "name": "交互进度能力", "description": "声明状态承载可被中断的持续交互进度。", "kernelOps": ["prop.set", "attach.del"] },
+    { "id": "status.capability.posture", "name": "姿态能力", "description": "声明状态承载姿态并影响与姿态相关的行动资格。", "kernelOps": ["prop.set", "tag.add", "tag.del"] },
+    { "id": "status.capability.survival_stage", "name": "生存阶段能力", "description": "声明状态参与生存阶段判定。", "kernelOps": ["prop.set", "entity.demote"] },
+    { "id": "status.capability.resource_boundary", "name": "资源边界能力", "description": "声明状态表示某项资源越界并承载相应惩罚语义。", "kernelOps": ["prop.set", "pool.set"] },
+    { "id": "status.capability.recovery", "name": "恢复能力", "description": "声明状态参与恢复判定。", "kernelOps": ["prop.add", "attach.del"] },
+    { "id": "status.capability.burden", "name": "负重能力", "description": "声明状态承载负重负担来源。", "kernelOps": ["tag.add", "tag.del"] },
+    { "id": "status.capability.control_relation", "name": "控制关系能力", "description": "声明状态参与控制类效果之间的关系判定。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.temperature_relation", "name": "温度关系能力", "description": "声明状态参与温度类效果之间的关系判定。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.toxin_relation", "name": "毒素关系能力", "description": "声明状态参与毒素类效果之间的关系判定。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.fire_relation", "name": "火焰关系能力", "description": "声明状态参与火焰类效果之间的关系判定。", "kernelOps": ["attach.add", "attach.del"] },
+    { "id": "status.capability.awareness_reduction", "name": "察觉降低能力", "description": "声明状态降低持有者对外部刺激的察觉。", "kernelOps": ["prop.set"] }
+  ],
+  "statuses": [
+    {"id": "status_poisoned", "name": "中毒", "category": "negative", "type": "numeric", "tags": ["poison", "ongoing-effect", "adverse"], "description": "表示实体正承受持续毒素影响的语义状态。"},
+    {"id": "status_burning", "name": "燃烧", "category": "negative", "type": "numeric", "tags": ["fire", "ongoing-effect", "adverse"], "description": "表示实体正承受持续火焰影响的语义状态。"},
+    {"id": "status_frozen", "name": "冰冻", "category": "negative", "type": "tag", "tags": ["cold", "movement-impairment", "control"], "description": "表示实体因低温影响而行动受限的语义状态。"},
+    {"id": "status_slowed", "name": "迟缓", "category": "negative", "type": "numeric", "tags": ["slow", "action-impairment", "adverse"], "description": "表示实体的行动效率受到抑制的语义状态。"},
+    {"id": "status_weak", "name": "虚弱", "category": "negative", "type": "numeric", "tags": ["weakness", "output-impairment", "adverse"], "description": "表示实体的效果输出能力受到削弱的语义状态。"},
+    {"id": "status_heavy", "name": "重装", "category": "negative", "type": "tag", "tags": ["burden", "equipment", "movement-impairment"], "description": "表示实体因负重而承受行动负担的语义状态。"},
+    {"id": "status_lockpicking", "name": "撬锁中", "category": "negative", "type": "tag", "tags": ["interaction", "precision", "progress"], "description": "表示实体正在进行需要维持的精密交互的语义状态。"},
+    {"id": "status_stunned", "name": "眩晕", "category": "negative", "type": "tag", "tags": ["control", "stun", "action-restriction"], "description": "表示实体因控制效果而无法正常行动的语义状态。"},
+    {"id": "status_knocked_down", "name": "击倒", "category": "negative", "type": "tag", "tags": ["knockdown", "posture", "movement-restricted"], "description": "表示实体处于可恢复倒地姿态的语义状态。"},
+    {"id": "status_downed", "name": "零血倒地", "category": "negative", "type": "tag", "tags": ["downed", "critical", "incapacitated"], "description": "表示实体进入危急倒地阶段的语义状态。"},
+    {"id": "status_staggered", "name": "失衡", "category": "negative", "type": "tag", "tags": ["control", "stagger", "preparation"], "description": "表示实体的准备态可被失效的语义状态。"},
+    {"id": "status_overloaded", "name": "过载", "category": "negative", "type": "tag", "tags": ["resource", "boundary", "penalty"], "description": "表示资源越界后进入惩罚状态的语义。"},
+    {"id": "status_blocking", "name": "格挡", "category": "positive", "type": "tag", "tags": ["defense", "guard", "response"], "description": "表示实体处于主动防护准备中的语义状态。"},
+    {"id": "status_hastened", "name": "加速", "category": "positive", "type": "numeric", "tags": ["speed", "mobility", "enhancement"], "description": "表示实体的移动或行动效率获得提升的语义状态。"},
+    {"id": "status_concealed", "name": "隐蔽", "category": "positive", "type": "tag", "tags": ["stealth", "concealment", "detection"], "description": "表示实体处于降低可被发现性的语义状态。"},
+    {"id": "status_sleeping", "name": "睡眠", "category": "positive", "type": "tag", "tags": ["rest", "inactive", "recovery"], "description": "表示实体处于休息与低活动阶段的语义状态。"},
+    {"id": "status_radiation", "name": "辐射", "category": "environmental", "type": "numeric", "tags": ["radiation", "exposure", "environmental"], "description": "表示实体正承受环境辐射暴露的语义状态。"},
+    {"id": "status_traveling", "name": "前往X", "category": "environmental", "type": "tag", "tags": ["movement", "journey", "transit"], "description": "表示实体处于前往某个目的地过程中的语义状态。"},
+    {"id": "status_aiming", "name": "瞄准", "category": "positive", "type": "tag", "tags": ["aim", "preparation", "precision"], "description": "表示实体已完成目标锁定并等待执行对应动作的准备状态。"}
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.status.runtime_state_disguise",
+      "diagnosticCode": "LAYER_L1_RUNTIME_STATE",
+      "statement": "引擎层运行时迁移与簿记不得伪装成语义状态类。",
+      "correction": "把该概念留在引擎层；基类层只登记可复用的玩法语义状态。"
+    },
+    {
+      "id": "prohibition.status.pseudo_subtype",
+      "diagnosticCode": "STATUS_PSEUDO_SUBTYPE",
+      "statement": "状态类不得仅因名称或玩法取值不同而重复登记。",
+      "correction": "改为同一状态类加不同参数取值。"
+    },
+    {
+      "id": "prohibition.status.interaction_without_rule",
+      "diagnosticCode": "STATUS_INTERACTION_WITHOUT_RULE",
+      "statement": "状态交互不得缺少显式交互规则引用。",
+      "correction": "为每条交互声明 interactionRuleRef。"
+    },
+    {
+      "id": "prohibition.status.embedded_gameplay_value",
+      "diagnosticCode": "SCHEMA_GAMEPLAY_TABLE_IN_L2",
+      "statement": "状态类不得内嵌持续回合数、叠加上限、优先级或效果强度取值。",
+      "correction": "只声明模式轴与可配置参数名，取值由玩法层提供。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.sourceClass",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "statusParameters",
+    "playLayerOwnedFieldNames": ["duration", "durationUnit", "stacking", "stackBehavior", "priority", "effects", "breakConditions", "interactionMatrix", "icon", "color"],
+    "description": "玩法层以 classComposition.sourceClass 引用状态类，并在上列玩法层字段中提供持续、叠加、优先级、效果与交互取值。"
+  }
+}

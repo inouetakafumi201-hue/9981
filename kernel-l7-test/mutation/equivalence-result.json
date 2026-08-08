@@ -1,0 +1,21 @@
+{
+  "seqCount": 20000,
+  "opsPerSeq": 60,
+  "results": [
+    {
+      "id": "M53",
+      "desc": "[预期等价] scene_delete 迭代 childScenes 不做快照",
+      "equivalent": true
+    },
+    {
+      "id": "M54",
+      "desc": "[预期等价] scene_delete 迭代 nodes 不做快照",
+      "equivalent": true
+    },
+    {
+      "id": "M55",
+      "desc": "[预期等价] node_delete 迭代 links 不做快照",
+      "equivalent": true
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 技能族语义目录",
+  "description": "基类层技能语义最小单元目录：主动、被动与触发技能按启用语义区分类型身份；成本、冷却、触发条件与效果全部经参数与组合表达，不含具体玩法取值。",
+  "category": "skills",
+  "semanticFamilies": ["skill"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "技能按启用语义只有主动、被动、触发三种，可有限列举。",
+    "composable": true,
+    "compositionRationale": "技能类与成本声明、冷却声明、触发条件、效果绑定、附件族组合成具体技能实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "技能类不知道具体成本、冷却回合数与效果强度；这些取值全部由玩法层绑定。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 9: 伤害、状态、技能、移动和附件契约 / 9.3-9.4"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:skill-family:activation-semantics-type-identity"
+    },
+    {
+      "sourceFile": "docs/L0_规范宪法.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "section": "二、三层架构定义 / 基类层铁律"
+      },
+      "precedence": "l0-constitution",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l0:class-layer-iron-law:no-gameplay-values-in-instances"
+    }
+  ],
+  "classes": [
+    {
+      "id": "skill.class.active",
+      "name": "主动技能类",
+      "description": "由施动者在自己的行动机会内经付费动作启用的技能类。",
+      "defKind": "action",
+      "semanticFamily": "skill",
+      "abstract": true,
+      "activation": "active",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "主动技能必须绑定一个付费动作作为启用入口；该必需能力使它在决策枚举中出现，被动与触发技能不具备该能力。"
+      },
+      "requiredCapabilityIds": [
+        "skill.capability.activation_action",
+        "skill.capability.cost_declaration",
+        "skill.capability.effect_binding"
+      ],
+      "optionalCapabilityIds": [
+        "skill.capability.cooldown_declaration",
+        "skill.capability.trigger_condition"
+      ],
+      "parameters": [
+        { "key": "activationActionRef", "description": "启用该技能的付费动作引用。", "required": true, "valueShape": "reference<action>" },
+        { "key": "costFields", "description": "成本参数字段名集合；成本取值由玩法层绑定。", "required": true, "valueShape": "array<field-name>" },
+        { "key": "cooldownFields", "description": "冷却参数字段名集合；冷却取值由玩法层绑定。", "required": false, "valueShape": "array<field-name>" },
+        { "key": "effectRefs", "description": "效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "forbiddenFieldNames": ["cooldownTurns", "cost", "damage", "duration"],
+      "kernelOps": []
+    },
+    {
+      "id": "skill.class.passive",
+      "name": "被动技能类",
+      "description": "无启用入口、以持续效果形式生效的技能类。",
+      "defKind": "rule",
+      "semanticFamily": "skill",
+      "abstract": true,
+      "activation": "passive",
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "被动技能的不变量是不存在启用入口与冷却：它不能出现在决策枚举中，也不能声明启用动作或冷却字段。"
+      },
+      "requiredCapabilityIds": [
+        "skill.capability.continuous_effect",
+        "skill.capability.effect_binding"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "continuousEffectRefs", "description": "持续效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "effectRefs", "description": "效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "forbiddenFieldNames": ["activationActionRef", "cooldownFields", "cooldownTurns", "cost"],
+      "kernelOps": ["attach.add", "attach.del"]
+    },
+    {
+      "id": "skill.class.triggered",
+      "name": "触发技能类",
+      "description": "无启用入口、在触发条件成立时生效的技能类。",
+      "defKind": "rule",
+      "semanticFamily": "skill",
+      "abstract": true,
+      "activation": "triggered",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "触发技能必须声明触发条件引用且不得声明启用动作；它既不出现在决策枚举中，也不像被动技能那样持续生效。"
+      },
+      "requiredCapabilityIds": [
+        "skill.capability.trigger_condition",
+        "skill.capability.effect_binding"
+      ],
+      "optionalCapabilityIds": ["skill.capability.cooldown_declaration"],
+      "parameters": [
+        { "key": "triggerConditionRefs", "description": "触发条件定义引用集合；具体阈值由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
+        { "key": "effectRefs", "description": "效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "cooldownFields", "description": "冷却参数字段名集合。", "required": false, "valueShape": "array<field-name>" }
+      ],
+      "forbiddenFieldNames": ["activationActionRef", "cooldownTurns", "cost"],
+      "kernelOps": ["attach.add", "attach.del"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "skill.capability.activation_action",
+      "name": "启用动作能力",
+      "description": "声明主动技能的付费动作启用入口。",
+      "parameters": [
+        { "key": "activationActionRef", "description": "付费动作引用。", "required": true, "valueShape": "reference<action>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "skill.capability.continuous_effect",
+      "name": "持续效果能力",
+      "description": "声明被动技能持续生效所引用的效果定义。",
+      "parameters": [
+        { "key": "continuousEffectRefs", "description": "持续效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del"]
+    },
+    {
+      "id": "skill.capability.trigger_condition",
+      "name": "触发条件能力",
+      "description": "声明触发技能的条件引用；具体阈值由玩法层绑定。",
+      "parameters": [
+        { "key": "triggerConditionRefs", "description": "触发条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "skill.capability.cost_declaration",
+      "name": "成本声明能力",
+      "description": "声明成本参数字段名。基类层只声明字段名，不给出成本取值，也不内嵌成本表。",
+      "parameters": [
+        { "key": "costFields", "description": "成本参数字段名集合。", "required": true, "valueShape": "array<field-name>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "skill.capability.cooldown_declaration",
+      "name": "冷却声明能力",
+      "description": "声明冷却参数字段名。基类层只声明字段名，不给出冷却取值。",
+      "parameters": [
+        { "key": "cooldownFields", "description": "冷却参数字段名集合。", "required": true, "valueShape": "array<field-name>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "skill.capability.effect_binding",
+      "name": "效果绑定能力",
+      "description": "声明技能可引用的效果定义集合。",
+      "parameters": [
+        { "key": "effectRefs", "description": "效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "skill.valueset.activations",
+      "name": "技能启用语义",
+      "description": "技能的启用语义；启用语义是类型身份来源。",
+      "tokens": [
+        { "id": "active", "name": "主动", "description": "经付费动作启用。" },
+        { "id": "passive", "name": "被动", "description": "无启用入口，持续生效。" },
+        { "id": "triggered", "name": "触发", "description": "无启用入口，在条件成立时生效。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.skill.pseudo_subtype",
+      "diagnosticCode": "INHERIT_GAMEPLAY_VALUE_ONLY_DIFFERENCE",
+      "statement": "技能子类型不得仅因名称或具体玩法取值不同而存在。",
+      "correction": "改为组合：同一技能类加不同参数取值，取值由玩法层提供。"
+    },
+    {
+      "id": "prohibition.skill.embedded_gameplay_value",
+      "diagnosticCode": "SCHEMA_GAMEPLAY_TABLE_IN_L2",
+      "statement": "技能类不得内嵌成本表、冷却回合数、伤害表或持续时间取值。",
+      "correction": "只声明参数字段名，由玩法层 profile 提供取值。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "skillParameters",
+    "playLayerOwnedFieldNames": ["cost", "cooldownTurns", "duration", "amount"],
+    "description": "玩法层以 classComposition 引用技能类与能力，并在 skillParameters 与上列玩法层字段中提供成本、冷却与效果取值。"
+  }
+}

@@ -1,0 +1,940 @@
+{
+  "total": 116,
+  "valid": 116,
+  "scored": 115,
+  "killed": 115,
+  "survived": 0,
+  "invalid": 0,
+  "expectEquivalent": 1,
+  "score": 100,
+  "outcomes": [
+    {
+      "id": "M01",
+      "file": "diagnostic.ts",
+      "desc": "reg：prefix 取三段而非两段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 15ms"
+    },
+    {
+      "id": "M02",
+      "file": "diagnostic.ts",
+      "desc": "reg：prefix 只取第一段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 15ms"
+    },
+    {
+      "id": "M03",
+      "file": "diagnostic.ts",
+      "desc": "reg：recoverable 恒 true（fatal 也可恢复）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > 干净注册表 checkRegistry 为空 11ms"
+    },
+    {
+      "id": "M04",
+      "file": "diagnostic.ts",
+      "desc": "reg：recoverable 恒 false",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M86：FATAL_RECOVERABLE 必须查 d.severity 而非 spec.severity 12ms"
+    },
+    {
+      "id": "M05",
+      "file": "diagnostic.ts",
+      "desc": "reg：recoverable 判据反向（把 fatal 当可恢复、其余当不可恢复）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M86：FATAL_RECOVERABLE 必须查 d.severity 而非 spec.severity 10ms"
+    },
+    {
+      "id": "M06",
+      "file": "diagnostic.ts",
+      "desc": "reg：不冻结 spec（severity 与 recoverable 可被改到脱钩）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 11ms"
+    },
+    {
+      "id": "M07",
+      "file": "diagnostic.ts",
+      "desc": "reg：spec.code 写成 prefix（键与 code 不一致）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > 干净注册表 checkRegistry 为空 8ms"
+    },
+    {
+      "id": "M08",
+      "file": "diagnostic.ts",
+      "desc": "VALID_PREFIXES：去掉 E_INV（最常用前缀落在白名单外）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > 干净注册表 checkRegistry 为空 10ms"
+    },
+    {
+      "id": "M09",
+      "file": "diagnostic.ts",
+      "desc": "sealRegistry：整体不生效（注册表写入面敞开）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 15ms"
+    },
+    {
+      "id": "M10",
+      "file": "diagnostic.ts",
+      "desc": "sealRegistry：只封 set，delete/clear 仍可用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 22ms"
+    },
+    {
+      "id": "M11",
+      "file": "diagnostic.ts",
+      "desc": "sealRegistry：只封 delete/clear，set 仍可用（能注册任意码）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 11ms"
+    },
+    {
+      "id": "M12",
+      "file": "diagnostic.ts",
+      "desc": "sealRegistry：clear 未封",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 12ms"
+    },
+    {
+      "id": "M13",
+      "file": "diagnostic.ts",
+      "desc": "sealRegistry：deny 改为静默 no-op（写入不报错但也不生效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > 前提自检：封印与冻结确实生效（否则下面的注入路径是多余的） 9ms"
+    },
+    {
+      "id": "M14",
+      "file": "diagnostic.ts",
+      "desc": "emit：未注册码不再抛出（改为静默按 error 处理）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C16)：前缀合法但未注册的码必须被拒（不能靠前缀放行） 9ms"
+    },
+    {
+      "id": "M15",
+      "file": "diagnostic.ts",
+      "desc": "emit：未注册码抛出但错误码退化为通用 Error（测试只断言\"抛错\"就能过）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C16)：前缀合法但未注册的码必须被拒（不能靠前缀放行） 13ms"
+    },
+    {
+      "id": "M16",
+      "file": "diagnostic.ts",
+      "desc": "emit：未注册码的错误消息不带 code（无法定位是哪个码）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C16)：前缀合法但未注册的码必须被拒（不能靠前缀放行） 9ms"
+    },
+    {
+      "id": "M17",
+      "file": "diagnostic.ts",
+      "desc": "emit：改为按前缀放行（前缀合法即接受，未注册也收）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C16)：前缀合法但未注册的码必须被拒（不能靠前缀放行） 6ms"
+    },
+    {
+      "id": "M18",
+      "file": "diagnostic.ts",
+      "desc": "emit：归因校验去掉（layer 为空也接受）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M20：emit(code, null) 必须抛 MISSING_ATTRIBUTION 而非 TypeError 8ms"
+    },
+    {
+      "id": "M19",
+      "file": "diagnostic.ts",
+      "desc": "emit：归因只查 source 存在、不查 layer 非空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 影子模型：逐字段对照 > 任意操作序列下，产品与影子模型逐字段相等 38ms"
+    },
+    {
+      "id": "M20",
+      "file": "diagnostic.ts",
+      "desc": "emit：归因只查 layer、不查 source 本身（source 为 null 时 TypeError）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M20：emit(code, null) 必须抛 MISSING_ATTRIBUTION 而非 TypeError 9ms"
+    },
+    {
+      "id": "M21",
+      "file": "diagnostic.ts",
+      "desc": "emit：归因错误码退化为通用 Error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M20：emit(code, null) 必须抛 MISSING_ATTRIBUTION 而非 TypeError 12ms"
+    },
+    {
+      "id": "M22",
+      "file": "diagnostic.ts",
+      "desc": "emit：校验顺序颠倒（先查归因后查注册）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M22：未注册码 + 空 layer 同时出现时，必须优先报未注册码 11ms"
+    },
+    {
+      "id": "M23",
+      "file": "diagnostic.ts",
+      "desc": "emit：去掉 causedBy 成员校验（跨 collector/伪造/跨世代的因全部放行）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#7 (C09)：跨 collector 的因必须被拒（否则因果时间倒挂） 10ms"
+    },
+    {
+      "id": "M24",
+      "file": "diagnostic.ts",
+      "desc": "emit：成员校验改为结构相似性（有 code 字段就算合法因）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#7 (C09)：跨 collector 的因必须被拒（否则因果时间倒挂） 9ms"
+    },
+    {
+      "id": "M25",
+      "file": "diagnostic.ts",
+      "desc": "emit：成员校验改查 diags 数组（clear 后仍在 members 泄漏时行为不同）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M25：members 里有的合法因即使不在 diags 也必须被接受 11ms"
+    },
+    {
+      "id": "M26",
+      "file": "diagnostic.ts",
+      "desc": "emit：成员校验取反（只接受非成员）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 7ms"
+    },
+    {
+      "id": "M27",
+      "file": "diagnostic.ts",
+      "desc": "emit：FOREIGN_CAUSE 错误码退化为通用 Error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#7 (C09)：跨 collector 的因必须被拒（否则因果时间倒挂） 10ms"
+    },
+    {
+      "id": "M28",
+      "file": "diagnostic.ts",
+      "desc": "emit：用 != null 代替 !== undefined（causedBy 传 null 时行为不同）",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M29",
+      "file": "diagnostic.ts",
+      "desc": "emit：severity 不取注册表、写死 error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C15)：sealed 不阻断后续 emit（Spec 缺口，行为在此钉住） 10ms"
+    },
+    {
+      "id": "M30",
+      "file": "diagnostic.ts",
+      "desc": "emit：source 按引用存（事后改调用方对象会追改已发诊断）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#2 (C02)：emit 必须复制 source，事后改调用方对象不得追改已发诊断 8ms"
+    },
+    {
+      "id": "M31",
+      "file": "diagnostic.ts",
+      "desc": "emit：source 复制但丢掉 op 字段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#2 (C02)：emit 必须复制 source，事后改调用方对象不得追改已发诊断 8ms"
+    },
+    {
+      "id": "M32",
+      "file": "diagnostic.ts",
+      "desc": "emit：source 只留 layer",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#2 (C02)：emit 必须复制 source，事后改调用方对象不得追改已发诊断 7ms"
+    },
+    {
+      "id": "M33",
+      "file": "diagnostic.ts",
+      "desc": "emit：message 退回 `??`（空串被保留，留下无描述的诊断）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#11 (C18)：空白 message 必须退回 code 7ms"
+    },
+    {
+      "id": "M34",
+      "file": "diagnostic.ts",
+      "desc": "emit：message 用 `||`（\"0\" 会被误判为空而退回 code）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#11 (C18)：空白 message 必须退回 code 7ms"
+    },
+    {
+      "id": "M35",
+      "file": "diagnostic.ts",
+      "desc": "emit：message 被 trim（前后空格丢失）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#11 (C18)：空白 message 必须退回 code 7ms"
+    },
+    {
+      "id": "M36",
+      "file": "diagnostic.ts",
+      "desc": "emit：message 恒为 code（传入的描述被丢弃）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#11 (C18)：空白 message 必须退回 code 10ms"
+    },
+    {
+      "id": "M37",
+      "file": "diagnostic.ts",
+      "desc": "emit：timestamp 用后自增改为先自增（首条 ts 从 1 开始）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CAUSE_NOT_EARLIER：因的 timestamp 不早于果 9ms"
+    },
+    {
+      "id": "M38",
+      "file": "diagnostic.ts",
+      "desc": "emit：timestamp 不自增（所有诊断同 ts）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 17ms"
+    },
+    {
+      "id": "M39",
+      "file": "diagnostic.ts",
+      "desc": "emit：timestamp 用 diags.length（clear 后与旧世代重号）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C12)：clear() 刻意不重置 time 9ms"
+    },
+    {
+      "id": "M40",
+      "file": "diagnostic.ts",
+      "desc": "emit：恒写 causedBy 键（无因时也写入 undefined）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#12 (C19)：无因时不得写入 causedBy 键 6ms"
+    },
+    {
+      "id": "M41",
+      "file": "diagnostic.ts",
+      "desc": "emit：不登记 members（合法因全部被判为 FOREIGN）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 8ms"
+    },
+    {
+      "id": "M42",
+      "file": "diagnostic.ts",
+      "desc": "emit：不 push diags（只登记 members）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 8ms"
+    },
+    {
+      "id": "M43",
+      "file": "diagnostic.ts",
+      "desc": "emit：push 改 unshift（顺序反转，时间戳与排列不符）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 12ms"
+    },
+    {
+      "id": "M44",
+      "file": "diagnostic.ts",
+      "desc": "emit：fatal 不置 sealed",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FATAL_RECOVERABLE：注册表里的 fatal 码被标成可恢复 10ms"
+    },
+    {
+      "id": "M45",
+      "file": "diagnostic.ts",
+      "desc": "emit：任何诊断都置 sealed",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 11ms"
+    },
+    {
+      "id": "M46",
+      "file": "diagnostic.ts",
+      "desc": "emit：sealed 判据看 recoverable 而非 severity",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FATAL_RECOVERABLE：注册表里的 fatal 码被标成可恢复 8ms"
+    },
+    {
+      "id": "M47",
+      "file": "diagnostic.ts",
+      "desc": "emit：返回克隆而非本体（因果链身份断裂）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 8ms"
+    },
+    {
+      "id": "M48",
+      "file": "diagnostic.ts",
+      "desc": "all：返回内部数组本体（外泄，调用方可清空 collector）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#3 (C04)：col.all 不得外泄内部数组 9ms"
+    },
+    {
+      "id": "M49",
+      "file": "diagnostic.ts",
+      "desc": "all：返回排序后的副本（emit 顺序被抹掉）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 影子模型：逐字段对照 > 任意操作序列下，产品与影子模型逐字段相等 42ms"
+    },
+    {
+      "id": "M50",
+      "file": "diagnostic.ts",
+      "desc": "all：深克隆元素（因果链身份断裂）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#3 (C04)：col.all 不得外泄内部数组 8ms"
+    },
+    {
+      "id": "M51",
+      "file": "diagnostic.ts",
+      "desc": "fatals：筛选条件改为 error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 12ms"
+    },
+    {
+      "id": "M52",
+      "file": "diagnostic.ts",
+      "desc": "fatals：改用注册表的 severity 而非诊断自身的（篡改 severity 时不再被检出）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M52：fatals 必须查 d.severity，不得替换为注册表里的 severity 11ms"
+    },
+    {
+      "id": "M53",
+      "file": "diagnostic.ts",
+      "desc": "errors：筛选条件改为非 fatal（把 warn/info 也算进 error）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 影子模型：逐字段对照 > 任意操作序列下，产品与影子模型逐字段相等 32ms"
+    },
+    {
+      "id": "M54",
+      "file": "diagnostic.ts",
+      "desc": "isSealed：返回\"有 fatal\"而非 sealed 位（掩盖两者失同步）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M54：isSealed 必须查 sealed 位，而非\"有没有 fatal\" 6ms"
+    },
+    {
+      "id": "M55",
+      "file": "diagnostic.ts",
+      "desc": "isSealed：取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FATAL_NOT_SEALED：有 fatal 却未封 15ms"
+    },
+    {
+      "id": "M56",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：去掉 maxDepth 合法性校验（0 会报成 CHAIN_TOO_DEEP）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#10 (C13)：maxDepth 非法必须报专属码，不得报 CHAIN_TOO_DEEP 13ms"
+    },
+    {
+      "id": "M57",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：maxDepth 校验只查整数、不查下界",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#10 (C13)：maxDepth 非法必须报专属码，不得报 CHAIN_TOO_DEEP 14ms"
+    },
+    {
+      "id": "M58",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：maxDepth 下界写成 < 0（0 被放行）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#10 (C13)：maxDepth 非法必须报专属码，不得报 CHAIN_TOO_DEEP 23ms"
+    },
+    {
+      "id": "M59",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：非法 maxDepth 错误码退化为通用 Error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#10 (C13)：maxDepth 非法必须报专属码，不得报 CHAIN_TOO_DEEP 8ms"
+    },
+    {
+      "id": "M60",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：去掉环检测（环图上无限循环直至预算耗尽，报 TOO_DEEP 而非 CYCLE）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M60/M61：chainOf 必须检出环并以专属码 E_DIAG_CAUSAL_CYCLE 报出 21ms"
+    },
+    {
+      "id": "M61",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：环检测错误码退化为通用 Error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M60/M61：chainOf 必须检出环并以专属码 E_DIAG_CAUSAL_CYCLE 报出 8ms"
+    },
+    {
+      "id": "M62",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：预算边界改为 <=（多展开一节）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：变异覆盖补丁 > M62：链长超出 maxDepth 时必须抛 CHAIN_TOO_DEEP，不得静默多返回一节 11ms"
+    },
+    {
+      "id": "M63",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：超预算不报错、静默截断",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 12ms"
+    },
+    {
+      "id": "M64",
+      "file": "diagnostic.ts",
+      "desc": "chainOf：超预算错误码退化为通用 Error",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 14ms"
+    },
+    {
+      "id": "M65",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：改用 chainOf（回归 C01——合法长链被判数据损坏）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/EXCEEDS_MEMBERSHIP：链长超过成员数（非环） 8ms"
+    },
+    {
+      "id": "M66",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：去掉环检测（环图上死循环）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/CAUSAL_CYCLE：因果成环 8ms"
+    },
+    {
+      "id": "M67",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：上界改为写死 64（长链假警报）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/EXCEEDS_MEMBERSHIP：链长超过成员数（非环） 6ms"
+    },
+    {
+      "id": "M68",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：上界少 1（满员长链假警报）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M68：链长恰为 diags.length+1 的链不得报 CHAIN_EXCEEDS_MEMBERSHIP 9ms"
+    },
+    {
+      "id": "M69",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：上界改为 Infinity（外来长链不再被检出）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/EXCEEDS_MEMBERSHIP：链长超过成员数（非环） 6ms"
+    },
+    {
+      "id": "M70",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：超上界不报错",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/EXCEEDS_MEMBERSHIP：链长超过成员数（非环） 6ms"
+    },
+    {
+      "id": "M71",
+      "file": "diagnostic.ts",
+      "desc": "walkChainForCheck：环与超深共用同一错误码（无法区分两种损坏）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/CAUSAL_CYCLE：因果成环 8ms"
+    },
+    {
+      "id": "M72",
+      "file": "diagnostic.ts",
+      "desc": "clear：不清 members（旧世代诊断仍算合法因）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#9 (C11)：clear() 之后不得复用旧世代的诊断作因 7ms"
+    },
+    {
+      "id": "M73",
+      "file": "diagnostic.ts",
+      "desc": "clear：不复位 sealed",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 影子模型：逐字段对照 > 任意操作序列下，产品与影子模型逐字段相等 43ms"
+    },
+    {
+      "id": "M74",
+      "file": "diagnostic.ts",
+      "desc": "clear：不清 diags（只复位 sealed）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#9 (C11)：clear() 之后不得复用旧世代的诊断作因 12ms"
+    },
+    {
+      "id": "M75",
+      "file": "diagnostic.ts",
+      "desc": "clear：重置 time（跨世代 timestamp 重号）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：刻意的设计选择（钉住，防被顺手清理） > 设计 (C12)：clear() 刻意不重置 time 8ms"
+    },
+    {
+      "id": "M76",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 UNREGISTERED 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 10ms"
+    },
+    {
+      "id": "M77",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：UNREGISTERED 不带 code",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 12ms"
+    },
+    {
+      "id": "M78",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：UNREGISTERED 后不 continue（后续子句对 undefined spec 取属性）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 15ms"
+    },
+    {
+      "id": "M79",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 SEVERITY_MISMATCH 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > SEVERITY_MISMATCH：诊断的 severity 与注册表不符 10ms"
+    },
+    {
+      "id": "M80",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：SEVERITY_MISMATCH 的 reg/got 写反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > SEVERITY_MISMATCH：诊断的 severity 与注册表不符 11ms"
+    },
+    {
+      "id": "M81",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 BAD_PREFIX 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > BAD_PREFIX：注册表里塞进白名单外的前缀 9ms"
+    },
+    {
+      "id": "M82",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：BAD_PREFIX 判据取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 14ms"
+    },
+    {
+      "id": "M83",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 NO_ATTRIBUTION 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > NO_ATTRIBUTION：诊断的 source.layer 被抹掉 7ms"
+    },
+    {
+      "id": "M84",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：NO_ATTRIBUTION 只查 source 存在、不查 layer",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > NO_ATTRIBUTION：诊断的 source.layer 被抹掉 9ms"
+    },
+    {
+      "id": "M85",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 FATAL_RECOVERABLE 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FATAL_RECOVERABLE：注册表里的 fatal 码被标成可恢复 11ms"
+    },
+    {
+      "id": "M86",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：FATAL_RECOVERABLE 判据看 spec.severity 而非 d.severity",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M86：FATAL_RECOVERABLE 必须查 d.severity 而非 spec.severity 11ms"
+    },
+    {
+      "id": "M87",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：FATAL_RECOVERABLE 的两个条件改为或",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 14ms"
+    },
+    {
+      "id": "M88",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 CAUSE_NOT_EARLIER 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CAUSE_NOT_EARLIER：因的 timestamp 不早于果 8ms"
+    },
+    {
+      "id": "M89",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：CAUSE_NOT_EARLIER 用 > 而非 >=（同 ts 被放行）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > DUPLICATE_TS：非相邻的两条时间戳相同 10ms"
+    },
+    {
+      "id": "M90",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：CAUSE_NOT_EARLIER 方向反（要求因晚于果）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 13ms"
+    },
+    {
+      "id": "M91",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：CAUSE_NOT_EARLIER 的 cause/effect 取值写反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CAUSE_NOT_EARLIER：因的 timestamp 不早于果 7ms"
+    },
+    {
+      "id": "M92",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 FOREIGN_CAUSE 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CHAIN/EXCEEDS_MEMBERSHIP：链长超过成员数（非环） 10ms"
+    },
+    {
+      "id": "M93",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：FOREIGN_CAUSE 判据改查 diags（O(n²) 且与 members 失同步时不同）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FOREIGN_CAUSE：因不是本 collector 的成员 9ms"
+    },
+    {
+      "id": "M94",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 NON_MONOTONIC_TS 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CAUSE_NOT_EARLIER：因的 timestamp 不早于果 9ms"
+    },
+    {
+      "id": "M95",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：单调性用 < 而非 <=（相邻同 ts 被放行）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > M95：相邻同 timestamp 必须报 NON_MONOTONIC_TS 10ms"
+    },
+    {
+      "id": "M96",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：单调性循环从 0 起（prev 为 undefined）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 8ms"
+    },
+    {
+      "id": "M97",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：单调性只查最后一对",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > CAUSE_NOT_EARLIER：因的 timestamp 不早于果 9ms"
+    },
+    {
+      "id": "M98",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 FATAL_NOT_SEALED 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FATAL_NOT_SEALED：有 fatal 却未封 7ms"
+    },
+    {
+      "id": "M99",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 SEALED_WITHOUT_FATAL 反向子句（回归 C05）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > SEALED_WITHOUT_FATAL：无 fatal 却已封（反向子句） 34ms"
+    },
+    {
+      "id": "M100",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：两个封印子句共用同一诊断串（无法区分方向）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#4 (C05)：sealed=true 而无 fatal 必须被检出（反向子句） 24ms"
+    },
+    {
+      "id": "M101",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：封印子句合并为 !==（两个方向报同一条）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > SEALED_WITHOUT_FATAL：无 fatal 却已封（反向子句） 9ms"
+    },
+    {
+      "id": "M102",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 MEMBERS_SIZE_MISMATCH 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FOREIGN_CAUSE：因不是本 collector 的成员 20ms"
+    },
+    {
+      "id": "M103",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：MEMBERS_SIZE 只查 members 少于 diags（多出项漏检）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > MEMBERS_SIZE_MISMATCH：members 多出一个不在 diags 的对象 19ms"
+    },
+    {
+      "id": "M104",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 MEMBERS_MISSING 逐条子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FOREIGN_CAUSE：因不是本 collector 的成员 6ms"
+    },
+    {
+      "id": "M105",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：MEMBERS_MISSING 不带 timestamp（同码多条无法定位）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > FOREIGN_CAUSE：因不是本 collector 的成员 10ms"
+    },
+    {
+      "id": "M106",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：去掉 DUPLICATE_TS 子句（非相邻重号漏检）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > DUPLICATE_TS：非相邻的两条时间戳相同 9ms"
+    },
+    {
+      "id": "M107",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：DUPLICATE_TS 的 add 提到判断之前（永不触发）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 回归：产品缺陷 > BUG L11#1 (C01)：合法 API 建的长因果链不得被判为数据损坏 10ms"
+    },
+    {
+      "id": "M108",
+      "file": "diagnostic.ts",
+      "desc": "checkInvariants：整体返回空数组（检查器彻底失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 检查器：损坏注入（每条子句都必须可观测） > UNREGISTERED：诊断的 code 已不在注册表 10ms"
+    },
+    {
+      "id": "M109",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_KEY_MISMATCH 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_KEY_MISMATCH：键与 spec.code 不一致 8ms"
+    },
+    {
+      "id": "M110",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_BAD_PREFIX 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_BAD_PREFIX + REG_PREFIX_NOT_DERIVED：前缀非法且非派生 9ms"
+    },
+    {
+      "id": "M111",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_PREFIX_NOT_DERIVED 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_BAD_PREFIX + REG_PREFIX_NOT_DERIVED：前缀非法且非派生 7ms"
+    },
+    {
+      "id": "M112",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：REG_PREFIX_NOT_DERIVED 取三段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > 干净注册表 checkRegistry 为空 10ms"
+    },
+    {
+      "id": "M113",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_FATAL_RECOVERABLE 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_FATAL_RECOVERABLE：fatal 却可恢复 11ms"
+    },
+    {
+      "id": "M114",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_NONFATAL_UNRECOVERABLE 反向子句（回归 C08）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_NONFATAL_UNRECOVERABLE：非 fatal 却不可恢复（反向子句） 10ms"
+    },
+    {
+      "id": "M115",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：两个 recoverable 子句共用同一诊断串",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_NONFATAL_UNRECOVERABLE：非 fatal 却不可恢复（反向子句） 8ms"
+    },
+    {
+      "id": "M116",
+      "file": "diagnostic.ts",
+      "desc": "checkRegistry：去掉 REG_SPEC_MUTABLE 子句",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L11 注册表检查器：损坏注入 > REG_SPEC_MUTABLE：spec 未冻结 6ms"
+    }
+  ]
+}

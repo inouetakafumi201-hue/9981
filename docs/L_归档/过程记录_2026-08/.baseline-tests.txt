@@ -1,0 +1,60 @@
+﻿   [33m[2m✓[22m[39m I. 数值铁律：clamp 机制[2m > [22mI4 clamp 属性在任意 delta 序列下恒不越界 [33m342[2mms[22m[39m
+   [33m[2m✓[22m[39m K. 全引擎串联链路[2m > [22mK3 长随机 Op 序列后引擎仍自洽：无异常、无悬空引用、无越界数值 [33m435[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ops/__tests__/prop-ops.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ops/__tests__/agent-ops.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 53[2mms[22m[39m
+ [32m✓[39m src/core/kernel/testing/__tests__/fuzz-deep-nesting.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 2449[2mms[22m[39m
+   [33m[2m✓[22m[39m 深度嵌套探底：容器嵌套（容器持有的物品自身也持有容器）[2m > [22mProperty N1: 对于任意深度 1-20 的容器嵌套链（物品 A 持有容器，容器里的物品 B 自身也持有容器...），不变量恒成立，访问最深层元素的 Op 调用形式与浅层一致 [33m995[2mms[22m[39m
+   [33m[2m✓[22m[39m 深度嵌套探底：node.merge 连锁链[2m > [22mProperty N2: 对于任意长度 2-15 的 node.merge 连锁（A吸收B，结果再吸收C，...），最终节点应保留全部中间层的占位者引用，不产生悬空引用 [33m749[2mms[22m[39m
+   [33m[2m✓[22m[39m 深度嵌套探底：Attachment grantedBy 链[2m > [22mProperty N3: 对于任意深度 1-30 的 grantedBy 链（A授予B，B授予C，...），移除链首应级联移除全部子代，不留任何残留 [33m428[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ops/__tests__/relation-ops.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 128[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ops/__tests__/outcome-ops.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 78[2mms[22m[39m
+ [32m✓[39m src/core/kernel/spec-compiler/__tests__/compiler.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 80[2mms[22m[39m
+ [32m✓[39m src/core/kernel/expr/__tests__/query-log.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+ [32m✓[39m src/core/kernel/spec-compiler/__tests__/properties.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 4633[2mms[22m[39m
+   [33m[2m✓[22m[39m Property: arbitrary input is total and fail-closed[2m > [22mnever throws and never returns a rejection without a blocking diagnostic [33m335[2mms[22m[39m
+   [33m[2m✓[22m[39m Property: compilation is reproducible and single-effect[2m > [22myields the same artifact hash for the same document across independent hosts [33m1200[2mms[22m[39m
+   [33m[2m✓[22m[39m Property: compilation is reproducible and single-effect[2m > [22mdoes not depend on the order definitions are written in [33m1202[2mms[22m[39m
+   [33m[2m✓[22m[39m Property: compilation is reproducible and single-effect[2m > [22mnever publishes anything in draft mode, whatever the input [33m309[2mms[22m[39m
+ [32m✓[39m src/core/kernel/state/__tests__/value.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 31[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ai/__tests__/explanation-policy.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m src/core/kernel/topology/__tests__/micro-scene.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m src/core/kernel/events/__tests__/rule-lifecycle.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m src/class/__tests__/architecture-terminology.test.ts [2m([22m[2m1 test[22m[2m)[22m[90m 247[2mms[22m[39m
+ [32m✓[39m src/core/kernel/topology/__tests__/metrics.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m src/core/kernel/topology/__tests__/container.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m src/core/kernel/topology/__tests__/prefab.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+ [32m✓[39m src/core/kernel/__tests__/gateway.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m src/core/kernel/topology/__tests__/graph.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m src/core/kernel/state/__tests__/relation.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 250[2mms[22m[39m
+ [32m✓[39m src/core/kernel/events/__tests__/no-blocking.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m src/core/kernel/state/__tests__/entity.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+ [32m✓[39m src/core/kernel/ai/__tests__/ai.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m src/core/kernel/state/__tests__/tag.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m src/core/kernel/state/__tests__/attachment.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m src/core/kernel/expr/__tests__/named-expr.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m src/core/kernel/testing/__tests__/fuzz.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 3499[2mms[22m[39m
+   [33m[2m✓[22m[39m 全面对抗性属性测试：长随机 Op 序列探底[2m > [22mProperty F1: 对于任意长度 20-200 的随机 Op 序列（含悬空引用与边界数值），全部调用永不抛出未捕获异常 [33m1235[2mms[22m[39m
+   [33m[2m✓[22m[39m 全面对抗性属性测试：长随机 Op 序列探底[2m > [22mProperty F2: 对于任意随机 Op 序列，序列执行完毕后落地的 WorldState 应恒满足全部不变量（零条 fatal 诊断） [33m1010[2mms[22m[39m
+   [33m[2m✓[22m[39m 全面对抗性属性测试：长随机 Op 序列探底[2m > [22mProperty F3: 对于任意随机 Op 序列，任一步返回 ok:false 时，该次 invoke 调用不应改变 holder 持有的 WorldState 引用（事务原子性的跨层版本） [33m913[2mms[22m[39m
+ [32m✓[39m src/play/action-turn/__tests__/action-turn-playpack.test.ts [2m([22m[2m30 tests[22m[2m)[22m[33m 15478[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: pure JSON decoding[2m > [22mdecodes the on-disk playpack without any executable field [33m1015[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: pure JSON decoding[2m > [22mdeclares no mechanic-specific kernel operation [33m835[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: activation[2m > [22minitializes pools, selects the schedule, and builds the action-turn queue [33m904[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: activation[2m > [22morders the queue by action points then by the tie-break roll [33m835[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: activation[2m > [22mproduces identical results for identical named random streams [33m1781[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: activation[2m > [22mleaves definitions and world state untouched when activation fails [33m687[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: stamina window actions[2m > [22mcharges 1 SP for the +1 power die and records an exclusive window choice [33m427[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: stamina window actions[2m > [22mcharges 2 SP for the +2 power die [33m303[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: stamina window actions[2m > [22mmakes the power die and the reversal mutually exclusive within one window [33m307[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: stamina window actions[2m > [22mcharges 1 AP for the regular reversal and 2 SP for the super reversal [33m309[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: parry[2m > [22mblocks the damage, staggers the attacker, and raises the attacker stamina [33m347[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: weakness chain[2m > [22mcovers every documented one-to-one damage-to-weakness pair [33m2594[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: weakness chain[2m > [22mchains into overload when the weakness gain overflows stamina [33m332[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: overload[2m > [22mdoes not trigger when stamina merely reaches the cap [33m317[2mms[22m[39m
+   [33m[2m✓[22m[39m action-turn playpack: cleanup phase[2m > [22mrecovers one stamina per actor without exceeding the cap [33m324[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m77 passed[39m[22m[90m (77)[39m
+[2m      Tests [22m [1m[32m1072 passed[39m[22m[90m (1072)[39m
+[2m   Start at [22m 00:34:21
+[2m   Duration [22m 18.86s[2m (transform 17.96s, setup 0ms, collect 60.01s, tests 40.61s, environment 38ms, prepare 19.64s)[22m
+

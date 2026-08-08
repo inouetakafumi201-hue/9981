@@ -1,0 +1,73 @@
+{
+  "id": "item_iced_americano_001",
+  "name": "冰美式咖啡",
+  "category": "consumable",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": [
+      "item.capability.recover"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "恢复",
+    "体力",
+    "消耗品",
+    "饮料",
+    "清醒"
+  ],
+  "stackable": true,
+  "grantedStates": [],
+  "description": "冰镇的美式咖啡，苦涩中带着清凉。在零和睡眠协议的高压环境下，一杯咖啡可能是最好的提神剂。",
+  "actions": [
+    {
+      "name": "喝咖啡",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP饮用，恢复1点体力",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{actor}.props.stamina",
+          "delta": 1,
+          "clamp": {
+            "min": 0,
+            "max": 5
+          }
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "pendingKernelOps": [
+    "list.remove"
+  ],
+  "pendingKernelOpsNote": "消耗品用后从背包移除仍未建模：需要先确定背包容器的列表路径，才能给出 list.remove 的完整参数。",
+  "mvp": true,
+  "weight": "light",
+  "source": [
+    "地图生成",
+    "商店",
+    "搜刮"
+  ],
+  "worldbuilding": {
+    "origin": "校园食堂自动贩卖机",
+    "flavorText": "冰块撞击杯壁的声音，是早晨最好的闹钟。"
+  },
+  "itemParameters": {
+    "item.capability.recover": {
+      "targetSelector": "self",
+      "targetProperty": "stamina",
+      "amount": "actions[].effects[].delta",
+      "applicationTiming": "on-use",
+      "operation": "prop.add"
+    }
+  }
+}

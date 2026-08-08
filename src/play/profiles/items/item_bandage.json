@@ -1,0 +1,68 @@
+{
+  "id": "item_bandage_001",
+  "name": "绷带",
+  "category": "consumable",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": [
+      "item.capability.recover"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "医疗",
+    "恢复",
+    "消耗品",
+    "轻伤治疗"
+  ],
+  "stackable": true,
+  "grantedStates": [],
+  "description": "基础的急救绷带，可以快速包扎伤口。零和睡眠协议的标准配置物资。",
+  "actions": [
+    {
+      "name": "使用绷带",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP从背包使用",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{actor}.props.hp",
+          "delta": 1,
+          "clamp": {
+            "min": 0,
+            "max": 5
+          }
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "pendingKernelOps": [
+    "list.remove"
+  ],
+  "pendingKernelOpsNote": "消耗品用后从背包移除仍未建模：需要先确定背包容器的列表路径，才能给出 list.remove 的完整参数。",
+  "mvp": true,
+  "weight": "light",
+  "source": [
+    "地图生成",
+    "商店",
+    "搜刮"
+  ],
+  "itemParameters": {
+    "item.capability.recover": {
+      "targetSelector": "self",
+      "targetProperty": "hp",
+      "amount": "actions[].effects[].delta",
+      "applicationTiming": "on-use",
+      "operation": "prop.add"
+    }
+  }
+}

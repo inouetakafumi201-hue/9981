@@ -1,0 +1,24 @@
+{
+  "name": "kernel-l5-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@types/node": "^26.1.2",
+    "fast-check": "^4.9.0",
+    "tsx": "^4.23.8",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,699 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Define immutable shared TypeScript models and schema primitives in `src/l2/model/`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027296461
+      },
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027349551
+      }
+    ],
+    "1.2 Implement canonical ordering, immutable collection utilities, diagnostic construction, and diagnostic sorting in `src/l2/model/`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027296623
+      }
+    ],
+    "2.1 Implement source-statement classification and proposed semantic-family qualification in `src/l2/compiler/source-classifier.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027296762
+      }
+    ],
+    "2.2 Implement precedence resolution, same-level conflict preservation, and decision-ID reuse tracking in `src/l2/compiler/conflict-resolver.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027296903
+      }
+    ],
+    "2.3 Compose the `Specification_Compiler.compile` orchestration in `src/l2/compiler/specification-compiler.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297059
+      }
+    ],
+    "3.1 Implement versioned declarative JSON parsing and prohibited-construct detection in `src/l2/codec/json-codec.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297204
+      }
+    ],
+    "3.2 Implement canonical JSON emission and parse-canonical re-entry in `src/l2/codec/json-canonicalizer.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297283
+      }
+    ],
+    "3.3 Implement the `UGC_Adapter` candidate conversion and shared JSON-validation handoff in `src/l2/ugc/ugc-adapter.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297399
+      }
+    ],
+    "4.1 Implement the `Definition_Validator` framework and package-shape validation in `src/l2/validation/validator.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297659
+      }
+    ],
+    "4.2 Implement layer-boundary, canonical-term, Def-kind, abstract-instantiation, and semantic-family validators in `src/l2/validation/classification-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027297847
+      }
+    ],
+    "4.3 Implement parameter-schema, numeric-ownership, source-support, and terminology validators in `src/l2/validation/parameter-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027298160
+      }
+    ],
+    "4.4 Implement inheritance, composition, and type-identity validation rules in `src/l2/validation/inheritance-composition-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027298543
+      }
+    ],
+    "4.5 Implement action-family and three-gateway contract validators in `src/l2/validation/action-gateway-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027298823
+      }
+    ],
+    "4.6 Implement natural-scene, micro-scene, transition, and vehicle-lifecycle validation in `src/l2/validation/spatial-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027299077
+      }
+    ],
+    "4.7 Implement item, weapon, armor, consumable, and vehicle capability validators in `src/l2/validation/item-vehicle-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027299324
+      }
+    ],
+    "4.8 Implement damage, status, skill, movement, attachment, and AI-behavior schema validators in `src/l2/validation/effect-ai-rules.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027299502
+      }
+    ],
+    "5.1 Implement candidate-plus-active typed reference graph construction in `src/l2/resolution/reference-graph.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027299681
+      }
+    ],
+    "5.2 Implement lineage and nested-composition resolution in `src/l2/resolution/definition-resolver.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300114
+      }
+    ],
+    "5.3 Implement dependent revalidation for overrides and removals in `src/l2/resolution/dependent-revalidation.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300374
+      }
+    ],
+    "5.4 Integrate graph/resolution outcomes into package validation in `src/l2/validation/package-validation.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300450
+      }
+    ],
+    "6.1 Implement working-copy package activation and atomic active-registry replacement in `src/l2/registry/definition-registry.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300518
+      }
+    ],
+    "6.2 Implement canonical snapshot generation and snapshot-equivalence support in `src/l2/registry/canonical-snapshot.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300592
+      }
+    ],
+    "6.3 Implement scoped, deeply immutable semantic projection in `src/l2/registry/read-only-projection.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300668
+      }
+    ],
+    "6.4 Implement validated runtime submission and the sole Op invocation mapping in `src/l2/registry/action-submitter.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300749
+      }
+    ],
+    "7.1 Implement registered-family valid/invalid candidate generators in `src/l2/testing/definition-generators.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027300896
+      }
+    ],
+    "7.2 Implement independent observation and controlled fault injection in `src/l2/testing/test-interface.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027301114
+      }
+    ],
+    "8.1 Implement `AI_Adapter.aiView` and AI action submission integration in `src/l2/adapters/ai-adapter.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027301319
+      }
+    ],
+    "8.2 Implement `UI_Adapter.uiDescriptor` and UI action submission integration in `src/l2/adapters/ui-adapter.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027301475
+      }
+    ],
+    "9.1 Add Property 1 source-adjudication PBT in `test/l2/properties/source-adjudication.property.test.ts` using generated source-record sets.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027301728
+      }
+    ],
+    "9.2 Add Property 2 family-admission and layer-boundary PBT in `test/l2/properties/family-boundary.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027301983
+      }
+    ],
+    "9.3 Add Property 3 numeric classification/ownership/range PBT in `test/l2/properties/numeric-ownership.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027302261
+      }
+    ],
+    "9.4 Add Property 4 inheritance-resolution idempotence PBT in `test/l2/properties/inheritance-idempotence.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027302519
+      }
+    ],
+    "9.5 Add Property 5 independent-composition PBT in `test/l2/properties/composition-commutativity.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027302784
+      }
+    ],
+    "9.6 Add Property 6 declarative JSON semantic round-trip PBT in `test/l2/properties/json-roundtrip.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027303052
+      }
+    ],
+    "9.7 Add Property 7 JSON normalization and UGC-unification PBT in `test/l2/properties/json-normalization-ugc.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027303496
+      }
+    ],
+    "9.8 Add Property 8 reference-graph completeness PBT in `test/l2/properties/reference-completeness.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027303772
+      }
+    ],
+    "9.9 Add Property 9 diagnostic completeness/determinism PBT in `test/l2/properties/diagnostic-determinism.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027304047
+      }
+    ],
+    "9.10 Add Property 10 atomic activation/rollback PBT in `test/l2/properties/atomic-activation.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027304385
+      }
+    ],
+    "9.11 Add Property 11 read-only projection immutability/scope PBT in `test/l2/properties/read-only-projection.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027304670
+      }
+    ],
+    "9.12 Add Property 12 unified action submission PBT in `test/l2/properties/unified-submission.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027304931
+      }
+    ],
+    "9.13 Add Property 13 micro-scene parent/lifecycle PBT in `test/l2/properties/micro-scene-lifecycle.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027305173
+      }
+    ],
+    "9.14 Add Property 14 effect/action-family composition PBT in `test/l2/properties/effect-family-composition.property.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027305430
+      }
+    ],
+    "10.1 Add adjacent-module DAG contract tests in `test/l2/integration/module-dag.contract.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027305585
+      }
+    ],
+    "10.2 Add L1-boundary integration tests in `test/l2/integration/op-hook-boundary.integration.test.ts` using injected kernel-contract doubles.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027305745
+      }
+    ],
+    "10.3 Add AI/UI consumer integration and renderer-substitution tests in `test/l2/integration/adapter-consumers.integration.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027306019
+      }
+    ],
+    "10.4 Add controlled failure-injection integration tests in `test/l2/integration/failure-injection.integration.test.ts`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027306305
+      }
+    ],
+    "10.5 Add approved regression fixtures for canonical JSON, diagnostics, and snapshots in `test/l2/regression/`.": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027306574
+      }
+    ],
+    "11. Checkpoint — enforce all serial quality gates": [
+      {
+        "executionId": "0f630ee7-5b83-4527-9567-7615cafd772c",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786027306831
+      }
+    ],
+    "**1.1 [Pending] 定义不可变共享 TypeScript 模型与 Schema 原语**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028149610
+      },
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028202732
+      }
+    ],
+    "**1.2 [Pending] 实现规范化排序、不可变集合工具和诊断构造/排序**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028149919
+      },
+      {
+        "executionId": "d4dd66ac-4ca4-45f0-b60e-b297fc4870b5",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028453320
+      }
+    ],
+    "**2.1 [Pending] 实现来源分类、三判据新语义族资格判定和历史示例归类**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028150170
+      }
+    ],
+    "**2.2 [Pending] 实现优先级裁决、同级冲突保留和决策编号复用追踪**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028150422
+      }
+    ],
+    "**2.3 [Pending] 编排 `Specification_Compiler.compile`**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028150712
+      }
+    ],
+    "**3.1 [Pending] 实现带版本的声明式 JSON 解析与禁止构造检测**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028151021
+      }
+    ],
+    "**3.2 [Pending] 实现 Canonical JSON 输出与规范化往返入口**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028151291
+      }
+    ],
+    "**3.3 [Pending] 实现 `UGC_Adapter` 候选转换和统一 JSON 验证交接**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028151545
+      }
+    ],
+    "**4.1 [Pending] 实现验证器框架、结果聚合和包形状验证**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028151765
+      }
+    ],
+    "**4.2 [Pending] 实现层级边界、术语、Def kind、抽象实例化和语义族规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028151985
+      }
+    ],
+    "**4.3 [Pending] 实现参数 Schema、数值归属、来源支持和术语数值规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028152146
+      }
+    ],
+    "**4.4 [Pending] 实现继承、组合和 Type_Identity 验证规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028152348
+      }
+    ],
+    "**4.5 [Pending] 实现 Action_Family 与三种 Gateway_Family 契约验证**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028152525
+      }
+    ],
+    "**4.6 [Pending] 实现天然场景、微型场景、过渡和车辆生命周期规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028152775
+      }
+    ],
+    "**4.7 [Pending] 实现物品、武器、防具、消耗品和载具能力规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028152859
+      }
+    ],
+    "**4.8 [Pending] 实现伤害、状态、技能、移动、附件和 AI 行为 Schema 规则**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028153009
+      }
+    ],
+    "**5.1 [Pending] 构建候选包叠加活动集的类型化引用图**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028153292
+      }
+    ],
+    "**5.2 [Pending] 实现继承谱系和嵌套 Composition 解析**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028153553
+      }
+    ],
+    "**5.3 [Pending] 实现覆盖与删除的依赖重验证**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028153941
+      }
+    ],
+    "**5.4 [Pending] 将图、解析和依赖重验证接入包验证**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028154110
+      }
+    ],
+    "**6.1 [Pending] 实现工作副本包激活与活动注册表原子替换**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028154374
+      }
+    ],
+    "**6.2 [Pending] 实现 Canonical_Snapshot 生成与快照等价支持**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028154552
+      }
+    ],
+    "**6.3 [Pending] 实现授权范围内深度不可变语义投影**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028154761
+      }
+    ],
+    "**6.4 [Pending] 实现统一运行时提交与唯一 `OpRegistry.invoke` 映射**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028154988
+      }
+    ],
+    "**7.1 [Pending] 实现各语义族有效/无效定义生成器**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028155308
+      }
+    ],
+    "**7.2 [Pending] 实现独立观察、快照观察和受控故障注入**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028155547
+      }
+    ],
+    "**8.1 [Pending] 实现 `AI_Adapter.aiView` 与统一动作提交集成**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028155794
+      }
+    ],
+    "**8.2 [Pending] 实现 `UI_Adapter.uiDescriptor` 与 UI 动作提交集成**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028156048
+      }
+    ],
+    "**9.1 [Pending] 为 Property 1 编写来源裁决 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028156301
+      }
+    ],
+    "**9.2 [Pending] 为 Property 2 编写三判据与层级边界 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028156566
+      }
+    ],
+    "**9.3 [Pending] 为 Property 3 编写数值分类/归属/范围 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028156745
+      }
+    ],
+    "**9.4 [Pending] 为 Property 4 编写继承解析幂等 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028156919
+      }
+    ],
+    "**9.5 [Pending] 为 Property 5 编写独立组合交换性与类型保持 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028157068
+      }
+    ],
+    "**9.6 [Pending] 为 Property 6 编写 Declarative JSON 语义往返 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028157260
+      }
+    ],
+    "**9.7 [Pending] 为 Property 7 编写 JSON 规范化幂等与 UGC 统一验证 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028157468
+      }
+    ],
+    "**9.8 [Pending] 为 Property 8 编写引用图完整性与确定性拒绝 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028157774
+      }
+    ],
+    "**9.9 [Pending] 为 Property 9 编写诊断完整性与确定性 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028158089
+      }
+    ],
+    "**9.10 [Pending] 为 Property 10 编写原子激活/覆盖/删除回滚 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028158397
+      }
+    ],
+    "**9.11 [Pending] 为 Property 11 编写只读投影不可变与作用域 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028158687
+      }
+    ],
+    "**9.12 [Pending] 为 Property 12 编写统一动作提交与唯一写入通道 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028159000
+      }
+    ],
+    "**9.13 [Pending] 为 Property 13 编写微型场景父级与生命周期 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028159254
+      }
+    ],
+    "**9.14 [Pending] 为 Property 14 编写动作/效果类无玩法值组合 PBT**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028159560
+      }
+    ],
+    "**10.1 [Pending] 编写固定来源、语义族、网关、空间、效果和 UI 代表性单元测试**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028159763
+      }
+    ],
+    "**10.2 [Pending] 编写相邻模块 DAG 契约与 L1 Op/Hook/事务边界集成测试**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028159991
+      }
+    ],
+    "**10.3 [Pending] 编写 AI/UI 消费者与渲染替换集成测试**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028160139
+      }
+    ],
+    "**10.4 [Pending] 编写解析失败、覆盖失效、事务失败、Hook 和评估故障注入测试**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028160242
+      }
+    ],
+    "**10.5 [Pending] 建立 Canonical JSON、诊断和 Canonical_Snapshot 回归夹具**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028160329
+      }
+    ],
+    "**10.6 [Pending] 完成端到端装载、动作链、全量测试配置和最终质量门禁**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028160532
+      }
+    ],
+    "**11. 最终检查点 — 全部质量门禁通过后再交付**": [
+      {
+        "executionId": "c5b2c015-e670-4405-b313-fcc8edaad18d",
+        "chatSessionId": "sess_63c6542d-10a4-4ea6-8b1b-99b13766e467",
+        "timestamp": 1786028160796
+      }
+    ]
+  }
+}

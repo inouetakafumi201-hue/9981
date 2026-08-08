@@ -1,0 +1,10 @@
+{
+  "id": "status_blocking",
+  "name": "格挡",
+  "category": "positive",
+  "type": "tag",
+  "tags": ["defense", "guard", "response"],
+  "description": "表示实体处于主动防护准备中的语义状态。",
+  "capabilityIds": ["status.capability.defense_response", "status.capability.preparation"],
+  "configurableParameters": ["defenseScope", "responseMode", "presentationPolicy"]
+}

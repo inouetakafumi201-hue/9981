@@ -1,0 +1,10 @@
+{
+  "id": "status_poisoned",
+  "name": "中毒",
+  "category": "negative",
+  "type": "numeric",
+  "tags": ["poison", "ongoing-effect", "adverse"],
+  "description": "表示实体正承受持续毒素影响的语义状态。",
+  "capabilityIds": ["status.capability.ongoing_effect", "status.capability.toxin_relation"],
+  "configurableParameters": ["affectedScope", "effectPolicy", "stackingPolicy", "presentationPolicy"]
+}

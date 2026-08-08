@@ -1,0 +1,21 @@
+{
+  "title": "DamageTypeClass",
+  "description": "无玩法数值和克制关系的伤害类别基类。标识格式只约束编号形态，不隐含类别数量上限。",
+  "type": "object",
+  "required": ["id", "name", "axis", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DMG_[0-9]{2,}$",
+      "description": "稳定伤害类别标识；位数可扩展，不隐含条目数量上限。"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "axis": {
+      "type": "string",
+      "enum": ["category"],
+      "description": "所属语义轴；伤害类别轴与伤害结算语义轴正交，结算语义登记在武器目录。"
+    },
+    "description": { "type": "string", "minLength": 1 }
+  }
+}

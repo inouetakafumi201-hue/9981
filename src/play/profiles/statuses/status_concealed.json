@@ -1,0 +1,36 @@
+{
+  "id": "status_concealed",
+  "name": "隐蔽",
+  "category": "positive",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_concealed"
+  },
+  "duration": "until_move",
+  "durationUnit": "until_event",
+  "stacking": "none",
+  "stackBehavior": "unique",
+  "effects": {
+    "onSearch": {
+      "effect": "cannot_be_found",
+      "sceneType": "macro",
+      "description": "在大场景不能被找到"
+    }
+  },
+  "breakConditions": [
+    {"type": "movement", "sceneType": "any", "effect": "remove", "description": "任何移动"},
+    {"type": "action", "actionId": "cancel_conceal", "effect": "cancel", "description": "主动取消"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_concealed", "type": "none", "description": "同名不叠加"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnSearch", "OnMovement"],
+  "icon": "eye-off",
+  "color": "darkgreen",
+  "priority": 22,
+  "description": "在大场景不能被找到，移动后解除",
+  "tags": ["stealth", "detection-immunity", "buff"],
+  "source": ["环境: 草丛或阴影", "物品: 烟雾弹"],
+  "mvp": true,
+  "notes": "只在大场景生效，小或中场景贴身仍然有效"
+}

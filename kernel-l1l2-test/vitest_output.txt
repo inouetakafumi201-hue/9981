@@ -1,0 +1,15 @@
+﻿
+ RUN  v2.1.9 D:/coding/WakeUp/kernel-l1l2-test
+
+ ✓ test/l1l2-property.test.ts (15 tests) 12144ms
+   ✓ L1/L2: Entity + Component 原语 > ECS-1..6: 任意操作序列后不变量成立 5924ms
+   ✓ L1/L2: Entity + Component 原语 > entity_destroy后该Entity的所有Component和索引均被清理 2825ms
+   ✓ L1/L2: Entity + Component 原语 > comp_add→comp_del→comp_add 状态可复现 393ms
+   ✓ L1/L2: Entity + Component 原语 > comp_get返回值被外部改写不影响世界状态 320ms
+   ✓ L1/L2: Entity + Component 原语 > INV-16: comp_set拒绝NaN/Infinity 2340ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  06:58:10
+   Duration  14.45s (transform 203ms, setup 0ms, collect 1.09s, tests 12.14s, environment 0ms, prepare 257ms)
+

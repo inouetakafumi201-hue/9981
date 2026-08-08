@@ -1,0 +1,94 @@
+{
+  "id": "wp_shotgun_pump",
+  "name": "泵动式霰弹枪",
+  "category": "firearm",
+  "gunType": "shotgun",
+  "description": "近距离毁灭性武器，每发消耗2发弹药。城市清理的标准配置。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile",
+      "weapon.capability.scatter_attribute"
+    ]
+  },
+  "weightClass": "medium",
+  "rangeClass": "close",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 3,
+  "range": 1,
+  "ammoCost": 2,
+  "ammoType": "12号",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "霰弹射击",
+      "apCost": 1,
+      "target": "area",
+      "description": "消耗2发弹药，近距(1格)造成3点伤害，可攻击扇形区域",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{targets}.props.hp",
+          "delta": -3,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "shotgun",
+    "close-range",
+    "area-damage"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害3，上限值，体现霰弹枪的近距离毁灭性",
+    "ammoRationale": "消耗2发弹药，高弹药消耗平衡高伤害",
+    "rangeRationale": "近距(1格)，霰弹枪的有效射程极短",
+    "volumeRationale": "占2格，双手持用，体现霰弹枪的体积"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.medium",
+      "handedness": "two-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.close",
+      "effectiveRangeField": "range"
+    }
+  }
+}

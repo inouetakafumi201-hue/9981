@@ -1,0 +1,96 @@
+{
+  "id": "wp_machinegun_m249",
+  "name": "M249机枪",
+  "category": "firearm",
+  "gunType": "machinegun",
+  "description": "持续火力压制武器，高弹药消耗换取强大压制力。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.burst_attribute",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile",
+      "weapon.capability.sweep_attribute"
+    ]
+  },
+  "weightClass": "heavy",
+  "rangeClass": "long",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 2,
+  "range": 3,
+  "ammoCost": 2,
+  "ammoType": "5.56mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "射击",
+      "apCost": 1,
+      "description": "消耗2发弹药，在3格射程内选择目标射击",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -2,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "machinegun",
+    "heavy"
+  ],
+  "mvp": false,
+  "designNotes": {
+    "damageRationale": "伤害2，中等伤害但可覆盖更大区域",
+    "ammoRationale": "消耗2发弹药，高弹药消耗是机枪的特征",
+    "rangeRationale": "远距(3格)，动作目标由射程和效果中的目标绑定共同确定",
+    "volumeRationale": "占2格双手，体现机枪的大型弹药箱"
+  },
+  "unresolvedIssues": [
+    "伤害说明称可覆盖更大区域，但唯一动作及效果没有区域目标或区域效果字段，覆盖语义未落地。",
+    "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
+  ],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.heavy",
+      "handedness": "two-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.long",
+      "effectiveRangeField": "range"
+    }
+  }
+}

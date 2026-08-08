@@ -1,0 +1,10 @@
+{
+  "id": "status_sleeping",
+  "name": "睡眠",
+  "category": "positive",
+  "type": "tag",
+  "tags": ["rest", "inactive", "recovery"],
+  "description": "表示实体处于休息与低活动阶段的语义状态。",
+  "capabilityIds": ["status.capability.recovery", "status.capability.awareness_reduction", "status.capability.action_eligibility"],
+  "configurableParameters": ["eligibleActionPolicy", "recoveryPolicy", "awarenessPolicy", "presentationPolicy"]
+}

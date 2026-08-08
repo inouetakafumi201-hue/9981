@@ -1,0 +1,529 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 空间族语义目录",
+  "description": "基类层空间语义最小单元目录：天然场景（大/中/小）、微型场景与过渡连接。目录只声明类型身份、附属关系与通行接口，不创建任何具体地图节点。",
+  "category": "scenes",
+  "semanticFamilies": ["natural-scene", "micro-scene", "transition"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "天然场景按尺度只有大、中、小三级；微型场景与过渡连接各自只有一个语义类型，可有限列举。",
+    "composable": true,
+    "compositionRationale": "天然场景与微型场景、过渡连接、通行条件、阻挡能力组合成具体地图；微型场景由实体创建并附属于天然场景。",
+    "gameplayIndependent": true,
+    "independenceRationale": "空间类不知道具体地图排布、生成分布与胜负条件；这些全部由玩法层提供。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": "docs/L0_规范宪法.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "section": "四、引擎层铁律 / 4.3 拓扑铁律"
+      },
+      "precedence": "l0-constitution",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l0:topology-iron-law:micro-scene-attaches-to-natural-scene"
+    },
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 7: 空间、微型场景和过渡契约"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:space-family:scene-micro-scene-transition-contracts"
+    },
+    {
+      "sourceFile": "docs/L2_基类层/03_空间系统.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L2_基类层/03_空间系统.md",
+        "section": "场景节点分类 / 4. 微型场景 / 微型场景的三种创建者"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:03:micro-scene-three-creators-entity-transition-small-scene"
+    },
+    {
+      "sourceFile": "docs/L2_基类层/03_空间系统.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L2_基类层/03_空间系统.md",
+        "section": "场景节点分类 / 4. 微型场景 / 空旷地（Vacant Ground）"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:03:vacant-ground-personal-in-large-medium-forbidden-in-small"
+    },
+    {
+      "sourceFile": "docs/L2_基类层/03_空间系统.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L2_基类层/03_空间系统.md",
+        "section": "距离范式（基准从 1 开始 — D-051）"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:03:distance-cross-natural-scene-plus-one-large-scene-times-two"
+    }
+  ],
+  "classes": [
+    {
+      "id": "scene.class.large",
+      "name": "大场景类",
+      "description": "在距离公式中按加权计量的最开阔天然场景类型。它声明占用、过渡端点、微型场景父级、个人空旷地与距离权重接口，不指定任何具体地图节点。",
+      "defKind": "node",
+      "semanticFamily": "natural-scene",
+      "abstract": true,
+      "sceneScale": "large",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "只有大场景必须具备距离权重能力：距离公式对跨大场景的移动按节点权重加权计量。该必需能力是它与中场景、小场景的类型分界。"
+      },
+      "admittedChildSceneScales": ["medium"],
+      "admitsMicroScene": true,
+      "connectionBoundId": "structural-bound.scene.connection_limit",
+      "requiredCapabilityIds": [
+        "scene.capability.occupancy",
+        "scene.capability.transition_endpoint",
+        "scene.capability.micro_scene_parenthood",
+        "scene.capability.personal_vacant_ground",
+        "scene.capability.traversal_weight"
+      ],
+      "optionalCapabilityIds": ["scene.capability.blocking"],
+      "parameters": [
+        { "key": "childSceneRefs", "description": "编排期可选的下级中场景引用集合；它只服务地图编排校验，不得被编译进运行期节点的附属字段。", "required": false, "valueShape": "array<reference<natural-scene>>" },
+        { "key": "microSceneRefs", "description": "附属于该场景的微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "transitionRefs", "description": "以该场景为端点的过渡连接引用集合。", "required": true, "valueShape": "array<reference<transition>>" }
+      ],
+      "kernelOps": ["node.create", "node.destroy", "node.merge", "node.split"]
+    },
+    {
+      "id": "scene.class.medium",
+      "name": "中场景类",
+      "description": "距离公式中按单位计量的标准天然场景类型。它声明占用、过渡端点、微型场景父级与个人空旷地接口，不承担共享微型场景职责，也不加权计距。",
+      "defKind": "node",
+      "semanticFamily": "natural-scene",
+      "abstract": true,
+      "sceneScale": "medium",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "中场景既不具备大场景的距离权重必需能力，也不具备小场景的共享微型场景必需能力；它是三档中唯一只保留基础占用、过渡端点、微型场景父级与个人空旷地的尺度。"
+      },
+      "admittedChildSceneScales": ["small"],
+      "admitsMicroScene": true,
+      "connectionBoundId": "structural-bound.scene.connection_limit",
+      "requiredCapabilityIds": [
+        "scene.capability.occupancy",
+        "scene.capability.transition_endpoint",
+        "scene.capability.micro_scene_parenthood",
+        "scene.capability.personal_vacant_ground"
+      ],
+      "optionalCapabilityIds": ["scene.capability.blocking"],
+      "parameters": [
+        { "key": "parentSceneRef", "description": "编排期可选的上级大场景引用；它只服务地图编排校验，不得被编译进运行期节点的附属字段。", "required": false, "valueShape": "reference<natural-scene>" },
+        { "key": "childSceneRefs", "description": "编排期可选的下级小场景引用集合；同样只服务地图编排校验。", "required": false, "valueShape": "array<reference<natural-scene>>" },
+        { "key": "microSceneRefs", "description": "附属于该场景的微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "transitionRefs", "description": "以该场景为端点的过渡连接引用集合。", "required": true, "valueShape": "array<reference<transition>>" }
+      ],
+      "kernelOps": ["node.create", "node.destroy", "node.merge", "node.split"]
+    },
+    {
+      "id": "scene.class.small",
+      "name": "小场景类",
+      "description": "唯一必须暴露共享微型场景能力的天然场景类型。场内所有活体共处该场景自带的共享微型场景，因此它排除个人空旷地式微型场景。",
+      "defKind": "node",
+      "semanticFamily": "natural-scene",
+      "abstract": true,
+      "sceneScale": "small",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "只有小场景必须具备共享微型场景能力，且必须排除个人空旷地微型场景；该必需能力与该排除项共同构成它与大场景、中场景的类型分界。"
+      },
+      "admittedChildSceneScales": [],
+      "admitsMicroScene": true,
+      "connectionBoundId": "structural-bound.scene.connection_limit",
+      "requiredCapabilityIds": [
+        "scene.capability.occupancy",
+        "scene.capability.transition_endpoint",
+        "scene.capability.shared_micro_scene",
+        "scene.capability.micro_scene_parenthood"
+      ],
+      "optionalCapabilityIds": ["scene.capability.blocking"],
+      "parameters": [
+        { "key": "parentSceneRef", "description": "编排期可选的上级中场景引用；它只服务地图编排校验，不得被编译进运行期节点的附属字段。", "required": false, "valueShape": "reference<natural-scene>" },
+        { "key": "microSceneRefs", "description": "附属于该场景的微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "sharedMicroSceneCapabilityRef", "description": "共享微型场景能力引用。", "required": true, "valueShape": "reference<capability>" },
+        { "key": "transitionRefs", "description": "以该场景为端点的过渡连接引用集合。", "required": true, "valueShape": "array<reference<transition>>" }
+      ],
+      "excludedMicroSceneKinds": ["personal-vacant-ground"],
+      "kernelOps": ["node.create", "node.destroy", "node.merge", "node.split"]
+    },
+    {
+      "id": "micro-scene.class.contact",
+      "name": "接触微型场景类",
+      "description": "由实体创建、恰好附属于一个天然场景、承载局部接触关系的微型场景类型。创建者信息只是不可变溯源数据，不承担归属或生命周期职责。",
+      "defKind": "node",
+      "semanticFamily": "micro-scene",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "微型场景的不变量是恰好一个有效天然场景父级（三档尺度均可），且生命周期资格只由该有效父级与当前占用契约共同决定；天然场景不满足该不变量。"
+      },
+      "parentCardinalityBoundId": "structural-bound.micro_scene.parent_cardinality",
+      "admittedParentSceneScales": ["large", "medium", "small"],
+      "lifecycleDeterminants": ["valid-parent", "occupancy"],
+      "requiredCapabilityIds": [
+        "scene.capability.micro_scene_attachment",
+        "scene.capability.creator_provenance",
+        "scene.capability.occupancy",
+        "scene.capability.lifecycle_eligibility"
+      ],
+      "optionalCapabilityIds": ["scene.capability.blocking"],
+      "parameters": [
+        { "key": "parent", "description": "唯一天然场景父级引用。", "required": true, "valueShape": "reference<natural-scene>" },
+        { "key": "creator", "description": "创建者溯源信息；不可变，且不作为归属或生命周期依据。", "required": true, "valueShape": "creator-provenance" },
+        { "key": "occupancyContractRef", "description": "占用契约引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "lifecycleDeterminants", "description": "生命周期判定项集合；必须同时含有效父级与占用。", "required": true, "valueShape": "array<enum<lifecycle-determinants>>" },
+        { "key": "sharingMode", "description": "共享模式，取自 micro-scene-kinds 值集。它是配置参数而非类型身份：个人空旷地与共享接触场景使用同一套父级、占用查询与回收语义。", "required": true, "valueShape": "enum<micro-scene-kinds>" }
+      ],
+      "forbiddenFieldNames": ["owner", "ownerId", "ownedBy"],
+      "kernelOps": ["node.create", "node.destroy", "relation.set", "relation.del", "entity.place"]
+    },
+    {
+      "id": "transition.class.scene_link",
+      "name": "场景过渡连接类",
+      "description": "连接两个天然场景端点的过渡连接类型。方向性是配置参数而非子类型：单向与双向不构成两个语义类型。",
+      "defKind": "link",
+      "semanticFamily": "transition",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "过渡连接的合法端点是天然场景；它不能以微型场景、实体或物品为端点，因此与任何节点类型不可互换。"
+      },
+      "endpointCountBoundId": "structural-bound.transition.endpoint_count",
+      "admittedEndpointSceneScales": ["large", "medium", "small"],
+      "requiredCapabilityIds": [
+        "scene.capability.transition_endpoint",
+        "scene.capability.traversal_condition"
+      ],
+      "optionalCapabilityIds": ["scene.capability.blocking"],
+      "parameters": [
+        { "key": "endpoints", "description": "恰好两个天然场景端点引用；单向时按 [起点, 终点] 排列。", "required": true, "valueShape": "array<reference<natural-scene>>" },
+        { "key": "directionality", "description": "方向性，取自 transition-directionalities 值集；这是配置参数而非类型身份。", "required": true, "valueShape": "enum<transition-directionalities>" },
+        { "key": "traversalConditionRefs", "description": "通行条件定义引用集合；具体判据取值由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
+        { "key": "blockingCapabilityRefs", "description": "阻挡能力引用集合。", "required": true, "valueShape": "array<reference<capability>>" }
+      ],
+      "kernelOps": ["link.create", "link.destroy"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "scene.capability.occupancy",
+      "name": "占用能力",
+      "description": "声明空间节点如何登记当前占用者，供生命周期资格与通行判定读取。占用上限取值由玩法层绑定。",
+      "parameters": [
+        { "key": "occupantRelationRef", "description": "占用关系定义引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "occupantCapacityField", "description": "占用上限所引用的参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.place", "relation.set", "relation.del"]
+    },
+    {
+      "id": "scene.capability.shared_micro_scene",
+      "name": "共享微型场景能力",
+      "description": "声明小场景向所有在场实体开放的共享微型场景接口；该能力显式排除个人空地式微型场景。",
+      "parameters": [
+        { "key": "sharedMicroSceneRefs", "description": "共享微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "excludedMicroSceneKinds", "description": "被排除的微型场景种类集合。", "required": true, "valueShape": "array<string>" }
+      ],
+      "kernelOps": ["node.create", "node.destroy"]
+    },
+    {
+      "id": "scene.capability.personal_vacant_ground",
+      "name": "个人空旷地能力",
+      "description": "声明大场景与中场景向单个进场实体开放的个人空旷地微型场景接口：实体可移动到空旷地从而创建只有自己在其中的微型场景。小场景不具备该能力，其空旷地入口复用共享微型场景。",
+      "parameters": [
+        { "key": "personalMicroSceneRefs", "description": "由该场景的空旷地入口创建的个人微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "vacantGroundActionRef", "description": "移动到空旷地的付费动作引用；动作成本取值由玩法层绑定。", "required": true, "valueShape": "reference<action>" }
+      ],
+      "kernelOps": ["entity.place", "node.create", "node.destroy"]
+    },
+    {
+      "id": "scene.capability.traversal_weight",
+      "name": "距离权重能力",
+      "description": "声明该场景在距离公式中的节点权重所引用的参数字段名。权重取值由玩法层绑定；基类层只声明这里存在一个加权位。",
+      "parameters": [
+        { "key": "traversalWeightField", "description": "节点权重所引用的参数字段名。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["node.create"]
+    },
+    {
+      "id": "scene.capability.micro_scene_parenthood",
+      "name": "微型场景父级能力",
+      "description": "声明天然场景可作为微型场景的唯一父级，并在自身被移除时要求同一候选事务处理全部子微型场景引用。",
+      "parameters": [
+        { "key": "childMicroSceneRefs", "description": "子微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },
+        { "key": "removalChildResolution", "description": "父级移除时子引用的处理方式；只允许引擎层支持的生命周期操作。", "required": true, "valueShape": "enum<child-resolution-modes>" }
+      ],
+      "kernelOps": ["node.destroy", "node.merge", "relation.set"]
+    },
+    {
+      "id": "scene.capability.micro_scene_attachment",
+      "name": "微型场景附属能力",
+      "description": "声明微型场景恰好附属于一个有效天然场景父级；父级引用不可解析时整个候选包被拒绝。",
+      "parameters": [
+        { "key": "parent", "description": "唯一天然场景父级引用。", "required": true, "valueShape": "reference<natural-scene>" },
+        { "key": "parentCardinality", "description": "父级基数；恒为恰好一个。", "required": true, "valueShape": "enum<parent-cardinalities>" }
+      ],
+      "kernelOps": ["relation.set", "relation.del"]
+    },
+    {
+      "id": "scene.capability.creator_provenance",
+      "name": "创建者溯源能力",
+      "description": "声明微型场景的创建者溯源信息为不可变数据。创建者变化不影响生命周期结论，也不构成归属依据。",
+      "parameters": [
+        { "key": "creatorEntityRef", "description": "创建者实体引用。", "required": true, "valueShape": "reference<entity>" },
+        { "key": "immutable", "description": "溯源信息不可变标记；恒为真。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "scene.capability.lifecycle_eligibility",
+      "name": "生命周期资格能力",
+      "description": "声明微型场景的生命周期资格只由有效父级引用与当前占用契约共同决定。",
+      "parameters": [
+        { "key": "determinants", "description": "判定项集合；必须同时含 valid-parent 与 occupancy。", "required": true, "valueShape": "array<enum<lifecycle-determinants>>" }
+      ],
+      "kernelOps": ["node.destroy"]
+    },
+    {
+      "id": "scene.capability.transition_endpoint",
+      "name": "过渡端点能力",
+      "description": "声明空间节点可作为过渡连接端点，并把连接数上限作为结构边界消费。",
+      "parameters": [
+        { "key": "transitionRefs", "description": "以该节点为端点的过渡连接引用集合。", "required": true, "valueShape": "array<reference<transition>>" },
+        { "key": "connectionBoundId", "description": "连接数结构边界引用。", "required": true, "valueShape": "structural-bound-id" }
+      ],
+      "kernelOps": ["link.create", "link.destroy"]
+    },
+    {
+      "id": "scene.capability.traversal_condition",
+      "name": "通行条件能力",
+      "description": "声明过渡连接的通行条件引用；具体判据取值、成本与概率由玩法层绑定。",
+      "parameters": [
+        { "key": "traversalConditionRefs", "description": "通行条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "scene.capability.blocking",
+      "name": "阻挡能力",
+      "description": "声明空间节点或过渡连接可被阻挡，以及阻挡状态所引用的能力与条件。",
+      "parameters": [
+        { "key": "blockingCapabilityRefs", "description": "阻挡能力引用集合。", "required": true, "valueShape": "array<reference<capability>>" },
+        { "key": "blockingConditionRefs", "description": "阻挡条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["prop.set", "attach.add", "attach.del"]
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "scene.valueset.scene_scales",
+      "name": "天然场景尺度",
+      "description": "天然场景的三级尺度；尺度决定合法上下级关系，不是数值。",
+      "tokens": [
+        { "id": "large", "name": "大场景", "description": "承载中场景的最外层天然场景。" },
+        { "id": "medium", "name": "中场景", "description": "承载小场景的中层天然场景。" },
+        { "id": "small", "name": "小场景", "description": "唯一可承载微型场景的天然场景。" }
+      ]
+    },
+    {
+      "id": "scene.valueset.transition_directionalities",
+      "name": "过渡方向性",
+      "description": "过渡连接的方向性配置值。",
+      "tokens": [
+        { "id": "bidirectional", "name": "双向", "description": "两个端点互相可达。" },
+        { "id": "unidirectional", "name": "单向", "description": "只能由起点到达终点。" }
+      ]
+    },
+    {
+      "id": "scene.valueset.micro_scene_kinds",
+      "name": "微型场景共享模式",
+      "description": "微型场景的共享模式配置值。它是配置而非类型身份：两种模式使用同一套父级契约、占用查询与回收语义。",
+      "tokens": [
+        { "id": "personal-vacant-ground", "name": "个人空旷地", "description": "由单个实体在大场景或中场景移动到空旷地时创建，初始只有该实体在其中。" },
+        { "id": "shared-contact", "name": "共享接触场景", "description": "由过渡连接在其两侧创建，或由小场景固有提供，场内活体共处其中。" }
+      ]
+    },
+    {
+      "id": "scene.valueset.lifecycle_determinants",
+      "name": "微型场景生命周期判定项",
+      "description": "决定微型场景生命周期资格的判定项；创建者信息不在其中。",
+      "tokens": [
+        { "id": "valid-parent", "name": "有效父级", "description": "父级引用可解析且为允许的天然场景类型。" },
+        { "id": "occupancy", "name": "当前占用", "description": "当前占用契约的判定结果。" }
+      ]
+    },
+    {
+      "id": "scene.valueset.parent_cardinalities",
+      "name": "父级基数",
+      "description": "微型场景父级引用的基数；只允许恰好一个。",
+      "tokens": [
+        { "id": "exactly-one", "name": "恰好一个", "description": "必须恰好声明一个可解析的天然场景父级。" }
+      ]
+    },
+    {
+      "id": "scene.valueset.child_resolution_modes",
+      "name": "子引用处理方式",
+      "description": "父级场景被移除时，同一候选事务处理子微型场景引用的方式；只允许引擎层支持的生命周期操作。",
+      "tokens": [
+        { "id": "destroy-children", "name": "销毁子级", "description": "在同一候选事务中销毁全部子微型场景。" },
+        { "id": "redirect-parent", "name": "重定向父级", "description": "在同一候选事务中把子微型场景重定向到另一个有效父级。" }
+      ]
+    }
+  ],
+  "structuralBounds": [
+    {
+      "id": "structural-bound.scene.connection_limit",
+      "name": "节点连接数上限",
+      "classification": "Structural_Bound",
+      "unit": "connection-count",
+      "value": 5,
+      "appliesToFields": ["transitionRefs", "connectionBoundId"],
+      "structuralRationale": "五并列原则限制单个节点的连接数，用于保证玩家可同时认知的分支数量上限；这是拓扑与认知结构约束，不是玩法层可调的地图数值。",
+      "authoritativeSource": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "sourceLocation": {
+          "sourceFile": "docs/L0_规范宪法.md",
+          "section": "四、引擎层铁律 / 4.3 拓扑铁律 / 五并列原则"
+        },
+        "precedence": "l0-constitution",
+        "classification": "Normative_Contract",
+        "owningLayer": "基类层",
+        "statementFingerprint": "l0:topology-iron-law:max-five-parallel-connections"
+      }
+    },
+    {
+      "id": "structural-bound.micro_scene.parent_cardinality",
+      "name": "微型场景父级基数",
+      "classification": "Structural_Bound",
+      "unit": "parent-count",
+      "value": 1,
+      "appliesToFields": ["parent", "parentCardinality"],
+      "structuralRationale": "微型场景附属于天然场景是拓扑铁律；恰好一个父级保证附属关系与生命周期资格可确定判定，多父级会使生命周期结论歧义。",
+      "authoritativeSource": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "sourceLocation": {
+          "sourceFile": "docs/L0_规范宪法.md",
+          "section": "四、引擎层铁律 / 4.3 拓扑铁律"
+        },
+        "precedence": "l0-constitution",
+        "classification": "Normative_Contract",
+        "owningLayer": "基类层",
+        "statementFingerprint": "l0:topology-iron-law:micro-scene-single-natural-scene-parent"
+      }
+    },
+    {
+      "id": "structural-bound.transition.endpoint_count",
+      "name": "过渡连接端点数",
+      "classification": "Structural_Bound",
+      "unit": "endpoint-count",
+      "value": 2,
+      "appliesToFields": ["endpoints"],
+      "structuralRationale": "过渡连接映射到引擎层连接原语，连接原语恰好有两个端点；端点数是原语结构约束而不是玩法赋值。",
+      "authoritativeSource": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "sourceLocation": {
+          "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+          "section": "Requirement 7: 空间、微型场景和过渡契约 / 7.7-7.8"
+        },
+        "precedence": "finalized-l2-contract",
+        "classification": "Normative_Contract",
+        "owningLayer": "基类层",
+        "statementFingerprint": "l2:transition:two-endpoint-references"
+      }
+    }
+  ],
+  "prohibitions": [
+    {
+      "id": "prohibition.scene.owner_semantics",
+      "diagnosticCode": "SPACE_MICRO_SCENE_OWNER_SEMANTICS",
+      "statement": "微型场景不得以 owner 字段作为归属或生命周期依据。",
+      "correction": "改用 parent 表达附属关系，用 creator 表达不可变溯源，用有效父级与占用契约共同决定生命周期资格。"
+    },
+    {
+      "id": "prohibition.scene.mutable_creator",
+      "diagnosticCode": "SPACE_CREATOR_MUTABLE",
+      "statement": "创建者溯源信息不得可变，也不得参与生命周期判定。",
+      "correction": "把创建者字段标记为不可变，并从生命周期判定项中移除。"
+    },
+    {
+      "id": "prohibition.scene.concrete_map_node",
+      "diagnosticCode": "SPACE_CONCRETE_MAP_NODE",
+      "statement": "天然场景类不得登记具体地图节点标识、具体地图排布或生成分布。",
+      "correction": "把具体地图内容下沉到玩法层 profile。"
+    },
+    {
+      "id": "prohibition.scene.personal_vacant_ground",
+      "diagnosticCode": "SPACE_SMALL_SCENE_PERSONAL_VACANT_GROUND",
+      "statement": "小场景的共享微型场景能力不得包含个人空地式微型场景。",
+      "correction": "把个人空地需求改为共享微型场景加占用契约，或改由玩法层以其他语义族表达。"
+    },
+    {
+      "id": "prohibition.scene.unsourced_connection_bound",
+      "diagnosticCode": "SPACE_CONNECTION_BOUND_UNSOURCED",
+      "statement": "连接数上限不得在缺少权威来源与结构理由时作为结构边界生效。",
+      "correction": "补齐权威来源记录与结构理由，或改为玩法层参数。"
+    },
+    {
+      "id": "prohibition.scene.vehicle_as_micro_scene",
+      "diagnosticCode": "VEHICLE_NOT_ENTITY",
+      "statement": "载具不得建模为微型场景或物品。",
+      "correction": "载具是实体；车内交互经载具授予的动作与门引用表达。"
+    },
+    {
+      "id": "prohibition.scene.natural_scene_nesting_in_runtime_parent",
+      "diagnosticCode": "LAYER_L1_OWNERSHIP",
+      "statement": "天然场景之间的编排期层级不得被编译进运行期节点的附属字段。该字段的含义由引擎层拥有，且被用作「是否微型场景」的判据：一旦天然场景携带该字段，最后一名占用者离开时它会被按微型场景回收，并级联销毁其子节点与关联连接。",
+      "correction": "层级只保留为编排期校验输入（parentSceneRef / childSceneRefs 与地图校验器的嵌套检查）；运行期天然场景之间只用过渡连接表达，附属字段专用于微型场景对天然场景的附属。"
+    },
+    {
+      "id": "prohibition.scene.orphaned_child_on_parent_removal",
+      "diagnosticCode": "SPACE_PARENT_REMOVAL_ORPHANS_CHILD",
+      "statement": "父级天然场景的移除不得在同一候选事务外留下未解析的子微型场景引用。",
+      "correction": "在同一候选变更中销毁子微型场景或把它们重定向到另一个有效父级。"
+    }
+  ],
+  "unresolvedItems": [
+    {
+      "id": "Q-04",
+      "statement": "载具内部微型场景与外部交互点的边界尚未获得权威裁决。",
+      "handling": "本目录只保留微型场景父级契约与过渡端点契约，不为载具内部推导任何微型场景机制；载具侧同样只保留门引用与邻接交互接口。",
+      "awaitingDecisionId": "Q-04",
+      "sources": [
+        {
+          "sourceFile": "docs/L0_规范宪法.md",
+          "sourceLocation": {
+            "sourceFile": "docs/L0_规范宪法.md",
+            "section": "七、待访谈确认事项 / Q-04"
+          },
+          "precedence": "unresolved-l2-content",
+          "decisionId": "Q-04",
+          "classification": "Unresolved_Item",
+          "owningLayer": "基类层",
+          "statementFingerprint": "l0:q-04:vehicle-interior-micro-scene-boundary"
+        }
+      ]
+    }
+  ],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "sceneParameters",
+    "playLayerOwnedFieldNames": ["nodes", "links", "spawnDistribution", "capacity", "apCost"],
+    "description": "玩法层以 classComposition 引用空间类与能力，并在 sceneParameters 与上列玩法层字段中提供具体地图排布、容量与成本取值。"
+  }
+}

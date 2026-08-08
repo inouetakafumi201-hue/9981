@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 移动族语义目录",
+  "description": "基类层移动语义最小单元目录：地面、载具与传送按通行语义区分类型身份。成本、速度、范围、地形修正与碰撞效果全部作为玩法层拥有的参数暴露。",
+  "category": "movement",
+  "semanticFamilies": ["movement"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "移动按通行语义只有地面、载具、传送三种，可有限列举。",
+    "composable": true,
+    "compositionRationale": "移动类与地形条件、碰撞效果、成本声明、载具驾驶能力组合成具体移动实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "移动类不知道具体成本、速度与地形修正取值；这些字段被显式标注为玩法层拥有。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 9: 伤害、状态、技能、移动和附件契约 / 9.5-9.6"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:movement-family:traversal-semantics-and-l3-owned-parameters"
+    }
+  ],
+  "l3OwnedParameterNames": ["cost", "speed", "range", "terrainModifier", "collisionEffect"],
+  "l3OwnedParameterOwnership": "玩法层",
+  "classes": [
+    {
+      "id": "movement.class.ground",
+      "name": "地面移动类",
+      "description": "沿相邻空间关系逐步通行的移动类；通行受地形条件与阻挡能力约束。",
+      "defKind": "action",
+      "semanticFamily": "movement",
+      "abstract": true,
+      "traversal": "ground",
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "地面移动的不变量是目标必须与当前所在节点相邻且中间关系连续；传送不满足相邻性，载具移动的施动关系不同。"
+      },
+      "requiredCapabilityIds": [
+        "movement.capability.adjacency_traversal",
+        "movement.capability.terrain_condition",
+        "movement.capability.cost_declaration"
+      ],
+      "optionalCapabilityIds": ["movement.capability.collision_effect"],
+      "parameters": [
+        { "key": "targetNodeRef", "description": "目标空间节点引用。", "required": true, "valueShape": "reference<node>" },
+        { "key": "traversalConditionRefs", "description": "通行条件定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "costField", "description": "成本参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
+        { "key": "speedField", "description": "速度参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "rangeField", "description": "范围参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "terrainModifierField", "description": "地形修正参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.place"]
+    },
+    {
+      "id": "movement.class.vehicle",
+      "name": "载具移动类",
+      "description": "由座位绑定的驾驶者发起、改变载具实体所在节点从而带动乘员的移动类。",
+      "defKind": "action",
+      "semanticFamily": "movement",
+      "abstract": true,
+      "traversal": "vehicle",
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "载具移动要求施动者与载具存在座位绑定关系，且被移动的主体是载具实体而不是施动者本身；这一合法关系与地面移动、传送互斥。"
+      },
+      "requiredCapabilityIds": [
+        "movement.capability.vehicle_bound_traversal",
+        "movement.capability.terrain_condition",
+        "movement.capability.cost_declaration"
+      ],
+      "optionalCapabilityIds": ["movement.capability.collision_effect"],
+      "parameters": [
+        { "key": "vehicleRef", "description": "被驾驶的载具实体引用。", "required": true, "valueShape": "reference<entity>" },
+        { "key": "seatRoleRef", "description": "施动者所处座位角色引用；只有允许驾驶的座位角色可发起。", "required": true, "valueShape": "reference<seat-role>" },
+        { "key": "targetNodeRef", "description": "目标空间节点引用。", "required": true, "valueShape": "reference<node>" },
+        { "key": "costField", "description": "成本参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
+        { "key": "speedField", "description": "速度参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "terrainModifierField", "description": "地形修正参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.place", "agent.bind", "agent.unbind"]
+    },
+    {
+      "id": "movement.class.teleport",
+      "name": "传送移动类",
+      "description": "不经过中间相邻关系直接改变所在节点的移动类。",
+      "defKind": "action",
+      "semanticFamily": "movement",
+      "abstract": true,
+      "traversal": "teleport",
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "传送的不变量是不产生中间通行过程：它不检查相邻性，也不触发沿途阻挡与碰撞判定。"
+      },
+      "requiredCapabilityIds": [
+        "movement.capability.discontinuous_traversal",
+        "movement.capability.cost_declaration"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "targetNodeRef", "description": "目标空间节点引用。", "required": true, "valueShape": "reference<node>" },
+        { "key": "targetResolutionRuleRef", "description": "目标合法性判定规则引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "costField", "description": "成本参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
+        { "key": "rangeField", "description": "范围参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+      ],
+      "forbiddenFieldNames": ["terrainModifierField"],
+      "kernelOps": ["entity.place"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "movement.capability.adjacency_traversal",
+      "name": "相邻通行能力",
+      "description": "声明移动必须沿相邻空间关系逐步进行，并引用相邻关系查询接口。",
+      "parameters": [
+        { "key": "adjacencyRelationRef", "description": "相邻关系定义引用。", "required": true, "valueShape": "reference<rule>" }
+      ],
+      "kernelOps": ["entity.place"]
+    },
+    {
+      "id": "movement.capability.vehicle_bound_traversal",
+      "name": "载具绑定通行能力",
+      "description": "声明移动由座位绑定关系授权，且被移动主体是载具实体。",
+      "parameters": [
+        { "key": "seatBindingRelationRef", "description": "座位绑定关系定义引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "drivingSeatRoleRefs", "description": "允许发起移动的座位角色引用集合。", "required": true, "valueShape": "array<reference<seat-role>>" }
+      ],
+      "kernelOps": ["entity.place", "agent.bind", "agent.unbind"]
+    },
+    {
+      "id": "movement.capability.discontinuous_traversal",
+      "name": "非连续通行能力",
+      "description": "声明移动不经过中间相邻关系，因此不触发沿途阻挡与碰撞判定。",
+      "parameters": [
+        { "key": "targetResolutionRuleRef", "description": "目标合法性判定规则引用。", "required": true, "valueShape": "reference<rule>" }
+      ],
+      "kernelOps": ["entity.place"]
+    },
+    {
+      "id": "movement.capability.terrain_condition",
+      "name": "地形条件能力",
+      "description": "声明移动的地形通行条件引用与地形修正参数字段名；修正取值归玩法层。",
+      "parameters": [
+        { "key": "traversalConditionRefs", "description": "地形通行条件定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "terrainModifierField", "description": "地形修正参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "movement.capability.collision_effect",
+      "name": "碰撞效果能力",
+      "description": "声明移动可产生的碰撞效果引用；碰撞伤害与触发条件取值归玩法层。",
+      "parameters": [
+        { "key": "collisionEffectRefs", "description": "碰撞效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "collisionConditionRefs", "description": "碰撞触发条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "movement.capability.cost_declaration",
+      "name": "成本声明能力",
+      "description": "声明移动的成本、速度与范围参数字段名。基类层只声明字段名，取值归玩法层。",
+      "parameters": [
+        { "key": "costField", "description": "成本参数字段名。", "required": true, "valueShape": "field-name" },
+        { "key": "speedField", "description": "速度参数字段名。", "required": false, "valueShape": "field-name" },
+        { "key": "rangeField", "description": "范围参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "movement.valueset.traversals",
+      "name": "通行语义",
+      "description": "移动的通行语义；通行语义是类型身份来源。",
+      "tokens": [
+        { "id": "ground", "name": "地面", "description": "沿相邻空间关系逐步通行。" },
+        { "id": "vehicle", "name": "载具", "description": "由座位绑定的驾驶者移动载具实体。" },
+        { "id": "teleport", "name": "传送", "description": "不经过中间相邻关系直接改变所在节点。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.movement.embedded_parameter_value",
+      "diagnosticCode": "MOVEMENT_PARAMETER_NOT_L3_OWNED",
+      "statement": "移动类不得内嵌成本、速度、范围、地形修正或碰撞伤害的具体取值。",
+      "correction": "只声明参数字段名，把取值交给玩法层 profile。"
+    },
+    {
+      "id": "prohibition.movement.pseudo_subtype",
+      "diagnosticCode": "INHERIT_GAMEPLAY_VALUE_ONLY_DIFFERENCE",
+      "statement": "移动子类型不得仅因速度或成本取值不同而存在。",
+      "correction": "改为组合：同一移动类加不同参数取值。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "movementParameters",
+    "playLayerOwnedFieldNames": ["cost", "speed", "range", "terrainModifier", "collisionEffect", "apCost"],
+    "description": "玩法层以 classComposition 引用移动类与能力，并在 movementParameters 与上列玩法层字段中提供成本、速度、范围与碰撞取值。"
+  }
+}

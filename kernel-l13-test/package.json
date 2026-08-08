@@ -1,0 +1,21 @@
+{
+  "name": "kernel-l13-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "L13 Safety (Linter/诊断/配额控制) 属性测试",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.15",
+    "fast-check": "^3.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "keywords": ["safety", "linter", "diagnostic", "quota", "property-testing", "fast-check"],
+  "author": "",
+  "license": "MIT"
+}

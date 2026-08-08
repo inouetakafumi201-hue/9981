@@ -1,0 +1,10 @@
+{
+  "id": "status_knocked_down",
+  "name": "击倒",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["knockdown", "posture", "movement-restricted"],
+  "description": "表示实体处于可恢复倒地姿态的语义状态。",
+  "capabilityIds": ["status.capability.posture", "status.capability.movement_restriction", "status.capability.recovery"],
+  "configurableParameters": ["eligibleActionPolicy", "movementPolicy", "recoveryPolicy", "presentationPolicy"]
+}

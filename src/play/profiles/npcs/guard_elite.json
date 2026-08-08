@@ -1,0 +1,188 @@
+{
+  "id": "npc_guard_elite",
+  "name": "精英守卫",
+  "type": "guard",
+  "hp": 4,
+  "perception": {
+    "vision": 4,
+    "hearing": 4,
+    "alertThreshold": 2
+  },
+  "fsm": {
+    "initialState": "patrolling",
+    "states": {
+      "patrolling": {
+        "onEnter": ["PatrolRoute", "StartPatrol"],
+        "transitions": [
+          {
+            "event": "OnNoise",
+            "condition": "perception.hearing >= perception.alertThreshold",
+            "target": "listening",
+            "kernelEvent": "NPC_Alert"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "NPC_DetectedPlayer"
+          }
+        ]
+      },
+      "listening": {
+        "onEnter": ["InvestigateSound"],
+        "transitions": [
+          {
+            "event": "OnArriveAtSoundSource",
+            "condition": "!playerInSight",
+            "target": "patrolling",
+            "kernelEvent": "NPC_ReturnToPatrol"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "NPC_DetectedPlayer"
+          }
+        ]
+      },
+      "chasing": {
+        "onEnter": ["LockTarget", "MoveToLastKnownPosition"],
+        "transitions": [
+          {
+            "event": "OnArriveAtLastSeen",
+            "condition": "!playerInSight",
+            "target": "patrolling",
+            "kernelEvent": "NPC_LostTarget"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "sameMicroScene",
+            "target": "attacking",
+            "kernelEvent": "NPC_Engaging"
+          }
+        ]
+      },
+      "attacking": {
+        "onEnter": ["SelectWeapon", "AttackTarget"],
+        "transitions": [
+          {
+            "event": "OnTargetDowned",
+            "condition": "target.hp <= 0",
+            "target": "patrolling",
+            "kernelEvent": "NPC_ReturnToPatrol"
+          },
+          {
+            "event": "OnPlayerLeft",
+            "condition": "!sameMicroScene && distance > 1",
+            "target": "chasing",
+            "kernelEvent": "NPC_ResumeChase"
+          }
+        ]
+      }
+    },
+    "memory": {
+      "patrolRoute": [],
+      "currentPatrolIndex": 0,
+      "lastSeenPosition": null,
+      "lastKnownSoundSource": null
+    }
+  },
+  "initialEquipment": ["weapon_pistol", "item_bulletproof_vest_medium"],
+  "resources": {
+    "actionPoints": 1,
+    "staminaMax": 3,
+    "initialStamina": 0,
+    "usesStaminaActively": false,
+    "participatesInActionTurn": false,
+    "canSpendStaminaOnInitiative": false,
+    "description": "D-052：NPC 没有轮次，全部在玩家轮次结束后顺序行动；体力池只用于承受弱点命中与过载压制，不可用于逆转或超逆转。"
+  },
+  "behaviors": [
+    {
+      "id": "patrol_behavior",
+      "trigger": "State: patrolling",
+      "action": "MoveToNextPatrolPoint",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "investigate_behavior",
+      "trigger": "State: listening",
+      "action": "MoveTowardsSound",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "chase_behavior",
+      "trigger": "State: chasing",
+      "action": "MoveTowardsTarget",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "combat_behavior",
+      "trigger": "State: attacking",
+      "action": "MeleeOrRangedAttack",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "ranged_combat",
+      "trigger": "State: attacking && distance > 1",
+      "action": "RangedAttack",
+      "apCost": 1,
+      "repeatable": true,
+      "priority": 1
+    }
+  ],
+  "kernelEvents": [
+    "OnNoise",
+    "OnPlayerEnter",
+    "OnArriveAtSoundSource",
+    "OnArriveAtLastSeen",
+    "OnTargetDowned",
+    "OnPlayerLeft",
+    "NPC_Alert",
+    "NPC_DetectedPlayer",
+    "NPC_ReturnToPatrol",
+    "NPC_LostTarget",
+    "NPC_Engaging",
+    "NPC_ResumeChase"
+  ],
+  "tags": ["ai-significant", "hostile", "guard", "elite"],
+  "description": "精英守卫，感知更高、装备更好，会使用远程武器。警觉阈值更低，更快响应声音。",
+  "designNotes": {
+    "n001Resolution": "NPC FSM是AI行为状态，与实体的StateComponent完全分离。",
+    "n013Resolution": "MVP不实现sleeping状态。",
+    "n010Resolution": "所有状态转换通过kernelEvents触发。",
+    "n004Resolution": "遵循1-5铁律：hp=4, vision=4, hearing=4",
+    "alertThresholdNote": "alertThreshold=2意味着比普通守卫更容易警觉"
+  },
+  "classComposition": {
+    "behaviorClassId": "npc.class.guard",
+    "capabilityIds": [
+      "npc.capability.patrol",
+      "npc.capability.perceive",
+      "npc.capability.investigate",
+      "npc.capability.chase",
+      "npc.capability.attack",
+      "npc.capability.remember",
+      "npc.capability.event_driven"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "NPC-GUARD-STATE-NAMING",
+      "status": "unresolved",
+      "issue": "迁移前目录将守卫统一描述为“五状态守卫范式”，当前 profile 的 FSM 实际仅定义 patrolling、listening、chasing、attacking 四个状态。",
+      "decision": "保留现有四状态定义，不擅自补充缺失状态；需后续明确第五状态是否为 sleeping，以及是否属于当前玩法配置。"
+    },
+    {
+      "code": "NPC-EQUIPMENT-DANGLING-PISTOL",
+      "status": "unresolved",
+      "issue": "initialEquipment 引用的 weapon_pistol 在玩法层没有对应实例。",
+      "decision": "保留原引用不改。玩法层存在两个候选实例（wp_pistol_standard、wp_pistol_quickdraw），选哪一个属于精英守卫的配装取舍，不由审计代为裁决。同批的 armor_medium 已可无歧义地改为 item_bulletproof_vest_medium。"
+    }
+  ],
+  "version": "1.0"
+}

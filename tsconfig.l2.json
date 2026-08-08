@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["src/l2", "test/l2", "src/core/kernel/ops/registry.ts", "src/core/kernel/ops/result.ts"]
+}

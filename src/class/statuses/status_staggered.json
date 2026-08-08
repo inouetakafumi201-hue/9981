@@ -1,0 +1,10 @@
+{
+  "id": "status_staggered",
+  "name": "失衡",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["control", "stagger", "preparation"],
+  "description": "表示实体的准备态可被失效的语义状态。",
+  "capabilityIds": ["status.capability.preparation_invalidation", "status.capability.control_relation"],
+  "configurableParameters": ["affectedPreparationScope", "invalidationPolicy", "presentationPolicy"]
+}

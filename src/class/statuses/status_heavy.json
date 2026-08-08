@@ -1,0 +1,10 @@
+{
+  "id": "status_heavy",
+  "name": "重装",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["burden", "equipment", "movement-impairment"],
+  "description": "表示实体因负重而承受行动负担的语义状态。",
+  "capabilityIds": ["status.capability.burden", "status.capability.action_efficiency"],
+  "configurableParameters": ["affectedActionScope", "burdenPolicy", "stackingPolicy", "presentationPolicy"]
+}

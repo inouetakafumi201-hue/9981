@@ -1,0 +1,10 @@
+{
+  "id": "status_hastened",
+  "name": "加速",
+  "category": "positive",
+  "type": "numeric",
+  "tags": ["speed", "mobility", "enhancement"],
+  "description": "表示实体的移动或行动效率获得提升的语义状态。",
+  "capabilityIds": ["status.capability.action_efficiency"],
+  "configurableParameters": ["affectedActionScope", "adjustmentPolicy", "stackingPolicy", "presentationPolicy"]
+}

@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 网关族语义目录",
+  "description": "基类层三种网关语义最小单元目录：资源转换、检定与条件网关。三者拥有互不包含的类型契约；具名商店、具名锁具、具名工作台与具体阈值均归玩法层。",
+  "category": "gateways",
+  "semanticFamilies": ["gateway"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "网关按裁决方式只有资源转换、检定、条件三种，可有限列举。",
+    "composable": true,
+    "compositionRationale": "网关与动作、物品、空间连接、容器组合，形成商店、上锁门、宝箱、合成等玩法实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "网关不知道自己是商店还是宝箱；判据阈值、兑换比率与效果取值全部由玩法层绑定。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": "docs/访谈决策记录.md",
+      "sourceLocation": {
+        "sourceFile": "docs/访谈决策记录.md",
+        "section": "D-006 三种网关"
+      },
+      "precedence": "confirmed-interview-decision",
+      "decisionId": "D-006",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "d-006:three-gateway-kinds"
+    },
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 6: 动作、回合接口和三种网关 / 6.5-6.10"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:gateway-family:distinct-type-contracts"
+    }
+  ],
+  "classes": [
+    {
+      "id": "gateway.class.resource_conversion",
+      "name": "资源转换网关类",
+      "description": "以输入资源引用换取输出效果引用、且裁决语义为确定性成功的网关类。",
+      "defKind": "rule",
+      "semanticFamily": "gateway",
+      "abstract": true,
+      "gatewayKind": "resource-conversion",
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "资源转换网关的不变量是确定性成功：给定输入资源满足即产生输出效果，不引入随机或表达式裁决分支，因此没有失败效果引用。"
+      },
+      "requiredCapabilityIds": [
+        "gateway.capability.resource_input",
+        "gateway.capability.effect_output",
+        "gateway.capability.deterministic_resolution",
+        "gateway.capability.failure_rejection"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "inputResourceRefs", "description": "输入资源定义引用集合；具体兑换数量由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
+        { "key": "outputEffectRefs", "description": "输出效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "deterministicSuccess", "description": "确定性成功语义；资源转换网关恒为真。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.class.check",
+      "name": "检定网关类",
+      "description": "引用引擎层随机或求值原语、按可配置判据裁决成败并分别引用成败效果的网关类。",
+      "defKind": "rule",
+      "semanticFamily": "gateway",
+      "abstract": true,
+      "gatewayKind": "check",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "检定网关必须绑定引擎层随机或求值原语并声明可配置判据；这两项必需能力是其与条件网关、资源转换网关的类型分界。"
+      },
+      "requiredCapabilityIds": [
+        "gateway.capability.random_primitive_binding",
+        "gateway.capability.criterion",
+        "gateway.capability.effect_output",
+        "gateway.capability.failure_effect_output",
+        "gateway.capability.failure_rejection"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "primitiveRef", "description": "引擎层随机或求值原语引用。", "required": true, "valueShape": "reference<expr|op>" },
+        { "key": "criterion.comparison", "description": "判据比较方式，取自 criterion-comparisons 值集。", "required": true, "valueShape": "enum<criterion-comparisons>" },
+        { "key": "criterion.thresholdField", "description": "判据阈值所引用的参数字段名；阈值取值由玩法层绑定。", "required": true, "valueShape": "field-name" },
+        { "key": "successEffectRefs", "description": "成功效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "failureEffectRefs", "description": "失败效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["random.roll", "random.pick", "random.weightedPick", "random.shuffle"]
+    },
+    {
+      "id": "gateway.class.condition",
+      "name": "条件网关类",
+      "description": "引用引擎层布尔表达式裁决成败并分别引用成败效果的网关类。",
+      "defKind": "rule",
+      "semanticFamily": "gateway",
+      "abstract": true,
+      "gatewayKind": "condition",
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "条件网关必须绑定布尔表达式引用且禁止绑定随机原语；其裁决完全可复算，与检定网关不可互换。"
+      },
+      "requiredCapabilityIds": [
+        "gateway.capability.boolean_condition_binding",
+        "gateway.capability.effect_output",
+        "gateway.capability.failure_effect_output",
+        "gateway.capability.failure_rejection"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "conditionExprRef", "description": "引擎层布尔表达式定义引用。", "required": true, "valueShape": "reference<expr>" },
+        { "key": "successEffectRefs", "description": "成功效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "failureEffectRefs", "description": "失败效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "gateway.capability.resource_input",
+      "name": "资源输入能力",
+      "description": "声明网关消耗的输入资源定义引用；消耗数量由玩法层绑定。",
+      "parameters": [
+        { "key": "inputResourceRefs", "description": "输入资源定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.effect_output",
+      "name": "成功效果输出能力",
+      "description": "声明网关裁决通过后引用的效果定义集合。",
+      "parameters": [
+        { "key": "successEffectRefs", "description": "成功效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.failure_effect_output",
+      "name": "失败效果输出能力",
+      "description": "声明网关裁决未通过后引用的效果定义集合。",
+      "parameters": [
+        { "key": "failureEffectRefs", "description": "失败效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.deterministic_resolution",
+      "name": "确定性裁决能力",
+      "description": "声明网关裁决不引入随机或表达式分支：输入满足即成功。",
+      "parameters": [
+        { "key": "deterministicSuccess", "description": "确定性成功语义标记。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.random_primitive_binding",
+      "name": "随机或求值原语绑定能力",
+      "description": "声明检定所引用的引擎层随机或求值原语。基类层只引用原语，不实现随机流、不重定义确定性随机接口。",
+      "parameters": [
+        { "key": "primitiveRef", "description": "引擎层随机或求值原语引用。", "required": true, "valueShape": "reference<expr|op>" }
+      ],
+      "kernelOps": ["random.roll", "random.pick", "random.weightedPick", "random.shuffle"]
+    },
+    {
+      "id": "gateway.capability.criterion",
+      "name": "可配置判据能力",
+      "description": "声明判据的比较方式与阈值字段名。阈值取值由玩法层绑定，基类层不内嵌具体阈值。",
+      "parameters": [
+        { "key": "comparison", "description": "比较方式。", "required": true, "valueShape": "enum<criterion-comparisons>" },
+        { "key": "thresholdField", "description": "阈值参数字段名。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.boolean_condition_binding",
+      "name": "布尔条件绑定能力",
+      "description": "声明条件网关所引用的引擎层布尔表达式定义。基类层不实现表达式求值。",
+      "parameters": [
+        { "key": "conditionExprRef", "description": "引擎层布尔表达式定义引用。", "required": true, "valueShape": "reference<expr>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "gateway.capability.failure_rejection",
+      "name": "失败拒绝能力",
+      "description": "声明网关条件在运行期不满足时返回结构化拒绝，且不施加任何网关效果，请求前语义状态保持不变。",
+      "parameters": [
+        { "key": "rejectionDiagnosticCode", "description": "拒绝时使用的稳定诊断代码。", "required": true, "valueShape": "diagnostic-code" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "gateway.valueset.gateway_kinds",
+      "name": "网关种类",
+      "description": "三种网关的裁决方式。",
+      "tokens": [
+        { "id": "resource-conversion", "name": "资源转换", "description": "以输入资源换取输出效果，确定性成功。" },
+        { "id": "check", "name": "检定", "description": "按引擎层随机或求值原语与可配置判据裁决成败。" },
+        { "id": "condition", "name": "条件", "description": "按引擎层布尔表达式裁决成败。" }
+      ]
+    },
+    {
+      "id": "gateway.valueset.criterion_comparisons",
+      "name": "判据比较方式",
+      "description": "检定判据可使用的比较关系；比较关系本身不含阈值。",
+      "tokens": [
+        { "id": "gte", "name": "大于等于", "description": "被检定值大于等于阈值时通过。" },
+        { "id": "gt", "name": "大于", "description": "被检定值大于阈值时通过。" },
+        { "id": "lte", "name": "小于等于", "description": "被检定值小于等于阈值时通过。" },
+        { "id": "lt", "name": "小于", "description": "被检定值小于阈值时通过。" },
+        { "id": "eq", "name": "等于", "description": "被检定值等于阈值时通过。" },
+        { "id": "neq", "name": "不等于", "description": "被检定值不等于阈值时通过。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.gateway.named_gameplay_entity",
+      "diagnosticCode": "GATEWAY_NAMED_GAMEPLAY_ENTITY",
+      "statement": "网关定义不得内嵌具名商店、具名锁具、具名工作台或任何与具体玩法耦合的实例。",
+      "correction": "把具名实例下沉到玩法层 profile，仅在基类层保留网关类与能力组合。"
+    },
+    {
+      "id": "prohibition.gateway.concrete_threshold",
+      "diagnosticCode": "GATEWAY_CONCRETE_THRESHOLD",
+      "statement": "网关定义不得内嵌具体判据阈值。",
+      "correction": "改用 criterion.thresholdField 引用参数字段名，由玩法层提供阈值取值。"
+    },
+    {
+      "id": "prohibition.gateway.effect_on_failure",
+      "diagnosticCode": "RUNTIME_GATEWAY_CONDITION_FAILED",
+      "statement": "网关条件在运行期不满足时不得施加任何网关效果。",
+      "correction": "在条件不满足时返回结构化拒绝并保持请求前语义状态。"
+    },
+    {
+      "id": "prohibition.gateway.kind_ambiguity",
+      "diagnosticCode": "GATEWAY_KIND_AMBIGUOUS",
+      "statement": "同一网关定义不得同时满足两种网关种类的必需能力集合。",
+      "correction": "拆分为独立网关定义，或明确其唯一网关种类。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "gatewayParameters",
+    "playLayerOwnedFieldNames": ["threshold", "cost", "amount", "unlockConditions"],
+    "description": "玩法层以 classComposition 引用网关类与能力，并在 gatewayParameters 与上列玩法层字段中提供阈值、兑换与条件取值。"
+  }
+}

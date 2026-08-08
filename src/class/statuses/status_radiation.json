@@ -1,0 +1,10 @@
+{
+  "id": "status_radiation",
+  "name": "辐射",
+  "category": "environmental",
+  "type": "numeric",
+  "tags": ["radiation", "exposure", "environmental"],
+  "description": "表示实体正承受环境辐射暴露的语义状态。",
+  "capabilityIds": ["status.capability.ongoing_effect", "status.capability.environment_exposure"],
+  "configurableParameters": ["exposureScope", "effectPolicy", "stackingPolicy", "presentationPolicy"]
+}

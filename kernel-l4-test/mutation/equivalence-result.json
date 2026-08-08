@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-08-07T13:57:16.143Z",
+  "selfTestPassed": true,
+  "sentinels": [
+    "M01",
+    "M09",
+    "M13",
+    "M17",
+    "M33",
+    "M40",
+    "M43",
+    "M49",
+    "M51",
+    "M52",
+    "M57",
+    "M67"
+  ],
+  "sequences": 3000,
+  "operations": 30,
+  "allEquivalent": true,
+  "report": [
+    {
+      "id": "M15",
+      "desc": "排序前不复制数组（原地排序污染注册表顺序）",
+      "equivalent": true,
+      "sequences": 3000,
+      "operations": 30,
+      "comparedSteps": 90000,
+      "firstDivergence": null
+    },
+    {
+      "id": "M44",
+      "desc": "instead 阶段恒不阻止 default",
+      "equivalent": true,
+      "sequences": 3000,
+      "operations": 30,
+      "comparedSteps": 90000,
+      "firstDivergence": null
+    },
+    {
+      "id": "M50",
+      "desc": "depth 归零时不清理调用栈",
+      "equivalent": true,
+      "sequences": 3000,
+      "operations": 30,
+      "comparedSteps": 90000,
+      "firstDivergence": null
+    },
+    {
+      "id": "M61",
+      "desc": "drain 结束后不清空队列",
+      "equivalent": true,
+      "sequences": 3000,
+      "operations": 30,
+      "comparedSteps": 90000,
+      "firstDivergence": null
+    },
+    {
+      "id": "M64",
+      "desc": "根 emit 不清空上次残留队列",
+      "equivalent": true,
+      "sequences": 3000,
+      "operations": 30,
+      "comparedSteps": 90000,
+      "firstDivergence": null
+    }
+  ]
+}

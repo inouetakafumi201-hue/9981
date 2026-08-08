@@ -1,0 +1,34 @@
+{
+  "id": "status_downed",
+  "name": "零血倒地",
+  "category": "negative",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_downed"
+  },
+  "duration": "until_execute",
+  "durationUnit": "until_event",
+  "stacking": "none",
+  "stackBehavior": "unique",
+  "effects": {
+    "onAction": {"allowed": ["drop_item", "crawl", "watch", "quit"], "description": "只能丢弃、爬行、观战、退出"},
+    "onRoll": {"effect": "participate", "description": "仍参与投点获得AP"},
+    "passive": {"blockedActions": ["attack", "move", "pickup", "use_item", "sleep", "wake", "execute_self"], "description": "禁止大部分主动动作"}
+  },
+  "breakConditions": [
+    {"type": "action", "actionId": "execute", "actor": "other", "effect": "death", "description": "被令其长眠"},
+    {"type": "action", "actionId": "watch", "effect": "exit_roll", "description": "观战则退出投点"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_knocked_down", "type": "none", "description": "与普通击倒是不同状态，不冲突"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnRoll", "OnExecute", "OnWatch"],
+  "icon": "skull-crossbones",
+  "color": "red",
+  "priority": 100,
+  "description": "生命值归零导致的濒死状态，可被处决，仍参与投点",
+  "tags": ["downed", "critical", "debuff"],
+  "source": ["系统: 生命值归零"],
+  "mvp": true,
+  "notes": "这是最优先处理的状态，优先级100"
+}

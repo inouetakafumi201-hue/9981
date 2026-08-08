@@ -1,0 +1,55 @@
+{
+  "$id": "catalog-metadata.schema.json",
+  "title": "ClassCatalogMetadata",
+  "description": "所有基类层目录必须满足的共同元数据契约。它只约束元数据，不约束各族特有的条目结构，因此以 additionalProperties 允许族特有字段；族特有结构与跨目录引用由 class-contract.ts 的校验器负责。",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "name",
+    "description",
+    "category",
+    "semanticFamilies",
+    "classificationEvidence",
+    "sourceRecords",
+    "structuralBounds",
+    "prohibitions",
+    "unresolvedItems",
+    "compositionContract"
+  ],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "semanticFamilies": {
+      "$ref": "class-catalog.schema.json#/definitions/identifierList"
+    },
+    "classificationEvidence": {
+      "$ref": "class-catalog.schema.json#/definitions/classificationEvidence"
+    },
+    "sourceRecords": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "class-catalog.schema.json#/definitions/sourceRecord" }
+    },
+    "structuralBounds": {
+      "type": "array",
+      "items": { "$ref": "class-catalog.schema.json#/definitions/structuralBound" }
+    },
+    "prohibitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "class-catalog.schema.json#/definitions/prohibition" }
+    },
+    "unresolvedItems": {
+      "type": "array",
+      "items": { "$ref": "class-catalog.schema.json#/definitions/unresolvedItem" }
+    },
+    "compositionContract": {
+      "$ref": "class-catalog.schema.json#/definitions/compositionContract"
+    },
+    "valueSets": {
+      "type": "array",
+      "items": { "$ref": "class-catalog.schema.json#/definitions/valueSet" }
+    }
+  }
+}

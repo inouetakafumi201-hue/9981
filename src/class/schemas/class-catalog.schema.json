@@ -1,0 +1,327 @@
+{
+  "$id": "class-catalog.schema.json",
+  "title": "ClassCatalog",
+  "description": "统一形状的基类层语义族目录文档。目录只声明语义类、能力形状、语义值集合、结构边界、禁止项与未决项；玩法取值由玩法层提供。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "version",
+    "name",
+    "description",
+    "category",
+    "semanticFamilies",
+    "classificationEvidence",
+    "sourceRecords",
+    "classes",
+    "capabilities",
+    "valueSets",
+    "structuralBounds",
+    "prohibitions",
+    "unresolvedItems",
+    "compositionContract"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "semanticFamilies": { "$ref": "#/definitions/identifierList" },
+    "classificationEvidence": { "$ref": "#/definitions/classificationEvidence" },
+    "sourceRecords": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/sourceRecord" } },
+    "classes": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/classEntry" } },
+    "capabilities": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/capabilityEntry" } },
+    "valueSets": { "type": "array", "items": { "$ref": "#/definitions/valueSet" } },
+    "structuralBounds": { "type": "array", "items": { "$ref": "#/definitions/structuralBound" } },
+    "prohibitions": { "type": "array", "items": { "$ref": "#/definitions/prohibition" } },
+    "unresolvedItems": { "type": "array", "items": { "$ref": "#/definitions/unresolvedItem" } },
+    "compositionContract": { "$ref": "#/definitions/compositionContract" },
+    "l3OwnedParameterNames": { "$ref": "#/definitions/identifierList" },
+    "l3OwnedParameterOwnership": { "type": "string", "enum": ["玩法层"] }
+  },
+  "definitions": {
+    "identifierList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "classificationEvidence": {
+      "description": "三判据证据：可枚举、可组合、不含具体玩法语义。三项都必须为真，且各带分类理由。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enumerable",
+        "enumerationRationale",
+        "composable",
+        "compositionRationale",
+        "gameplayIndependent",
+        "independenceRationale"
+      ],
+      "properties": {
+        "enumerable": { "type": "boolean", "enum": [true] },
+        "enumerationRationale": { "type": "string", "minLength": 1 },
+        "composable": { "type": "boolean", "enum": [true] },
+        "compositionRationale": { "type": "string", "minLength": 1 },
+        "gameplayIndependent": { "type": "boolean", "enum": [true] },
+        "independenceRationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sourceLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceFile", "section"],
+      "properties": {
+        "sourceFile": { "type": "string", "minLength": 1 },
+        "section": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sourceRecord": {
+      "description": "来源记录：文件、定位、优先级、规范分类、归属层与稳定指纹。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceFile",
+        "sourceLocation",
+        "precedence",
+        "classification",
+        "owningLayer",
+        "statementFingerprint"
+      ],
+      "properties": {
+        "sourceFile": { "type": "string", "minLength": 1 },
+        "sourceLocation": { "$ref": "#/definitions/sourceLocation" },
+        "precedence": {
+          "type": "string",
+          "enum": [
+            "l0-constitution",
+            "confirmed-interview-decision",
+            "l1-boundary-invariant",
+            "finalized-l2-contract",
+            "unresolved-l2-content",
+            "historical-example"
+          ]
+        },
+        "decisionId": { "type": "string", "minLength": 1 },
+        "classification": {
+          "type": "string",
+          "enum": ["Normative_Contract", "L3_Profile", "Historical_Example", "Unresolved_Item"]
+        },
+        "owningLayer": { "type": "string", "enum": ["引擎层", "基类层", "玩法层"] },
+        "statementFingerprint": { "type": "string", "minLength": 1 }
+      }
+    },
+    "parameterShape": {
+      "description": "参数槽位形状：只声明键名、语义与是否必填，不含取值。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "description"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "valueShape": { "type": "string", "minLength": 1 }
+      }
+    },
+    "typeIdentity": {
+      "description": "类型身份判据：必需能力、合法关系、不变量或替换兼容性之一，且必须给出陈述。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basis", "statement"],
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["required-capability", "legal-relationship", "invariant", "substitution-compatibility"]
+        },
+        "statement": { "type": "string", "minLength": 1 }
+      }
+    },
+    "defKind": {
+      "description": "引擎层允许的定义种类。",
+      "type": "string",
+      "enum": [
+        "entity",
+        "item",
+        "node",
+        "link",
+        "attachment",
+        "action",
+        "rule",
+        "playpack",
+        "decision",
+        "prefab",
+        "expr",
+        "schedule",
+        "policy"
+      ]
+    },
+    "prohibition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "diagnosticCode", "statement", "correction"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "diagnosticCode": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "statement": { "type": "string", "minLength": 1 },
+        "correction": { "type": "string", "minLength": 1 }
+      }
+    },
+    "unresolvedItem": {
+      "description": "未决项：保留原陈述与处理方式，并记录等待哪一个决策编号。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "handling", "awaitingDecisionId", "sources"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "statement": { "type": "string", "minLength": 1 },
+        "handling": { "type": "string", "minLength": 1 },
+        "awaitingDecisionId": { "type": "string", "minLength": 1 },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/sourceRecord" } }
+      }
+    },
+    "structuralBound": {
+      "description": "结构边界：基类层唯一允许携带数字的位置，必须带分类、权威来源与结构理由。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "classification",
+        "unit",
+        "value",
+        "appliesToFields",
+        "structuralRationale",
+        "authoritativeSource"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "classification": { "type": "string", "enum": ["Structural_Bound", "Constitutional_Constant"] },
+        "unit": { "type": "string", "minLength": 1 },
+        "value": { "type": "number" },
+        "appliesToFields": { "$ref": "#/definitions/identifierList" },
+        "structuralRationale": { "type": "string", "minLength": 1 },
+        "authoritativeSource": { "$ref": "#/definitions/sourceRecord" }
+      }
+    },
+    "valueSet": {
+      "description": "语义值集合：枚举语义取值，不含玩法数值。playLayerTokens 只登记玩法层已在用的同义取值，供适配解析。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "description", "tokens"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "cardinality": {
+          "type": "string",
+          "enum": ["exactly-one", "zero-or-one", "one-or-more", "zero-or-more"]
+        },
+        "tokens": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "name": { "type": "string", "minLength": 1 },
+              "description": { "type": "string", "minLength": 1 },
+              "playLayerTokens": { "$ref": "#/definitions/identifierList" }
+            }
+          }
+        }
+      }
+    },
+    "compositionContract": {
+      "description": "组合契约：声明玩法层以哪些字段名引用本目录的类与能力，以及哪些字段名归玩法层所有。各目录引用字段名不同，故只强制通用两项。",
+      "type": "object",
+      "required": ["description", "playLayerOwnedFieldNames"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "playLayerOwnedFieldNames": { "$ref": "#/definitions/identifierList" },
+        "parameterBindingField": { "type": "string", "minLength": 1 },
+        "classReferenceField": { "type": "string", "minLength": 1 },
+        "capabilityReferenceField": { "type": "string", "minLength": 1 },
+        "slotField": { "type": "string", "minLength": 1 }
+      }
+    },
+    "capabilityEntry": {
+      "description": "能力形状：可被类或玩法实例组合的最小单元，必须至少声明一个参数槽位与一个引擎层写入通道列表（可为空数组）。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "description", "parameters", "kernelOps"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "parameters": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/parameterShape" } },
+        "kernelOps": { "$ref": "#/definitions/identifierList" },
+        "mutuallyExclusiveWith": { "$ref": "#/definitions/identifierList" },
+        "writeChannelContract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["channel", "alternateChannels", "description"],
+          "properties": {
+            "channel": { "type": "string", "enum": ["OpRegistry.invoke"] },
+            "alternateChannels": { "type": "string", "enum": ["none"] },
+            "description": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "classEntry": {
+      "description": "语义类：必须声明引擎层定义种类、语义族、抽象状态、类型身份判据与必需/可选能力集合。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "description",
+        "defKind",
+        "semanticFamily",
+        "abstract",
+        "typeIdentity",
+        "requiredCapabilityIds",
+        "optionalCapabilityIds"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "defKind": { "$ref": "#/definitions/defKind" },
+        "semanticFamily": { "type": "string", "minLength": 1 },
+        "abstract": { "type": "boolean", "enum": [true] },
+        "typeIdentity": { "$ref": "#/definitions/typeIdentity" },
+        "requiredCapabilityIds": { "$ref": "#/definitions/identifierList" },
+        "optionalCapabilityIds": { "$ref": "#/definitions/identifierList" },
+        "parameters": { "type": "array", "items": { "$ref": "#/definitions/parameterShape" } },
+        "kernelOps": { "$ref": "#/definitions/identifierList" },
+        "forbiddenFieldNames": { "$ref": "#/definitions/identifierList" },
+        "costCategory": { "type": "string", "enum": ["paid", "attached"] },
+        "apUnitBoundId": { "type": "string", "minLength": 1 },
+        "gatewayKind": { "type": "string", "enum": ["resource-conversion", "check", "condition"] },
+        "sceneScale": { "type": "string", "enum": ["large", "medium", "small"] },
+        "admittedChildSceneScales": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "admittedParentSceneScales": { "$ref": "#/definitions/identifierList" },
+        "admittedEndpointSceneScales": { "$ref": "#/definitions/identifierList" },
+        "admitsMicroScene": { "type": "boolean" },
+        "connectionBoundId": { "type": "string", "minLength": 1 },
+        "parentCardinalityBoundId": { "type": "string", "minLength": 1 },
+        "endpointCountBoundId": { "type": "string", "minLength": 1 },
+        "lifecycleDeterminants": { "$ref": "#/definitions/identifierList" },
+        "excludedMicroSceneKinds": { "$ref": "#/definitions/identifierList" },
+        "activation": { "type": "string", "enum": ["active", "passive", "triggered"] },
+        "traversal": { "type": "string", "enum": ["ground", "vehicle", "teleport"] },
+        "grantedContractKind": {
+          "type": "string",
+          "enum": ["status-reference", "property-rule-reference", "skill-reference"]
+        },
+        "contentLocality": { "type": "string", "enum": ["follows-host", "bound-to-node"] }
+      }
+    }
+  }
+}

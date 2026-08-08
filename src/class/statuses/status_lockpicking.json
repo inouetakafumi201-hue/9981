@@ -1,0 +1,10 @@
+{
+  "id": "status_lockpicking",
+  "name": "撬锁中",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["interaction", "precision", "progress"],
+  "description": "表示实体正在进行需要维持的精密交互的语义状态。",
+  "capabilityIds": ["status.capability.interaction_progress", "status.capability.target_binding"],
+  "configurableParameters": ["targetBindingPolicy", "interruptionPolicy", "completionPolicy", "presentationPolicy"]
+}

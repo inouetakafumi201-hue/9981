@@ -1,0 +1,367 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 动作族语义目录",
+  "description": "基类层动作语义最小单元目录：声明施动者要求、目标要求、成本类别、效果引用、中断条件与完成状态的接口形状；不含具体玩法数值、具体玩法规则或具名动作实例。",
+  "category": "actions",
+  "semanticFamilies": ["action"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "动作成本类别在当前玩法范围内只有付费与依附两种，可有限列举。",
+    "composable": true,
+    "compositionRationale": "动作类通过施动者要求、目标要求、效果引用、中断条件与序列能力组合成具体动作实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "动作类不知道自己服务于哪种玩法模式，具体成本表、命中规则与效果取值由玩法层绑定。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 6: 动作、回合接口和三种网关 / 6.1-6.4"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:action-family:contract-fields-and-cost-categories"
+    },
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Glossary / Paid_Action, Attached_Action"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:action-family:paid-one-ap-attached-zero-ap"
+    },
+    {
+      "sourceFile": "docs/L0_规范宪法.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "section": "四、引擎层铁律 / 4.1 Op 通道铁律"
+      },
+      "precedence": "l0-constitution",
+      "classification": "Normative_Contract",
+      "owningLayer": "引擎层",
+      "statementFingerprint": "l0:op-iron-law:single-write-channel"
+    }
+  ],
+  "classes": [
+    {
+      "id": "action.class.paid",
+      "name": "付费动作类",
+      "description": "占用一个行动点单位、可独立形成决策分支的动作类。多步骤付费交互由有序付费动作序列与显式中间状态表达。",
+      "defKind": "action",
+      "semanticFamily": "action",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "substitution-compatibility",
+        "statement": "付费动作可作为独立决策分支被替换与枚举；依附动作不可，二者在决策枚举契约上不可互换。"
+      },
+      "costCategory": "paid",
+      "apUnitBoundId": "structural-bound.action.paid_ap_unit",
+      "requiredCapabilityIds": [
+        "action.capability.actor_requirement",
+        "action.capability.target_requirement",
+        "action.capability.effect_binding",
+        "action.capability.completion_state"
+      ],
+      "optionalCapabilityIds": [
+        "action.capability.interruption",
+        "action.capability.multi_step_sequence",
+        "action.capability.op_mapping",
+        "action.capability.presentation_semantics"
+      ],
+      "parameters": [
+        { "key": "actorRequirements", "description": "施动者要求集合引用。", "required": true, "valueShape": "array<actor-requirement>" },
+        { "key": "targetRequirements", "description": "目标要求集合引用。", "required": true, "valueShape": "array<target-requirement>" },
+        { "key": "effectRefs", "description": "效果定义引用集合；效果取值由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
+        { "key": "interruptionConditionRefs", "description": "中断条件引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "completionState", "description": "动作完成后进入的显式完成状态标识。", "required": true, "valueShape": "string" },
+        { "key": "availableAsDecisionBranch", "description": "是否可作为独立决策分支；付费动作恒为真。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.class.attached",
+      "name": "依附动作类",
+      "description": "不占用行动点单位、必须依附于一个付费动作、且不能独立形成决策分支的动作类。",
+      "defKind": "action",
+      "semanticFamily": "action",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "依附动作必须声明宿主付费动作引用，且被禁止出现在决策分支枚举中；该合法关系与付费动作互斥。"
+      },
+      "costCategory": "attached",
+      "apUnitBoundId": "structural-bound.action.attached_ap_unit",
+      "requiredCapabilityIds": [
+        "action.capability.actor_requirement",
+        "action.capability.effect_binding",
+        "action.capability.host_binding"
+      ],
+      "optionalCapabilityIds": [
+        "action.capability.target_requirement",
+        "action.capability.op_mapping",
+        "action.capability.presentation_semantics"
+      ],
+      "parameters": [
+        { "key": "hostActionRef", "description": "所依附的付费动作引用。", "required": true, "valueShape": "reference<action>" },
+        { "key": "actorRequirements", "description": "施动者要求集合引用。", "required": true, "valueShape": "array<actor-requirement>" },
+        { "key": "effectRefs", "description": "效果定义引用集合；效果取值由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
+        { "key": "availableAsDecisionBranch", "description": "是否可作为独立决策分支；依附动作恒为假。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "action.capability.actor_requirement",
+      "name": "施动者要求能力",
+      "description": "声明动作对施动者的能力要求与条件表达式引用。",
+      "parameters": [
+        { "key": "requirementId", "description": "要求项的稳定标识。", "required": true, "valueShape": "string" },
+        { "key": "capability", "description": "施动者需具备的能力语义标识。", "required": true, "valueShape": "string" },
+        { "key": "conditionExprRef", "description": "引擎层布尔表达式定义引用。", "required": false, "valueShape": "reference<expr>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.target_requirement",
+      "name": "目标要求能力",
+      "description": "声明动作的目标种类、期望语义族、目标上限参数名与交互意图。",
+      "parameters": [
+        { "key": "requirementId", "description": "要求项的稳定标识。", "required": true, "valueShape": "string" },
+        { "key": "targetKind", "description": "目标种类，取自 target-kinds 值集。", "required": true, "valueShape": "enum<target-kinds>" },
+        { "key": "expectedFamily", "description": "期望目标所属语义族。", "required": false, "valueShape": "semantic-family-id" },
+        { "key": "maxTargetsField", "description": "目标上限所引用的参数字段名；上限取值由玩法层绑定。", "required": false, "valueShape": "field-name" },
+        { "key": "conditionExprRef", "description": "引擎层布尔表达式定义引用。", "required": false, "valueShape": "reference<expr>" },
+        { "key": "interactionIntent", "description": "交互意图，取自 interaction-intents 值集。", "required": false, "valueShape": "enum<interaction-intents>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.effect_binding",
+      "name": "效果绑定能力",
+      "description": "声明动作可引用的效果定义集合；效果本身的取值与结算规则由玩法层与被引用定义提供。",
+      "parameters": [
+        { "key": "effectRefs", "description": "效果定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.interruption",
+      "name": "中断条件能力",
+      "description": "声明动作在何种条件引用下被中断；具体阈值由玩法层绑定。",
+      "parameters": [
+        { "key": "interruptionConditionRefs", "description": "中断条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.completion_state",
+      "name": "完成状态能力",
+      "description": "声明动作完成后进入的显式完成状态标识，使动作结果可被查询而不依赖隐式推断。",
+      "parameters": [
+        { "key": "completionState", "description": "完成状态标识。", "required": true, "valueShape": "string" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.host_binding",
+      "name": "宿主绑定能力",
+      "description": "声明依附动作所依附的付费动作引用；缺失该引用的依附动作不成立。",
+      "parameters": [
+        { "key": "hostActionRef", "description": "宿主付费动作引用。", "required": true, "valueShape": "reference<action>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.multi_step_sequence",
+      "name": "多步骤序列能力",
+      "description": "声明多步骤付费交互的有序步骤；除最后一步外每一步都必须声明中间状态引用，从而拒绝把多步骤交互压缩为单个原子多点成本。",
+      "parameters": [
+        { "key": "steps", "description": "有序步骤集合。", "required": true, "valueShape": "array<sequence-step>" },
+        { "key": "steps.stepId", "description": "步骤稳定标识。", "required": true, "valueShape": "string" },
+        { "key": "steps.actionRef", "description": "该步骤对应的付费动作引用。", "required": true, "valueShape": "reference<action>" },
+        { "key": "steps.intermediateStatusRef", "description": "该步骤完成后进入的中间状态引用；非末步必填。", "required": false, "valueShape": "reference<status>" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "action.capability.op_mapping",
+      "name": "结构化写入映射能力",
+      "description": "声明动作在运行期映射到哪一个已注册引擎层写入操作及其实参来源。基类层只声明映射，不解释操作、不开启事务、不求值表达式。",
+      "parameters": [
+        { "key": "opId", "description": "已注册引擎层操作标识。", "required": true, "valueShape": "op-id" },
+        { "key": "argumentMapping", "description": "实参映射集合。", "required": true, "valueShape": "array<op-argument-mapping>" },
+        { "key": "argumentMapping.opArgument", "description": "被映射的操作实参名。", "required": true, "valueShape": "string" },
+        { "key": "argumentMapping.source", "description": "实参来源，取自 op-argument-sources 值集。", "required": true, "valueShape": "enum<op-argument-sources>" },
+        { "key": "argumentMapping.parameterName", "description": "来源为参数时的参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": [],
+      "writeChannelContract": {
+        "channel": "OpRegistry.invoke",
+        "alternateChannels": "none",
+        "description": "任何经动作定义允许的运行期写入都只能通过唯一写入通道执行。"
+      }
+    },
+    {
+      "id": "action.capability.presentation_semantics",
+      "name": "表现语义能力",
+      "description": "声明与渲染技术无关的表现语义：交互意图、姿态标签与无障碍标签。表现字段不改变规则结果。2026-08-08 权威变更（本次会话裁决，已获项目所有者授权）：已删除 attackShape 参数与 action.valueset.attack_shapes 取值集，攻击形状判定为冗余设计，已被武器属性（散射/扫射/连发，见 src/class/weapons/index.json）完全覆盖。",
+      "parameters": [
+        { "key": "interactionIntent", "description": "交互意图。", "required": false, "valueShape": "enum<interaction-intents>" },
+        { "key": "posture", "description": "姿态语义标签；基类层不枚举具体姿态。", "required": false, "valueShape": "string" },
+        { "key": "accessibleLabel", "description": "无障碍标签。", "required": false, "valueShape": "string" }
+      ],
+      "kernelOps": []
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "action.valueset.cost_categories",
+      "name": "成本类别",
+      "description": "动作成本类别；类别决定是否可独立形成决策分支。",
+      "tokens": [
+        { "id": "paid", "name": "付费", "description": "占用一个行动点单位并可独立形成决策分支。" },
+        { "id": "attached", "name": "依附", "description": "不占用行动点单位且必须依附于付费动作。" }
+      ]
+    },
+    {
+      "id": "action.valueset.target_kinds",
+      "name": "目标种类",
+      "description": "动作目标可指向的引擎层原语种类。",
+      "tokens": [
+        { "id": "entity", "name": "实体", "description": "指向实体原语。" },
+        { "id": "item", "name": "物品", "description": "指向物品原语。" },
+        { "id": "node", "name": "节点", "description": "指向空间节点原语。" },
+        { "id": "link", "name": "连接", "description": "指向空间连接原语。" },
+        { "id": "attachment", "name": "附件", "description": "指向附件原语。" },
+        { "id": "self", "name": "自身", "description": "指向施动者自身。" },
+        { "id": "none", "name": "无目标", "description": "不需要目标。" }
+      ]
+    },
+    {
+      "id": "action.valueset.interaction_intents",
+      "name": "交互意图",
+      "description": "供只读投影与界面消费的交互语义，与渲染技术无关。",
+      "tokens": [
+        { "id": "traversal", "name": "移动通行", "description": "以改变所在位置为意图。" },
+        { "id": "precise-interaction", "name": "精确交互", "description": "以对特定目标执行精密操作为意图。" },
+        { "id": "hostile-interaction", "name": "敌对交互", "description": "以对目标施加敌对效果为意图。" },
+        { "id": "executable-target", "name": "可执行目标", "description": "以标示目标可被执行为意图。" }
+      ]
+    },
+    {
+      "id": "action.valueset.op_argument_sources",
+      "name": "操作实参来源",
+      "description": "结构化写入映射中实参的来源类别。",
+      "tokens": [
+        { "id": "actor", "name": "施动者", "description": "取自施动者引用。" },
+        { "id": "target", "name": "目标", "description": "取自目标引用。" },
+        { "id": "parameter", "name": "参数", "description": "取自参数字段；取值由玩法层绑定。" },
+        { "id": "constant", "name": "常量", "description": "取自结构化常量；不得承载玩法数值。" }
+      ]
+    }
+  ],
+  "structuralBounds": [
+    {
+      "id": "structural-bound.action.paid_ap_unit",
+      "name": "付费动作行动点单位数",
+      "classification": "Structural_Bound",
+      "unit": "ap-unit-count",
+      "value": 1,
+      "appliesToFields": ["costCategory", "apUnitBoundId"],
+      "structuralRationale": "付费动作的类型定义即为占用一个行动点单位；该数量是类型结构约束而不是可平衡的玩法赋值，玩法层不能改写它，只能改写具体动作是否可用及其效果取值。",
+      "authoritativeSource": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "sourceLocation": {
+          "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+          "section": "Glossary / Paid_Action"
+        },
+        "precedence": "finalized-l2-contract",
+        "classification": "Normative_Contract",
+        "owningLayer": "基类层",
+        "statementFingerprint": "l2:glossary:paid-action-consumes-one-ap-unit"
+      }
+    },
+    {
+      "id": "structural-bound.action.attached_ap_unit",
+      "name": "依附动作行动点单位数",
+      "classification": "Structural_Bound",
+      "unit": "ap-unit-count",
+      "value": 0,
+      "appliesToFields": ["costCategory", "apUnitBoundId"],
+      "structuralRationale": "依附动作的类型定义即为零行动点；该数量是类型结构约束，用于把依附动作与付费动作在决策枚举上区分开。",
+      "authoritativeSource": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "sourceLocation": {
+          "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+          "section": "Glossary / Attached_Action"
+        },
+        "precedence": "finalized-l2-contract",
+        "classification": "Normative_Contract",
+        "owningLayer": "基类层",
+        "statementFingerprint": "l2:glossary:attached-action-zero-ap"
+      }
+    }
+  ],
+  "prohibitions": [
+    {
+      "id": "prohibition.action.multi_ap_atomic_cost",
+      "diagnosticCode": "ACTION_MULTI_AP_ATOMIC_COST",
+      "statement": "动作不得声明跨越多个行动点单位的原子成本；多步骤付费交互必须表达为有序付费动作序列与显式中间状态。",
+      "correction": "改用 action.capability.multi_step_sequence 声明有序步骤。"
+    },
+    {
+      "id": "prohibition.action.attached_as_decision_branch",
+      "diagnosticCode": "ACTION_ATTACHED_AS_DECISION_BRANCH",
+      "statement": "依附动作不得作为独立决策分支出现。",
+      "correction": "把该动作改为付费动作类，或声明其宿主付费动作引用。"
+    },
+    {
+      "id": "prohibition.action.local_write_channel",
+      "diagnosticCode": "LAYER_L1_OWNERSHIP",
+      "statement": "动作定义不得声明本地写入分发、事务模型、表达式求值器或钩子调度；写入只经唯一写入通道执行。",
+      "correction": "改为声明结构化写入映射，把实际写入交由引擎层执行。"
+    },
+    {
+      "id": "prohibition.action.named_gameplay_instance",
+      "diagnosticCode": "LAYER_L3_OWNERSHIP",
+      "statement": "动作目录不得登记与具体玩法耦合的具名动作实例或具体成本表。",
+      "correction": "把具名实例与成本取值下沉到玩法层 profile。"
+    }
+  ],
+  "unresolvedItems": [
+    {
+      "id": "Q-02",
+      "statement": "远程武器两步与枪械一步的并列表述尚未获得权威裁决。",
+      "handling": "本目录只保留有序付费动作序列与中间状态接口，不裁决任何武器族的具体步数。",
+      "awaitingDecisionId": "Q-02",
+      "sources": [
+        {
+          "sourceFile": "docs/L0_规范宪法.md",
+          "sourceLocation": {
+            "sourceFile": "docs/L0_规范宪法.md",
+            "section": "七、待访谈确认事项 / Q-02"
+          },
+          "precedence": "unresolved-l2-content",
+          "decisionId": "Q-02",
+          "classification": "Unresolved_Item",
+          "owningLayer": "基类层",
+          "statementFingerprint": "l0:q-02:ranged-two-step-vs-firearm-one-step"
+        }
+      ]
+    }
+  ],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "actionParameters",
+    "playLayerOwnedFieldNames": ["apCost", "target", "effects", "kernelOp", "kernelOps"],
+    "description": "玩法层以 classComposition 引用动作类与能力，并在 actionParameters 与上列玩法层字段中提供具体取值。"
+  }
+}

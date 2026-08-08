@@ -1,0 +1,286 @@
+{
+  "id": "vehicle_armored_car_001",
+  "name": "装甲车",
+  "type": "land",
+  "volume": 3,
+  "hp": 5,
+  "maxHp": 5,
+  "armorRating": 2,
+  "speed": 1,
+  "seats": [
+    { "index": 1, "role": "driver", "accessible": true, "label": "驾驶位" },
+    { "index": 2, "role": "passenger", "accessible": false, "label": "车长位" },
+    { "index": 3, "role": "passenger", "accessible": false, "label": "乘员位A" },
+    { "index": 4, "role": "passenger", "accessible": false, "label": "乘员位B" },
+    { "index": 5, "role": "passenger", "accessible": false, "label": "乘员位C" }
+  ],
+  "cargo": {
+    "accessibleFrom": "none",
+    "note": "装甲车不提供货舱，空间用于装甲结构"
+  },
+  "canLock": true,
+  "damageOnCollision": 4,
+  "moveEffect": {
+    "apCost": 1,
+    "range": 1,
+    "description": "驾驶移动：因重量原因只能移动1个节点"
+  },
+  "interior": {
+    "isMicroScene": false,
+    "interactionModel": "vehicle_entity",
+    "note": "载具是独立实体，非微型场景；装甲车乘员位不提供对外交互能力"
+  },
+  "specialAbilities": [
+    {
+      "id": "armor_protection",
+      "name": "装甲防护",
+      "description": "装甲车提供额外防护，承受伤害时减免部分伤害",
+      "armorRating": 2,
+      "effect": "reduce_incoming_damage",
+      "note": "装甲评级2意为受到伤害时减少2点伤害（最低为0）"
+    },
+    {
+      "id": "riot_control",
+      "name": "防暴压制",
+      "description": "装甲车可对周围区域产生威慑效果",
+      "requires": "moving",
+      "effect": "aoe_intimidation",
+      "note": "防暴压制效果待NPC AI系统补充具体行为定义"
+    }
+  ],
+  "grantedActions": [
+    {
+      "name": "驾驶移动",
+      "id": "vehicle_drive",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "node", "description": "移动载具到相邻节点" }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "花费1 AP，只能在大/中场景移动1个节点（装甲重量导致）"
+    },
+    {
+      "name": "撞击（瞄准）",
+      "id": "vehicle_ram_aim",
+      "apCost": 1,
+      "type": "combat_aim",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
+      ],
+      "kernelOps": ["attach.add"],
+      "description": "花费1 AP瞄准撞击目标，对方可在此期间躲避；若未躲避则造成4点伤害"
+    },
+    {
+      "name": "上车",
+      "id": "vehicle_board",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_has_seat_available" }
+      ],
+      "effects": [
+        { "op": "agent.bind", "description": "将角色绑定到载具实体" },
+        { "op": "prop.set", "target": "agent", "prop": "vehicle", "description": "记录角色当前载具" },
+        { "op": "prop.set", "target": "agent", "prop": "seat", "description": "分配座位" }
+      ],
+      "kernelOps": ["agent.bind", "prop.set"],
+      "description": "移动到载具节点，花费1 AP进入载具（仅驾驶位和副驾可从外部进入）"
+    },
+    {
+      "name": "下车",
+      "id": "vehicle_disembark",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "in_vehicle" }
+      ],
+      "effects": [
+        { "op": "agent.unbind", "description": "将角色从载具实体解绑" },
+        { "op": "prop.set", "target": "agent", "prop": "node", "description": "角色回到载具所在节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "花费1 AP离开载具，回到载具当前节点"
+    },
+    {
+      "name": "拽下乘员（撬开舱门）",
+      "id": "vehicle_pull_out_breach",
+      "apCost": 1,
+      "type": "interaction",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_locked", "value": false },
+        { "type": "target_in_vehicle" }
+      ],
+      "effects": [
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_lockpicking", "durationTurns": 1, "description": "维持中的精密交互：撬开装甲舱门" }
+      ],
+      "kernelOps": ["attach.add"],
+      "description": "拽下乘员第一步：花费 1 AP 撬开装甲舱门并保持该姿态。装甲车乘员只能从副驾出口被拽出，因此需要额外一步"
+    },
+    {
+      "name": "拽下乘员",
+      "id": "vehicle_pull_out",
+      "apCost": 1,
+      "type": "interaction",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_locked", "value": false },
+        { "type": "target_in_vehicle" }
+      ],
+      "prerequisite": {
+        "state": "status_lockpicking",
+        "description": "必须先执行[拽下乘员（撬开舱门）]"
+      },
+      "effects": [
+        { "op": "agent.unbind", "target": "agent", "description": "目标角色从载具解绑" },
+        { "op": "prop.set", "target": "target_agent", "prop": "node", "description": "目标回到载具节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "拽下乘员第二步：花费 1 AP 完成拽下。两步合计仍是文档的 2 AP，但拆成有序的单 AP 序列以符合 L2 需求 6.2/6.4"
+    },
+    {
+      "name": "远程爆胎",
+      "id": "vehicle_tire_pop_ranged",
+      "apCost": 1,
+      "type": "sabotage",
+      "preconditions": [
+        { "type": "has_ranged_weapon" },
+        { "type": "target_vehicle_adjacent" }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "tireStatus", "value": "flat" },
+        { "op": "prop.set", "target": "vehicle", "prop": "speedModifier", "value": 1 }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "装甲车轮胎有额外防护，需要连续命中2次才能完全爆胎"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interact_tire_front_left",
+      "label": "左前轮胎（强化）",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop",
+      "hitPoints": 2,
+      "note": "强化轮胎需要命中2次才能完全破坏"
+    },
+    {
+      "id": "interact_tire_front_right",
+      "label": "右前轮胎（强化）",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop",
+      "hitPoints": 2
+    },
+    {
+      "id": "interact_tire_rear_left",
+      "label": "左后轮胎（强化）",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop",
+      "hitPoints": 2
+    },
+    {
+      "id": "interact_tire_rear_right",
+      "label": "右后轮胎（强化）",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop",
+      "hitPoints": 2
+    },
+    {
+      "id": "interact_hull",
+      "label": "车体装甲",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "armor_damage",
+      "note": "攻击车体装甲需要重型武器"
+    },
+    {
+      "id": "interact_door_driver",
+      "label": "主驾门",
+      "type": "breakable",
+      "targetable": true,
+      "effect": "door_destroy",
+      "armored": true,
+      "note": "装甲车门有额外耐久"
+    },
+    {
+      "id": "interact_door_passenger",
+      "label": "副驾门",
+      "type": "breakable",
+      "targetable": true,
+      "effect": "door_destroy",
+      "armored": true
+    }
+  ],
+  "kernelTopologyOps": [
+    "agent.bind",
+    "agent.unbind",
+    "attach.add",
+    "prop.set"
+  ],
+  "pendingKernelOps": ["entity.place", "prefab.spawn"],
+  "pendingKernelOpsNote": "损毁序列的燃烧与爆炸尚未表达为 effect；落地时预计需要 prefab.spawn 生成爆炸效果实体、entity.place 安置残骸。",
+  "damageStates": [
+    { "hpRange": [4, 5], "label": "完好", "effects": ["armor_active"] },
+    { "hpRange": [3, 3], "label": "轻损", "effects": ["speed: -0", "armor_active"] },
+    { "hpRange": [2, 2], "label": "中损", "effects": ["speed: -1", "armor_active"] },
+    { "hpRange": [1, 1], "label": "重损", "effects": ["speed: -1", "armor_damaged"] },
+    { "hpRange": [0, 0], "label": "损毁", "effects": ["destroyed"] }
+  ],
+  "destructionSequence": [
+    { "step": 1, "effect": "burning", "duration": 1, "description": "进入燃烧状态，持续1回合" },
+    { "step": 2, "effect": "explosion", "damage": 4, "scope": "vehicle_and_node", "description": "爆炸更猛烈，造成4点伤害" }
+  ],
+  "description": "装甲运兵车，提供高度防护但机动性差。装甲可减免2点伤害（最低为0），强化轮胎需要连续命中2次。乘员位不对外开放交互，需从副驾门下车。",
+  "tags": ["transport", "land", "lockable", "armored", "slow"],
+  "classComposition": {
+    "classIds": ["vehicle.class.land"],
+    "capabilityIds": [
+      "vehicle.capability.durable",
+      "vehicle.capability.seat_binding",
+      "vehicle.capability.lockable",
+      "vehicle.capability.drive",
+      "vehicle.capability.collision",
+      "vehicle.capability.boarding",
+      "vehicle.capability.occupant_extraction",
+      "vehicle.capability.tire_sabotage",
+      "vehicle.capability.targetable_parts",
+      "vehicle.capability.damage_stages",
+      "vehicle.capability.destruction_sequence",
+      "vehicle.capability.armor",
+      "vehicle.capability.reinforced_tire",
+      "vehicle.capability.intimidation"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "VEHICLE-PULLOUT-INTERMEDIATE-STATE",
+      "status": "unresolved",
+      "issue": "拽下装甲车乘员原本是一个 apCost=2 的原子动作，违反 L2 需求 6.4（多 AP 必须拆成有序单 AP 序列）。拆分后第一步需要一个中间状态承载「已撬开装甲舱门」。",
+      "decision": "审计选用基类层已登记的 status_lockpicking 作为中间状态，理由是其类语义为「正在进行需要维持的精密交互」，与撬开装甲舱门同构。这是审计的自主判断，是否为装甲舱门单独引入状态语义待裁决；总成本仍为 2 AP，未改变玩法强度。"
+    }
+  ],
+  "metadata": {
+    "profileVersion": "1.0",
+    "createdDate": "2026-08-04",
+    "category": "special_vehicle",
+    "notes": [
+      "装甲防护机制需要与伤害计算系统协调",
+      "强化轮胎的hitPoints机制需在游戏引擎中实现",
+      "装甲车不适合狭窄地形，适合开阔区域作战"
+    ]
+  }
+}

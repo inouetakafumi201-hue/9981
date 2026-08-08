@@ -1,0 +1,117 @@
+{
+  "id": "wp_rifle_assault",
+  "name": "突击步枪",
+  "category": "firearm",
+  "gunType": "rifle",
+  "description": "零和睡眠协议的主力步兵武器，精度与火力的平衡。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.burst_attribute",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile",
+      "weapon.capability.target_limit"
+    ]
+  },
+  "weightClass": "medium",
+  "rangeClass": "long",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 2,
+  "range": 3,
+  "ammoCost": 1,
+  "ammoType": "5.56mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "精确射击",
+      "apCost": 1,
+      "description": "消耗1发弹药，在3格射程内选择目标并造成2点伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -2,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "点射",
+      "apCost": 1,
+      "target": "area",
+      "description": "消耗2发弹药，对相邻两格各造成1点伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{targets}.props.hp",
+          "delta": -1,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "rifle",
+    "primary"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害2，中等伤害，适合作为主力武器",
+    "rangeRationale": "远距(3格)，精确射击目标由射程和效果中的目标绑定共同确定",
+    "volumeRationale": "占2格，体现突击步枪的体积"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.medium",
+      "handedness": "two-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.long",
+      "effectiveRangeField": "range"
+    },
+    "weapon.capability.target_limit": {
+      "maxTargetsField": "maxTargets"
+    }
+  },
+  "maxTargets": 2
+}

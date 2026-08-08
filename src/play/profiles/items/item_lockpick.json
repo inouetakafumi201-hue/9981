@@ -1,0 +1,109 @@
+{
+  "id": "item_lockpick_001",
+  "name": "撬锁工具",
+  "category": "tool",
+  "classComposition": {
+    "classIds": [
+      "item.class.tool"
+    ],
+    "capabilityIds": [
+      "item.capability.lock_interaction",
+      "item.capability.durability",
+      "item.capability.status_grant"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "工具",
+    "撬锁",
+    "开锁"
+  ],
+  "stackable": false,
+  "grantedStates": [],
+  "description": "精细的撬锁工具套装，可以打开大部分标准锁具。零和睡眠协议中常用的突破手段。",
+  "actions": [
+    {
+      "name": "开始撬锁",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "开始撬锁，获得[撬锁中]状态",
+      "effects": [
+        {
+          "op": "attach.add",
+          "def": "status_lockpicking",
+          "target": "{actor}",
+          "grantedBy": "item_lockpick_001",
+          "description": "进入撬锁中状态"
+        }
+      ],
+      "kernelOps": [
+        "attach.add"
+      ]
+    },
+    {
+      "name": "完成撬锁",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "完成撬锁动作（需要先[开始撬锁]）",
+      "effects": [
+        {
+          "op": "prop.set",
+          "path": "containers.{target}.props.locked",
+          "value": false,
+          "description": "解除容器锁定状态"
+        },
+        {
+          "op": "attach.del",
+          "def": "status_lockpicking",
+          "target": "{actor}",
+          "description": "移除撬锁中状态"
+        }
+      ],
+      "kernelOps": [
+        "attach.del",
+        "prop.set"
+      ],
+      "prerequisite": {
+        "state": "status_lockpicking",
+        "description": "必须先执行[开始撬锁]"
+      }
+    }
+  ],
+  "kernelOps": [
+    "attach.add",
+    "attach.del",
+    "prop.set"
+  ],
+  "mvp": true,
+  "durability": {
+    "max": 3,
+    "decrementOnUse": true,
+    "description": "撬锁工具使用3次后损坏"
+  },
+  "source": [
+    "地图生成",
+    "搜刮"
+  ],
+  "rarity": "common",
+  "itemParameters": {
+    "item.capability.durability": {
+      "resourceProperty": "durability.max",
+      "changeTrigger": "on-use",
+      "depletionBehavior": "break-on-depleted",
+      "operation": "prop.set"
+    },
+    "item.capability.lock_interaction": {
+      "lockSelector": "adjacent-locked-container",
+      "interactionMode": "progressive-unlock",
+      "prerequisite": "status_lockpicking",
+      "completionRule": "two-step-paid-action-sequence",
+      "operation": "prop.set"
+    },
+    "item.capability.status_grant": {
+      "targetSelector": "self",
+      "statusSelector": "status_lockpicking",
+      "lifecycle": "until-complete",
+      "operation": "attach.add"
+    }
+  }
+}

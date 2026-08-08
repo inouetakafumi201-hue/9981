@@ -1,0 +1,130 @@
+{
+  "id": "npc_zombie_common",
+  "name": "普通僵尸",
+  "type": "zombie",
+  "hp": 3,
+  "perception": {
+    "vision": 1,
+    "hearing": 3,
+    "alertThreshold": 4
+  },
+  "fsm": {
+    "initialState": "sleeping",
+    "states": {
+      "sleeping": {
+        "onEnter": ["SetIdle"],
+        "transitions": [
+          {
+            "event": "OnNoise",
+            "condition": "soundLevel >= perception.alertThreshold",
+            "target": "chasing",
+            "kernelEvent": "Zombie_Awakened"
+          }
+        ]
+      },
+      "chasing": {
+        "onEnter": ["LockOnSoundSource", "BeginChase"],
+        "transitions": [
+          {
+            "event": "OnPlayerEnter",
+            "condition": "sameMicroScene",
+            "target": "attacking",
+            "kernelEvent": "Zombie_Attacking"
+          }
+        ],
+        "noDistractions": true
+      },
+      "attacking": {
+        "onEnter": ["MeleeAttack"],
+        "transitions": [
+          {
+            "event": "OnTargetDowned",
+            "condition": "target.hp <= 0",
+            "target": "chasing",
+            "kernelEvent": "Zombie_ResumeSearch"
+          },
+          {
+            "event": "OnTargetLeft",
+            "condition": "!sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "Zombie_ResumeSearch"
+          }
+        ]
+      }
+    },
+    "memory": {
+      "lastKnownPosition": null,
+      "wakeSource": null
+    }
+  },
+  "initialEquipment": ["weapon_claws"],
+  "resources": {
+    "actionPoints": 1,
+    "staminaMax": 3,
+    "initialStamina": 0,
+    "usesStaminaActively": false,
+    "participatesInActionTurn": false,
+    "canSpendStaminaOnInitiative": false,
+    "description": "D-052：NPC 没有轮次，全部在玩家轮次结束后顺序行动；体力上限 3 低于玩家的 5，正是「去杀僵尸」能练习弱点与过载压制的收益来源。"
+  },
+  "behaviors": [
+    {
+      "id": "chase_behavior",
+      "trigger": "State: chasing",
+      "action": "MoveTowardsSound",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "melee_combat",
+      "trigger": "State: attacking",
+      "action": "MeleeAttack",
+      "apCost": 1,
+      "repeatable": true
+    }
+  ],
+  "kernelEvents": [
+    "OnNoise",
+    "OnPlayerEnter",
+    "OnTargetDowned",
+    "OnTargetLeft",
+    "Zombie_Awakened",
+    "Zombie_Attacking",
+    "Zombie_ResumeSearch"
+  ],
+  "tags": ["ai-significant", "hostile", "zombie"],
+  "description": "普通僵尸，视觉差但听觉敏锐。睡眠中被声音唤醒后持续追逐目标，不受声音干扰。",
+  "designNotes": {
+    "n004Resolution": "修正07文档hp:1|2|3违反铁律问题。本玩法配置hp=3遵循1-5约束。",
+    "n013Resolution": "僵尸的sleeping状态有明确意义：初始睡眠，被声音唤醒。",
+    "n007Resolution": "简化版FSM：sleeping→chasing→attacking，不实现patrolling/listening（僵尸不巡逻）。",
+    "n010Resolution": "所有状态转换通过kernelEvents触发。",
+    "noDistractions": "chasing状态noDistractions=true，僵尸锁定目标后不受其他声音影响"
+  },
+  "zombieSpecific": {
+    "speed": 1,
+    "canBeExecuted": true,
+    "dropsDeathBackpack": true,
+    "cannotRespawn": true
+  },
+  "classComposition": {
+    "behaviorClassId": "npc.class.zombie",
+    "capabilityIds": [
+      "npc.capability.sleep",
+      "npc.capability.perceive",
+      "npc.capability.chase",
+      "npc.capability.attack",
+      "npc.capability.remember",
+      "npc.capability.event_driven"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "NPC-EQUIPMENT-DANGLING-CLAWS",
+      "status": "unresolved",
+      "issue": "initialEquipment 引用的 weapon_claws 在玩法层没有对应实例，也没有任何近似候选。",
+      "decision": "保留原引用不改。补齐需要新增一个「爪击」武器实例并为其设定伤害、体积等玩法数值，属新增玩法内容而非引用修正，不由审计代为裁决。"
+    }
+  ],
+  "version": "1.0"
+}

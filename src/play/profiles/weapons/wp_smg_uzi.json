@@ -1,0 +1,126 @@
+{
+  "id": "wp_smg_uzi",
+  "name": "乌兹冲锋枪",
+  "category": "firearm",
+  "gunType": "smg",
+  "description": "高射速冲锋武器，近距离倾泻弹雨。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.burst_attribute",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile"
+    ]
+  },
+  "weightClass": "light",
+  "rangeClass": "medium",
+  "volume": 1,
+  "twoHanded": true,
+  "damage": 1,
+  "range": 2,
+  "ammoCost": 1,
+  "ammoType": "9mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "扫射",
+      "apCost": 1,
+      "description": "消耗1发弹药，在2格射程内选择目标快速射击",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "连发",
+      "apCost": 1,
+      "description": "消耗3发弹药，在2格射程内对同一目标进行3次伤害判定",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit_1"
+        },
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit_2"
+        },
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit_3"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "smg",
+    "rapid-fire"
+  ],
+  "mvp": false,
+  "designNotes": {
+    "damageRationale": "伤害1，单发伤害低但射速快，可通过连发叠加",
+    "rangeRationale": "中距(2格)，动作目标由射程和效果中的目标绑定共同确定",
+    "volumeRationale": "占1格，体现冲锋枪的紧凑设计"
+  },
+  "unresolvedIssues": [
+    "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
+  ],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.light",
+      "handedness": "two-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.medium",
+      "effectiveRangeField": "range"
+    }
+  },
+  "maxTargets": 1
+}

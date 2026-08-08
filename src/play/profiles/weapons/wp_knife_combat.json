@@ -1,0 +1,111 @@
+{
+  "id": "wp_knife_combat",
+  "name": "战斗匕首",
+  "category": "melee",
+  "meleeType": "knife",
+  "description": "零和睡眠协议的近距离区域控制刀具，可藏匿于衣物中。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.melee",
+    "damageClassId": "damage-class.physical",
+    "capabilityIds": [
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile"
+    ]
+  },
+  "weightClass": "light",
+  "volume": 1,
+  "twoHanded": false,
+  "damage": 2,
+  "range": 1,
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "刺",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "近距离刺击，造成2点伤害",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -2
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "突刺",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "投5面骰，结果为1时造成3点伤害，否则造成2点伤害",
+      "effects": [
+        {
+          "op": "random.roll",
+          "sides": 5,
+          "bind": "criticalRoll"
+        },
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -3,
+          "condition": "criticalRoll == 1"
+        },
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -2,
+          "condition": "criticalRoll != 1"
+        }
+      ],
+      "kernelOps": [
+        "random.roll",
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnDamage"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add",
+    "random.roll"
+  ],
+  "kernelEvents": [
+    "OnDamage",
+    "OnMeleeAttack"
+  ],
+  "tags": [
+    "melee",
+    "knife",
+    "concealable",
+    "sharp"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害2，比拳头高一倍但保持近距",
+    "volumeRationale": "占1格，体现匕首的小型轻便",
+    "concealable": "可藏匿，不会触发金属探测器以外的安检",
+    "criticalRule": "突刺投5面骰，结果为1时伤害从2提高到3"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.physical",
+      "damageTypeIds": [
+        "DMG_01"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.light",
+      "handedness": "one-handed"
+    }
+  },
+  "maxTargets": 1
+}

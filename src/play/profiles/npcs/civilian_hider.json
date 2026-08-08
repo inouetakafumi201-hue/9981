@@ -1,0 +1,111 @@
+{
+  "id": "npc_civilian_hider",
+  "name": "躲藏型平民",
+  "type": "civilian",
+  "hp": 2,
+  "perception": {
+    "vision": 3,
+    "hearing": 3,
+    "alertThreshold": 2
+  },
+  "fsm": {
+    "initialState": "patrolling",
+    "states": {
+      "patrolling": {
+        "onEnter": ["PatrolRandomly"],
+        "transitions": [
+          {
+            "event": "OnNoise",
+            "condition": "soundLevel >= perception.alertThreshold",
+            "target": "hiding",
+            "kernelEvent": "Civilian_Hide"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "hiding",
+            "kernelEvent": "Civilian_Hide"
+          }
+        ]
+      },
+      "hiding": {
+        "onEnter": ["FindHidingSpot", "StopMoving"],
+        "transitions": [
+          {
+            "event": "OnSafe",
+            "condition": "!threatInSight && timeSinceThreat > 2",
+            "target": "patrolling",
+            "kernelEvent": "Civilian_Emerge"
+          }
+        ],
+        "canBeFound": true
+      }
+    },
+    "memory": {
+      "patrolRoute": [],
+      "currentPatrolIndex": 0,
+      "threatPosition": null,
+      "hidingSpot": null
+    }
+  },
+  "initialEquipment": [],
+  "resources": {
+    "actionPoints": 1,
+    "staminaMax": 3,
+    "initialStamina": 0,
+    "usesStaminaActively": false,
+    "participatesInActionTurn": false,
+    "canSpendStaminaOnInitiative": false,
+    "description": "D-052：NPC 没有轮次，全部在玩家轮次结束后顺序行动；体力池只用于承受弱点命中与过载压制，不可用于逆转或超逆转。"
+  },
+  "behaviors": [
+    {
+      "id": "patrol_behavior",
+      "trigger": "State: patrolling",
+      "action": "MoveRandomly",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
+      "id": "hide_behavior",
+      "trigger": "State: hiding",
+      "action": "Wait",
+      "apCost": 1,
+      "repeatable": true
+    }
+  ],
+  "kernelEvents": [
+    "OnNoise",
+    "OnPlayerEnter",
+    "OnSafe",
+    "Civilian_Hide",
+    "Civilian_Emerge"
+  ],
+  "tags": ["ai-significant", "neutral", "civilian"],
+  "description": "躲藏型平民，遇到威胁会躲起来。警觉阈值更低，更快发现威胁，但选择躲藏而非逃跑。",
+  "designNotes": {
+    "n001Resolution": "平民使用简化的FSM：patrolling→hiding。",
+    "n004Resolution": "hp=2遵循1-5约束。",
+    "n007Resolution": "简化版FSM。",
+    "n010Resolution": "通过kernelEvents触发。",
+    "alertThresholdNote": "alertThreshold=2，比逃跑型更警觉"
+  },
+  "civilianSpecific": {
+    "canBeExecuted": true,
+    "rewardsStaminaOnExecute": true,
+    "dropsDeathBackpack": false,
+    "hostileToPlayer": false,
+    "canBeFoundInHiding": true
+  },
+  "classComposition": {
+    "behaviorClassId": "npc.class.civilian",
+    "capabilityIds": [
+      "npc.capability.patrol",
+      "npc.capability.perceive",
+      "npc.capability.hide",
+      "npc.capability.remember",
+      "npc.capability.event_driven"
+    ]
+  },
+  "version": "1.0"
+}

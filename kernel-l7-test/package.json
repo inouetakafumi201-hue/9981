@@ -1,0 +1,33 @@
+{
+  "name": "kernel-l7-test",
+  "version": "1.0.0",
+  "description": "L7 微场景/拓扑(Node/Link/Scene) 属性测试",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "mutation": "tsx mutation/run.ts",
+    "equivalence": "tsx mutation/equivalence.ts",
+    "verify": "npm run typecheck && npm run test:coverage && npm run mutation && npm run equivalence"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "fast-check": "3.18.0",
+    "tsx": "4.19.2",
+    "typescript": "5.3.3",
+    "vitest": "1.6.0"
+  },
+  "keywords": [
+    "topology",
+    "scene",
+    "property-testing",
+    "fast-check"
+  ],
+  "author": "",
+  "license": "MIT"
+}

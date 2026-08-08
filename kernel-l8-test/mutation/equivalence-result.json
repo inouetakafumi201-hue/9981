@@ -1,0 +1,66 @@
+{
+  "seqs": 3000,
+  "opsMax": 14,
+  "sentinelSeqs": 400,
+  "sentinels": [
+    "M06",
+    "M08",
+    "M09",
+    "M12",
+    "M13",
+    "M20",
+    "M22",
+    "M24",
+    "M78",
+    "M80",
+    "M81",
+    "M51",
+    "M52",
+    "M69"
+  ],
+  "selfTestPassed": true,
+  "results": [
+    {
+      "id": "M14",
+      "desc": "等价：先删实体再级联——被删实体自己的索引无人再读，另一端仍被清理",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M15",
+      "desc": "等价：级联时不快照 attachments——循环内只删当前元素，Set 迭代对此安全",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M93",
+      "desc": "等价：attrs 默认值去掉——展开 undefined 得空对象，行为不变",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M94",
+      "desc": "等价：dump 内 relations 遍历改用 entries——同一迭代顺序",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M95",
+      "desc": "等价：grantedBy 级联的快照数组换成 Array.from——同语义",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    },
+    {
+      "id": "M96",
+      "desc": "等价：hasIn 的多余空格删掉——纯格式",
+      "equivalent": true,
+      "step": 3000,
+      "detail": ""
+    }
+  ]
+}

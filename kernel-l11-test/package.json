@@ -1,0 +1,25 @@
+{
+  "name": "kernel-l11-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "L11 诊断体系(错误码/Diagnostic) 属性测试",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:mutation": "vitest run --config vitest.mutation.config.ts",
+    "test:equiv": "vitest run --config vitest.equivalence.config.ts",
+    "mutate": "node mutation/run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.15",
+    "fast-check": "^3.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "keywords": ["diagnostic", "error-code", "property-testing", "fast-check"],
+  "author": "",
+  "license": "MIT"
+}

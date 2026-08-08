@@ -1,0 +1,572 @@
+{
+  "total": 70,
+  "valid": 70,
+  "scored": 65,
+  "killed": 65,
+  "survived": 0,
+  "invalid": 0,
+  "expectEquivalent": 5,
+  "score": 100,
+  "outcomes": [
+    {
+      "id": "M01",
+      "file": "hook-system.ts",
+      "desc": "priority 排序方向反转（降序→升序）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventAll 阻止 default 并中断 instead 链 68ms"
+    },
+    {
+      "id": "M02",
+      "file": "hook-system.ts",
+      "desc": "priority 缺省值 0 改为 1（破坏\"未指定即 0\"契约）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 31ms"
+    },
+    {
+      "id": "M03",
+      "file": "hook-system.ts",
+      "desc": "完全不比较 priority",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 26ms"
+    },
+    {
+      "id": "M04",
+      "file": "hook-system.ts",
+      "desc": "containerIndex 排序方向反转",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 33ms"
+    },
+    {
+      "id": "M05",
+      "file": "hook-system.ts",
+      "desc": "不比较 containerIndex",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 28ms"
+    },
+    {
+      "id": "M06",
+      "file": "hook-system.ts",
+      "desc": "slotIndex 排序方向反转",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 24ms"
+    },
+    {
+      "id": "M07",
+      "file": "hook-system.ts",
+      "desc": "不比较 slotIndex",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 27ms"
+    },
+    {
+      "id": "M08",
+      "file": "hook-system.ts",
+      "desc": "defId 比较方向反转",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 23ms"
+    },
+    {
+      "id": "M09",
+      "file": "hook-system.ts",
+      "desc": "不比较 defId",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 27ms"
+    },
+    {
+      "id": "M10",
+      "file": "hook-system.ts",
+      "desc": "hookId 比较方向反转",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 25ms"
+    },
+    {
+      "id": "M11",
+      "file": "hook-system.ts",
+      "desc": "不比较 hookId",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 45ms"
+    },
+    {
+      "id": "M12",
+      "file": "hook-system.ts",
+      "desc": "order 兜底比较方向反转",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 23ms"
+    },
+    {
+      "id": "M13",
+      "file": "hook-system.ts",
+      "desc": "order 兜底改为恒等（放弃全序）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 26ms"
+    },
+    {
+      "id": "M14",
+      "file": "hook-system.ts",
+      "desc": "compareText 相等分支返回 1（破坏自反性）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 22ms"
+    },
+    {
+      "id": "M15",
+      "file": "hook-system.ts",
+      "desc": "排序前不复制数组（原地排序污染注册表顺序）",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M16",
+      "file": "hook-system.ts",
+      "desc": "phase 过滤失效（收集所有阶段的 Hook）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 20ms"
+    },
+    {
+      "id": "M17",
+      "file": "hook-system.ts",
+      "desc": "when 条件被忽略（恒执行）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 轨迹面 > 被 when 跳过的 Hook 不进轨迹 11ms"
+    },
+    {
+      "id": "M18",
+      "file": "hook-system.ts",
+      "desc": "when 条件取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 轨迹面 > 被 when 跳过的 Hook 不进轨迹 9ms"
+    },
+    {
+      "id": "M19",
+      "file": "hook-system.ts",
+      "desc": "全局 Hook 的 defId 用固定串代替 hook.id",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 111ms"
+    },
+    {
+      "id": "M20",
+      "file": "hook-system.ts",
+      "desc": "全局 Hook 的 order 恒为 0（丢失注册序）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 31ms"
+    },
+    {
+      "id": "M21",
+      "file": "hook-system.ts",
+      "desc": "destroyed 物品不再跳过",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 23ms"
+    },
+    {
+      "id": "M22",
+      "file": "hook-system.ts",
+      "desc": "destroyed 判定取反（只保留已销毁物品）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 数据与实体解析 > 无实体时物品 Hook 一律不参与 9ms"
+    },
+    {
+      "id": "M23",
+      "file": "hook-system.ts",
+      "desc": "物品 Hook 的 on 过滤失效",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 22ms"
+    },
+    {
+      "id": "M24",
+      "file": "hook-system.ts",
+      "desc": "物品 Hook 的 phase 过滤失效",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 17ms"
+    },
+    {
+      "id": "M25",
+      "file": "hook-system.ts",
+      "desc": "物品 Hook 的 when 被忽略",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 37ms"
+    },
+    {
+      "id": "M26",
+      "file": "hook-system.ts",
+      "desc": "物品 Hook 的 defId 错用 item.id 而非 item.def",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 36ms"
+    },
+    {
+      "id": "M27",
+      "file": "hook-system.ts",
+      "desc": "物品 Hook 的 order 错用 slotIndex 而非 ruleIndex",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 排序 tiebreak 逐级判定表 > 三重过滤：on / phase / when 任一不符即不收集 8ms"
+    },
+    {
+      "id": "M28",
+      "file": "hook-system.ts",
+      "desc": "slotIndex 记录为常量 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 25ms"
+    },
+    {
+      "id": "M29",
+      "file": "hook-system.ts",
+      "desc": "containerIndex 记录为常量 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 影子模型：instead 竞争排序 > 排序结果与独立模型逐位一致（400次） 37ms"
+    },
+    {
+      "id": "M30",
+      "file": "hook-system.ts",
+      "desc": "无 entity 时提前返回改为继续（读 undefined 容器）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > Hook 抛错穿透根 emit 后，反应队列不残留 8ms"
+    },
+    {
+      "id": "M31",
+      "file": "hook-system.ts",
+      "desc": "容器不存在时不跳过",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 数据与实体解析 > containerOrder 含不存在的容器名时安全跳过 7ms"
+    },
+    {
+      "id": "M32",
+      "file": "hook-system.ts",
+      "desc": "entity 解析优先级反转（entity 优先于 target）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 数据与实体解析 > target 优先于 entity 解析实体 8ms"
+    },
+    {
+      "id": "M33",
+      "file": "hook-system.ts",
+      "desc": "before 与 modify 顺序交换",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 五阶段顺序 > 完整顺序 before → modify → instead → default → after 9ms"
+    },
+    {
+      "id": "M34",
+      "file": "hook-system.ts",
+      "desc": "before 阶段被跳过",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 重入错误穿透根 emit 后，反应队列不残留 7ms"
+    },
+    {
+      "id": "M35",
+      "file": "hook-system.ts",
+      "desc": "modify 阶段被跳过",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > Hook 抛错穿透根 emit 后，反应队列不残留 12ms"
+    },
+    {
+      "id": "M36",
+      "file": "hook-system.ts",
+      "desc": "after 阶段被跳过",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > depth 超限穿透根 emit 后，反应队列不残留 12ms"
+    },
+    {
+      "id": "M37",
+      "file": "hook-system.ts",
+      "desc": "after 提前到 default 之前",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 五阶段顺序 > 完整顺序 before → modify → instead → default → after 12ms"
+    },
+    {
+      "id": "M38",
+      "file": "hook-system.ts",
+      "desc": "default 无条件执行（prevent 失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventAll 阻止 default 并中断 instead 链 10ms"
+    },
+    {
+      "id": "M39",
+      "file": "hook-system.ts",
+      "desc": "prevent 判定取反（未阻止才跳过 default）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 轨迹面 > 轨迹包含 default 调用且 phase 标为 default 8ms"
+    },
+    {
+      "id": "M40",
+      "file": "hook-system.ts",
+      "desc": "preventAll 不再中断 instead 链",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventAll 阻止 default 并中断 instead 链 11ms"
+    },
+    {
+      "id": "M41",
+      "file": "hook-system.ts",
+      "desc": "preventExcept 的包含判定取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventExcept 含当前事件时放行 default 且不中断链 40ms"
+    },
+    {
+      "id": "M42",
+      "file": "hook-system.ts",
+      "desc": "preventExcept 一律阻止（忽略白名单）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventExcept 含当前事件时放行 default 且不中断链 8ms"
+    },
+    {
+      "id": "M43",
+      "file": "hook-system.ts",
+      "desc": "preventExcept 完全失效",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > preventExcept 不含当前事件时阻止 default 并中断链 12ms"
+    },
+    {
+      "id": "M44",
+      "file": "hook-system.ts",
+      "desc": "instead 阶段恒不阻止 default",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M45",
+      "file": "hook-system.ts",
+      "desc": "before/modify/after 阶段的返回值不再被忽略（错误地当成 prevent）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 prevent 语义边界 > before / modify / after 阶段返回 prevent 一律无效 7ms"
+    },
+    {
+      "id": "M46",
+      "file": "hook-system.ts",
+      "desc": "depth 上限判定改为 >（放宽一层）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > depth 超限穿透根 emit 后，反应队列不残留 8ms"
+    },
+    {
+      "id": "M47",
+      "file": "hook-system.ts",
+      "desc": "depth 上限常量 32→31",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 depth 边界 > 第 32 层允许，第 33 层抛错 7ms"
+    },
+    {
+      "id": "M48",
+      "file": "hook-system.ts",
+      "desc": "depth 上限检查被移除",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > depth 超限穿透根 emit 后，反应队列不残留 10ms"
+    },
+    {
+      "id": "M49",
+      "file": "hook-system.ts",
+      "desc": "depth 递减被移除（计数器不复原）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 检查器：干净态必须无违规 > 正常 emit 之后无违规 9ms"
+    },
+    {
+      "id": "M50",
+      "file": "hook-system.ts",
+      "desc": "depth 归零时不清理调用栈",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M51",
+      "file": "hook-system.ts",
+      "desc": "finally 改为正常路径清理（抛错时不复原 depth）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > Hook 抛错穿透根 emit 后，反应队列不残留 9ms"
+    },
+    {
+      "id": "M52",
+      "file": "hook-system.ts",
+      "desc": "重入检查被移除",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 重入错误穿透根 emit 后，反应队列不残留 9ms"
+    },
+    {
+      "id": "M53",
+      "file": "hook-system.ts",
+      "desc": "重入判定只看 type（同事件不同 Hook 也误判为重入）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 调度模型对照 > 执行轨迹与独立模型逐条一致（400次） 38ms"
+    },
+    {
+      "id": "M54",
+      "file": "hook-system.ts",
+      "desc": "重入判定只看 hookId（跨事件复用同 id 被误判）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 重入锁边界 > 不同 type 同 hookId 不是重入 7ms"
+    },
+    {
+      "id": "M55",
+      "file": "hook-system.ts",
+      "desc": "调用栈不出栈（重入锁永不释放）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "exit 1"
+    },
+    {
+      "id": "M56",
+      "file": "hook-system.ts",
+      "desc": "调用栈不入栈（重入锁形同虚设）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 重入错误穿透根 emit 后，反应队列不残留 9ms"
+    },
+    {
+      "id": "M57",
+      "file": "hook-system.ts",
+      "desc": "反应轮上限 8→7",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 抛错后下一次 emit 的反应轮预算是完整的 8 轮 8ms"
+    },
+    {
+      "id": "M58",
+      "file": "hook-system.ts",
+      "desc": "反应轮上限判定改为 <=（多跑一轮）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 抛错后下一次 emit 的反应轮预算是完整的 8 轮 8ms"
+    },
+    {
+      "id": "M59",
+      "file": "hook-system.ts",
+      "desc": "根 emit 的 reactionRounds 初值 1→0（白送一轮）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > 抛错后下一次 emit 的反应轮预算是完整的 8 轮 12ms"
+    },
+    {
+      "id": "M60",
+      "file": "hook-system.ts",
+      "desc": "反应轮计数不递增（死循环风险）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "spawn error: spawnSync C:\\Program Files\\nodejs\\node.exe ETIMEDOUT"
+    },
+    {
+      "id": "M61",
+      "file": "hook-system.ts",
+      "desc": "drain 结束后不清空队列",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M62",
+      "file": "hook-system.ts",
+      "desc": "整轮取出改为逐个取出（轮次语义退化为逐事件）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 调度模型对照 > 执行轨迹与独立模型逐条一致（400次） 72ms"
+    },
+    {
+      "id": "M63",
+      "file": "hook-system.ts",
+      "desc": "非根 emit 也执行 drain",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 反应轮边界 > 嵌套 emit 内部的 react 归入外层根事件的反应队列 10ms"
+    },
+    {
+      "id": "M64",
+      "file": "hook-system.ts",
+      "desc": "根 emit 不清空上次残留队列",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M65",
+      "file": "hook-system.ts",
+      "desc": "finally 中的反应态归零被移除（BUG L4#1 的回归哨兵）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > Hook 抛错穿透根 emit 后，反应队列不残留 14ms"
+    },
+    {
+      "id": "M66",
+      "file": "hook-system.ts",
+      "desc": "react 改为立即 dispatch（丧失轮次语义）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× BUG L4#1：根 emit 的反应态归零必须异常安全 > Hook 抛错穿透根 emit 后，反应队列不残留 10ms"
+    },
+    {
+      "id": "M67",
+      "file": "hook-system.ts",
+      "desc": "default handler 的返回值不再写入 ctx.result",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 五阶段顺序 > default handler 的返回值写入 ctx.result 并对 after 可见 7ms"
+    },
+    {
+      "id": "M68",
+      "file": "hook-system.ts",
+      "desc": "default handler 注册覆盖改为忽略（后注册不生效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 五阶段顺序 > 后注册的 default handler 覆盖先注册的 10ms"
+    },
+    {
+      "id": "M69",
+      "file": "hook-system.ts",
+      "desc": "data 为 null 时不规范化为 {}",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 数据与实体解析 > emit 传 null 时规范化为空对象而非崩溃 8ms"
+    },
+    {
+      "id": "M70",
+      "file": "hook-system.ts",
+      "desc": "注册序号不自增（所有 Hook order 相同）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "× L4 检查器：干净态必须无违规 > 注册若干 Hook 后无违规 9ms"
+    }
+  ]
+}

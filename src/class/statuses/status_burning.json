@@ -1,0 +1,10 @@
+{
+  "id": "status_burning",
+  "name": "燃烧",
+  "category": "negative",
+  "type": "numeric",
+  "tags": ["fire", "ongoing-effect", "adverse"],
+  "description": "表示实体正承受持续火焰影响的语义状态。",
+  "capabilityIds": ["status.capability.ongoing_effect", "status.capability.propagation", "status.capability.fire_relation"],
+  "configurableParameters": ["affectedScope", "propagationMode", "stackingPolicy", "presentationPolicy"]
+}

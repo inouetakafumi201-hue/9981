@@ -1,0 +1,115 @@
+﻿基线校验中...
+基线全绿。
+
+M01 杀死   cloneState 不再深拷贝 props（浅拷贝）
+M02 杀死   cloneState 直接返回入参（完全不拷贝）
+M03 杀死   takeSnapshot 按引用持有状态
+M04 杀死   checkpoint 存入时不拷贝
+M05 杀死   restore 返回内部引用
+M06 杀死   markBoundary 存入活引用
+M07 杀死   rewind 返回内部引用
+M08 杀死   replay 直接以 seed 起步（不克隆）
+M09 杀死   快照编号从 0 起（后置递增）
+M10 杀死   快照编号不递增，恒为 1
+M11 杀死   createdAt 与编号脱钩，恒为 0
+M12 杀死   count 返回 0
+M13 杀死   resetSnapshotCounter 变成空操作
+M14 杀死   版本正则去掉起始锚
+M15 杀死   版本正则去掉结束锚
+M16 杀死   版本正则只要两段
+M17 杀死   版本校验恒为真
+M18 杀死   版本正则允许任意字符段
+M19 杀死   checkWorldState 恒返回空（自检失效）
+M20 杀死   不再校验 version
+M21 杀死   不再校验 playpackId 空串
+M22 杀死   phaseIndex 允许负数
+M23 杀死   phaseIndex 允许非整数
+M24 杀死   randomCounter 允许负数
+M25 杀死   props 非对象不再报错
+M26 杀死   props 内非有限数不再报错
+M27 存活!! props 内非数字不再报错
+M28 杀死   违规只报第一条就返回
+M29 杀死   where 参数被忽略（定位信息丢失）
+M30 杀死   append 使用后置递增，首条 seq 为 0
+M31 杀死   append 不递增发号器（全部同号）
+M32 杀死   since 用 >= 而非 >（多返回一条）
+M33 杀死   trim 保留最前 N 条而非最后 N 条
+M34 存活!! trim(0) 不清空
+M35 存活!! trim 边界用 >= （多截一条）
+M36 存活!! clear 不重置发号器
+M37 杀死   Journal 自检不查严格递增
+M38 杀死   Journal 自检不查发号器回退
+M39 杀死   Journal 自检不查 op 合法性
+M40 杀死   Journal 自检不查 seq 整数性
+M41 杀死   checkpoint 每次都往 order 追加（重复标签）
+M42 杀死   checkpoint 从不登记 order
+M43 杀死   restore 缺失时返回 undefined 而非抛错
+M44 存活!! list 返回内部数组引用
+M45 杀死   remove 不清理 order
+M46 杀死   remove 不删除状态
+M47 杀死   检查点自检不查 order 与集合一致
+M48 杀死   检查点自检不查重复标签
+M49 杀死   检查点自检不查未登记的检查点
+M50 杀死   检查点自检不递归校验状态良构性
+M51 杀死   rewind 下标偏移 1（回退错一格）
+M52 杀死   rewind 允许 n=0
+M53 杀死   rewind 越界不抛错（下标钳到 0）
+M54 杀死   边界日志自检恒返回空
+M55 杀死   PhaseBoundaryLog.count 返回下标而非条数
+M56 杀死   比较只看首段（次段末段永不表决）
+M57 杀死   比较结果取反
+M58 杀死   比较恒返回 0（一切版本视为相同）
+M59 存活(预期) 段数取 min 而非 max
+M60 存活(预期) parseInt 去掉 || 0 兜底
+M61 杀死   删除畸形版本前置校验
+M62 杀死   只校验存档版本，放过目标版本
+M63 杀死   只校验目标版本，放过存档版本
+M64 杀死   同版本分支返回入参引用
+M65 杀死   同版本判定改为 <=（旧存档也走直接恢复）
+M66 杀死   更新存档不再拒绝
+M67 杀死   无迁移链时不再拒绝（当作空链继续）
+M68 杀死   effects 逐个落盘（失败留下部分应用状态）
+M69 杀死   成功跳不推进版本
+M70 杀死   版本推进到 from 而非 to
+M71 杀死   bestEffort 跳过时不留诊断
+M72 杀死   bestEffort 用 break 而非 continue（中断整链）
+M73 杀死   reject 分支丢弃已积累的诊断
+M74 杀死   reject 分支改为跳过（不回滚）
+M75 杀死   reject 分支交出部分应用状态
+M76 杀死   删除未达目标版本守卫（虚假成功）
+M77 杀死   INCOMPLETE 仍报 ok:true
+M78 杀死   INCOMPLETE 分支丢弃已积累诊断
+M79 杀死   成功路径返回未克隆状态
+M80 杀死   成功路径丢弃诊断（跳过记录消失）
+M81 存活(预期) 命中判定移到 visited 之后（起点等于终点时失效）
+M82 存活!! 改用栈（DFS），不再保证最短链
+M83 存活!! 去掉 visited（环图上无限增长）
+M84 杀死   邻接判定用 m.to 而非 m.from
+M85 杀死   入队时丢弃已走路径（返回空链）
+M86 杀死   找不到链时返回空数组而非 null
+M87 杀死   起点直接入队为 to（链恒为空）
+M88 存活!! SKIPPED 与 FAILED 共用同一码（无法区分失败原因）
+M89 存活!! INCOMPLETE 与 NO_PATH 共用同一码
+M90 存活!! BAD_VERSION 与 NEWER_SAVE 共用同一码
+M91 杀死   诊断 detail 置空（失败原因不可读）
+
+========================================
+变异体总数：91
+无效（find 未唯一命中）：0
+计分变异体：87  杀死：77  存活：10
+预期等价（存活为正确）：4
+变异得分：88.51%
+
+存活的计分变异体（测试盲区或契约过粗）：
+  M27  props 内非数字不再报错
+  M34  trim(0) 不清空
+  M35  trim 边界用 >= （多截一条）
+  M36  clear 不重置发号器
+  M44  list 返回内部数组引用
+  M82  改用栈（DFS），不再保证最短链
+  M83  去掉 visited（环图上无限增长）
+  M88  SKIPPED 与 FAILED 共用同一码（无法区分失败原因）
+  M89  INCOMPLETE 与 NO_PATH 共用同一码
+  M90  BAD_VERSION 与 NEWER_SAVE 共用同一码
+
+注意：M79 标注为预期等价却被杀死，标注有误。

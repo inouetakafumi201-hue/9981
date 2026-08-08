@@ -1,0 +1,106 @@
+{
+  "id": "wp_bat_baseball",
+  "name": "棒球棒",
+  "category": "melee",
+  "meleeType": "bat",
+  "description": "标准铝合金棒球棒，城市中的常见防身武器。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.melee",
+    "damageClassId": "damage-class.physical",
+    "capabilityIds": [
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile"
+    ]
+  },
+  "weightClass": "medium",
+  "volume": 2,
+  "twoHanded": true,
+  "damage": 2,
+  "range": 1,
+  "stackable": false,
+  "grantedStates": [
+    {
+      "id": "status_stunned",
+      "target": "target",
+      "condition": "stunRoll == 1",
+      "duration": 1,
+      "description": "投5面骰，结果为1时造成眩晕"
+    }
+  ],
+  "actions": [
+    {
+      "name": "挥击",
+      "apCost": 1,
+      "target": "adjacent",
+      "description": "造成2点伤害；投5面骰，结果为1时击晕目标",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -2
+        },
+        {
+          "op": "random.roll",
+          "sides": 5,
+          "bind": "stunRoll"
+        },
+        {
+          "op": "attach.add",
+          "def": "status_stunned",
+          "target": "{target}",
+          "durationTurns": 1,
+          "condition": "stunRoll == 1"
+        }
+      ],
+      "kernelOps": [
+        "prop.add",
+        "random.roll",
+        "attach.add"
+      ],
+      "kernelEvents": [
+        "OnDamage",
+        "OnStun"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add",
+    "random.roll",
+    "attach.add"
+  ],
+  "kernelEvents": [
+    "OnDamage",
+    "OnMeleeAttack",
+    "OnStun"
+  ],
+  "tags": [
+    "melee",
+    "bat",
+    "common",
+    "blunt"
+  ],
+  "mvp": false,
+  "designNotes": {
+    "damageRationale": "伤害2，与战斗匕首持平",
+    "volumeRationale": "占2格，体现棒球棒的长度",
+    "twoHanded": "双手持用，增加稳定性",
+    "stunRule": "投5面骰，结果为1时附加持续1回合的眩晕"
+  },
+  "unresolvedIssues": [
+    "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
+  ],
+  "weaponParameters": {
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.physical",
+      "damageTypeIds": [
+        "DMG_02"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.medium",
+      "handedness": "two-handed"
+    }
+  },
+  "maxTargets": 1
+}

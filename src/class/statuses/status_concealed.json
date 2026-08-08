@@ -1,0 +1,10 @@
+{
+  "id": "status_concealed",
+  "name": "隐蔽",
+  "category": "positive",
+  "type": "tag",
+  "tags": ["stealth", "concealment", "detection"],
+  "description": "表示实体处于降低可被发现性的语义状态。",
+  "capabilityIds": ["status.capability.detection_modulation"],
+  "configurableParameters": ["detectionScope", "visibilityPolicy", "stackingPolicy", "presentationPolicy"]
+}

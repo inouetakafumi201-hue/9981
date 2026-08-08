@@ -1,0 +1,10 @@
+{
+  "id": "status_aiming",
+  "name": "瞄准",
+  "category": "positive",
+  "type": "tag",
+  "tags": ["aim", "preparation", "precision"],
+  "description": "表示实体已完成目标锁定并等待执行对应动作的准备状态。",
+  "capabilityIds": ["status.capability.preparation", "status.capability.target_binding"],
+  "configurableParameters": ["affectedActionScope", "targetBindingPolicy", "consumptionPolicy", "invalidationPolicy", "presentationPolicy"]
+}

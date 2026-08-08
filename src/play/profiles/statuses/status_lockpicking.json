@@ -1,0 +1,33 @@
+{
+  "id": "status_lockpicking",
+  "name": "撬锁中",
+  "category": "negative",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_lockpicking"
+  },
+  "duration": "until_complete",
+  "durationUnit": "until_event",
+  "stacking": "none",
+  "stackBehavior": "unique",
+  "effects": {
+    "onAction": {"blocked": true, "actionTypes": ["move"], "description": "禁止移动"},
+    "onDamage": {"effect": "interrupt", "description": "受击时中断撬锁"}
+  },
+  "breakConditions": [
+    {"type": "action", "actionId": "complete_lockpick", "effect": "complete", "description": "完成撬锁"},
+    {"type": "action", "actionId": "cancel_lockpick", "effect": "cancel", "description": "主动取消"},
+    {"type": "movement", "effect": "interrupt", "description": "移动"},
+    {"type": "damage", "effect": "interrupt", "description": "受击"}
+  ],
+  "interactionMatrix": [],
+  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnDamageTaken", "OnLockpickComplete", "OnMovement"],
+  "icon": "lockpick",
+  "color": "yellow",
+  "priority": 25,
+  "description": "正在撬锁，绑定目标门，禁止移动，受击中断",
+  "tags": ["interruptible", "precision", "progress"],
+  "source": ["动作: 撬锁", "动作: 拽下乘员（撬开舱门）"],
+  "mvp": true,
+  "notes": "精密交互状态，属于2个1AP动作的中间状态"
+}

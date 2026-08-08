@@ -1,0 +1,266 @@
+{
+  "id": "vehicle_ebike_001",
+  "name": "电瓶车",
+  "type": "land",
+  "volume": 1,
+  "hp": 3,
+  "maxHp": 3,
+  "speed": 2,
+  "seats": [
+    { "index": 1, "role": "driver", "accessible": true, "label": "驾驶位" },
+    { "index": 2, "role": "passenger", "accessible": true, "label": "后座" }
+  ],
+  "cargo": {
+    "capacity": 2,
+    "accessibleFrom": "outside",
+    "accessibleApCost": 1,
+    "unlockable": false
+  },
+  "canLock": false,
+  "damageOnCollision": 2,
+  "moveEffect": {
+    "apCost": 1,
+    "range": 2,
+    "description": "驾驶移动：大/中场景移动2个节点"
+  },
+  "interior": {
+    "isMicroScene": false,
+    "interactionModel": "vehicle_entity",
+    "note": "载具是独立实体，非微型场景；车内交互通过载具授予的动作权限执行"
+  },
+  "specialAbilities": [
+    {
+      "id": "push_through_transition",
+      "name": "推车穿越过渡场景",
+      "description": "电瓶车可在不在车上时由角色推行穿越过渡场景（楼梯、窗户等）",
+      "requires": "character_not_in_vehicle",
+      "effect": "vehicle_can_traverse_transition",
+      "note": "汽车不支持推车（体积和重量不允许）"
+    },
+    {
+      "id": "combat_from_vehicle",
+      "name": "车上近战",
+      "description": "电瓶车驾驶位/乘客位占用者可在驾驶状态下直接使用近战武器，无需下车",
+      "requires": "is_driver_or_passenger",
+      "effect": "can_use_melee_weapons",
+      "note": "平衡代价：电瓶车不能锁门，驾驶中容易被拽下车"
+    }
+  ],
+  "grantedActions": [
+    {
+      "name": "驾驶移动",
+      "id": "vehicle_drive",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "node", "description": "移动载具到相邻节点" }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "花费1 AP，在大/中场景移动2个节点"
+    },
+    {
+      "name": "撞击（瞄准）",
+      "id": "vehicle_ram_aim",
+      "apCost": 1,
+      "type": "combat_aim",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
+      ],
+      "kernelOps": ["attach.add"],
+      "description": "花费1 AP瞄准撞击目标，对方可在此期间躲避；若未躲避则造成2点伤害"
+    },
+    {
+      "name": "上车",
+      "id": "vehicle_board",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_has_seat_available" }
+      ],
+      "effects": [
+        { "op": "agent.bind", "description": "将角色绑定到载具实体" },
+        { "op": "prop.set", "target": "agent", "prop": "vehicle", "description": "记录角色当前载具" },
+        { "op": "prop.set", "target": "agent", "prop": "seat", "description": "分配座位" }
+      ],
+      "kernelOps": ["agent.bind", "prop.set"],
+      "description": "移动到载具节点，花费1 AP进入载具"
+    },
+    {
+      "name": "下车",
+      "id": "vehicle_disembark",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "in_vehicle" }
+      ],
+      "effects": [
+        { "op": "agent.unbind", "description": "将角色从载具实体解绑" },
+        { "op": "prop.set", "target": "agent", "prop": "node", "description": "角色回到载具所在节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "花费1 AP离开载具，回到载具当前节点"
+    },
+    {
+      "name": "推车",
+      "id": "vehicle_push",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "character_not_in_vehicle" },
+        { "type": "adjacent_to_vehicle" }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "node", "description": "携带电瓶车一起移动" },
+        { "op": "prop.set", "target": "agent", "prop": "node", "description": "角色同步移动" }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "不在车上时，花费1 AP带着电瓶车一起移动。可推过过渡场景，可推进微型场景"
+    },
+    {
+      "name": "拽下乘员",
+      "id": "vehicle_pull_out",
+      "apCost": 1,
+      "type": "interaction",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "target_in_vehicle" }
+      ],
+      "effects": [
+        { "op": "agent.unbind", "target": "agent", "description": "目标角色从载具解绑" },
+        { "op": "prop.set", "target": "target_agent", "prop": "node", "description": "目标回到载具节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "站在车旁可对车内任意乘员发起拽下动作（电瓶车不可锁门，无需破锁）"
+    },
+    {
+      "name": "近战爆胎（接近）",
+      "id": "vehicle_tire_pop_melee_approach",
+      "apCost": 1,
+      "type": "sabotage",
+      "preconditions": [
+        { "type": "has_melee_weapon" },
+        { "type": "target_vehicle_adjacent" }
+      ],
+      "effects": [
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "蹲到轮胎旁进入准备态" }
+      ],
+      "kernelOps": ["attach.add"],
+      "description": "近战爆胎第一步：花费 1 AP 接近轮胎并进入准备态。该步骤本身不改变轮胎，正是文档所述留给车内乘员的 1 AP 反应窗口"
+    },
+    {
+      "name": "近战爆胎（攻击）",
+      "id": "vehicle_tire_pop_melee",
+      "apCost": 1,
+      "type": "sabotage",
+      "preconditions": [
+        { "type": "has_melee_weapon" },
+        { "type": "target_vehicle_adjacent" }
+      ],
+      "prerequisite": {
+        "state": "status_aiming",
+        "description": "必须先执行[近战爆胎（接近）]"
+      },
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "tireStatus", "value": "flat", "description": "完成接近轮胎后的攻击" },
+        { "op": "prop.set", "target": "vehicle", "prop": "speedModifier", "value": 1, "description": "移动效果降级" }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "近战爆胎第二步：花费 1 AP 完成爆胎。两步合计仍是文档的 2 AP，但拆成有序的单 AP 序列以符合 L2 需求 6.2/6.4"
+    },
+    {
+      "name": "远程爆胎",
+      "id": "vehicle_tire_pop_ranged",
+      "apCost": 1,
+      "type": "sabotage",
+      "preconditions": [
+        { "type": "has_ranged_weapon" },
+        { "type": "target_vehicle_adjacent" }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "tireStatus", "value": "flat" },
+        { "op": "prop.set", "target": "vehicle", "prop": "speedModifier", "value": 1 }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "远程武器直接判定命中后，车辆失去移动加速"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interact_tire_rear",
+      "label": "后轮胎",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop"
+    },
+    {
+      "id": "interact_seat_rear",
+      "label": "后座",
+      "type": "seat",
+      "note": "电瓶车座位索引仅用于叙事引用，位置优先于索引"
+    }
+  ],
+  "kernelTopologyOps": [
+    "agent.bind",
+    "agent.unbind",
+    "attach.add",
+    "prop.set"
+  ],
+  "pendingKernelOps": ["entity.place", "prefab.spawn"],
+  "pendingKernelOpsNote": "损毁序列的燃烧与爆炸尚未表达为 effect；落地时预计需要 prefab.spawn 生成爆炸效果实体、entity.place 安置残骸。",
+  "damageStates": [
+    { "hpRange": [2, 3], "label": "完好", "effects": [] },
+    { "hpRange": [1, 1], "label": "轻损", "effects": ["speed: -1"] },
+    { "hpRange": [0, 0], "label": "损毁", "effects": ["destroyed"] }
+  ],
+  "destructionSequence": [
+    { "step": 1, "effect": "burning", "duration": 1, "description": "进入燃烧状态，持续1回合" },
+    { "step": 2, "effect": "explosion", "damage": 3, "scope": "vehicle_and_node", "description": "爆炸，造成3点伤害" }
+  ],
+  "description": "电瓶车，轻便灵活但耐久较低。独特能力：可被推行穿越过渡场景（汽车不允许）；驾驶时可直接使用近战武器（车上近战）。不能锁门，驾驶中容易被拽下。",
+  "tags": ["transport", "land", "pushable", "combat_from_vehicle"],
+  "classComposition": {
+    "classIds": ["vehicle.class.land"],
+    "capabilityIds": [
+      "vehicle.capability.durable",
+      "vehicle.capability.seat_binding",
+      "vehicle.capability.cargo",
+      "vehicle.capability.drive",
+      "vehicle.capability.collision",
+      "vehicle.capability.boarding",
+      "vehicle.capability.occupant_extraction",
+      "vehicle.capability.tire_sabotage",
+      "vehicle.capability.targetable_parts",
+      "vehicle.capability.damage_stages",
+      "vehicle.capability.destruction_sequence",
+      "vehicle.capability.pushable_transition",
+      "vehicle.capability.mounted_melee"
+    ]
+  },
+  "unresolvedIssues": [
+    {
+      "code": "VEHICLE-TIREPOP-INTERMEDIATE-STATE",
+      "status": "unresolved",
+      "issue": "近战爆胎原本是一个 apCost=2 的原子动作，违反 L2 需求 6.4（多 AP 必须拆成有序单 AP 序列）。拆分后第一步需要一个中间状态承载「已蹲到轮胎旁」。",
+      "decision": "审计选用基类层已登记的 status_aiming 作为中间状态，理由是同一 profile 的 vehicle_ram_aim 已用它表达载具攻击准备态。这是审计的自主判断，是否为爆胎单独引入准备态语义待裁决；总成本仍为 2 AP，未改变玩法强度。"
+    }
+  ],
+  "metadata": {
+    "profileVersion": "1.0",
+    "createdDate": "2026-08-04",
+    "category": "land_vehicle",
+    "notes": [
+      "电瓶车不可上锁，驾驶时容易被拽下车",
+      "推车穿越过渡场景是电瓶车独有机制",
+      "车上近战是电瓶车独有能力（汽车/JEEP不可）"
+    ]
+  }
+}

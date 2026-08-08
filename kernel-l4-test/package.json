@@ -1,0 +1,23 @@
+{
+  "name": "kernel-l4-test",
+  "version": "1.0.0",
+  "description": "L4 Hook五阶段竞争属性测试",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "mutation": "tsx mutation/run.ts",
+    "equivalence": "tsx mutation/equivalence.ts",
+    "verify": "npm run typecheck && npm run test && npm run mutation && npm run equivalence"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@types/node": "26.1.2",
+    "fast-check": "4.9.0",
+    "tsx": "4.23.8",
+    "typescript": "7.0.2"
+  }
+}

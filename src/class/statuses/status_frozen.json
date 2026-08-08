@@ -1,0 +1,10 @@
+{
+  "id": "status_frozen",
+  "name": "冰冻",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["cold", "movement-impairment", "control"],
+  "description": "表示实体因低温影响而行动受限的语义状态。",
+  "capabilityIds": ["status.capability.movement_restriction", "status.capability.temperature_relation", "status.capability.control_relation"],
+  "configurableParameters": ["affectedActionScope", "restrictionPolicy", "stackingPolicy", "presentationPolicy"]
+}

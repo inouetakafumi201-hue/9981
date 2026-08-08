@@ -1,0 +1,281 @@
+{
+  "schemaVersion": "1.0",
+  "version": "1.0.0",
+  "name": "WakeUp 附件族语义目录",
+  "description": "基类层附件语义最小单元目录：状态附件、属性附件与技能附件按所授予的契约形状区分类型身份。宿主类型、来源类型、持续模式、叠加行为、授予规则与回收行为全部以接口声明，不含具体持续时间或强度取值。",
+  "category": "attachments",
+  "semanticFamilies": ["attachment"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "附件按授予内容只有状态、属性与技能三种契约形状，可有限列举。",
+    "composable": true,
+    "compositionRationale": "附件类与宿主绑定、来源绑定、持续声明、叠加行为、回收行为与光环投射能力组合成具体附件实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "附件类不知道具体持续回合数、叠加层数上限与效果强度；这些取值全部由玩法层绑定。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 9: 伤害、状态、技能、移动和附件契约 / 9.7"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:attachment-family:host-source-duration-stack-granted-cleanup"
+    },
+    {
+      "sourceFile": "docs/L1_引擎层/05_底层引擎架构.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L1_引擎层/05_底层引擎架构.md",
+        "section": "附件层：附件、光环与到期回收"
+      },
+      "precedence": "l1-boundary-invariant",
+      "classification": "Normative_Contract",
+      "owningLayer": "引擎层",
+      "statementFingerprint": "l1:attachment-layer:aura-and-expiry-primitives"
+    }
+  ],
+  "classes": [
+    {
+      "id": "attachment.class.status",
+      "name": "状态附件类",
+      "description": "把语义状态类附加到宿主的附件类。它授予的是状态引用，而不是属性修改规则或技能。",
+      "defKind": "attachment",
+      "semanticFamily": "attachment",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "状态附件必须授予一个语义状态类引用；授予内容的契约形状是它与属性附件、技能附件的类型分界。"
+      },
+      "grantedContractKind": "status-reference",
+      "requiredCapabilityIds": [
+        "attachment.capability.host_binding",
+        "attachment.capability.source_binding",
+        "attachment.capability.duration_declaration",
+        "attachment.capability.stack_behavior",
+        "attachment.capability.granted_status_binding",
+        "attachment.capability.cleanup"
+      ],
+      "optionalCapabilityIds": ["attachment.capability.aura_projection"],
+      "parameters": [
+        { "key": "hostType", "description": "宿主期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "sourceType", "description": "来源期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "durationMode", "description": "持续模式，取自 duration-modes 值集；具体回合数由玩法层绑定。", "required": true, "valueShape": "enum<duration-modes>" },
+        { "key": "stackBehavior", "description": "叠加行为，取自 stack-behaviors 值集；层数上限由玩法层绑定。", "required": true, "valueShape": "enum<stack-behaviors>" },
+        { "key": "grantedStatusRef", "description": "被授予的语义状态类引用。", "required": true, "valueShape": "reference<status>" },
+        { "key": "cleanupBehavior", "description": "回收行为，取自 cleanup-behaviors 值集。", "required": true, "valueShape": "enum<cleanup-behaviors>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del", "attach.expire"]
+    },
+    {
+      "id": "attachment.class.property",
+      "name": "属性附件类",
+      "description": "把属性修改规则附加到宿主的附件类。它授予的是属性修改规则引用，且修改幅度由玩法层绑定。",
+      "defKind": "attachment",
+      "semanticFamily": "attachment",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "属性附件必须授予属性修改规则引用并声明被修改属性的选择器；它不授予状态或技能。"
+      },
+      "grantedContractKind": "property-rule-reference",
+      "requiredCapabilityIds": [
+        "attachment.capability.host_binding",
+        "attachment.capability.source_binding",
+        "attachment.capability.duration_declaration",
+        "attachment.capability.stack_behavior",
+        "attachment.capability.granted_property_rule_binding",
+        "attachment.capability.cleanup"
+      ],
+      "optionalCapabilityIds": ["attachment.capability.aura_projection"],
+      "parameters": [
+        { "key": "hostType", "description": "宿主期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "sourceType", "description": "来源期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "durationMode", "description": "持续模式。", "required": true, "valueShape": "enum<duration-modes>" },
+        { "key": "stackBehavior", "description": "叠加行为。", "required": true, "valueShape": "enum<stack-behaviors>" },
+        { "key": "targetPropertySelector", "description": "被修改属性的选择器。", "required": true, "valueShape": "string" },
+        { "key": "grantedRuleRefs", "description": "属性修改规则引用集合；修改幅度由玩法层绑定。", "required": true, "valueShape": "array<reference<rule>>" },
+        { "key": "cleanupBehavior", "description": "回收行为。", "required": true, "valueShape": "enum<cleanup-behaviors>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del", "attach.expire", "prop.add", "prop.set"]
+    },
+    {
+      "id": "attachment.class.skill",
+      "name": "技能附件类",
+      "description": "把技能类授予宿主的附件类。它授予的是技能引用，宿主在附件存续期间获得对应技能。",
+      "defKind": "attachment",
+      "semanticFamily": "attachment",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "技能附件必须授予技能类引用；它既不直接修改属性，也不直接施加状态。"
+      },
+      "grantedContractKind": "skill-reference",
+      "requiredCapabilityIds": [
+        "attachment.capability.host_binding",
+        "attachment.capability.source_binding",
+        "attachment.capability.duration_declaration",
+        "attachment.capability.stack_behavior",
+        "attachment.capability.granted_skill_binding",
+        "attachment.capability.cleanup"
+      ],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "hostType", "description": "宿主期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "sourceType", "description": "来源期望引用类型。", "required": true, "valueShape": "expected-reference-type" },
+        { "key": "durationMode", "description": "持续模式。", "required": true, "valueShape": "enum<duration-modes>" },
+        { "key": "stackBehavior", "description": "叠加行为。", "required": true, "valueShape": "enum<stack-behaviors>" },
+        { "key": "grantedSkillRefs", "description": "被授予的技能类引用集合。", "required": true, "valueShape": "array<reference<skill>>" },
+        { "key": "cleanupBehavior", "description": "回收行为。", "required": true, "valueShape": "enum<cleanup-behaviors>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del", "attach.expire"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "attachment.capability.host_binding",
+      "name": "宿主绑定能力",
+      "description": "声明附件可附着的宿主期望引用类型。",
+      "parameters": [
+        { "key": "hostType", "description": "宿主期望引用类型。", "required": true, "valueShape": "expected-reference-type" }
+      ],
+      "kernelOps": ["attach.add"]
+    },
+    {
+      "id": "attachment.capability.source_binding",
+      "name": "来源绑定能力",
+      "description": "声明附件来源的期望引用类型，使来源移除后的回收行为可被判定。",
+      "parameters": [
+        { "key": "sourceType", "description": "来源期望引用类型。", "required": true, "valueShape": "expected-reference-type" }
+      ],
+      "kernelOps": []
+    },
+    {
+      "id": "attachment.capability.duration_declaration",
+      "name": "持续声明能力",
+      "description": "声明持续模式；具体持续回合数、到期时点与结束条件取值由玩法层绑定。",
+      "parameters": [
+        { "key": "durationMode", "description": "持续模式。", "required": true, "valueShape": "enum<duration-modes>" },
+        { "key": "durationField", "description": "持续取值所引用的参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["attach.expire"]
+    },
+    {
+      "id": "attachment.capability.stack_behavior",
+      "name": "叠加行为能力",
+      "description": "声明同源或同类附件重复施加时的叠加行为；层数上限取值由玩法层绑定。",
+      "parameters": [
+        { "key": "stackBehavior", "description": "叠加行为。", "required": true, "valueShape": "enum<stack-behaviors>" },
+        { "key": "stackLimitField", "description": "层数上限所引用的参数字段名。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["attach.add"]
+    },
+    {
+      "id": "attachment.capability.granted_status_binding",
+      "name": "状态授予能力",
+      "description": "声明附件授予的语义状态类引用。",
+      "parameters": [
+        { "key": "grantedStatusRef", "description": "语义状态类引用。", "required": true, "valueShape": "reference<status>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del"]
+    },
+    {
+      "id": "attachment.capability.granted_property_rule_binding",
+      "name": "属性规则授予能力",
+      "description": "声明附件授予的属性修改规则引用与被修改属性选择器；修改幅度取值归玩法层。",
+      "parameters": [
+        { "key": "targetPropertySelector", "description": "被修改属性选择器。", "required": true, "valueShape": "string" },
+        { "key": "grantedRuleRefs", "description": "属性修改规则引用集合。", "required": true, "valueShape": "array<reference<rule>>" }
+      ],
+      "kernelOps": ["prop.add", "prop.set"]
+    },
+    {
+      "id": "attachment.capability.granted_skill_binding",
+      "name": "技能授予能力",
+      "description": "声明附件授予的技能类引用集合。",
+      "parameters": [
+        { "key": "grantedSkillRefs", "description": "技能类引用集合。", "required": true, "valueShape": "array<reference<skill>>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del"]
+    },
+    {
+      "id": "attachment.capability.cleanup",
+      "name": "回收能力",
+      "description": "声明附件在持续结束、宿主移除或来源移除时的回收行为。",
+      "parameters": [
+        { "key": "cleanupBehavior", "description": "回收行为。", "required": true, "valueShape": "enum<cleanup-behaviors>" }
+      ],
+      "kernelOps": ["attach.del", "attach.expire"]
+    },
+    {
+      "id": "attachment.capability.aura_projection",
+      "name": "光环投射能力",
+      "description": "声明附件可向宿主所在范围内的其他实体投射效果，并引用范围选择器与重算触发条件。基类层只引用引擎层光环重算能力，不实现重算调度。",
+      "parameters": [
+        { "key": "rangeSelectorRef", "description": "范围选择器定义引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "recomputeTriggerRefs", "description": "重算触发条件定义引用集合。", "required": true, "valueShape": "array<reference>" }
+      ],
+      "kernelOps": ["attach.add", "attach.del", "prop.set"]
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "attachment.valueset.duration_modes",
+      "name": "持续模式",
+      "description": "附件与状态共用的持续模式；模式是语义，具体回合数是玩法层取值。",
+      "tokens": [
+        { "id": "instant", "name": "瞬时", "description": "施加后立即结算并结束。", "playLayerTokens": [] },
+        { "id": "turns", "name": "按回合", "description": "按回合计数存续；回合数由玩法层提供。", "playLayerTokens": ["turns"] },
+        { "id": "until-condition", "name": "直到条件成立", "description": "存续到声明的解除条件成立。", "playLayerTokens": ["until_event"] },
+        { "id": "permanent", "name": "永久", "description": "除显式移除外不自行结束。", "playLayerTokens": [] }
+      ]
+    },
+    {
+      "id": "attachment.valueset.stack_behaviors",
+      "name": "叠加行为",
+      "description": "重复施加时的叠加行为；层数上限是玩法层取值。",
+      "tokens": [
+        { "id": "none", "name": "不叠加", "description": "已存在时忽略新的施加。", "playLayerTokens": ["none"] },
+        { "id": "refresh", "name": "刷新", "description": "已存在时刷新其持续。", "playLayerTokens": ["refresh"] },
+        { "id": "stack", "name": "累加", "description": "已存在时累加层数或延长持续。", "playLayerTokens": ["extend"] },
+        { "id": "independent", "name": "独立并存", "description": "每次施加形成互不影响的独立实例。", "playLayerTokens": ["unique"] }
+      ]
+    },
+    {
+      "id": "attachment.valueset.cleanup_behaviors",
+      "name": "回收行为",
+      "description": "附件的回收时机。",
+      "tokens": [
+        { "id": "on-duration-end", "name": "持续结束时回收", "description": "持续结束即回收。" },
+        { "id": "on-host-removal", "name": "宿主移除时回收", "description": "宿主被移除即回收。" },
+        { "id": "on-source-removal", "name": "来源移除时回收", "description": "来源被移除即回收。" },
+        { "id": "explicit-only", "name": "仅显式回收", "description": "只在显式移除时回收。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.attachment.embedded_duration_value",
+      "diagnosticCode": "SCHEMA_GAMEPLAY_TABLE_IN_L2",
+      "statement": "附件类不得内嵌具体持续回合数、层数上限或效果强度取值。",
+      "correction": "只声明持续模式、叠加行为与参数字段名，取值由玩法层提供。"
+    },
+    {
+      "id": "prohibition.attachment.local_expiry_scheduler",
+      "diagnosticCode": "LAYER_L1_OWNERSHIP",
+      "statement": "附件类不得自行实现到期调度、光环重算循环或钩子分发。",
+      "correction": "引用引擎层到期与光环重算能力，由引擎层负责调度。"
+    }
+  ],
+  "unresolvedItems": [],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "attachmentParameters",
+    "playLayerOwnedFieldNames": ["duration", "durationUnit", "stacking", "stackBehavior", "priority"],
+    "description": "玩法层以 classComposition 引用附件类与能力，并在 attachmentParameters 与上列玩法层字段中提供持续、叠加与优先级取值。"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "id": "item_medkit_001",
+  "name": "医疗包",
+  "category": "consumable",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": [
+      "item.capability.recover"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "医疗",
+    "恢复",
+    "消耗品",
+    "重伤治疗"
+  ],
+  "stackable": true,
+  "grantedStates": [],
+  "description": "标准配置的急救医疗包，内含止血剂和消炎药膏。恢复效果优于绷带。",
+  "actions": [
+    {
+      "name": "使用医疗包",
+      "apCost": 1,
+      "target": "self",
+      "description": "从背包使用，消耗1 AP进行处置",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{actor}.props.hp",
+          "delta": 2,
+          "clamp": {
+            "min": 0,
+            "max": 5
+          }
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add"
+  ],
+  "pendingKernelOps": [
+    "list.remove"
+  ],
+  "pendingKernelOpsNote": "消耗品用后从背包移除仍未建模：需要先确定背包容器的列表路径，才能给出 list.remove 的完整参数。",
+  "mvp": true,
+  "weight": "medium",
+  "source": [
+    "地图生成",
+    "商店",
+    "搜刮"
+  ],
+  "rarity": "uncommon",
+  "unresolvedIssues": [
+    {
+      "code": "ITEM-MEDKIT-AP-COST",
+      "status": "unresolved",
+      "issue": "来源文档对医疗包的使用成本同时出现 0 AP 与 1 AP 两种写法，本 profile 取 1 AP。",
+      "decision": "保留 1 AP 不改，等待裁决。src/play/action-turn/决策与风险记录.md §5.3 声明该冲突记录在本文件，但此前本文件缺少该记录条目，现补上。"
+    }
+  ],
+  "itemParameters": {
+    "item.capability.recover": {
+      "targetSelector": "self",
+      "targetProperty": "hp",
+      "amount": "actions[].effects[].delta",
+      "applicationTiming": "on-use",
+      "operation": "prop.add"
+    }
+  }
+}

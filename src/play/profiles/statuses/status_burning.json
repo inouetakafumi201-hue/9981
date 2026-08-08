@@ -1,0 +1,39 @@
+{
+  "id": "status_burning",
+  "name": "燃烧",
+  "category": "negative",
+  "type": "numeric",
+  "classComposition": {
+    "sourceClass": "status_burning"
+  },
+  "duration": 1,
+  "durationUnit": "turns",
+  "stacking": "none",
+  "stackBehavior": "extend",
+  "effects": {
+    "onTurnEnd": {
+      "op": "prop.add",
+      "path": "entities.{same_micro_scene_except_self}.props.hp",
+      "delta": -3,
+      "condition": "alive",
+      "description": "回合结束时对同微型场景造成3伤"
+    }
+  },
+  "breakConditions": [
+    {"type": "item", "itemId": "water", "action": "use", "effect": "extinguish", "description": "水"},
+    {"type": "movement", "description": "离开当前微型场景（燃烧目标改变）"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_frozen", "type": "neutralize", "description": "燃烧解除冰冻"}
+  ],
+  "kernelEvents": ["OnTurnEnd", "OnDamage", "OnItemUsed", "OnStatusApplied"],
+  "kernelOps": ["prop.add"],
+  "icon": "fire",
+  "color": "orange",
+  "priority": 20,
+  "description": "持续燃烧1回合，回合结束时对同微型场景内所有活体造成3点伤害",
+  "tags": ["area-damage", "fire", "debuff"],
+  "source": ["物品: 火焰喷射器", "环境: 燃烧区域"],
+  "mvp": true,
+  "notes": "伤害目标是同微型场景内除自己外的所有活体"
+}

@@ -1,0 +1,108 @@
+{
+  "id": "wp_pistol_standard",
+  "name": "制式手枪",
+  "category": "firearm",
+  "gunType": "pistol",
+  "description": "零和睡眠协议的制式配枪，可靠性优先于火力。",
+  "classComposition": {
+    "weaponClassId": "weapon-class.firearm",
+    "damageClassId": "damage-class.firearm",
+    "capabilityIds": [
+      "weapon.capability.ammunition_binding",
+      "weapon.capability.damage_reference",
+      "weapon.capability.handling_profile",
+      "weapon.capability.range_profile"
+    ]
+  },
+  "weightClass": "light",
+  "rangeClass": "medium",
+  "volume": 1,
+  "twoHanded": false,
+  "damage": 1,
+  "range": 2,
+  "ammoCost": 1,
+  "ammoType": "9mm",
+  "stackable": false,
+  "grantedStates": [],
+  "actions": [
+    {
+      "name": "射击",
+      "apCost": 1,
+      "description": "消耗1发弹药，在2格射程内选择目标",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{target}.props.hp",
+          "delta": -1,
+          "condition": "hit"
+        }
+      ],
+      "kernelOps": [
+        "prop.add"
+      ],
+      "kernelEvents": [
+        "OnWeaponFire",
+        "OnDamage"
+      ]
+    },
+    {
+      "name": "装填",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP，将弹药补充到5发",
+      "effects": [
+        {
+          "op": "prop.set",
+          "path": "entities.{actor}.props.ammo.wp_pistol_standard",
+          "value": 5
+        }
+      ],
+      "kernelOps": [
+        "prop.set"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "prop.add",
+    "prop.set"
+  ],
+  "kernelEvents": [
+    "OnWeaponFire",
+    "OnDamage"
+  ],
+  "tags": [
+    "firearm",
+    "pistol",
+    "reliable"
+  ],
+  "mvp": true,
+  "designNotes": {
+    "damageRationale": "伤害1，与拳头持平但可远程，符合手枪作为副武器的定位",
+    "rangeRationale": "中距(2格)，动作目标由射程和效果中的目标绑定共同确定",
+    "reloadRationale": "花费1 AP补充到5发，弹药刻度保持在1-5"
+  },
+  "unresolvedIssues": [],
+  "weaponParameters": {
+    "weapon.capability.ammunition_binding": {
+      "ammunitionClassId": "item.class.ammunition",
+      "ammunitionTypeField": "ammoType",
+      "ammunitionCostField": "ammoCost"
+    },
+    "weapon.capability.damage_reference": {
+      "damageClassId": "damage-class.firearm",
+      "damageTypeIds": [
+        "DMG_03"
+      ],
+      "damageAmountField": "damage"
+    },
+    "weapon.capability.handling_profile": {
+      "weightTierId": "weight-tier.light",
+      "handedness": "one-handed"
+    },
+    "weapon.capability.range_profile": {
+      "rangeTierId": "range-tier.medium",
+      "effectiveRangeField": "range"
+    }
+  },
+  "maxTargets": 1
+}

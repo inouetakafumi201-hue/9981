@@ -1,0 +1,264 @@
+{
+  "id": "vehicle_ambulance_001",
+  "name": "医疗车",
+  "type": "land",
+  "volume": 2,
+  "hp": 4,
+  "maxHp": 4,
+  "speed": 2,
+  "seats": [
+    { "index": 1, "role": "driver", "accessible": true, "label": "驾驶位" },
+    { "index": 2, "role": "passenger", "accessible": true, "label": "副驾驶位" },
+    { "index": 3, "role": "passenger", "accessible": true, "label": "医疗舱座位" }
+  ],
+  "cargo": {
+    "capacity": 5,
+    "accessibleFrom": "outside",
+    "accessibleApCost": 1,
+    "unlockable": false
+  },
+  "canLock": true,
+  "damageOnCollision": 3,
+  "moveEffect": {
+    "apCost": 1,
+    "range": 2,
+    "description": "驾驶移动：大/中场景移动2个节点"
+  },
+  "interior": {
+    "isMicroScene": false,
+    "interactionModel": "vehicle_entity",
+    "note": "载具是独立实体，非微型场景"
+  },
+  "specialAbilities": [
+    {
+      "id": "healing_station",
+      "name": "医疗舱治疗点",
+      "description": "医疗舱内部提供治疗效果，乘员在医疗舱内可恢复生命值",
+      "requires": "inside_medical_bay",
+      "effect": "heal_per_turn",
+      "healRate": 1,
+      "note": "只有进入医疗舱座位（index=3）的乘员才能获得治疗效果"
+    },
+    {
+      "id": "emergency_light",
+      "name": "警示灯",
+      "description": "开启医疗车警示灯，可能对NPC行为产生影响（如吸引或驱散）",
+      "requires": "driver_seated",
+      "effect": "broadcast_alert",
+      "note": "警示灯效果待 NPC AI 系统补充具体行为定义"
+    }
+  ],
+  "grantedActions": [
+    {
+      "name": "驾驶移动",
+      "id": "vehicle_drive",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "node", "description": "移动载具到相邻节点" }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "花费1 AP，在大/中场景移动2个节点"
+    },
+    {
+      "name": "撞击（瞄准）",
+      "id": "vehicle_ram_aim",
+      "apCost": 1,
+      "type": "combat_aim",
+      "preconditions": [
+        { "type": "seat_role", "value": "driver" },
+        { "type": "vehicle_has_hp", "min": 1 }
+      ],
+      "effects": [
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
+      ],
+      "kernelOps": ["attach.add"],
+      "description": "花费1 AP瞄准撞击目标，对方可在此期间躲避；若未躲避则造成3点伤害"
+    },
+    {
+      "name": "上车",
+      "id": "vehicle_board",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_has_seat_available" }
+      ],
+      "effects": [
+        { "op": "agent.bind", "description": "将角色绑定到载具实体" },
+        { "op": "prop.set", "target": "agent", "prop": "vehicle", "description": "记录角色当前载具" },
+        { "op": "prop.set", "target": "agent", "prop": "seat", "description": "分配座位" }
+      ],
+      "kernelOps": ["agent.bind", "prop.set"],
+      "description": "移动到载具节点，花费1 AP进入载具"
+    },
+    {
+      "name": "下车",
+      "id": "vehicle_disembark",
+      "apCost": 1,
+      "type": "movement",
+      "preconditions": [
+        { "type": "in_vehicle" }
+      ],
+      "effects": [
+        { "op": "agent.unbind", "description": "将角色从载具实体解绑" },
+        { "op": "prop.set", "target": "agent", "prop": "node", "description": "角色回到载具所在节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "花费1 AP离开载具，回到载具当前节点"
+    },
+    {
+      "name": "拽下乘员",
+      "id": "vehicle_pull_out",
+      "apCost": 1,
+      "type": "interaction",
+      "preconditions": [
+        { "type": "adjacent_to_vehicle" },
+        { "type": "vehicle_locked", "value": false },
+        { "type": "target_in_vehicle" }
+      ],
+      "effects": [
+        { "op": "agent.unbind", "target": "agent", "description": "目标角色从载具解绑" },
+        { "op": "prop.set", "target": "target_agent", "prop": "node", "description": "目标回到载具节点" }
+      ],
+      "kernelOps": ["agent.unbind", "prop.set"],
+      "description": "站在车旁可对车内任意乘员发起拽下动作"
+    },
+    {
+      "name": "爆胎",
+      "id": "vehicle_tire_pop",
+      "apCost": 1,
+      "type": "sabotage",
+      "preconditions": [
+        { "type": "has_ranged_weapon" },
+        { "type": "target_vehicle_adjacent" }
+      ],
+      "effects": [
+        { "op": "prop.set", "target": "vehicle", "prop": "tireStatus", "value": "flat" },
+        { "op": "prop.set", "target": "vehicle", "prop": "speedModifier", "value": 1 }
+      ],
+      "kernelOps": ["prop.set"],
+      "description": "远程武器直接判定命中后，车辆失去移动加速"
+    },
+    {
+      "name": "使用医疗舱治疗",
+      "id": "ambulance_heal",
+      "apCost": 1,
+      "type": "utility",
+      "preconditions": [
+        { "type": "in_medical_bay_seat" },
+        { "type": "target_in_same_vehicle" }
+      ],
+      "effects": [
+        { "op": "prop.add", "target": "target_agent", "prop": "hp", "delta": 1, "description": "治疗目标1点生命值" }
+      ],
+      "kernelOps": ["prop.add"],
+      "description": "医疗舱内乘员可为同在医疗舱的目标恢复1点生命值（需双方均在医疗舱座位）"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interact_tire_front_left",
+      "label": "左前轮胎",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop"
+    },
+    {
+      "id": "interact_tire_front_right",
+      "label": "右前轮胎",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop"
+    },
+    {
+      "id": "interact_tire_rear_left",
+      "label": "左后轮胎",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop"
+    },
+    {
+      "id": "interact_tire_rear_right",
+      "label": "右后轮胎",
+      "type": "sabotage",
+      "targetable": true,
+      "effect": "tire_pop"
+    },
+    {
+      "id": "interact_door_driver",
+      "label": "主驾门",
+      "type": "breakable",
+      "targetable": true,
+      "effect": "door_destroy"
+    },
+    {
+      "id": "interact_door_passenger",
+      "label": "副驾门",
+      "type": "breakable",
+      "targetable": true,
+      "effect": "door_destroy"
+    },
+    {
+      "id": "interact_door_rear",
+      "label": "后门（医疗舱）",
+      "type": "breakable",
+      "targetable": true,
+      "effect": "door_destroy",
+      "note": "后门通往医疗舱，破坏后可能影响治疗功能"
+    }
+  ],
+  "kernelTopologyOps": [
+    "agent.bind",
+    "agent.unbind",
+    "attach.add",
+    "prop.add",
+    "prop.set"
+  ],
+  "pendingKernelOps": ["entity.place", "prefab.spawn"],
+  "pendingKernelOpsNote": "损毁序列的燃烧与爆炸尚未表达为 effect；落地时预计需要 prefab.spawn 生成爆炸效果实体、entity.place 安置残骸。",
+  "damageStates": [
+    { "hpRange": [3, 4], "label": "完好", "effects": [] },
+    { "hpRange": [2, 2], "label": "轻损", "effects": ["speed: -1"] },
+    { "hpRange": [1, 1], "label": "重损", "effects": ["speed: -2", "healing_disabled"] },
+    { "hpRange": [0, 0], "label": "损毁", "effects": ["destroyed"] }
+  ],
+  "destructionSequence": [
+    { "step": 1, "effect": "burning", "duration": 1, "description": "进入燃烧状态，持续1回合" },
+    { "step": 2, "effect": "explosion", "damage": 3, "scope": "vehicle_and_node", "description": "爆炸，造成3点伤害" }
+  ],
+  "description": "医疗车，提供3个座位和5格货舱容量，内置医疗舱可恢复生命值。治疗功能在重损状态下失效。",
+  "tags": ["transport", "land", "lockable", "healing"],
+  "classComposition": {
+    "classIds": ["vehicle.class.land"],
+    "capabilityIds": [
+      "vehicle.capability.durable",
+      "vehicle.capability.seat_binding",
+      "vehicle.capability.cargo",
+      "vehicle.capability.lockable",
+      "vehicle.capability.drive",
+      "vehicle.capability.collision",
+      "vehicle.capability.boarding",
+      "vehicle.capability.occupant_extraction",
+      "vehicle.capability.tire_sabotage",
+      "vehicle.capability.targetable_parts",
+      "vehicle.capability.damage_stages",
+      "vehicle.capability.destruction_sequence",
+      "vehicle.capability.medical_bay",
+      "vehicle.capability.emergency_signal"
+    ]
+  },
+  "metadata": {
+    "profileVersion": "1.0",
+    "createdDate": "2026-08-04",
+    "category": "special_vehicle",
+    "notes": [
+      "医疗车治疗功能是特殊能力，需与状态效果系统协调",
+      "警示灯对NPC行为的影响待AI系统补充"
+    ]
+  }
+}

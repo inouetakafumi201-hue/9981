@@ -1,0 +1,740 @@
+{
+  "total": 91,
+  "valid": 91,
+  "scored": 85,
+  "killed": 85,
+  "survived": 0,
+  "invalid": 0,
+  "expectEquivalent": 6,
+  "score": 100,
+  "outcomes": [
+    {
+      "id": "M01",
+      "file": "persistence.ts",
+      "desc": "cloneState 不再深拷贝 props（浅拷贝）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{a=-108,c=-212}' to be 'v1.0.0/pp:1/p0/r0/{a=-109,c=-212}' // Object.is equality"
+    },
+    {
+      "id": "M02",
+      "file": "persistence.ts",
+      "desc": "cloneState 直接返回入参（完全不拷贝）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{a=-145,c=-72}' to be 'v1.0.0/pp:1/p0/r0/{a=-146,c=-72}' // Object.is equality"
+    },
+    {
+      "id": "M03",
+      "file": "persistence.ts",
+      "desc": "takeSnapshot 按引用持有状态",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p99/r0/{a=12345}' to be 'v1.0.0/pp:1/p0/r0/{}' // Object.is equality"
+    },
+    {
+      "id": "M04",
+      "file": "persistence.ts",
+      "desc": "checkpoint 存入时不拷贝",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p1/r0/{b=999}' to be 'v1.0.0/pp:1/p0/r0/{}' // Object.is equality"
+    },
+    {
+      "id": "M05",
+      "file": "persistence.ts",
+      "desc": "restore 返回内部引用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected { version: '1.0.0', …(4) } not to be { version: '1.0.0', …(4) } // Object.is equality"
+    },
+    {
+      "id": "M06",
+      "file": "persistence.ts",
+      "desc": "markBoundary 存入活引用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 2 to be 10 // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M07",
+      "file": "persistence.ts",
+      "desc": "rewind 返回内部引用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{a=4242}' to be 'v1.0.0/pp:1/p0/r0/{}' // Object.is equality"
+    },
+    {
+      "id": "M08",
+      "file": "persistence.ts",
+      "desc": "replay 直接以 seed 起步（不克隆）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{a=8,c=4}' to be 'v1.0.0/pp:1/p0/r0/{a=9,c=4}' // Object.is equality"
+    },
+    {
+      "id": "M09",
+      "file": "persistence.ts",
+      "desc": "快照编号从 0 起（后置递增）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'snap:0' ] to deeply equal [ 'snap:1' ]"
+    },
+    {
+      "id": "M10",
+      "file": "persistence.ts",
+      "desc": "快照编号不递增，恒为 1",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected +0 to be 1 // Object.is equality"
+    },
+    {
+      "id": "M11",
+      "file": "persistence.ts",
+      "desc": "createdAt 与编号脱钩，恒为 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M12",
+      "file": "persistence.ts",
+      "desc": "count 返回 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected +0 to be 1 // Object.is equality"
+    },
+    {
+      "id": "M13",
+      "file": "persistence.ts",
+      "desc": "resetSnapshotCounter 变成空操作",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 'snap:3' to be 'snap:1' // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M14",
+      "file": "persistence.ts",
+      "desc": "版本正则去掉起始锚",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected true to be false // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M15",
+      "file": "persistence.ts",
+      "desc": "版本正则去掉结束锚",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected true to be false // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M16",
+      "file": "persistence.ts",
+      "desc": "版本正则只要两段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ '检查点[\" \"].version 非法: \"1.0.0\"' ] to deeply equal []"
+    },
+    {
+      "id": "M17",
+      "file": "persistence.ts",
+      "desc": "版本校验恒为真",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M18",
+      "file": "persistence.ts",
+      "desc": "版本正则允许任意字符段",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M19",
+      "file": "persistence.ts",
+      "desc": "checkWorldState 恒返回空（自检失效）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M20",
+      "file": "persistence.ts",
+      "desc": "不再校验 version",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M21",
+      "file": "persistence.ts",
+      "desc": "不再校验 playpackId 空串",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M22",
+      "file": "persistence.ts",
+      "desc": "phaseIndex 允许负数",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M23",
+      "file": "persistence.ts",
+      "desc": "phaseIndex 允许非整数",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M24",
+      "file": "persistence.ts",
+      "desc": "randomCounter 允许负数",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M25",
+      "file": "persistence.ts",
+      "desc": "props 非对象不再报错",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 0 to be greater than 0\u001b[39m"
+    },
+    {
+      "id": "M26",
+      "file": "persistence.ts",
+      "desc": "props 内非有限数不再报错",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M27",
+      "file": "persistence.ts",
+      "desc": "props 内非数字不再报错（typeof 前置判断冗余）",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M28",
+      "file": "persistence.ts",
+      "desc": "违规只报第一条就返回",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 1 to be 5 // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M29",
+      "file": "persistence.ts",
+      "desc": "where 参数被忽略（定位信息丢失）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 'state.phaseIndex 必须为非负整数，实为 -1' to contain '检查点[\"c1\"]'\u001b[39m"
+    },
+    {
+      "id": "M30",
+      "file": "persistence.ts",
+      "desc": "append 使用后置递增，首条 seq 为 0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected +0 to be 1 // Object.is equality"
+    },
+    {
+      "id": "M31",
+      "file": "persistence.ts",
+      "desc": "append 不递增发号器（全部同号）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{}' to be 'v1.0.0/pp:1/p0/r1/{}' // Object.is equality"
+    },
+    {
+      "id": "M32",
+      "file": "persistence.ts",
+      "desc": "since 用 >= 而非 >（多返回一条）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p2/r0/{}' to be 'v1.0.0/pp:1/p1/r0/{}' // Object.is equality"
+    },
+    {
+      "id": "M33",
+      "file": "persistence.ts",
+      "desc": "trim 保留最前 N 条而非最后 N 条",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "exit 1"
+    },
+    {
+      "id": "M34",
+      "file": "persistence.ts",
+      "desc": "trim(0) 由提前清空改为落入 slice 分支",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M35",
+      "file": "persistence.ts",
+      "desc": "trim 边界用 >=（相等时多做一次整份 slice）",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M36",
+      "file": "persistence.ts",
+      "desc": "clear 不重置发号器",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 4 ] to deeply equal [ 1 ]\u001b[39m"
+    },
+    {
+      "id": "M37",
+      "file": "persistence.ts",
+      "desc": "Journal 自检不查严格递增",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M38",
+      "file": "persistence.ts",
+      "desc": "Journal 自检不查发号器回退",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M39",
+      "file": "persistence.ts",
+      "desc": "Journal 自检不查 op 合法性",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M40",
+      "file": "persistence.ts",
+      "desc": "Journal 自检不查 seq 整数性",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M41",
+      "file": "persistence.ts",
+      "desc": "checkpoint 每次都往 order 追加（重复标签）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'c1', 'c1' ] to deeply equal [ 'c1' ]\u001b[39m"
+    },
+    {
+      "id": "M42",
+      "file": "persistence.ts",
+      "desc": "checkpoint 从不登记 order",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ '检查点未登记进 order: \" \"', …(1) ] to deeply equal []"
+    },
+    {
+      "id": "M43",
+      "file": "persistence.ts",
+      "desc": "restore 缺失时返回 undefined 而非抛错",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [Function] to throw an error\u001b[39m"
+    },
+    {
+      "id": "M44",
+      "file": "persistence.ts",
+      "desc": "list 返回内部数组引用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'b', '__injected__' ] to deeply equal [ 'a', 'b' ]\u001b[39m"
+    },
+    {
+      "id": "M45",
+      "file": "persistence.ts",
+      "desc": "remove 不清理 order",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'order 含无对应状态的标签: \"c1\"', …(1) ] to deeply equal []\u001b[39m"
+    },
+    {
+      "id": "M46",
+      "file": "persistence.ts",
+      "desc": "remove 不删除状态",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ '检查点未登记进 order: \"c1\"', …(1) ] to deeply equal []\u001b[39m"
+    },
+    {
+      "id": "M47",
+      "file": "persistence.ts",
+      "desc": "检查点自检不查 order 与集合一致",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M48",
+      "file": "persistence.ts",
+      "desc": "检查点自检不查重复标签",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M49",
+      "file": "persistence.ts",
+      "desc": "检查点自检不查未登记的检查点",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M50",
+      "file": "persistence.ts",
+      "desc": "检查点自检不递归校验状态良构性",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M51",
+      "file": "persistence.ts",
+      "desc": "rewind 下标偏移 1（回退错一格）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [Function] to throw an error"
+    },
+    {
+      "id": "M52",
+      "file": "persistence.ts",
+      "desc": "rewind 允许 n=0",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [Function] to throw an error"
+    },
+    {
+      "id": "M53",
+      "file": "persistence.ts",
+      "desc": "rewind 越界不抛错（下标钳到 0）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [Function] to throw an error"
+    },
+    {
+      "id": "M54",
+      "file": "persistence.ts",
+      "desc": "边界日志自检恒返回空",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected false to be true // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M55",
+      "file": "persistence.ts",
+      "desc": "PhaseBoundaryLog.count 返回下标而非条数",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 1 to be 2 // Object.is equality"
+    },
+    {
+      "id": "M56",
+      "file": "migration.ts",
+      "desc": "比较只看首段（次段末段永不表决）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "id": "M57",
+      "file": "migration.ts",
+      "desc": "比较结果取反",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_NO_PATH' ] to deeply equal [ 'E_MIG_NEWER_SAVE' ]"
+    },
+    {
+      "id": "M58",
+      "file": "migration.ts",
+      "desc": "比较恒返回 0（一切版本视为相同）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "id": "M59",
+      "file": "migration.ts",
+      "desc": "段数取 min 而非 max",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M60",
+      "file": "migration.ts",
+      "desc": "parseInt 去掉 || 0 兜底",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M61",
+      "file": "migration.ts",
+      "desc": "删除畸形版本前置校验",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'E_MIG_NO_PATH' ] to deeply equal [ 'E_MIG_BAD_VERSION' ]\u001b[39m"
+    },
+    {
+      "id": "M62",
+      "file": "migration.ts",
+      "desc": "只校验存档版本，放过目标版本",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'E_MIG_NEWER_SAVE' ] to deeply equal [ 'E_MIG_BAD_VERSION' ]\u001b[39m"
+    },
+    {
+      "id": "M63",
+      "file": "migration.ts",
+      "desc": "只校验目标版本，放过存档版本",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'E_MIG_NO_PATH' ] to deeply equal [ 'E_MIG_BAD_VERSION' ]\u001b[39m"
+    },
+    {
+      "id": "M64",
+      "file": "migration.ts",
+      "desc": "同版本分支返回入参引用",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected { version: '1.0.0', …(4) } not to be { version: '1.0.0', …(4) } // Object.is equality"
+    },
+    {
+      "id": "M65",
+      "file": "migration.ts",
+      "desc": "同版本判定改为 <=（旧存档也走直接恢复）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "id": "M66",
+      "file": "migration.ts",
+      "desc": "更新存档不再拒绝",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_NO_PATH' ] to deeply equal [ 'E_MIG_NEWER_SAVE' ]"
+    },
+    {
+      "id": "M67",
+      "file": "migration.ts",
+      "desc": "无迁移链时不再拒绝（当作空链继续）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "exit 1"
+    },
+    {
+      "id": "M68",
+      "file": "migration.ts",
+      "desc": "effects 逐个落盘（失败留下部分应用状态）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v1.0.0/pp:1/p0/r0/{a=0}' to be 'v1.0.0/pp:1/p0/r0/{}' // Object.is equality"
+    },
+    {
+      "id": "M69",
+      "file": "migration.ts",
+      "desc": "成功跳不推进版本",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "id": "M70",
+      "file": "migration.ts",
+      "desc": "版本推进到 from 而非 to",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "id": "M71",
+      "file": "migration.ts",
+      "desc": "bestEffort 跳过时不留诊断",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_INCOMPLETE' ] to deeply equal [ 'W_MIG_SKIPPED', 'E_MIG_INCOMPLETE' ]"
+    },
+    {
+      "id": "M72",
+      "file": "migration.ts",
+      "desc": "bestEffort 用 break 而非 continue（中断整链）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "id": "M73",
+      "file": "migration.ts",
+      "desc": "reject 分支丢弃已积累的诊断",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected [ 'E_MIG_FAILED' ] to deeply equal [ 'W_MIG_SKIPPED', 'E_MIG_FAILED' ]\u001b[39m"
+    },
+    {
+      "id": "M74",
+      "file": "migration.ts",
+      "desc": "reject 分支改为跳过（不回滚）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_INCOMPLETE' ] to deeply equal [ 'E_MIG_FAILED' ]"
+    },
+    {
+      "id": "M75",
+      "file": "migration.ts",
+      "desc": "reject 分支交出部分应用状态",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "id": "M76",
+      "file": "migration.ts",
+      "desc": "删除未达目标版本守卫（虚假成功）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "id": "M77",
+      "file": "migration.ts",
+      "desc": "INCOMPLETE 仍报 ok:true",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "id": "M78",
+      "file": "migration.ts",
+      "desc": "INCOMPLETE 分支丢弃已积累诊断",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_INCOMPLETE' ] to deeply equal [ 'W_MIG_SKIPPED', 'E_MIG_INCOMPLETE' ]"
+    },
+    {
+      "id": "M79",
+      "file": "migration.ts",
+      "desc": "成功路径返回未克隆状态",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected {} not to be {} // Object.is equality"
+    },
+    {
+      "id": "M80",
+      "file": "migration.ts",
+      "desc": "成功路径丢弃诊断（跳过记录消失）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [] to deeply equal [ 'W_MIG_SKIPPED' ]"
+    },
+    {
+      "id": "M81",
+      "file": "migration.ts",
+      "desc": "命中判定移到 visited 之后（起点等于终点时失效）",
+      "status": "survived",
+      "expectEquivalent": true,
+      "detail": "all green"
+    },
+    {
+      "id": "M82",
+      "file": "migration.ts",
+      "desc": "改用栈（DFS），不再保证最短链",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 2 to be 1 // Object.is equality"
+    },
+    {
+      "id": "M83",
+      "file": "migration.ts",
+      "desc": "去掉 visited（环图上队列无界增长）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "spawn error: spawnSync C:\\Program Files\\nodejs\\node.exe ETIMEDOUT"
+    },
+    {
+      "id": "M84",
+      "file": "migration.ts",
+      "desc": "邻接判定用 m.to 而非 m.from",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "id": "M85",
+      "file": "migration.ts",
+      "desc": "入队时丢弃已走路径（返回空链）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected 'v2.0.0/pp:1/p0/r0/{}' to be 'v2.0.0/pp:1/p0/r0/{a=0}' // Object.is equality"
+    },
+    {
+      "id": "M86",
+      "file": "migration.ts",
+      "desc": "找不到链时返回空数组而非 null",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_INCOMPLETE' ] to deeply equal [ 'E_MIG_NO_PATH' ]"
+    },
+    {
+      "id": "M87",
+      "file": "migration.ts",
+      "desc": "起点直接入队为 to（链恒为空）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "Got AssertionError: expected [ 'E_MIG_INCOMPLETE' ] to deeply equal [ 'E_MIG_NO_PATH' ]"
+    },
+    {
+      "id": "M88",
+      "file": "migration.ts",
+      "desc": "SKIPPED 与 FAILED 共用同一码（无法区分失败原因）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 'E_MIG_FAILED' to be 'W_MIG_SKIPPED' // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M89",
+      "file": "migration.ts",
+      "desc": "INCOMPLETE 与 NO_PATH 共用同一码",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 'E_MIG_NO_PATH' to be 'E_MIG_INCOMPLETE' // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M90",
+      "file": "migration.ts",
+      "desc": "BAD_VERSION 与 NEWER_SAVE 共用同一码",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 'E_MIG_NEWER_SAVE' to be 'E_MIG_BAD_VERSION' // Object.is equality\u001b[39m"
+    },
+    {
+      "id": "M91",
+      "file": "migration.ts",
+      "desc": "诊断 detail 置空（失败原因不可读）",
+      "status": "killed",
+      "expectEquivalent": false,
+      "detail": "\u001b[31m\u001b[1mAssertionError\u001b[22m: expected '' to contain 'saved'\u001b[39m"
+    }
+  ]
+}

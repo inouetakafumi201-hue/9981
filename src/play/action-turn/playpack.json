@@ -1,0 +1,1855 @@
+{
+  "id": "playpack:action-turn-stamina",
+  "kind": "playpack",
+  "version": "1.0.0",
+  "tags": ["action-turn", "resource-risk", "declarative"],
+  "props": {
+    "sourceDocument": "docs/L3_玩法层/01_行动轮与体力博弈系统.md",
+    "resolutionPolicy": {
+      "regularReversalCost": "采用规则正文、窗口期表与术语表的一致值：1 AP；3.5 的 2 AP 示例视为冲突示例。",
+      "overloadThreshold": "仅尝试使 SP 严格超过上限时触发；达到上限本身不触发。",
+      "overloadAction": "尚未行动者跳过当前行动阶段；观察和成为其他行为目标的身份保留。",
+      "overloadReturn": "过载后跳过下一次投点，在再下一次投点前解除。",
+      "weaknessStagger": "采用 5.4 与 6.4 的完整连锁：弱点命中必然施加失衡。",
+      "initiativeDie": "D-054 裁决：投点固定使用 1d6。原始骰点为内部瞬时比较值（Internal_Metric），仅作为最高点差距结算法（allocateAp）的输入，不作为玩家可见玩法数值持久展示；玩家可见产出为 AP（1-3，未分配以离散状态呈现）与行动顺序，均落在 1-5 内，故不违反 L0 第四条。",
+      "apAllocation": "AP 按 wakeup-core-mechanics Requirement 5 的差值分配算法（allocateAp）在投点相位结算：2 人局最终点数不低于对方者得 2AP、差 1 得 1AP、差≥2 未分配、不产生 3AP；3+ 人局唯一最高且领先第二高≥2 得 3AP、并列最高或领先不足 2 得 2AP、差 1 得 1AP、差≥2 未分配。原始骰点不再直接充当 AP。",
+      "singleParticipant": "U-002 未冻结：仅 1 名合法投点参与者时，投点结算 abort 阻塞，不推断默认 AP（取代 01 文档 D-037 的单人 2AP 旧陈述，因 wakeup-core-mechanics 为完全权威）。",
+      "parryProbability": "文档未定义成功率；实现为满足声明条件时确定性拦截，不擅自加入概率。"
+    },
+    "eventContracts": {
+      "combat.nearDamage": ["attacker", "target", "damagePath", "delta"],
+      "combat.weaknessHit": ["attacker", "target", "damageType", "weaknessType", "itemId", "dropContainerId"],
+      "execution.success": ["actor"]
+    }
+  },
+  "schedule": "schedule:action-turn",
+  "rules": [
+    "rule:overload-on-pool-overflow",
+    "rule:overload-countdown",
+    "rule:parry-must-be-hidden",
+    "rule:near-damage-default",
+    "rule:weakness-hit",
+    "rule:execution-rank-up"
+  ],
+  "hookOrder": [
+    "rule:parry-intercept",
+    "rule:near-damage-default",
+    "rule:weakness-hit",
+    "rule:overload-on-pool-overflow"
+  ],
+  "pools": [
+    {
+      "name": "AP",
+      "per": "actor",
+      "min": 0,
+      "max": 5,
+      "initial": 0,
+      "reset": "turn",
+      "resetTo": 0
+    },
+    {
+      "name": "SP",
+      "per": "actor",
+      "min": 0,
+      "max": 5,
+      "initial": 0,
+      "reset": "never"
+    }
+  ],
+  "entry": [
+    {
+      "op": "prop.set",
+      "args": {
+        "path": "world.props.actionTurn",
+        "value": {
+          "queue": [],
+          "acted": [],
+          "skipped": []
+        }
+      }
+    },
+    {
+      "emit": "action-turn.activated",
+      "data": "playpack:action-turn-stamina"
+    }
+  ],
+  "defs": [
+    {
+      "id": "schedule:action-turn",
+      "kind": "schedule",
+      "loop": true,
+      "order": "initiative",
+      "phases": [
+        {
+          "id": "phase:initiative-roll",
+          "name": "投点阶段",
+          "kind": "custom",
+          "phaseKind": "resolve",
+          "input": "none",
+          "actors": {
+            "from": "agents"
+          },
+          "onEnter": [
+            {
+              "emit": "phase.roll.started"
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.actionTurn.acted",
+                "value": []
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.actionTurn.skipped",
+                "value": []
+              }
+            },
+            {
+              "let": "eligibleAgents",
+              "be": {
+                "q": {
+                  "from": "agents",
+                  "where": {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "len",
+                        "args": [
+                          {
+                            "q": {
+                              "from": "attachments",
+                              "where": {
+                                "op": "and",
+                                "args": [
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      { "path": "def" },
+                                      "attachment:overloaded"
+                                    ]
+                                  },
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      { "path": "target" },
+                                      { "var": "self" }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      0
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "forEach": { "var": "eligibleAgents" },
+              "as": "agent",
+              "do": [
+                {
+                  "let": "powerChoices",
+                  "be": {
+                    "q": {
+                      "from": "attachments",
+                      "where": {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              { "path": "def" },
+                              "attachment:power-die"
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              { "path": "target" },
+                              { "var": "agent" }
+                            ]
+                          }
+                        ]
+                      },
+                      "limit": 1
+                    }
+                  }
+                },
+                {
+                  "let": "powerChoice",
+                  "be": {
+                    "op": "at",
+                    "args": [
+                      { "var": "powerChoices" },
+                      0
+                    ]
+                  }
+                },
+                {
+                  "let": "powerBonus",
+                  "be": {
+                    "op": "coalesce",
+                    "args": [
+                      {
+                        "op": "refGet",
+                        "args": [
+                          { "var": "powerChoice" },
+                          "props.bonus"
+                        ]
+                      },
+                      0
+                    ]
+                  }
+                },
+                {
+                  "op": "random.roll",
+                  "args": {
+                    "sides": 6,
+                    "stream": "action-turn.initiative"
+                  },
+                  "result": "baseRoll"
+                },
+                {
+                  "let": "initiativeTotal",
+                  "be": {
+                    "op": "add",
+                    "args": [
+                      { "var": "baseRoll" },
+                      { "var": "powerBonus" }
+                    ]
+                  }
+                },
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "world.agents.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "var": "agent" },
+                            "$"
+                          ]
+                        },
+                        ".props.initiativeTotal"
+                      ]
+                    },
+                    "value": { "var": "initiativeTotal" }
+                  }
+                },
+                {
+                  "op": "random.roll",
+                  "args": {
+                    "sides": 6,
+                    "stream": "action-turn.tie-break"
+                  },
+                  "result": "tieBreak"
+                },
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "world.agents.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "var": "agent" },
+                            "$"
+                          ]
+                        },
+                        ".props.initiativeTie"
+                      ]
+                    },
+                    "value": { "var": "tieBreak" }
+                  }
+                },
+                {
+                  "forEach": { "var": "powerChoices" },
+                  "as": "choice",
+                  "do": [
+                    {
+                      "op": "attach.del",
+                      "args": {
+                        "id": {
+                          "op": "get",
+                          "args": [
+                            { "var": "choice" },
+                            "$"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "world.agents.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "var": "agent" },
+                            "$"
+                          ]
+                        },
+                        ".props.windowChoice"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "let": "baseQueue",
+              "be": {
+                "q": {
+                  "from": "agents",
+                  "where": {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "len",
+                        "args": [
+                          {
+                            "q": {
+                              "from": "attachments",
+                              "where": {
+                                "op": "and",
+                                "args": [
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      { "path": "def" },
+                                      "attachment:overloaded"
+                                    ]
+                                  },
+                                  {
+                                    "op": "eq",
+                                    "args": [
+                                      { "path": "target" },
+                                      { "var": "self" }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      0
+                    ]
+                  },
+                  "orderBy": {
+                    "op": "array",
+                    "args": [
+                      { "path": "props.initiativeTotal" },
+                      { "path": "props.initiativeTie" }
+                    ]
+                  },
+                  "desc": true
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.actionTurn.queue",
+                "value": { "var": "baseQueue" }
+              }
+            },
+            {
+              "let": "apParticipantCount",
+              "be": { "op": "len", "args": [ { "path": "world.props.actionTurn.queue" } ] }
+            },
+            {
+              "if": { "op": "eq", "args": [ { "var": "apParticipantCount" }, 1 ] },
+              "then": [
+                { "abort": "U-002 未冻结（wakeup-core-mechanics Requirement 5.11）：仅 1 名投点参与者时标准 AP 分配未裁决，投点结算阻塞，不推断默认 AP。" }
+              ]
+            },
+            {
+              "let": "apMaxTier",
+              "be": {
+                "op": "refGet",
+                "args": [
+                  { "op": "at", "args": [ { "path": "world.props.actionTurn.queue" }, 0 ] },
+                  "props.initiativeTotal"
+                ]
+              }
+            },
+            {
+              "let": "apCountAtMax",
+              "be": {
+                "op": "len",
+                "args": [
+                  {
+                    "q": {
+                      "from": "agents",
+                      "where": {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "len",
+                                "args": [
+                                  {
+                                    "q": {
+                                      "from": "attachments",
+                                      "where": {
+                                        "op": "and",
+                                        "args": [
+                                          { "op": "eq", "args": [ { "path": "def" }, "attachment:overloaded" ] },
+                                          { "op": "eq", "args": [ { "path": "target" }, { "var": "self" } ] }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              0
+                            ]
+                          },
+                          { "op": "eq", "args": [ { "path": "props.initiativeTotal" }, { "var": "apMaxTier" } ] }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "let": "apSecondList",
+              "be": {
+                "q": {
+                  "from": "agents",
+                  "where": {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "len",
+                            "args": [
+                              {
+                                "q": {
+                                  "from": "attachments",
+                                  "where": {
+                                    "op": "and",
+                                    "args": [
+                                      { "op": "eq", "args": [ { "path": "def" }, "attachment:overloaded" ] },
+                                      { "op": "eq", "args": [ { "path": "target" }, { "var": "self" } ] }
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          0
+                        ]
+                      },
+                      { "op": "lt", "args": [ { "path": "props.initiativeTotal" }, { "var": "apMaxTier" } ] }
+                    ]
+                  },
+                  "orderBy": { "path": "props.initiativeTotal" },
+                  "desc": true,
+                  "limit": 1
+                }
+              }
+            },
+            {
+              "let": "apSecondTier",
+              "be": {
+                "op": "coalesce",
+                "args": [
+                  {
+                    "op": "refGet",
+                    "args": [
+                      { "op": "at", "args": [ { "var": "apSecondList" }, 0 ] },
+                      "props.initiativeTotal"
+                    ]
+                  },
+                  -100
+                ]
+              }
+            },
+            {
+              "let": "apLead",
+              "be": { "op": "sub", "args": [ { "var": "apMaxTier" }, { "var": "apSecondTier" } ] }
+            },
+            {
+              "forEach": { "path": "world.props.actionTurn.queue" },
+              "as": "apAgent",
+              "do": [
+                {
+                  "let": "apTier",
+                  "be": { "op": "refGet", "args": [ { "var": "apAgent" }, "props.initiativeTotal" ] }
+                },
+                {
+                  "let": "apDiff",
+                  "be": { "op": "sub", "args": [ { "var": "apMaxTier" }, { "var": "apTier" } ] }
+                },
+                { "let": "apValue", "be": 0 },
+                {
+                  "if": { "op": "eq", "args": [ { "var": "apParticipantCount" }, 2 ] },
+                  "then": [
+                    {
+                      "if": { "op": "eq", "args": [ { "var": "apTier" }, { "var": "apMaxTier" } ] },
+                      "then": [ { "let": "apValue", "be": 2 } ],
+                      "else": [
+                        {
+                          "if": { "op": "eq", "args": [ { "var": "apDiff" }, 1 ] },
+                          "then": [ { "let": "apValue", "be": 1 } ]
+                        }
+                      ]
+                    }
+                  ],
+                  "else": [
+                    {
+                      "if": { "op": "eq", "args": [ { "var": "apTier" }, { "var": "apMaxTier" } ] },
+                      "then": [
+                        {
+                          "if": {
+                            "op": "and",
+                            "args": [
+                              { "op": "eq", "args": [ { "var": "apCountAtMax" }, 1 ] },
+                              { "op": "gte", "args": [ { "var": "apLead" }, 2 ] }
+                            ]
+                          },
+                          "then": [ { "let": "apValue", "be": 3 } ],
+                          "else": [ { "let": "apValue", "be": 2 } ]
+                        }
+                      ],
+                      "else": [
+                        {
+                          "if": { "op": "eq", "args": [ { "var": "apDiff" }, 1 ] },
+                          "then": [ { "let": "apValue", "be": 1 } ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "pool.set",
+                  "args": {
+                    "pool": "AP",
+                    "scope": { "var": "apAgent" },
+                    "value": { "var": "apValue" }
+                  }
+                }
+              ]
+            },
+            {
+              "let": "reversals",
+              "be": {
+                "q": {
+                  "from": "attachments",
+                  "where": {
+                    "op": "eq",
+                    "args": [
+                      { "path": "def" },
+                      "attachment:reversal-choice"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "forEach": { "var": "reversals" },
+              "as": "reversal",
+              "do": [
+                {
+                  "let": "reversalTarget",
+                  "be": {
+                    "op": "refGet",
+                    "args": [
+                      { "var": "reversal" },
+                      "target"
+                    ]
+                  }
+                },
+                {
+                  "let": "reversalPlaces",
+                  "be": {
+                    "op": "refGet",
+                    "args": [
+                      { "var": "reversal" },
+                      "props.places"
+                    ]
+                  }
+                },
+                {
+                  "let": "reversalIndex",
+                  "be": {
+                    "op": "indexOf",
+                    "args": [
+                      { "path": "world.props.actionTurn.queue" },
+                      { "var": "reversalTarget" }
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "op": "gt",
+                    "args": [
+                      { "var": "reversalIndex" },
+                      0
+                    ]
+                  },
+                  "then": [
+                    {
+                      "op": "list.move",
+                      "args": {
+                        "path": "world.props.actionTurn.queue",
+                        "from": { "var": "reversalIndex" },
+                        "to": {
+                          "op": "max",
+                          "args": [
+                            0,
+                            {
+                              "op": "sub",
+                              "args": [
+                                { "var": "reversalIndex" },
+                                { "var": "reversalPlaces" }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "attach.del",
+                  "args": {
+                    "id": {
+                      "op": "get",
+                      "args": [
+                        { "var": "reversal" },
+                        "$"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "world.agents.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "var": "reversalTarget" },
+                            "$"
+                          ]
+                        },
+                        ".props.windowChoice"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "emit": "phase.roll.completed",
+              "data": { "path": "world.props.actionTurn.queue" }
+            }
+          ]
+        },
+        {
+          "id": "phase:action",
+          "name": "行动执行阶段",
+          "kind": "action",
+          "phaseKind": "resolve",
+          "input": "actor",
+          "actors": {
+            "from": "agents"
+          },
+          "onEnter": [
+            {
+              "emit": "phase.action.started"
+            }
+          ]
+        },
+        {
+          "id": "phase:cleanup",
+          "name": "清理阶段",
+          "kind": "cleanup",
+          "phaseKind": "normal",
+          "input": "none",
+          "onEnter": [
+            {
+              "forEach": {
+                "q": { "from": "agents" }
+              },
+              "as": "agent",
+              "do": [
+                {
+                  "op": "pool.get",
+                  "args": {
+                    "pool": "SP",
+                    "scope": { "var": "agent" }
+                  },
+                  "result": "currentStamina"
+                },
+                {
+                  "if": {
+                    "op": "lt",
+                    "args": [
+                      { "var": "currentStamina" },
+                      5
+                    ]
+                  },
+                  "then": [
+                    {
+                      "op": "pool.add",
+                      "args": {
+                        "pool": "SP",
+                        "scope": { "var": "agent" },
+                        "delta": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "let": "roundAttachments",
+              "be": {
+                "q": {
+                  "from": "attachments",
+                  "where": {
+                    "op": "or",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          { "path": "def" },
+                          "attachment:staggered"
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          { "path": "def" },
+                          "attachment:parry-ready"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "forEach": { "var": "roundAttachments" },
+              "as": "roundAttachment",
+              "do": [
+                {
+                  "op": "attach.del",
+                  "args": {
+                    "id": {
+                      "op": "get",
+                      "args": [
+                        { "var": "roundAttachment" },
+                        "$"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "emit": "phase.cleanup.completed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "attachment:power-die",
+      "kind": "attachment",
+      "stackStrategy": "unique"
+    },
+    {
+      "id": "attachment:reversal-choice",
+      "kind": "attachment",
+      "stackStrategy": "unique"
+    },
+    {
+      "id": "attachment:parry-ready",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "rules": ["rule:parry-intercept"]
+    },
+    {
+      "id": "attachment:staggered",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "rules": ["rule:staggered-block-preparation"]
+    },
+    {
+      "id": "attachment:overloaded",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "rules": ["rule:overloaded-block-intent"]
+    },
+    {
+      "id": "action:power-die-1",
+      "kind": "action",
+      "label": "强力骰 +1",
+      "group": "initiative-window",
+      "require": {
+        "op": "isNull",
+        "args": [
+          {
+            "op": "refGet",
+            "args": [
+              { "var": "agent" },
+              "props.windowChoice"
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "SP", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:power-die",
+            "target": { "var": "agent" },
+            "props": { "bonus": 1 }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": {
+              "op": "concat",
+              "args": [
+                "world.agents.",
+                {
+                  "op": "get",
+                  "args": [
+                    { "var": "agent" },
+                    "$"
+                  ]
+                },
+                ".props.windowChoice"
+              ]
+            },
+            "value": "power-die"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action:power-die-2",
+      "kind": "action",
+      "label": "强力骰 +2",
+      "group": "initiative-window",
+      "require": {
+        "op": "isNull",
+        "args": [
+          {
+            "op": "refGet",
+            "args": [
+              { "var": "agent" },
+              "props.windowChoice"
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "SP", "amount": 2 }
+      ],
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:power-die",
+            "target": { "var": "agent" },
+            "props": { "bonus": 2 }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": {
+              "op": "concat",
+              "args": [
+                "world.agents.",
+                {
+                  "op": "get",
+                  "args": [
+                    { "var": "agent" },
+                    "$"
+                  ]
+                },
+                ".props.windowChoice"
+              ]
+            },
+            "value": "power-die"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action:reverse",
+      "kind": "action",
+      "label": "逆转",
+      "group": "initiative-window",
+      "require": {
+        "op": "isNull",
+        "args": [
+          {
+            "op": "refGet",
+            "args": [
+              { "var": "agent" },
+              "props.windowChoice"
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "AP", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:reversal-choice",
+            "target": { "var": "agent" },
+            "props": { "places": 1 }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": {
+              "op": "concat",
+              "args": [
+                "world.agents.",
+                {
+                  "op": "get",
+                  "args": [
+                    { "var": "agent" },
+                    "$"
+                  ]
+                },
+                ".props.windowChoice"
+              ]
+            },
+            "value": "reversal"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action:super-reverse",
+      "kind": "action",
+      "label": "超逆转",
+      "group": "initiative-window",
+      "require": {
+        "op": "isNull",
+        "args": [
+          {
+            "op": "refGet",
+            "args": [
+              { "var": "agent" },
+              "props.windowChoice"
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "SP", "amount": 2 }
+      ],
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:reversal-choice",
+            "target": { "var": "agent" },
+            "props": { "places": 2 }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": {
+              "op": "concat",
+              "args": [
+                "world.agents.",
+                {
+                  "op": "get",
+                  "args": [
+                    { "var": "agent" },
+                    "$"
+                  ]
+                },
+                ".props.windowChoice"
+              ]
+            },
+            "value": "reversal"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action:parry",
+      "kind": "action",
+      "label": "招架",
+      "group": "preparation",
+      "cost": [
+        { "pool": "AP", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:parry-ready",
+            "target": { "var": "agent" }
+          }
+        }
+      ]
+    },
+    {
+      "id": "action:complete",
+      "kind": "action",
+      "label": "完成行动",
+      "group": "turn-control",
+      "require": {
+        "op": "not",
+        "args": [
+          {
+            "op": "includes",
+            "args": [
+              { "path": "world.props.actionTurn.acted" },
+              { "var": "agent" }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "op": "list.insert",
+          "args": {
+            "path": "world.props.actionTurn.acted",
+            "value": { "var": "agent" }
+          }
+        },
+        {
+          "emit": "action-turn.actor-completed",
+          "data": { "var": "agent" }
+        }
+      ]
+    },
+    {
+      "id": "rule:overload-on-pool-overflow",
+      "kind": "rule",
+      "on": "pool.overflow",
+      "phase": "default",
+      "priority": 1,
+      "when": {
+        "op": "eq",
+        "args": [
+          {
+            "op": "get",
+            "args": [
+              { "var": "payload" },
+              "pool"
+            ]
+          },
+          "SP"
+        ]
+      },
+      "effects": [
+        {
+          "let": "overloadedActor",
+          "be": {
+            "op": "get",
+            "args": [
+              { "var": "payload" },
+              "scope"
+            ]
+          }
+        },
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:overloaded",
+            "target": { "var": "overloadedActor" },
+            "props": { "remainingRolls": 2 }
+          }
+        },
+        {
+          "if": {
+            "op": "not",
+            "args": [
+              {
+                "op": "includes",
+                "args": [
+                  { "path": "world.props.actionTurn.acted" },
+                  { "var": "overloadedActor" }
+                ]
+              }
+            ]
+          },
+          "then": [
+            {
+              "op": "list.insert",
+              "args": {
+                "path": "world.props.actionTurn.skipped",
+                "value": { "var": "overloadedActor" }
+              }
+            }
+          ]
+        },
+        {
+          "emit": "action-turn.overloaded",
+          "data": { "var": "overloadedActor" }
+        }
+      ]
+    },
+    {
+      "id": "rule:overload-countdown",
+      "kind": "rule",
+      "on": "phase.roll.started",
+      "phase": "default",
+      "priority": 1,
+      "effects": [
+        {
+          "let": "overloads",
+          "be": {
+            "q": {
+              "from": "attachments",
+              "where": {
+                "op": "eq",
+                "args": [
+                  { "path": "def" },
+                  "attachment:overloaded"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "forEach": { "var": "overloads" },
+          "as": "overload",
+          "do": [
+            {
+              "let": "remainingRolls",
+              "be": {
+                "op": "refGet",
+                "args": [
+                  { "var": "overload" },
+                  "props.remainingRolls"
+                ]
+              }
+            },
+            {
+              "if": {
+                "op": "lte",
+                "args": [
+                  { "var": "remainingRolls" },
+                  1
+                ]
+              },
+              "then": [
+                {
+                  "op": "attach.del",
+                  "args": {
+                    "id": {
+                      "op": "get",
+                      "args": [
+                        { "var": "overload" },
+                        "$"
+                      ]
+                    }
+                  }
+                }
+              ],
+              "else": [
+                {
+                  "op": "prop.add",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "world.attachments.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "var": "overload" },
+                            "$"
+                          ]
+                        },
+                        ".props.remainingRolls"
+                      ]
+                    },
+                    "delta": -1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rule:overloaded-block-intent",
+      "kind": "rule",
+      "on": "before:intent.submit",
+      "phase": "before",
+      "priority": 1,
+      "when": {
+        "op": "gt",
+        "args": [
+          {
+            "op": "len",
+            "args": [
+              {
+                "q": {
+                  "from": "attachments",
+                  "where": {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          { "path": "def" },
+                          "attachment:overloaded"
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          {
+                            "op": "get",
+                            "args": [
+                              { "path": "target" },
+                              "$"
+                            ]
+                          },
+                          {
+                            "op": "coalesce",
+                            "args": [
+                              {
+                                "op": "get",
+                                "args": [
+                                  {
+                                    "op": "get",
+                                    "args": [
+                                      { "var": "payload" },
+                                      "agent"
+                                    ]
+                                  },
+                                  "$"
+                                ]
+                              },
+                              {
+                                "op": "get",
+                                "args": [
+                                  { "var": "payload" },
+                                  "agent"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "effects": [
+        { "abort": "overloaded actor cannot submit an intent" }
+      ]
+    },
+    {
+      "id": "rule:staggered-block-preparation",
+      "kind": "rule",
+      "on": "before:intent.submit",
+      "phase": "before",
+      "priority": 2,
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "op": "get",
+                "args": [
+                  { "var": "payload" },
+                  "action"
+                ]
+              },
+              "action:parry"
+            ]
+          },
+          {
+            "op": "gt",
+            "args": [
+              {
+                "op": "len",
+                "args": [
+                  {
+                    "q": {
+                      "from": "attachments",
+                      "where": {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "eq",
+                            "args": [
+                              { "path": "def" },
+                              "attachment:staggered"
+                            ]
+                          },
+                          {
+                            "op": "eq",
+                            "args": [
+                              {
+                                "op": "get",
+                                "args": [
+                                  { "path": "target" },
+                                  "$"
+                                ]
+                              },
+                              {
+                                "op": "coalesce",
+                                "args": [
+                                  {
+                                    "op": "get",
+                                    "args": [
+                                      {
+                                        "op": "get",
+                                        "args": [
+                                          { "var": "payload" },
+                                          "agent"
+                                        ]
+                                      },
+                                      "$"
+                                    ]
+                                  },
+                                  {
+                                    "op": "get",
+                                    "args": [
+                                      { "var": "payload" },
+                                      "agent"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "effects": [
+        { "abort": "staggered actor cannot prepare parry" }
+      ]
+    },
+    {
+      "id": "rule:parry-must-be-hidden",
+      "kind": "rule",
+      "on": "before:intent.submit",
+      "phase": "before",
+      "priority": 1,
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              {
+                "op": "get",
+                "args": [
+                  { "var": "payload" },
+                  "action"
+                ]
+              },
+              "action:parry"
+            ]
+          },
+          {
+            "op": "neq",
+            "args": [
+              {
+                "op": "get",
+                "args": [
+                  { "var": "payload" },
+                  "hidden"
+                ]
+              },
+              true
+            ]
+          }
+        ]
+      },
+      "effects": [
+        { "abort": "parry intent must be hidden" }
+      ]
+    },
+    {
+      "id": "rule:parry-intercept",
+      "kind": "rule",
+      "on": "combat.nearDamage",
+      "phase": "instead",
+      "priority": 1,
+      "when": {
+        "op": "gt",
+        "args": [
+          {
+            "op": "len",
+            "args": [
+              {
+                "q": {
+                  "from": "attachments",
+                  "where": {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "eq",
+                        "args": [
+                          { "path": "def" },
+                          "attachment:parry-ready"
+                        ]
+                      },
+                      {
+                        "op": "eq",
+                        "args": [
+                          { "path": "target" },
+                          {
+                            "op": "get",
+                            "args": [
+                              { "var": "payload" },
+                              "target"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "limit": 1
+                }
+              }
+            ]
+          },
+          0
+        ]
+      },
+      "effects": [
+        {
+          "let": "parries",
+          "be": {
+            "q": {
+              "from": "attachments",
+              "where": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      { "path": "def" },
+                      "attachment:parry-ready"
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      { "path": "target" },
+                      {
+                        "op": "get",
+                        "args": [
+                          { "var": "payload" },
+                          "target"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "limit": 1
+            }
+          }
+        },
+        {
+          "let": "parry",
+          "be": {
+            "op": "at",
+            "args": [
+              { "var": "parries" },
+              0
+            ]
+          }
+        },
+        {
+          "let": "attacker",
+          "be": {
+            "op": "get",
+            "args": [
+              { "var": "payload" },
+              "attacker"
+            ]
+          }
+        },
+        {
+          "op": "attach.del",
+          "args": {
+            "id": {
+              "op": "get",
+              "args": [
+                { "var": "parry" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:staggered",
+            "target": { "var": "attacker" }
+          }
+        },
+        {
+          "op": "pool.add",
+          "args": {
+            "pool": "SP",
+            "scope": { "var": "attacker" },
+            "delta": 1
+          }
+        },
+        {
+          "let": "attackerIndex",
+          "be": {
+            "op": "indexOf",
+            "args": [
+              { "path": "world.props.actionTurn.queue" },
+              { "var": "attacker" }
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "and",
+            "args": [
+              {
+                "op": "gte",
+                "args": [
+                  { "var": "attackerIndex" },
+                  0
+                ]
+              },
+              {
+                "op": "lt",
+                "args": [
+                  { "var": "attackerIndex" },
+                  {
+                    "op": "sub",
+                    "args": [
+                      {
+                        "op": "len",
+                        "args": [
+                          { "path": "world.props.actionTurn.queue" }
+                        ]
+                      },
+                      1
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "then": [
+            {
+              "op": "list.move",
+              "args": {
+                "path": "world.props.actionTurn.queue",
+                "from": { "var": "attackerIndex" },
+                "to": {
+                  "op": "add",
+                  "args": [
+                    { "var": "attackerIndex" },
+                    1
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "emit": "combat.parry.success",
+          "data": { "var": "payload" }
+        }
+      ]
+    },
+    {
+      "id": "rule:near-damage-default",
+      "kind": "rule",
+      "on": "combat.nearDamage",
+      "phase": "default",
+      "priority": 1,
+      "effects": [
+        {
+          "op": "prop.add",
+          "args": {
+            "path": {
+              "op": "get",
+              "args": [
+                { "var": "payload" },
+                "damagePath"
+              ]
+            },
+            "delta": {
+              "op": "get",
+              "args": [
+                { "var": "payload" },
+                "delta"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "rule:weakness-hit",
+      "kind": "rule",
+      "on": "combat.weaknessHit",
+      "phase": "default",
+      "priority": 1,
+      "when": {
+        "op": "or",
+        "args": [
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_01"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_01"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_02"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_02"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_03"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_03"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_04"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_04"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_05"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_05"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_06"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_06"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_07"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_07"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_08"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_08"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_09"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_09"] }] },
+          { "op": "and", "args": [{ "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "damageType"] }, "DMG_10"] }, { "op": "eq", "args": [{ "op": "get", "args": [{ "var": "payload" }, "weaknessType"] }, "WKN_10"] }] }
+        ]
+      },
+      "effects": [
+        {
+          "let": "weakTarget",
+          "be": {
+            "op": "get",
+            "args": [
+              { "var": "payload" },
+              "target"
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "and",
+            "args": [
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "isNull",
+                    "args": [
+                      {
+                        "op": "get",
+                        "args": [
+                          { "var": "payload" },
+                          "itemId"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "isNull",
+                    "args": [
+                      {
+                        "op": "get",
+                        "args": [
+                          { "var": "payload" },
+                          "dropContainerId"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "then": [
+            {
+              "op": "item.move",
+              "args": {
+                "itemId": {
+                  "op": "get",
+                  "args": [
+                    { "var": "payload" },
+                    "itemId"
+                  ]
+                },
+                "toContainerId": {
+                  "op": "get",
+                  "args": [
+                    { "var": "payload" },
+                    "dropContainerId"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "op": "pool.add",
+          "args": {
+            "pool": "SP",
+            "scope": { "var": "weakTarget" },
+            "delta": 1
+          }
+        },
+        {
+          "let": "weakTargetIndex",
+          "be": {
+            "op": "indexOf",
+            "args": [
+              { "path": "world.props.actionTurn.queue" },
+              { "var": "weakTarget" }
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "and",
+            "args": [
+              { "op": "gte", "args": [{ "var": "weakTargetIndex" }, 0] },
+              {
+                "op": "lt",
+                "args": [
+                  { "var": "weakTargetIndex" },
+                  {
+                    "op": "sub",
+                    "args": [
+                      { "op": "len", "args": [{ "path": "world.props.actionTurn.queue" }] },
+                      1
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "then": [
+            {
+              "op": "list.move",
+              "args": {
+                "path": "world.props.actionTurn.queue",
+                "from": { "var": "weakTargetIndex" },
+                "to": { "op": "add", "args": [{ "var": "weakTargetIndex" }, 1] }
+              }
+            }
+          ]
+        },
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:staggered",
+            "target": { "var": "weakTarget" }
+          }
+        },
+        {
+          "emit": "combat.weakness.resolved",
+          "data": { "var": "payload" }
+        }
+      ]
+    },
+    {
+      "id": "rule:execution-rank-up",
+      "kind": "rule",
+      "on": "execution.success",
+      "phase": "default",
+      "priority": 1,
+      "effects": [
+        {
+          "let": "executionActor",
+          "be": {
+            "op": "get",
+            "args": [
+              { "var": "payload" },
+              "actor"
+            ]
+          }
+        },
+        {
+          "let": "executionIndex",
+          "be": {
+            "op": "indexOf",
+            "args": [
+              { "path": "world.props.actionTurn.queue" },
+              { "var": "executionActor" }
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "gt",
+            "args": [
+              { "var": "executionIndex" },
+              0
+            ]
+          },
+          "then": [
+            {
+              "op": "list.move",
+              "args": {
+                "path": "world.props.actionTurn.queue",
+                "from": { "var": "executionIndex" },
+                "to": { "op": "sub", "args": [{ "var": "executionIndex" }, 1] }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

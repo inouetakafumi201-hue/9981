@@ -1,0 +1,24 @@
+{
+  "name": "kernel-l6-test",
+  "version": "1.0.0",
+  "description": "L6 Decision决策树 属性测试",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:verbose": "vitest run --reporter=verbose",
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "29.5.14",
+    "@types/node": "20.19.43",
+    "fast-check": "3.23.2",
+    "jest": "29.7.0",
+    "ts-jest": "29.4.12",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3"
+  },
+  "keywords": ["decision", "property-testing", "fast-check"],
+  "author": "",
+  "license": "MIT"
+}

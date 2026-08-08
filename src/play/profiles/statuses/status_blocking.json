@@ -1,0 +1,50 @@
+{
+  "id": "status_blocking",
+  "name": "格挡",
+  "category": "positive",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_blocking"
+  },
+  "duration": "until_hit",
+  "durationUnit": "until_event",
+  "stacking": "none",
+  "stackBehavior": "unique",
+  "effects": {
+    "onDamageReceived": {
+      "effect": "block",
+      "blockType": "shield_type",
+      "description": "免疫下一次伤害（按盾牌类型）"
+    }
+  },
+  "breakConditions": [
+    {
+      "type": "action",
+      "actionId": "cancel_block",
+      "effect": "cancel",
+      "apCost": 1,
+      "description": "花费1 AP主动取消"
+    },
+    {
+      "type": "damage",
+      "effect": "auto_cancel",
+      "description": "受击后自动取消（无论是否格挡成功）"
+    }
+  ],
+  "interactionMatrix": [
+    {
+      "with": "status_blocking",
+      "type": "none",
+      "description": "同名不叠加，已有的格挡效果持续"
+    }
+  ],
+  "kernelEvents": ["OnDamageReceived", "OnActionCheck", "OnTurnEnd"],
+  "icon": "shield",
+  "color": "blue",
+  "priority": 30,
+  "description": "举盾格挡，免疫下一次伤害，不会回合结束自动取消",
+  "tags": ["defense", "shield", "buff"],
+  "source": ["装备: 盾牌"],
+  "mvp": true,
+  "notes": "S-007已解决：v2规则明确为无时限持续到受击或主动取消"
+}

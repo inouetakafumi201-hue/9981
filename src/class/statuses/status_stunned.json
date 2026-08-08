@@ -1,0 +1,10 @@
+{
+  "id": "status_stunned",
+  "name": "眩晕",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["control", "stun", "action-restriction"],
+  "description": "表示实体因控制效果而无法正常行动的语义状态。",
+  "capabilityIds": ["status.capability.action_eligibility", "status.capability.control_relation"],
+  "configurableParameters": ["affectedActionScope", "restrictionPolicy", "stackingPolicy", "presentationPolicy"]
+}

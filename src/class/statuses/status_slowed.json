@@ -1,0 +1,10 @@
+{
+  "id": "status_slowed",
+  "name": "迟缓",
+  "category": "negative",
+  "type": "numeric",
+  "tags": ["slow", "action-impairment", "adverse"],
+  "description": "表示实体的行动效率受到抑制的语义状态。",
+  "capabilityIds": ["status.capability.action_efficiency"],
+  "configurableParameters": ["affectedActionScope", "adjustmentPolicy", "stackingPolicy", "presentationPolicy"]
+}

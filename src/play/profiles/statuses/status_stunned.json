@@ -1,0 +1,33 @@
+{
+  "id": "status_stunned",
+  "name": "眩晕",
+  "category": "negative",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_stunned"
+  },
+  "duration": 1,
+  "durationUnit": "turns",
+  "stacking": "none",
+  "stackBehavior": "extend",
+  "effects": {
+    "onAction": {"blocked": true, "actionTypes": ["attack", "move", "use_item"], "description": "无法执行任何主动动作"},
+    "passive": {"description": "跳过当前回合", "effect": "skip_turn"}
+  },
+  "breakConditions": [
+    {"type": "turn", "turns": 1, "description": "1回合后自动解除"},
+    {"type": "damage", "damageType": "any", "effect": "wake", "description": "受到任何伤害时解除"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_sleeping", "type": "counter", "description": "眩晕可打断睡眠"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnDamageTaken", "OnActionCheck"],
+  "icon": "zap",
+  "color": "yellow",
+  "priority": 28,
+  "description": "无法执行任何动作，跳过当前回合，持续1回合",
+  "tags": ["control", "stun", "debuff"],
+  "source": ["物品: 电击棒"],
+  "mvp": true,
+  "notes": "新增状态，用于电击棒等控制类武器的效果"
+}

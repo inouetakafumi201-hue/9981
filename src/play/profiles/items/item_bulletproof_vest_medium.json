@@ -1,0 +1,70 @@
+{
+  "id": "item_bulletproof_vest_medium",
+  "name": "中型防弹衣",
+  "category": "equipment",
+  "classComposition": {
+    "classIds": [
+      "item.class.equipment"
+    ],
+    "capabilityIds": [
+      "item.capability.armor",
+      "item.capability.durability"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "防具",
+    "装备",
+    "护甲",
+    "中型"
+  ],
+  "stackable": false,
+  "slot": "body",
+  "grantedStates": [],
+  "description": "标准配置的防弹衣，提供更好的防护但略显笨重。",
+  "passiveEffects": [
+    {
+      "type": "damage_reduction",
+      "damageTag": "any",
+      "reduction": 1,
+      "minDamage": 1,
+      "breakCondition": "on_hit",
+      "description": "受到伤害时减伤1，最低降到1；受击后破损"
+    }
+  ],
+  "actions": [],
+  "kernelOps": [],
+  "pendingKernelOps": [
+    "item.destroy",
+    "tag.add"
+  ],
+  "pendingKernelOpsNote": "护甲破损时销毁物品本体（item.destroy）与装备打标签（tag.add）都尚未建模：需先确定装备槽绑定动作归属哪个玩法包。",
+  "mvp": true,
+  "armorClass": "medium",
+  "durability": {
+    "max": 1,
+    "breakOnZeroHp": true,
+    "description": "承受一次攻击后破损"
+  },
+  "source": [
+    "地图生成",
+    "商店"
+  ],
+  "rarity": "uncommon",
+  "itemParameters": {
+    "item.capability.armor": {
+      "damageSelector": "passiveEffects[].damageTag",
+      "mitigationRule": "passiveEffects[].reduction",
+      "resultBoundary": "passiveEffects[].minDamage",
+      "breakCondition": "passiveEffects[].breakCondition",
+      "slotRequirementRef": "slot",
+      "operation": "tag.add"
+    },
+    "item.capability.durability": {
+      "resourceProperty": "durability.max",
+      "changeTrigger": "on-hit",
+      "depletionBehavior": "break-on-depleted",
+      "operation": "item.destroy"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "status_overloaded",
+  "name": "过载",
+  "category": "negative",
+  "type": "tag",
+  "tags": ["resource", "boundary", "penalty"],
+  "description": "表示资源越界后进入惩罚状态的语义。",
+  "capabilityIds": ["status.capability.resource_boundary"],
+  "configurableParameters": ["resourceKind", "boundaryPolicy", "penaltyPolicy", "presentationPolicy"]
+}

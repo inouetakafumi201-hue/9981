@@ -1,0 +1,36 @@
+{
+  "id": "status_slowed",
+  "name": "迟缓",
+  "category": "negative",
+  "type": "numeric",
+  "classComposition": {
+    "sourceClass": "status_slowed"
+  },
+  "duration": 2,
+  "durationUnit": "turns",
+  "stacking": "none",
+  "stackBehavior": "extend",
+  "effects": {
+    "actionModifiers": [
+      {"actionType": "move", "apModifier": "+1", "description": "移动动作消耗+1 AP"},
+      {"actionType": "attack", "apModifier": "+1", "description": "攻击动作消耗+1 AP（近战和远程均适用）"}
+    ]
+  },
+  "breakConditions": [
+    {"type": "turn", "turns": 2, "description": "2回合后自动解除"},
+    {"type": "item", "itemId": "energy_drink", "action": "use", "effect": "remove_slow", "description": "能量饮料"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_heavy", "type": "amplify", "description": "与重装叠加：大场景移动+2 AP（原+1+1）"},
+    {"with": "status_hastened", "type": "neutralize", "description": "与加速状态互斥，叠加时取较高效果"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnItemUsed"],
+  "icon": "clock",
+  "color": "gray",
+  "priority": 12,
+  "description": "所有动作消耗+1 AP，持续2回合（符合数值小于等于5约束）",
+  "tags": ["ap-penalty", "slow", "debuff"],
+  "source": ["物品: 减速手雷", "NPC技能: 减速攻击"],
+  "mvp": true,
+  "notes": "S-005已解决：迟缓持续时间明确定义为2回合"
+}

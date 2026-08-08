@@ -1,0 +1,92 @@
+{
+  "id": "item_energy_drink_001",
+  "name": "能量饮料",
+  "category": "consumable",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": [
+      "item.capability.recover",
+      "item.capability.status_grant"
+    ]
+  },
+  "volume": 1,
+  "tags": [
+    "恢复",
+    "体力",
+    "消耗品",
+    "加速",
+    "状态赋予"
+  ],
+  "stackable": true,
+  "grantedStates": [
+    "status_hastened"
+  ],
+  "description": "高浓度的能量饮料，除了恢复体力外还能让人短暂进入加速状态。副作用是心跳加速。",
+  "actions": [
+    {
+      "name": "饮用能量饮料",
+      "apCost": 1,
+      "target": "self",
+      "description": "花费1 AP饮用，恢复2点体力并获得加速状态",
+      "effects": [
+        {
+          "op": "prop.add",
+          "path": "entities.{actor}.props.stamina",
+          "delta": 2,
+          "clamp": {
+            "min": 0,
+            "max": 5
+          }
+        },
+        {
+          "op": "attach.add",
+          "def": "status_hastened",
+          "target": "{actor}",
+          "grantedBy": "item_energy_drink_001",
+          "durationTurns": 2,
+          "description": "获得持续 2 回合的加速状态"
+        }
+      ],
+      "kernelOps": [
+        "attach.add",
+        "prop.add"
+      ]
+    }
+  ],
+  "kernelOps": [
+    "attach.add",
+    "prop.add"
+  ],
+  "pendingKernelOps": [
+    "list.remove"
+  ],
+  "pendingKernelOpsNote": "消耗品用后从背包移除仍未建模：需要先确定背包容器的列表路径，才能给出 list.remove 的完整参数。",
+  "mvp": true,
+  "weight": "light",
+  "source": [
+    "地图生成",
+    "商店"
+  ],
+  "rarity": "uncommon",
+  "worldbuilding": {
+    "origin": "便利店热销产品",
+    "flavorText": "喝下这罐橙色液体，世界仿佛按下了快进键。"
+  },
+  "itemParameters": {
+    "item.capability.recover": {
+      "targetSelector": "self",
+      "targetProperty": "stamina",
+      "amount": "actions[].effects[].delta",
+      "applicationTiming": "on-use",
+      "operation": "prop.add"
+    },
+    "item.capability.status_grant": {
+      "targetSelector": "self",
+      "statusSelector": "status_hastened",
+      "lifecycle": "actions[].effects[].durationTurns",
+      "operation": "attach.add"
+    }
+  }
+}

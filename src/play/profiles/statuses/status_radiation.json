@@ -1,0 +1,32 @@
+{
+  "id": "status_radiation",
+  "name": "辐射",
+  "category": "environmental",
+  "type": "numeric",
+  "classComposition": {
+    "sourceClass": "status_radiation"
+  },
+  "duration": "until_zone_exit",
+  "durationUnit": "until_event",
+  "stacking": "none",
+  "stackBehavior": "unique",
+  "effects": {
+    "onTurnStart": {"op": "prop.add", "path": "entities.{self}.props.hp", "delta": -1, "description": "每回合开始扣1生命"}
+  },
+  "breakConditions": [
+    {"type": "zone", "zoneType": "safe", "effect": "remove", "description": "离开辐射区域到达安全区域"}
+  ],
+  "interactionMatrix": [
+    {"with": "status_poisoned", "type": "amplify", "description": "与中毒叠加：双重持续伤害"}
+  ],
+  "kernelEvents": ["OnTurnStart", "OnZoneChange", "OnDamage"],
+  "kernelOps": ["prop.add"],
+  "icon": "radiation",
+  "color": "yellowgreen",
+  "priority": 40,
+  "description": "辐射区域效果，每回合扣1生命，持续到离开区域",
+  "tags": ["area-damage", "zone", "environmental"],
+  "source": ["环境: 辐射毒区"],
+  "mvp": true,
+  "notes": "属于环境区域效果，不是独立状态但可通过区域检测触发"
+}

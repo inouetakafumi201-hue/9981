@@ -1,0 +1,431 @@
+{
+  "schemaVersion": "1.0",
+  "version": "3.0.0",
+  "name": "WakeUp 物品族语义目录",
+  "description": "基类层物品语义目录：只声明可组合的物品类、能力形状、槽位与容器接口以及配置槽位；玩法数值和具体玩法规则由玩法层 profile 提供。",
+  "category": "items",
+  "semanticFamilies": ["item"],
+  "classificationEvidence": {
+    "enumerable": true,
+    "enumerationRationale": "物品按使用生命周期与装配关系可有限列举为消耗品、工具、装备、配件与弹药五类。",
+    "composable": true,
+    "compositionRationale": "物品类与恢复、解除、护甲、盾牌、锁具交互、状态赋予、耐用、消耗、弹药供给、配件挂装等能力组合成具体物品实例；防具即装备类加护甲能力的组合实例。",
+    "gameplayIndependent": true,
+    "independenceRationale": "物品类不知道自己出现在哪种玩法模式，也不携带恢复量、护甲值、容量与耐久取值。"
+  },
+  "sourceRecords": [
+    {
+      "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+      "sourceLocation": {
+        "sourceFile": ".kiro/specs/l2-base-layer-spec/requirements.md",
+        "section": "Requirement 8: 物品、武器、防具和载具契约 / 8.1, 8.5, 8.6, 8.11-8.13"
+      },
+      "precedence": "finalized-l2-contract",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l2:item-family:container-slot-equip-tag-action-attachment-contracts"
+    },
+    {
+      "sourceFile": "docs/L0_规范宪法.md",
+      "sourceLocation": {
+        "sourceFile": "docs/L0_规范宪法.md",
+        "section": "三、基类层的判定标准与已知类别 / 3.2 物品类、防具类"
+      },
+      "precedence": "l0-constitution",
+      "classification": "Normative_Contract",
+      "owningLayer": "基类层",
+      "statementFingerprint": "l0:known-base-categories:item-and-armor-class"
+    }
+  ],
+  "classes": [
+    {
+      "id": "item.class.consumable",
+      "name": "消耗品类",
+      "description": "具有消耗式使用生命周期的物品类。使用位置、效果引用与消耗行为由本类参数暴露，具体取值由玩法层提供。",
+      "defKind": "item",
+      "semanticFamily": "item",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "invariant",
+        "statement": "消耗品的不变量是使用即改变自身存量或存在性；装备、工具与配件在使用后仍保持原有装配关系。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": [
+        "item.capability.recover",
+        "item.capability.cure",
+        "item.capability.status_grant",
+        "item.capability.consumption",
+        "item.capability.durability"
+      ],
+      "parameters": [
+        { "key": "containerEligibility.storable", "description": "是否可存入容器。", "required": true, "valueShape": "boolean" },
+        { "key": "containerEligibility.volumeField", "description": "占位体积参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "useLocation", "description": "使用位置语义，取自 use-locations 值集。", "required": true, "valueShape": "enum<use-locations>" },
+        { "key": "effectRefs", "description": "使用效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "consumptionBehavior", "description": "消耗行为语义，取自 consumption-behaviors 值集。", "required": true, "valueShape": "enum<consumption-behaviors>" },
+        { "key": "chargesField", "description": "可用次数参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "grantedActionRefs", "description": "该物品授予持有者的动作引用集合。", "required": true, "valueShape": "array<reference<action>>" },
+        { "key": "tags", "description": "标签集合。", "required": false, "valueShape": "array<tag-id>" }
+      ],
+      "kernelOps": ["item.destroy", "prop.add", "prop.set", "attach.add", "attach.del"]
+    },
+    {
+      "id": "item.class.tool",
+      "name": "工具类",
+      "description": "通过交互能力作用于角色、物体或场景目标的物品类。工具在使用后保持存在。",
+      "defKind": "item",
+      "semanticFamily": "item",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "工具的合法关系是对外部目标施加交互而自身不进入装备槽位；它既不像消耗品被用尽，也不像装备占用槽位。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": [
+        "item.capability.lock_interaction",
+        "item.capability.durability",
+        "item.capability.status_grant",
+        "item.capability.recover",
+        "item.capability.cure"
+      ],
+      "parameters": [
+        { "key": "containerEligibility.storable", "description": "是否可存入容器。", "required": true, "valueShape": "boolean" },
+        { "key": "containerEligibility.volumeField", "description": "占位体积参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "grantedActionRefs", "description": "该物品授予持有者的动作引用集合。", "required": true, "valueShape": "array<reference<action>>" },
+        { "key": "interactionTargetKinds", "description": "可交互目标种类集合。", "required": true, "valueShape": "array<enum<target-kinds>>" },
+        { "key": "tags", "description": "标签集合。", "required": false, "valueShape": "array<tag-id>" }
+      ],
+      "kernelOps": ["prop.set", "tag.add", "tag.del", "attach.add", "attach.del"]
+    },
+    {
+      "id": "item.class.equipment",
+      "name": "装备类",
+      "description": "可绑定到角色装备关系并在装备期间持续提供能力的物品类。防具是装备类与护甲能力的组合结果，不是独立基类。",
+      "defKind": "item",
+      "semanticFamily": "item",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "装备类必须声明装备槽位要求与装备条件；占用槽位并在装备期间持续生效是它与消耗品、工具、配件的类型分界。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": [
+        "item.capability.armor",
+        "item.capability.shield",
+        "item.capability.status_grant",
+        "item.capability.durability",
+        "item.capability.heavy_tag_aggregation"
+      ],
+      "parameters": [
+        { "key": "containerEligibility.storable", "description": "是否可存入容器。", "required": true, "valueShape": "boolean" },
+        { "key": "containerEligibility.volumeField", "description": "占位体积参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "slotRequirements", "description": "装备槽位要求集合；具体槽位标识由玩法层提供。", "required": true, "valueShape": "array<slot-requirement>" },
+        { "key": "slotRequirements.slotRef", "description": "槽位引用。", "required": true, "valueShape": "reference<slot>" },
+        { "key": "slotRequirements.exclusive", "description": "是否独占该槽位。", "required": true, "valueShape": "boolean" },
+        { "key": "equipRequirements", "description": "装备条件集合。", "required": true, "valueShape": "array<equip-requirement>" },
+        { "key": "grantedActionRefs", "description": "装备期间授予持有者的动作引用集合。", "required": true, "valueShape": "array<reference<action>>" },
+        { "key": "attachmentPoints", "description": "可接受配件的挂点集合。", "required": false, "valueShape": "array<attachment-point>" },
+        { "key": "tags", "description": "标签集合。", "required": false, "valueShape": "array<tag-id>" }
+      ],
+      "kernelOps": ["slot.add", "slot.del", "relation.set", "relation.del", "attach.add", "attach.del", "prop.set"]
+    },
+    {
+      "id": "item.class.attachment",
+      "name": "配件类",
+      "description": "可挂装到其他物品的挂点并扩展其能力组合的物品类。",
+      "defKind": "item",
+      "semanticFamily": "item",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "配件的合法关系是挂装到宿主物品的挂点而不是角色槽位；它必须声明宿主接受方，且移除后不改变宿主类型身份。"
+      },
+      "requiredCapabilityIds": ["item.capability.accessory_mount"],
+      "optionalCapabilityIds": ["item.capability.durability", "item.capability.status_grant"],
+      "parameters": [
+        { "key": "containerEligibility.storable", "description": "是否可存入容器。", "required": true, "valueShape": "boolean" },
+        { "key": "hostAttachmentPointId", "description": "所挂装的宿主挂点标识。", "required": true, "valueShape": "string" },
+        { "key": "acceptedHostClassIds", "description": "可挂装的宿主物品类引用集合。", "required": true, "valueShape": "array<reference<item-class>>" },
+        { "key": "grantedCapabilityIds", "description": "挂装后向宿主追加的能力引用集合。", "required": true, "valueShape": "array<reference<capability>>" },
+        { "key": "typeDefining", "description": "该配件是否为宿主的类型决定项；默认否，移除后宿主类型身份不变。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": ["slot.add", "slot.del", "relation.set", "relation.del"]
+    },
+    {
+      "id": "item.class.ammunition",
+      "name": "弹药类",
+      "description": "被武器弹药绑定能力消耗的物品类。弹药类别与消耗量取值由玩法层提供。",
+      "defKind": "item",
+      "semanticFamily": "item",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "legal-relationship",
+        "statement": "弹药的合法关系是被武器的弹药绑定能力引用并在攻击结算中被消耗；它不进入装备槽位，也不作为独立交互工具使用。"
+      },
+      "requiredCapabilityIds": ["item.capability.ammunition_supply"],
+      "optionalCapabilityIds": [],
+      "parameters": [
+        { "key": "containerEligibility.storable", "description": "是否可存入容器。", "required": true, "valueShape": "boolean" },
+        { "key": "containerEligibility.volumeField", "description": "占位体积参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "ammunitionTypeField", "description": "弹药类别参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
+        { "key": "compatibleWeaponClassIds", "description": "可使用该弹药的武器类引用集合。", "required": true, "valueShape": "array<reference<weapon-class>>" },
+        { "key": "stackable", "description": "是否可堆叠。", "required": true, "valueShape": "boolean" },
+        { "key": "tags", "description": "标签集合。", "required": false, "valueShape": "array<tag-id>" }
+      ],
+      "kernelOps": ["item.create", "item.destroy", "stack.merge", "stack.split"]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "item.capability.recover",
+      "name": "恢复能力",
+      "description": "描述对可恢复属性执行变更的能力形状。",
+      "parameters": [
+        { "key": "targetSelector", "description": "选择接受恢复效果的目标。", "required": true },
+        { "key": "targetProperty", "description": "选择被恢复的目标属性。", "required": true },
+        { "key": "amount", "description": "由玩法层绑定的恢复幅度。", "required": true },
+        { "key": "applicationTiming", "description": "由玩法层绑定的应用时机。", "required": true },
+        { "key": "operation", "description": "执行属性变化的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["prop.add", "prop.set"]
+    },
+    {
+      "id": "item.capability.cure",
+      "name": "治疗与解除能力",
+      "description": "描述解除状态或处理异常效果的能力形状。",
+      "parameters": [
+        { "key": "targetSelector", "description": "选择接受解除效果的目标。", "required": true },
+        { "key": "statusSelector", "description": "选择可被解除的状态。", "required": true },
+        { "key": "applicationTiming", "description": "由玩法层绑定的应用时机。", "required": true },
+        { "key": "operation", "description": "执行状态解除的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["attach.del"]
+    },
+    {
+      "id": "item.capability.armor",
+      "name": "护甲能力",
+      "description": "描述对伤害结算进行防护并响应破损条件的能力形状。装备槽位要求由宿主装备类的槽位参数提供，本能力只声明其引用。",
+      "parameters": [
+        { "key": "damageSelector", "description": "选择可被防护规则处理的伤害。", "required": true },
+        { "key": "mitigationRule", "description": "由玩法层绑定的减免规则。", "required": true },
+        { "key": "resultBoundary", "description": "声明结算结果的边界策略。", "required": true },
+        { "key": "breakCondition", "description": "由玩法层绑定的破损条件。", "required": true },
+        { "key": "slotRequirementRef", "description": "所占用装备槽位要求的引用。", "required": true },
+        { "key": "operation", "description": "执行防护结果的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["prop.add", "prop.set", "tag.add", "tag.del"]
+    },
+    {
+      "id": "item.capability.shield",
+      "name": "盾牌能力",
+      "description": "描述主动格挡、盾牌资源和耗尽行为的能力形状。扔盾与盾击等扩展动作是否属于标配尚未裁决，本能力不预设其存在。",
+      "parameters": [
+        { "key": "activationRule", "description": "由玩法层绑定的主动启用规则。", "required": true },
+        { "key": "blockRule", "description": "由玩法层绑定的格挡规则。", "required": true },
+        { "key": "resourcePool", "description": "选择格挡消耗的资源。", "required": true },
+        { "key": "depletionBehavior", "description": "由玩法层绑定的资源耗尽行为。", "required": true },
+        { "key": "operation", "description": "执行格挡结果的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["attach.add", "attach.del", "prop.add"]
+    },
+    {
+      "id": "item.capability.lock_interaction",
+      "name": "锁具交互能力",
+      "description": "描述物品与锁具、门、容器或载具之间的解锁交互形状。",
+      "parameters": [
+        { "key": "lockSelector", "description": "选择被交互的锁具目标。", "required": true },
+        { "key": "interactionMode", "description": "由玩法层绑定的锁具交互方式。", "required": true },
+        { "key": "prerequisite", "description": "由玩法层绑定的交互前置条件。", "required": true },
+        { "key": "completionRule", "description": "由玩法层绑定的完成判定。", "required": true },
+        { "key": "operation", "description": "执行锁具变化的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["prop.set", "tag.add", "tag.del"]
+    },
+    {
+      "id": "item.capability.status_grant",
+      "name": "状态赋予能力",
+      "description": "描述向目标附加或移除状态的能力形状。",
+      "parameters": [
+        { "key": "targetSelector", "description": "选择接受状态变化的目标。", "required": true },
+        { "key": "statusSelector", "description": "选择要附加或移除的状态。", "required": true },
+        { "key": "lifecycle", "description": "由玩法层绑定的状态生命周期。", "required": true },
+        { "key": "operation", "description": "执行状态变化的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["attach.add", "attach.del"]
+    },
+    {
+      "id": "item.capability.durability",
+      "name": "耐用性能力",
+      "description": "描述物品资源随事件变化以及耗尽后的行为形状。",
+      "parameters": [
+        { "key": "resourceProperty", "description": "选择表示耐用资源的属性。", "required": true },
+        { "key": "changeTrigger", "description": "由玩法层绑定的资源变化触发条件。", "required": true },
+        { "key": "depletionBehavior", "description": "由玩法层绑定的资源耗尽行为。", "required": true },
+        { "key": "operation", "description": "执行资源变化的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["prop.add", "prop.set", "item.destroy"]
+    },
+    {
+      "id": "item.capability.consumption",
+      "name": "消耗行为能力",
+      "description": "描述消耗品的使用位置、效果引用与消耗行为形状；可用次数与效果强度取值由玩法层绑定。",
+      "parameters": [
+        { "key": "useLocation", "description": "使用位置语义，取自 use-locations 值集。", "required": true, "valueShape": "enum<use-locations>" },
+        { "key": "effectRefs", "description": "使用效果定义引用集合。", "required": true, "valueShape": "array<reference>" },
+        { "key": "consumptionBehavior", "description": "消耗行为语义，取自 consumption-behaviors 值集。", "required": true, "valueShape": "enum<consumption-behaviors>" },
+        { "key": "chargesField", "description": "可用次数参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" },
+        { "key": "operation", "description": "执行消耗结果的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["item.destroy", "prop.add", "stack.split"]
+    },
+    {
+      "id": "item.capability.ammunition_supply",
+      "name": "弹药供给能力",
+      "description": "描述弹药如何被武器引用与消耗的能力形状；弹药类别与消耗量取值由玩法层绑定。",
+      "parameters": [
+        { "key": "ammunitionTypeField", "description": "弹药类别参数字段名。", "required": true, "valueShape": "field-name" },
+        { "key": "compatibleWeaponClassIds", "description": "可使用该弹药的武器类引用集合。", "required": true, "valueShape": "array<reference<weapon-class>>" },
+        { "key": "consumptionRuleRef", "description": "消耗规则定义引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "operation", "description": "执行弹药消耗的引擎层 Op。", "required": true }
+      ],
+      "kernelOps": ["item.destroy", "stack.split", "prop.add"]
+    },
+    {
+      "id": "item.capability.accessory_mount",
+      "name": "配件挂装能力",
+      "description": "描述配件挂装到宿主物品挂点的能力形状，以及挂装后向宿主追加的能力引用。",
+      "parameters": [
+        { "key": "hostAttachmentPointId", "description": "宿主挂点标识。", "required": true, "valueShape": "string" },
+        { "key": "acceptedHostClassIds", "description": "可挂装的宿主物品类引用集合。", "required": true, "valueShape": "array<reference<item-class>>" },
+        { "key": "grantedCapabilityIds", "description": "挂装后向宿主追加的能力引用集合。", "required": true, "valueShape": "array<reference<capability>>" },
+        { "key": "typeDefining", "description": "是否为宿主类型决定项。", "required": true, "valueShape": "boolean" }
+      ],
+      "kernelOps": ["slot.add", "slot.del", "relation.set", "relation.del"]
+    },
+    {
+      "id": "item.capability.heavy_tag_aggregation",
+      "name": "重物标签聚合能力",
+      "description": "描述重物标签的聚合只经引擎层查询与关系接口进行，不在基类层自行遍历或缓存聚合结果。",
+      "parameters": [
+        { "key": "tag", "description": "被聚合的标签标识。", "required": true, "valueShape": "tag-id" },
+        { "key": "queryRef", "description": "引擎层查询定义引用。", "required": true, "valueShape": "reference<expr>" },
+        { "key": "relationRef", "description": "引擎层持有关系定义引用。", "required": true, "valueShape": "reference<rule>" },
+        { "key": "aggregationChannel", "description": "聚合通道；恒为引擎层查询与关系接口。", "required": true, "valueShape": "enum<aggregation-channels>" }
+      ],
+      "kernelOps": ["tag.add", "tag.del"]
+    },
+    {
+      "id": "item.capability.death_container_binding",
+      "name": "遗留容器绑定能力",
+      "description": "描述玩法层选择遗留容器行为时的绑定形状：必须引用一个新建的禁止存入容器，且内容引用由死亡实体的那一次已完成引擎层变更派生。",
+      "parameters": [
+        { "key": "containerRef", "description": "新建的遗留容器引用。", "required": true, "valueShape": "reference<container>" },
+        { "key": "depositEnabled", "description": "存入开关；恒为假。", "required": true, "valueShape": "boolean" },
+        { "key": "contentSource", "description": "内容来源标识；恒为死亡实体变更。", "required": true, "valueShape": "enum<content-sources>" }
+      ],
+      "kernelOps": ["item.move", "entity.create", "entity.place"]
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "item.valueset.use_locations",
+      "name": "使用位置",
+      "description": "消耗品与工具的使用位置语义；位置是语义而不是距离数值。",
+      "tokens": [
+        { "id": "self", "name": "自身", "description": "只能对自身使用。" },
+        { "id": "adjacent", "name": "相邻", "description": "可对相邻目标使用。" },
+        { "id": "ranged", "name": "远程", "description": "可对非相邻目标使用；具体距离取值归玩法层。" },
+        { "id": "micro-scene", "name": "微型场景", "description": "在所属微型场景范围内使用。" }
+      ]
+    },
+    {
+      "id": "item.valueset.consumption_behaviors",
+      "name": "消耗行为",
+      "description": "消耗品的消耗行为语义；可用次数取值归玩法层。",
+      "tokens": [
+        { "id": "consume-on-use", "name": "使用即消耗", "description": "一次使用后即被消耗。" },
+        { "id": "charges", "name": "按次数消耗", "description": "按可用次数递减；次数取值归玩法层。" },
+        { "id": "persistent", "name": "不消耗", "description": "使用后不减少存量。" }
+      ]
+    },
+    {
+      "id": "item.valueset.aggregation_channels",
+      "name": "聚合通道",
+      "description": "标签与关系聚合允许的通道；基类层不自建聚合缓存。",
+      "tokens": [
+        { "id": "l1-query-relation", "name": "引擎层查询与关系", "description": "只经引擎层查询与关系接口聚合。" }
+      ]
+    },
+    {
+      "id": "item.valueset.content_sources",
+      "name": "内容来源",
+      "description": "遗留容器内容引用的来源类别。",
+      "tokens": [
+        { "id": "deceased-entity-transaction", "name": "死亡实体变更", "description": "内容引用由死亡实体的那一次已完成引擎层变更派生。" }
+      ]
+    }
+  ],
+  "structuralBounds": [],
+  "prohibitions": [
+    {
+      "id": "prohibition.item.embedded_gameplay_value",
+      "diagnosticCode": "SCHEMA_GAMEPLAY_TABLE_IN_L2",
+      "statement": "物品类与能力不得内嵌恢复量、护甲值、容量、耐久上限或持续时间取值。",
+      "correction": "只声明参数字段名与语义值集合，取值由玩法层 profile 提供。"
+    },
+    {
+      "id": "prohibition.item.armor_as_separate_base_class",
+      "diagnosticCode": "FAMILY_COMBINATION_INSTANCE_AS_BASE",
+      "statement": "防具不得作为独立基类登记；它是装备类与护甲能力的组合结果。",
+      "correction": "以装备类加护甲能力组合表达防具实例。"
+    },
+    {
+      "id": "prohibition.item.dangling_composition_reference",
+      "diagnosticCode": "ITEM_DANGLING_CAPABILITY_REFERENCE",
+      "statement": "物品组合不得留下无法解析的槽位、容器、弹药或配件引用。",
+      "correction": "在同一候选变更中补齐被引用的槽位、容器、弹药类与配件类。"
+    },
+    {
+      "id": "prohibition.item.heavy_tag_local_aggregation",
+      "diagnosticCode": "ITEM_HEAVY_TAG_NOT_QUERY_BASED",
+      "statement": "重物标签聚合不得在基类层自行遍历或缓存。",
+      "correction": "改为引用引擎层查询与关系接口。"
+    },
+    {
+      "id": "prohibition.item.death_container_deposit_enabled",
+      "diagnosticCode": "ITEM_DEATH_CONTAINER_DEPOSIT_ENABLED",
+      "statement": "遗留容器不得允许存入。",
+      "correction": "把 depositEnabled 置为假并组合禁止存入能力。"
+    }
+  ],
+  "unresolvedItems": [
+    {
+      "id": "Q-05",
+      "statement": "盾牌标配范围（扔盾与盾击是否保留）尚未获得权威裁决。",
+      "handling": "盾牌能力只保留启用、格挡、资源与耗尽四项接口，不登记扔盾或盾击动作，也不声明它们属于或不属于标配。",
+      "awaitingDecisionId": "Q-05",
+      "sources": [
+        {
+          "sourceFile": "docs/L0_规范宪法.md",
+          "sourceLocation": {
+            "sourceFile": "docs/L0_规范宪法.md",
+            "section": "七、待访谈确认事项 / Q-05"
+          },
+          "precedence": "unresolved-l2-content",
+          "decisionId": "Q-05",
+          "classification": "Unresolved_Item",
+          "owningLayer": "基类层",
+          "statementFingerprint": "l0:q-05:shield-standard-scope"
+        }
+      ]
+    }
+  ],
+  "compositionContract": {
+    "classReferenceField": "classComposition.classIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
+    "parameterBindingField": "itemParameters",
+    "slotField": "slot",
+    "playLayerOwnedFieldNames": ["volume", "slot", "tags", "actions", "kernelOps", "grantedStates", "stackable"],
+    "description": "玩法层以 classComposition 引用物品类与能力，并在上列玩法层字段中提供槽位标识、体积、动作与状态取值。槽位标识空间由玩法层拥有；基类层只要求槽位要求可解析。"
+  }
+}

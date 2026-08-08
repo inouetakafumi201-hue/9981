@@ -1,0 +1,42 @@
+{
+  "id": "status_aiming",
+  "name": "瞄准",
+  "category": "positive",
+  "type": "tag",
+  "classComposition": {
+    "sourceClass": "status_aiming"
+  },
+  "duration": 1,
+  "durationUnit": "turns",
+  "stacking": "none",
+  "stackBehavior": "refresh",
+  "effects": {
+    "onAction": {
+      "requiredActionTypes": ["prepared_attack"],
+      "consumeAfterUse": true,
+      "hitPolicy": "guaranteed",
+      "description": "下一次与已锁定目标一致的准备攻击按瞄准规则结算并消耗该状态。"
+    },
+    "passive": {
+      "targetMustRemainValid": true,
+      "description": "目标失效、离开允许范围或准备者失衡时，瞄准立即失效。"
+    }
+  },
+  "breakConditions": [
+    { "type": "action", "actionType": "prepared_attack", "description": "执行对应准备攻击后解除。" },
+    { "type": "status", "status": "status_staggered", "description": "进入失衡状态时解除。" },
+    { "type": "turn", "turns": 1, "description": "未在下一次行动机会使用时解除。" }
+  ],
+  "interactionMatrix": [
+    { "with": "status_staggered", "type": "counter", "description": "失衡会打断瞄准准备。" }
+  ],
+  "kernelEvents": ["OnActionCheck", "OnActionResolved", "OnTurnEnd", "OnStatusApplied"],
+  "icon": "crosshair",
+  "color": "blue",
+  "priority": 24,
+  "description": "锁定目标后保留到下一次行动机会；执行对应准备攻击或准备失效时解除。",
+  "tags": ["aim", "preparation", "precision", "buff"],
+  "source": ["动作: 瞄准", "动作: 载具撞击瞄准", "动作: 近战爆胎（接近）"],
+  "mvp": false,
+  "notes": "该配置只规定通用准备态生命周期；具体攻击伤害、目标范围与反应规则由对应玩法动作定义。"
+}
