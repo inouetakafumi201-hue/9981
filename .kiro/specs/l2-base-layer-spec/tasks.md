@@ -394,13 +394,21 @@ flowchart TD
   - **需求/设计引用：** R15；Design：Test_Interface、Property 1–14。
   - **当前状态：** 规范模型/管线侧 14 性质**已全绿（14 files / 19 tests / skip=0）**；目录与 profile 侧的具名性质归拢与 `Test_Interface` **未完成**，故为 `[-]`。
 
-- [ ] **D-5 打通 `src/class` 目录 → `Definition_Registry` 原子激活**
+- [-] **D-5 打通 `src/class` 目录 → `Definition_Registry` 原子激活**
   - **目标：** 让基类层实例目录经 `spec-compiler` 的原子激活/回滚管线装载，而非仅 `catalog-loader` + JSON Schema 一条旁路。
   - **实现范围（待建）：** 在 `src/class/catalog-loader.ts` 与 `src/core/kernel/spec-compiler/registries.ts`/`compiler.ts` 之间建立装载适配，使目录变更享有 P10 的原子性/回滚保证。
   - **验收标准：** `src/class` 目录经 `SpecificationCompiler.compileAndActivate`（`targetLayer:'基类层'`）装载；任一 Error 零变更；成功产生 `Canonical_Snapshot`。
   - **依赖：** A.4、B.1。
   - **需求/设计引用：** R12、R13；Design：Definition_Registry、Property 10。
-  - **当前状态：** 两条装载路径（catalog-loader vs spec-compiler 管线）**未打通**；当前目录不走原子激活管线。
+  - **当前状态与证据（为何 `[-]` 而非 `[x]`）：** 已落地 **scenes 目录一个切片**的装载桥并验收通过，其余 12 个目录未接入，故按状态铁律保持 `[-]`。
+    - **桥（新增，只消费公开 API，不改任一方交付物）：** `src/class/scene-catalog-activation.ts`——把已解析的 `ClassCatalog`（scenes）转成编译器候选文档，经 `SpecificationCompiler.compileAndActivate`（`targetLayer:'基类层'`）走真实原子激活/回滚管线。
+    - **验收证据：** `src/class/__tests__/scene-catalog-activation.property.test.ts`（4 tests 全通过，含 2 个 fast-check 性质各 100 次生成）——
+      清洁激活成功且产生确定性 `Canonical_Snapshot`（两独立主机产物哈希字节相同）；
+      **P8**：任意悬空组合引用被确定性拒绝（`E_REF_MISSING`、点名宿主、两次编译诊断序列相同）；
+      **P10**：任意单点违规（悬空引用/重复标识/非法 kind/非法语义族/未知字段/未知顶层字段）都被原子拒绝、全新注册表零候选变更（停留第 0 代、无产物），且后续包失败时先前已激活快照字节不变。
+    - **切片边界（实事求是，未完成部分）：** ① 只搬运 scenes 目录的"类 + 能力 + 类到能力的组合边"，其中类的 requiredCapabilityIds 与 optionalCapabilityIds 合并映射为编译器 `components`（组合边），能力映射为 `prefab` 定义；② 结构边界数值归属（P3）、值集合、过渡端点作为具体引用、禁令（校验规则）、玩法层参数绑定**不在本切片**；③ 其余 12 个基类层目录（actions/gateways/items/weapons/...）**未接入**。
+    - **两处自主映射判断（需人工复核）：** A. 能力在编译器模型登记为 `prefab` 定义（目录本身不给能力分配 Def kind）；B. 必需能力与可选能力合并为单条 `components` 列表，required/optional 的区分不在本切片建模（属 C.3 能力边界审计关注点）。
+    - **过程中定位并绕开的一个真实约束：** 组合会把组件 `value` 字段并入宿主，若能力与类都带同名字段（如 `title`），一个类组合多个能力时会触发 `E_LOAD_COMPOSITION_CONFLICT`。桥因此让定义只携带基础字段（`id`/`kind`/`abstract`/`semanticFamily`/`components`），能力只贡献组合"边"而不贡献任何字段。
 
 ## 待决项（一律保持未决，本计划不代为裁决）
 

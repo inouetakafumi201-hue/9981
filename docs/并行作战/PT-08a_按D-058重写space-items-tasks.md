@@ -1,5 +1,10 @@
 ## 任务：PT-08a — 按 D-058 重写 wakeup-space-items 的 tasks.md
 
+> ✅ **已完成（2026-08-09）**。产出：`.kiro/specs/wakeup-space-items/tasks.md` 全量重写。
+> DoD 全部达成：新 tasks.md 无任何指向被否决目录的落点（路径字面量已清除）；requirements 1–14 逐条映射为覆盖矩阵（✅/◐/⬜/⚠）；顶部有 D-058 落点说明与"取代旧版"注记。
+> 回流已完成：主状态板 PT-08a 标 ✅、PT-08b 解锁为 🟢；design.md 过时描述登记为交接项 T-01（建议 PT-08c）。
+> 重写期关键发现：①`src/l2/model/space-items-*.ts` 五文件已产出但为死代码；②`tsconfig.l2.json` 隔离门禁为旧计划未提的硬约束；③`spectrum-class.*`/`DMG_*`/`WKN_*` 三套标识不存在。
+
 ### 1. 背景与意图
 `wakeup-space-items/tasks.md` 的全部任务都针对 `src/class/space-items/{model,contracts,ports,validation,resolution,runtime,adapters}` ——但 **D-058 已裁决否决新建 `src/class/space-items/`**：目录数据落 `src/class/<族>/index.json`、领域验证落既有 `src/l2/validation/*.ts`、跨层适配落 `src/l2/adapters/`。所以这份 tasks.md 是针对被否决架构写的，**当前不可执行**。本任务把它重写为"校验既有 + 补缺口"的可执行任务。对应主状态板 PT-08a、全局报告 §三 空间物品断点。
 

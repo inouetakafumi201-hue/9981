@@ -404,15 +404,34 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
 
 ## Tasks
 
-- [ ] 0. 基线核验（只读，产出证据，不改代码）
-  - [ ] 0.1 记录实施前门禁基线
+> ### 复选框语义（PT-03b 对齐，2026-08-09）
+>
+> 本文件已是「按 D-058 重写」的新任务清单（PT-08a 产物）。本次 PT-03b **只做复选框与状态注记，不重写任务体**。
+> 三态约定（路径均经 `Test-Path` / grep 实测校验）：
+>
+> | 标记 | 含义 |
+> |---|---|
+> | `[x]` + `（证据：…）` | 任务交付物已存在且有测试覆盖。 |
+> | `[ ]` + `（待测：…）` | 相关源码已存在（路径已核实），但缺接线/测试，或只满足了 DoD 的一部分。 |
+> | `[ ]` + `（未做：…）` | 目标文件/目录不存在或记录未产出。 |
+>
+> **实测结论**：无任何任务达到 `[x]`。除 `src/l2/model/space-items-*.ts` 五个模型文件已存在（但仍是**死代码**：
+> 未从 `index` 导出、除彼此外无消费者、零测试）标为 `[ ]（待测）`、以及 3.1 的 scenes 残留冲突文本已消除外，
+> 领域验证规则（`src/l2/validation/space-items-*-rules.ts`）、契约、适配层、`resolution` 谓词与 `test/l2/space-items/**` 测试**全部尚未建立**。
+> 既有通用 l2 规则（`spatial-rules.ts`、`item-vehicle-rules.ts` 等）覆盖 §3 矩阵所列的部分语义，但那不是本任务清单要求的 space-items 专属交付物。
+>
+> 本次**不改任何 `src/**` 或 `test/**` 代码**，不重写任务体（结构性重写属 PT-08a）。
+
+
+- [ ] 0. 基线核验（只读，产出证据，不改代码） （未做：基线/端口/错误码/覆盖矩阵/D-016 差集等核验记录均未落 src/l2/决策与风险记录.md（该文件无任何 space-items 小节））
+  - [ ] 0.1 记录实施前门禁基线 （未做：实施前门禁基线记录未产出（src/l2/决策与风险记录.md 无「space-items 实施基线」小节））
     - 运行并记录 `npm run typecheck`、`npm run typecheck:l2`、`npm run lint`、`npm test` 的实施前完整结果；既有失败必须保存命令、错误文本与所属模块，不得通过过滤、改断言或缩小范围掩盖。
     - 记录 `src/class/__tests__/` 五个测试文件与 `test/l2/**`、`test/properties/**` 的当前通过状态。
     - **DoD（可机器校验）**：基线记录文件存在且包含四条命令的退出码与失败清单；同一工作区可复现。
     - **落点**：`src/l2/决策与风险记录.md` 追加「space-items 实施基线」小节。
     - **Requirements:** 12.1、14.6。
 
-  - [ ] 0.2 核实引擎层端口与动作可用性复用现状
+  - [ ] 0.2 核实引擎层端口与动作可用性复用现状 （未做：引擎层端口与 queryActions 复用现状（要求 11.7）的核实记录未产出）
     - 逐项核实真实导出与签名并记录：`src/l2/kernel/kernel-contract.ts::KernelContract`（含 `invoke`、`hasOp`、`semanticStateFingerprint`、`hookIntegrationAvailable` 是否存在）；`op-registry-adapter.ts::createKernelContractFromOpRegistry`；`src/core/kernel/ops/registry.ts::OpRegistry` 的 `invoke`/`register`/`has`/`listOpNames`/`isStructural`；`structural-ops.ts` 注册的 Op 名全集与 `ItemMoveArgs`、`EntityPlaceArgs` 字段；`topology/micro-scene.ts::{ensureMicroScene,onMicroSceneOccupantsChanged,checkMicroSceneCapacity}`；`topology/graph.ts::{linksTouching,cascadeNodeDestroySet}`；`topology/container.ts::{findDefaultSlotIndex,insertSlot,removeSlot,setSlotHolds}`；`ops/invariants.ts::ALL_INVARIANT_CHECKS` 覆盖的 `E_INV_*`。
     - **回答要求 11.7 的悬空问题**：核实 `src/l2/adapters/ai-adapter.ts` 与 `read-only-projection.ts` 是否已经（间接）复用引擎层 `queryActions`；若否，记录为缺口并指明接入点。
     - 核实 `OpRegistry.invoke` 是否有 `cause` 形参（旧 design R-10 声称无，需复核）。
@@ -420,14 +439,14 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：每个端口有"已冻结（签名原文）"或"unavailable（缺口 + owner）"记录；`typecheck:l2` 的依赖边界结论写明。
     - **Requirements:** 3.1、3.2、11.7、14.1、14.2、14.5、14.6。
 
-  - [ ] 0.3 核实错误码与领域诊断类别映射
+  - [ ] 0.3 核实错误码与领域诊断类别映射 （未做：错误码与领域诊断类别等价映射表未产出）
     - 审计 `src/core/kernel/state/error-codes.ts::ERR_CODES`，逐项确认 `space-items-diagnostic-categories.ts` 的 `CODE_MAP` 引用的每个码都已登记。**不得新增 `ERR_CODES` 成员**；若某映射目标不存在，停下并把该路径标为 unavailable，不得用 `E_LOAD_UNRESOLVED_CONTRACT` 给已登记码兜底。
     - 核实 `src/l2/model/diagnostic-codes.ts` 中已有的 `SPACE_*`、`ITEM_*`、`WEAPON_*`、`ARMOR_*`、`VEHICLE_*`、`LAYER_*`、`VALUE_L3_OWNERSHIP`、`SOURCE_PROMOTION_REQUIRES_DECISION` 条目，确定哪些领域检查可直接复用、哪些需新增领域类别。
     - **产出 §6 H-01 所需的等价映射表**：requirements 措辞（`VALUE_L3_OWNERSHIP`、`VALUE_CLASSIFICATION_MISSING`、`MICRO_SCENE_CREATOR_MISUSE`、`OP_BYPASS_FORBIDDEN`、`DEPRECATED_MECHANIC`）↔ 既有码。
     - **DoD**：每个已启用的领域诊断条件解析到唯一已登记码；`ERR_CODES` 成员数与实施前一致（写成快照断言的输入）。
     - **Requirements:** 12.2、12.3。
 
-  - [ ] 0.4 逐条核验 §3 覆盖矩阵中标 ✅ 与 ◐ 的项
+  - [ ] 0.4 逐条核验 §3 覆盖矩阵中标 ✅ 与 ◐ 的项 （未做：§3 覆盖矩阵逐条证据表未落 src/l2/决策与风险记录.md）
     - 对 §3 中每个标 ✅ 的条目，打开对应文件确认该检查真实存在且真实被 `DEFINITION_RULES` 执行序调用（不只是文件里有函数）。核验方式：读 `src/l2/validation/validator.ts` 的规则装配处，逐一比对。
     - **重点核验 §3 要求 1.8**：`src/l2/compiler/conflict-resolver.ts` 是否被 `validatePackage` 链路调用；它对同级优先级冲突是否确实保留 `Unresolved_Item` 而不自选默认语义。
     - 对每个标 ◐ 的条目，写清"已覆盖的面"与"缺的面"，缺面必须精确到字段名或判定条件。
@@ -435,59 +454,59 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **落点**：`src/l2/决策与风险记录.md` 追加「space-items 要求覆盖证据表」小节。
     - **Requirements:** 12.1。
 
-  - [ ] 0.5 核实 D-016 已移除状态清单与 `src/class/statuses/` 的一致性
+  - [ ] 0.5 核实 D-016 已移除状态清单与 `src/class/statuses/` 的一致性 （未做：D-016 已移除状态清单与 src/class/statuses/ 的差集核实未产出）
     - 从 `docs/访谈决策记录.md` D-016 与 `docs/_术语表与废案清单.md` 提取"已移除状态"的确切清单。
     - 逐一比对 `src/class/statuses/` 下 19 个 `status_*.json`（`aiming`、`blocking`、`burning`、`concealed`、`downed`、`frozen`、`hastened`、`heavy`、`knocked_down`、`lockpicking`、`overloaded`、`poisoned`、`radiation`、`sleeping`、`slowed`、`staggered`、`stunned`、`traveling`、`weak`）与 `statuses/index.json` 的值集。
     - 若发现已移除状态仍在目录中，**不在本任务删除**（跨越 §3 要求 9.7 的实现边界），登记为任务 3 的输入与 §6 交接项。
     - **DoD**：产出「D-016 已移除状态清单」与「目录现存状态清单」的差集，差集为空或每项有处置结论。
     - **Requirements:** 9.7。
 
-- [ ] 1. 把已落地的领域模型接线并测试（把 §2.2 的死代码转为受门禁保护的活代码）
+- [ ] 1. 把已落地的领域模型接线并测试（把 §2.2 的死代码转为受门禁保护的活代码） （待测：src/l2/model/space-items-domain-ids.ts, src/l2/model/space-items-structural-bounds.ts, src/l2/model/space-items-numeric-ownership.ts, src/l2/model/space-items-diagnostic-categories.ts, src/l2/model/space-items-unresolved.ts；五文件均已存在但仍为死代码：未从 index 导出、除彼此外无消费者、零测试（接线与测试是本任务未完成的部分））
   > 这五个文件**内容已存在**。本任务**不是重写**，是：①核对其内容与现行 requirements / 裁决一致；②从 `src/l2/model/index.ts` 导出；③补上测试。
   > **不得**因为文件已存在就跳过测试；**不得**为了让测试通过而改写断言去迁合实现——发现实现与 requirements 不一致时改实现。
 
-  - [ ] 1.1 核对并接线 `space-items-domain-ids.ts`
+  - [ ] 1.1 核对并接线 `space-items-domain-ids.ts` （待测：src/l2/model/space-items-domain-ids.ts（内容已存在，但未接线、无对应单元测试））
     - 核对：族标识集合是否恰为 requirements 涉及的十二族（`natural-scene`、`micro-scene`、`transition`、`container`、`item`、`weapon`、`profile`、`damage`、`armor`、`shield`、`movement`、`vehicle`）；能力标识与组合角色标识是否与 `src/class/<族>/index.json` 的实际 `capabilityIds` 对齐（**注意 §2.1 事实 2：不存在 `spectrum-class.*`**）；是否复用 `./ids.js` 的 `isWellFormedId` 与 `joinJsonPath` 而非自建；规范化排序序数函数是否对每个集合都提供。
     - 组合角色标识必须含 `weapon-attribute`（**不得**出现已废止的 `attack-shape`）。
     - 从 `src/l2/model/index.ts` 导出。
     - **DoD**：`test/l2/space-items/unit/domain-ids.test.ts` 断言：集合为 `as const` 封闭集；十二族齐备；每个能力标识在对应 `src/class/<族>/index.json` 中可找到（机械比对，读 JSON 而非硬编码清单）；不含任何数值；不含 `attack-shape` 字面量。
     - **依赖：** 0.2、0.4。**Requirements:** 1.2、14.2、14.3。
 
-  - [ ] 1.2 核对并接线 `space-items-structural-bounds.ts`
+  - [ ] 1.2 核对并接线 `space-items-structural-bounds.ts` （待测：src/l2/model/space-items-structural-bounds.ts（内容已存在，未接线、无测试））
     - 核对：是否只登记**单一**天花板 5（D-057），**没有**按档登记 5/4/3；`owningLayer` 恒为 `'基类层'`；`authoritativeSources` 与 `structuralRationale` 非空且与 `src/l2/model/constitution.ts` 的 `NODE_CONNECTION_BOUND_SOURCE` 同 precedence 语义；`ConnectionCountMetric.kind` 恒为 `'Internal_Metric'`；`measureConnectionCount` 是否经 `KernelContract` 或纯参数（links 数组）计算——**若它直接 import `src/core/kernel/topology/graph.ts`，会违反 `tsconfig.l2.json` 边界，必须改为纯参数或经端口**。
     - 与 `src/class/scenes/index.json::structural-bound.scene.connection_limit` 机械比对取值与来源。
     - 与玩法层 `src/play/map/types.ts::CONNECTION_LIMIT` 的分层关系已由 `src/play/map/__tests__/connection-limit-layering.test.ts` 钉死，**本任务不得改动玩法层**。
     - **DoD**：`test/l2/space-items/unit/structural-bounds.test.ts` 断言：天花板恰为 5 且只有一个；删除任一来源或理由字段导致类型检查失败（用 `@ts-expect-error` 反向断言）；`measureConnectionCount` 结果始终带 `Internal_Metric`；`typecheck:l2` 通过。
     - **依赖：** 1.1。**Requirements:** 2.4、2.5、4.1、4.2、4.6。**Properties:** P3。
 
-  - [ ] 1.3 核对并接线 `space-items-numeric-ownership.ts`
+  - [ ] 1.3 核对并接线 `space-items-numeric-ownership.ts` （待测：src/l2/model/space-items-numeric-ownership.ts（内容已存在，未接线、无测试））
     - 核对：四分类是否复用 `./schema.js::ParameterField` 与 `./constitution.js::GAMEPLAY_VALUE_RANGE`；`collectNumericFields` 是否递归覆盖参数 Schema、组合组件参数与契约内嵌字段；`validateGameplayValue` 是否对玩家可见值要求 1–5 有限整数，且对**非**玩家可见的 `Gameplay_Value` 要求 `authoritativeSources` 非空（否则 `playerVisible:false` 就成了绕过 1–5 的后门）；`validateInternalMetric` 是否要求显式标注与自有 Schema；模块是否为纯函数（不得 import `OpRegistry`、事务、`WorldState`）。
     - **与既有 `parameter-rules.ts` 去重**：该文件已实现十二类数值诊断。本模块只能提供**领域递归收集**与**领域分类判定**，不得产出与 `parameter-rules.ts` 重复的诊断（同一 (定义, 路径, 代码) 只能出现一次）。
     - **DoD**：`test/l2/space-items/unit/numeric-ownership.test.ts` 断言 1 与 5 通过、0 与 6 拒绝、非整数拒绝、非有限拒绝、缺分类拒绝、冲突分类拒绝、无来源的非玩家可见值拒绝；模块无副作用（import 后不产生任何全局状态变化）；与 `parameter-rules.ts` 无重复诊断。
     - **依赖：** 1.1。**Requirements:** 2.1、2.2、2.3、2.5、2.6。**Properties:** P2。
 
-  - [ ] 1.4 核对并接线 `space-items-diagnostic-categories.ts`
+  - [ ] 1.4 核对并接线 `space-items-diagnostic-categories.ts` （待测：src/l2/model/space-items-diagnostic-categories.ts（内容已存在，未接线、无测试））
     - 核对：类别集合是否封闭；`CODE_MAP` 是否用 `satisfies Record<Category, Readonly<Record<string, ErrCode>>>` 获得编译期完整性；诊断工厂是否按定义级 / 包级 / 运行时级补齐定位字段（不适用的字段显式省略而非填空串）；是否携带 `unresolvedId?` 与 `forbiddenSurface?` 两个附加字段；排序是否复用 `./ordering.js::canonicalSort`。
     - **落地 0.3 产出的等价映射表**：把 requirements 措辞的类别名映射到既有已登记码，映射关系写进注释与常量，不得静默改名。
     - **DoD**：`test/l2/space-items/unit/diagnostic-categories.test.ts` 断言任何自由字符串代码无法通过类型检查（`@ts-expect-error`）；同一诊断集合的任意输入排列产出字节等价顺序；缺 `Error_Diagnostic` 的拒绝被识别为无效；`ERR_CODES` 成员数与 0.3 记录一致（形状快照）。
     - **依赖：** 0.3、1.1。**Requirements:** 12.2、12.3。**Properties:** P12。
 
-  - [ ] 1.5 核对并接线 `space-items-unresolved.ts`
+  - [ ] 1.5 核对并接线 `space-items-unresolved.ts` （待测：src/l2/model/space-items-unresolved.ts（内容已存在，未接线、无测试））
     - 核对：`UNRESOLVED_ITEM_CATALOG` 恰含 `U-SPACE-001` … `U-SPACE-007` 七项；每项的 `upstreamIds`、`retainedInterface`、`forbiddenSurfaces`、`rejectionCategory`、`rejectionCode`、`sourceRecords` 齐备；**分级正确**——001 / 003 / 004 / 006 全未决；002 的二维正交结构已冻结（仅数值未决）；005 的"载具不建模为微型场景"已冻结（仅车内外互攻未决）；007 已由 D-042 关闭（保留为已冻结记录，不得再拒绝引用它的配置）。
     - **删除旧版遗留的错误注释**：旧 design R-01 声称"上游状态表与 requirements 冲突，按 requirements 保持全未决"。该冲突**已由 D-040 / D-038 / D-042 关闭**，现行 requirements 要求 13 本身就是分级的。若文件头仍有"按 requirements 保持全未决"的注释，改为分级说明并引用三条 D 号。
     - 提供 `forbiddenSurfacesOf(id)`、`findUnresolvedItem(id)`、`allForbiddenSurfaces()`，按标识规范化排序。
     - **DoD**：`test/l2/space-items/unit/unresolved.test.ts` 断言 `UNRESOLVED_ITEM_CATALOG.length === 7`；逐项断言分级状态；断言任何把 001/003/004/006 标为已冻结的改动使测试失败；断言 002/005/007 的已冻结面**不**出现在 `forbiddenSurfaces` 中。
     - **依赖：** 1.4。**Requirements:** 13.1–13.9。**Properties:** P11。
 
-  - [ ] 1.6 从 `src/l2/model/index.ts` 与 `src/l2/index.ts` 导出，并加"无死代码"守卫
+  - [ ] 1.6 从 `src/l2/model/index.ts` 与 `src/l2/index.ts` 导出，并加"无死代码"守卫 （未做：五个模型文件仍未从 src/l2/model/index.ts / src/l2/index.ts 导出（实测无 space-items 导出行），无死代码守卫测试 test/l2/space-items/unit/no-dead-exports.test.ts）
     - 把 1.1–1.5 的公共类型与只读目录从 `src/l2/model/index.ts` 导出，再由 `src/l2/index.ts` 转出。
     - **只导出**：领域标识、结构边界目录、数值归属纯函数、诊断类别与工厂、未决目录（只读）。**不导出**任何可变对象。
     - 新增守卫测试：扫描 `src/l2/model/space-items-*.ts` 的每个 `export`，断言它至少被 `src/l2/model/index.ts` 转出或被 `src/l2/{validation,resolution,adapters,registry}/**` 中至少一个模块引用。**这条守卫的目的就是防止 §2.2 的死代码状态复现。**
     - **DoD**：`test/l2/space-items/unit/no-dead-exports.test.ts` 存在并通过；故意加一个未被引用的 export 会使其失败。
     - **依赖：** 1.1–1.5。**Requirements:** 14.2、14.3。
 
-- [ ] 2. 领域契约扩展（`src/l2/model/space-items-contracts.ts`，单文件）
-  - [ ] 2.1 只补 `family-contracts.ts` 尚未表达的面，不复制已有契约
+- [ ] 2. 领域契约扩展（`src/l2/model/space-items-contracts.ts`，单文件） （未做：目标文件 src/l2/model/space-items-contracts.ts 不存在（容器/盾牌/谱型契约与违规检测面均未建））
+  - [ ] 2.1 只补 `family-contracts.ts` 尚未表达的面，不复制已有契约 （未做：src/l2/model/space-items-contracts.ts 不存在；ContainerDomainContract / ShieldDomainContract 等缺口未补）
     - **前置**：`family-contracts.ts` 已有 `natural-scene`、`micro-scene`、`transition`、`item`、`weapon`、`vehicle`、`damage`、`status`、`skill`、`movement`、`attachment`、`action`、`gateway`、`ai-behavior`、`generic` 共 15 个 `contractKind`。本任务**不重新定义**它们。
     - **真缺口 A — `ContainerDomainContract`**：`family-contracts.ts` 无容器契约（要求 7.1）。声明宿主类型、容器角色、槽位接受谓词引用、存取能力、`depositAllowed` / `withdrawAllowed`、转移动作引用。槽位数量与容量一律用 `*Field` 参数字段名表达；`concreteSlotCount` / `concreteCapacity` 只作违规检测面存在。
     - **真缺口 B — `ShieldDomainContract`**：无盾牌契约（要求 9.2）。声明持有要求、格挡动作引用、损耗规则引用、破损条件引用、可选互动能力引用；`mvpDefaultInteractionIds` 作违规检测面（`U-SPACE-006` 未决，不设默认标配范围）。
@@ -502,22 +521,22 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`typecheck` 与 `typecheck:l2` 通过；`test/l2/space-items/unit/contracts.test.ts` 逐项断言字面量固定值（`backingDefKind === 'entity'`、`bindOpId === 'agent.bind'`、`depositDisabled === true`、`depositMarkTiming === 'after-infusion-commit'`、`contentSource === 'deceased-entity-transaction'`、`creator.immutable === true`、`creator.purpose === 'provenance-only'`、`occupancySource === 'derived-query'`）；断言契约中不含任何具体数值、具体地图或模式绑定；断言违规检测面在合法定义构造中全部缺省；`@ts-expect-error` 反向断言"声明 creator 可变"与"载具映射为 item"在类型层不可表达。
     - **依赖：** 1.6、0.5。**Requirements:** 4.1、4.4、5.1、5.2、5.4、5.7、6.1、6.3、6.5、7.1、7.2、7.5、7.6、7.7、7.8、8.1、8.2、8.3、8.5、8.7、9.1、9.2、9.3、9.4、9.5、9.6、9.7、10.1–10.6。**Properties:** P3、P4、P6、P7、P9、P10、P11、P14。
 
-- [ ] 3. 目录数据修正与补齐（`src/class/<族>/index.json`，**不新建目录**）
-  - [ ] 3.1 修正 `src/class/scenes/index.json` 的 D-056 残留冲突
+- [ ] 3. 目录数据修正与补齐（`src/class/<族>/index.json`，**不新建目录**） （未做：目录补齐大部分未做：3.2/3.3/3.4 未完成；仅 3.1 的残留冲突文本已消除）
+  - [ ] 3.1 修正 `src/class/scenes/index.json` 的 D-056 残留冲突 （待测：src/class/scenes/index.json（实测已无「唯一…微型场景」字样，DoD 的 grep 断言通过）, src/class/__tests__/class-semantic-families.test.ts（覆盖 scenes 族，但无针对该 description 修正的专门断言））
     - `scene.valueset.scene_scales` 中 `small` 的 description 现为「唯一可承载微型场景的天然场景」，与 D-056（微型场景父级为大/中/小三档）冲突。改写为准确表述：小场景是**唯一自带共享微型场景且排除个人空旷地**的档位（这才是它的类型分界），三档均可作微型场景父级。
     - 同步核对 `large` / `medium` 的 description（现为「承载中场景的最外层天然场景」/「承载小场景的中层天然场景」）：三档父子关系按 D-056 只是**叙事分组**，description 不得暗示它参与距离、生命周期或"找到"判定。若暗示，改写。
     - 同步 `src/class/__tests__/class-semantic-families.test.ts` 中依赖这些描述或 `admittedChildSceneScales` 语义的断言（若有）。
     - **DoD**：`scenes/index.json` 中不再出现「唯一可承载微型场景」字样；`grep -n '唯一.*微型场景' src/class/scenes/index.json` 无匹配；`npm test` 中 `src/class/__tests__/**` 全绿。
     - **Requirements:** 4.4、4.8、5.1。
 
-  - [ ] 3.2 按 D-038 修正 `src/class/vehicles/index.json` 的 `interior.isMicroScene`
+  - [ ] 3.2 按 D-038 修正 `src/class/vehicles/index.json` 的 `interior.isMicroScene` （未做：src/class/vehicles/index.json 的 interior.isMicroScene 仍登记为 Q-04 未决下的可配置参数名（见 L92、L318），未按 D-038 改为定值 false）
     - 现状：`unresolvedItems[Q-04].handling` 把 `interior.isMicroScene` 登记为"可配置参数名"，并声明"不为车内空间推导任何微型场景机制"。**D-038 已裁决载具内部不建模为微型场景**，因此该项已从"未决"变为"已冻结为 `false`"。
     - 改动：把 `interior.isMicroScene` 从可配置参数名改为**定值 `false` 的结构性声明**（或等价的 prohibition 表达，与目录既有风格一致）；`unresolvedItems[Q-04]` 收窄为仅保留**车内外互相攻击判定细则**这一未决面（D-038 第 6 条明确保留的独立子课题），并注明 `interior.isMicroScene` 已由 D-038 关闭。
     - 保留 `vehicle.capability.adjacency_interaction` 与 `vehicle.capability.door_target_interaction` 两项独立能力不变（D-030 已归玩法层）。
     - **DoD**：`vehicles/index.json` 中 `interior.isMicroScene` 不再出现在任何"可配置参数名"位置；`unresolvedItems[Q-04]` 的 `handling` 文本只覆盖车内外互攻；`src/class/__tests__/**` 全绿。
     - **Requirements:** 5.8、10.8、13.5。
 
-  - [ ] 3.3 按 D-059 补齐死亡容器的"可替换机制引用"与"灌注时序"面
+  - [ ] 3.3 按 D-059 补齐死亡容器的"可替换机制引用"与"灌注时序"面 （未做：src/class/containers/index.json 无 depositDisabledMechanismRef / depositMarkTiming(after-infusion-commit) 槽位，也无 prohibition.container.deposit_mark_before_infusion；D-059 两层义务未落目录）
     - `src/class/containers/index.json`：`container.capability.deposit_disabled` 现只表达"禁止存入"这一声明层。补上**运行期机制引用**的参数槽位名（如 `depositDisabledMechanismRef`）与**灌注时序**的参数槽位名（如 `depositMarkTimingRef` 或值集条目 `after-infusion-commit`），使"机制可替换"与"标记必须在灌注事务提交后生效"成为目录层可表达、可校验的面，而非硬编码字面量。
     - `src/class/items/index.json`：`item.capability.death_container_binding` 同步补上对应引用槽位名。
     - 新增或修正 prohibition：`prohibition.container.deposit_mark_before_infusion`（灌注前即生效的标记必须被拒绝）。
@@ -525,7 +544,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`formal-data-integrity.test.ts` 通过（严格解析 + 字段名黑名单）；新增槽位名不在 `forbiddenFields` 黑名单（`apCost`、`capacity`、`damage`、`duration`、`hp`、`maxHp`、`range`、`speed`、`armorRating`、`multiplier`、`probability`、`matrix`、`ammoCost`、`damageOnCollision`、`healRate`）内。
     - **Requirements:** 7.6。
 
-  - [ ] 3.4 按 §3 矩阵补齐其余目录缺口
+  - [ ] 3.4 按 §3 矩阵补齐其余目录缺口 （未做：盾牌持有/损耗引用、配件兼容性引用、movement 措辞、已移除状态处置等目录缺口未补）
     - `containers/index.json`：补槽位接受谓词引用、存取能力的转移动作引用槽位名（要求 7.1）。
     - `items/index.json`：补盾牌能力的持有要求 / 格挡动作 / 损耗规则 / 破损条件引用槽位名（要求 9.2）；`Q-05` 条目保持未决且不设默认标配范围（`U-SPACE-006`）。
     - `weapons/index.json`：补配件兼容性引用槽位名（要求 8.5）；按 §6 H-02 的裁决决定是否补谱型登记面。
@@ -535,10 +554,10 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`src/class/__tests__/` 五个测试全绿；`grep` 确认新增字段全部以 `Field` / `Ref` 结尾或为 `key` 声明；`operationChannels` 与引擎层 `listOpNames()` 机械比对通过（该比对写在任务 8.4 的集成测试里）。
     - **Requirements:** 7.1、8.5、9.2、9.3、9.7。
 
-- [ ] 4. 领域验证规则补齐（`src/l2/validation/space-items-*.ts`）
+- [ ] 4. 领域验证规则补齐（`src/l2/validation/space-items-*.ts`） （未做：所有 src/l2/validation/space-items-*-rules.ts 文件均不存在；领域校验缺面尚未补（既有通用规则 spatial-rules/item-vehicle-rules 等只覆盖 §3 矩阵所列的部分语义，非本任务要求的 space-items 专属文件））
   > **纪律**：只补 §3 矩阵中标 ◐ 的缺面与 ⬜ 的空白。**不得**重复实现 `spatial-rules.ts` / `item-vehicle-rules.ts` / `classification-rules.ts` / `parameter-rules.ts` / `effect-ai-rules.ts` / `action-gateway-rules.ts` 已有的检查——同一 (定义, JSON 路径, 诊断码) 在一次验证结果中只能出现一次。
 
-  - [ ] 4.1 把领域规则挂进既有执行序（`src/l2/validation/validator.ts`）
+  - [ ] 4.1 把领域规则挂进既有执行序（`src/l2/validation/validator.ts`） （未做：领域规则未挂进 src/l2/validation/validator.ts 的 DEFINITION_RULES；无 test/l2/space-items/unit/rule-order.test.ts）
     - 在 `DEFINITION_RULES` 的确定性执行序中插入领域规则，并把 `spatial-rules.ts::validateSpatial` 与 `item-vehicle-rules.ts::validateItemsAndVehicles` 与新增领域规则编入**同一序列**，避免同一定义被两套互不知情的规则集分别校验。
     - 领域规则上下文在既有 `src/l2/validation/context.ts::ValidationContext` 之上**适配**，不新建第二套上下文类型。
     - 落地 0.3 / 1.4 的诊断码等价映射（§6 H-01）：requirements 措辞的类别名映射到既有已登记码，不改既有码。
@@ -547,7 +566,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`test/l2/space-items/unit/rule-order.test.ts` 断言执行序稳定（同一输入的诊断序列字节等价）；断言一个含多个独立问题的候选一次报全；断言无重复诊断（对 (definitionId, jsonPath, code) 三元组做去重后长度不变）。
     - **依赖：** 1.6、2.1。**Requirements:** 1.8、12.2。**Properties:** P12。
 
-  - [ ] 4.2 `space-items-write-channel-rules.ts`（要求 3.3、3.4、7.3、10.3）
+  - [ ] 4.2 `space-items-write-channel-rules.ts`（要求 3.3、3.4、7.3、10.3） （未做：src/l2/validation/space-items-write-channel-rules.ts 不存在（要求 3.3/3.4/7.3/10.3 的写入通道校验未建））
     - 拒绝声明直接写世界状态、直接修改容器数组、直接修改关系索引或绕过事务执行的定义 → `OP_BYPASS_FORBIDDEN` 类别。
     - 拒绝声明新增拾取 / 丢弃 / 装备 / 卸下 / 死亡物品转移 / 交易独立写入原语的定义；物品转移引用的 Op 名必须恰为 `item.move`。
     - 拒绝重写容器与槽位结构、顺序、插入策略、默认槽位选择、容纳检查或移动失败语义的声明（要求 7.3）。
@@ -556,7 +575,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：每类违规有正例与拒绝例；任何非 `item.move` 的转移 Op 引用被拒；`test/l2/space-items/unit/write-channel-rules.test.ts` 断言 Op 名比对是机械的（改动 registry 注册集合会改变测试结论）。
     - **依赖：** 4.1。**Requirements:** 3.1–3.5、7.3、7.6、10.3、10.8。**Properties:** P5。
 
-  - [ ] 4.3 `space-items-scene-rules.ts`（要求 4 的缺面）
+  - [ ] 4.3 `space-items-scene-rules.ts`（要求 4 的缺面） （未做：src/l2/validation/space-items-scene-rules.ts 不存在（要求 4 的缺面、逐节点连接数校验未建））
     - 校验 `scale` 为三值之一且 `connectionBoundRef` 指向单一天花板（要求 4.1、4.2）。
     - 补 `bound-source-removed`：边界来源或结构理由被删除即拒绝（要求 4.7）。
     - 补大 / 中场景必须声明 `scene.capability.personal_vacant_ground`；小场景必须声明 `shared_micro_scene` 且 `personalVacantGroundCapabilityRefs` 为空（要求 4.4）。
@@ -567,7 +586,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：三档各有通过与越界例；越界拒绝整份配置而非单节点；具体地图字段全部被拒；父移除留悬空子引用必定回滚。
     - **依赖：** 4.1、1.2。**Requirements:** 4.1–4.8、5.5。**Properties:** P3、P4。
 
-  - [ ] 4.4 `space-items-micro-scene-rules.ts`（要求 5 的缺面）
+  - [ ] 4.4 `space-items-micro-scene-rules.ts`（要求 5 的缺面） （未做：src/l2/validation/space-items-micro-scene-rules.ts 不存在（要求 5 的缺面未建））
     - 补父引用的**族兼容判定**：`parent` 必须解析为 `natural-scene` 族且 scale 在 `admittedParentSceneScales`（三档）内；父引用非天然场景即拒绝（要求 5.1、5.6）。
     - 补 `creatorAsOwner` / `creatorAsLifecycleDeterminant` / `creatorAsAccessControl` 三个检测面 → `MICRO_SCENE_CREATOR_MISUSE` 类别（要求 5.3）。
     - 补 `occupancySource !== 'derived-query'` 与 `occupancyCounterField` 出现即拒绝（要求 5.4）。
@@ -576,7 +595,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：每条检查有正例与拒绝例；`props.creator` 的任意取值变化不改变生命周期判定结论（由属性测试 P4 断言）。
     - **依赖：** 4.1、2.1。**Requirements:** 5.1–5.8。**Properties:** P4、P10。
 
-  - [ ] 4.5 `space-items-transition-rules.ts`（要求 6 的缺面）
+  - [ ] 4.5 `space-items-transition-rules.ts`（要求 6 的缺面） （未做：src/l2/validation/space-items-transition-rules.ts 不存在（要求 6 的缺面未建））
     - 补方向性合法性、通行条件引用 / 阻挡能力引用 / 视线与影响传播接口 / 可选距离策略引用的齐备性（要求 6.1）。端点数 == 2 已由 `spatial-rules.ts` 覆盖，**不重复实现**。
     - 补端点 scale 对是否在允许集合内（要求 6.1、6.2）。
     - 补 `boundConcreteSceneIds` / `concreteApCost` / `concreteDistance` / `boundGameModeId` 越层拒绝（要求 6.8）。
@@ -585,7 +604,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：任何具体成本 / 距离 / 伤害 / 反应窗口出现即拒绝；跳窗、楼梯、攀爬、接触、阻挡、视线桥接、距离权重的代表性组合均可通过（可表达性断言，属性测试 P14）。
     - **依赖：** 4.1、2.1、1.5。**Requirements:** 6.1、6.2、6.6、6.7、6.8。**Properties:** P14、P11。
 
-  - [ ] 4.6 `space-items-container-item-rules.ts`（要求 7 与 9 的缺面）
+  - [ ] 4.6 `space-items-container-item-rules.ts`（要求 7 与 9 的缺面） （未做：src/l2/validation/space-items-container-item-rules.ts 不存在（要求 7、9 的缺面未建））
     - **容器**（要求 7.1）：校验宿主类型、容器角色、槽位接受谓词引用、存取能力、`depositAllowed` / `withdrawAllowed`、转移动作引用齐备；`concreteSlotCount` / `concreteCapacity` 出现即越层拒绝。
     - **死亡容器**（要求 7.6，D-059）：校验 `depositDisabled === true`、`contentSource === 'deceased-entity-transaction'`、`containerRef` 指向新建容器（这三项 `item-vehicle-rules.ts` 已部分覆盖，**在此只补差集**）；补 `depositDisabledMechanismRef` 必须是**可替换引用**而非字面量；补 `depositMarkTiming === 'after-infusion-commit'` 的时序义务，任何在灌注事务提交前即生效的标记声明必须被拒绝。
     - **已否决携带机制**（要求 7.7）：补 `volumeClass` / `pocketSlots` 字段面 → `DEPRECATED_MECHANIC`，诊断携带控制来源。
@@ -596,7 +615,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：每条检查有正例与拒绝例；死亡容器的时序义务有专门的拒绝例（"创建时即写 accepts:false"必须被拒）；已否决携带机制字段必定被拒并引用来源；盾牌无默认可用性。
     - **依赖：** 4.1、2.1、3.3、3.4、0.5。**Requirements:** 7.1、7.5、7.6、7.7、9.2、9.6、9.7。**Properties:** P6、P7、P8、P11、P14。
 
-  - [ ] 4.7 `space-items-weapon-vehicle-rules.ts`（要求 8 与 10 的缺面）
+  - [ ] 4.7 `space-items-weapon-vehicle-rules.ts`（要求 8 与 10 的缺面） （未做：src/l2/validation/space-items-weapon-vehicle-rules.ts 不存在（要求 8、10 的缺面未建））
     - **武器组合角色**（要求 8.1、8.4）：校验武器属性 / 谱型 / 距离策略 / 伤害引用 / 弹药行为 / 配件兼容性 / 动作序列 / 目标上限出现在 `compositionRoles` 而非契约顶层；缺角色即引用契约错误。`compositionRoles.role` 出现 `'attack-shape'` 即拒绝（已废止）。伪子类型已由 `INHERIT_GAMEPLAY_VALUE_ONLY_DIFFERENCE` 覆盖，**不重复实现**。
     - **伤害与谱型数值面**（要求 8.7）：补 `baseDamageTable` / `damageTable` / `concreteHitThreshold` / `critIncrement` / `concreteRangeTable` / `concreteAmmunitionCount` / `namedFirearmId` 面（`concreteDamageValue` 已被 `item-vehicle-rules.ts` 覆盖，只补差集）；**不得**把未决表项视为零值，**不得**用同类武器或同类谱型做语义替换。
     - **配件**（要求 8.5）：校验兼容性引用、附件点、效果引用齐备；具体兼容名单 / 数值加成 / 装卸成本 / 弹药类型 / 显示规则属玩法层。
@@ -607,7 +626,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：三类武器身份各有正例；任何伤害表 / 命中门槛 / 暴击增量出现即拒绝且诊断携带 `U-SPACE-001`；载具非实体化必定被拒；D-011 全部能力面可表达且不含数值；`interiorMicroSceneBoundary` 的拒绝理由不再是"Q-04 未决"。
     - **依赖：** 4.1、2.1、3.2、1.5。**Requirements:** 8.1、8.5、8.6、8.7、8.8、10.2、10.6、10.8。**Properties:** P9、P10、P11。
 
-  - [ ] 4.8 `space-items-unresolved-gate-rules.ts`（要求 13）
+  - [ ] 4.8 `space-items-unresolved-gate-rules.ts`（要求 13） （未做：src/l2/validation/space-items-unresolved-gate-rules.ts 不存在（要求 13 的未决门禁未建））
     - 遍历 `UNRESOLVED_ITEM_CATALOG` 七项，对每项 `forbiddenSurfaces` 逐一检查候选定义是否有非空值；命中即产出未决默认化拒绝，诊断**必须携带 `unresolvedId` 与 `forbiddenSurface` 的 JSON 路径**（要求 13.8）。
     - 检查提升尝试：候选若声称提升某未决项但未携带新的控制决策、来源记录、拥有层与替代关系 → 提升拒绝；历史示例不得作为提升依据（要求 13.9）。
     - **收敛既有分散门禁**：`item-vehicle-rules.ts` 现以 `SOURCE_PROMOTION_REQUIRES_DECISION` 处理 Q-01 与 Q-04，无编号字段。改为由本规则统一承担并携带编号；`item-vehicle-rules.ts` 侧只保留结构性检查，避免同一问题两处报诊断。
@@ -616,7 +635,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：七项各有独立的默认化拒绝例；每条诊断可反查到 `U-SPACE-00N`；断言 002 / 005 / 007 的已冻结面**不**产生拒绝；断言三条入口结果一致。
     - **依赖：** 4.1、1.5。**Requirements:** 13.1–13.9。**Properties:** P11。
 
-- [ ] 5. 领域引用能力形状判定（`src/l2/resolution/space-items-capability-shape.ts`）
+- [ ] 5. 领域引用能力形状判定（`src/l2/resolution/space-items-capability-shape.ts`） （未做：src/l2/resolution/space-items-capability-shape.ts 不存在（领域引用能力形状谓词未建））
   - 在既有 `reference-graph.ts` / `reference-collector.ts` / `definition-resolver.ts` 构建的引用图之上，**只补** per-reference 的"领域能力形状与语义族兼容性"谓词。**不重新实现**引用图构建、拓扑排序或依赖遍历。
   - 谓词覆盖：过渡端点必须是天然场景族且具备对应 scale 能力；微型场景 `parent` 必须是天然场景族且 scale 在三档内；物品装备位置必须指向声明了该槽位角色的容器；载具货舱必须指向容器族；伤害引用必须指向已登记伤害语义（**按 §2.1 事实 3，目标是 `damage-axis.category` 体系，不是 `DMG_*`**）；易伤引用指向 `vulnerability-axis.category` 体系；谱型引用按 §6 H-02 的裁决指向 `range-tier.*` / `band-axis.*`。
   - 诊断：缺失引用、kind 或族不匹配（同时报期望与实际）、抽象目标被实例化、引用环（列出全部参与者）、未定义引用；全部携带引用方 JSON 路径，按既有 `canonicalSort` 稳定排序。
@@ -625,10 +644,10 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
   - **DoD**：每类引用失效有拒绝例；诊断确定且稳定排序；未激活任何候选；`test/l2/space-items/unit/capability-shape.test.ts` 断言"期望 vs 实际"同时出现在诊断中。
   - **依赖：** 4.2–4.8。**Requirements:** 3.7、6.2、7.9、8.8、10.7、12.3。**Properties:** P8。
 
-- [ ] 6. 领域运行时适配（`src/l2/adapters/space-items-*.ts`）
+- [ ] 6. 领域运行时适配（`src/l2/adapters/space-items-*.ts`） （未做：src/l2/adapters/space-items-transfer.ts 与 src/l2/adapters/space-items-micro-scene.ts 均不存在）
   > **落点理由与自主判断见 §0.1 注**。提交**必须**复用既有 `src/l2/registry/action-submitter.ts`，**不得**新建第二条提交路径。
 
-  - [ ] 6.1 `space-items-transfer.ts`
+  - [ ] 6.1 `space-items-transfer.ts` （未做：src/l2/adapters/space-items-transfer.ts 不存在（转移意图 → item.move 适配未建））
     - 实现 `TransferIntent` 与 `planTransfer(intent, context)`，返回 `ValidatedOpRequest | StructuredRejection`（`ValidatedOpRequest` 从 `src/l2/model/projection.ts` 导入，不自建）。
     - `opId` 恒为 `'item.move'`：函数签名**不接受** `opId` 入参，实现内**不存在**第二个分支。`purpose`（`pickup` / `drop` / `equip` / `unequip` / `trade` / `death-transfer` / `stow`）只影响 `require` 谓词与 Hook，不影响 `opId`。
     - 前置条件检查顺序固定：物品存在 → 容器存在 → 容器 `depositAllowed`（存入类）/ `withdrawAllowed`（取出类）→ 依赖 Hook 时 `KernelContract` 的 Hook 可用性判定。任一不满足返回带前状态指纹的 `StructuredRejection`，且**不调用**提交通道。
@@ -638,7 +657,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：所有 `purpose` 的成功路径产出的 `opId` 均为 `'item.move'`；前置失败时提交通道调用次数为零；无合法槽位时容器与物品位置完全不变；`grep -c "item.move" src/l2/adapters/space-items-transfer.ts` 的字面量出现处只在单一常量定义（架构测试 8.5 机械断言）。
     - **依赖：** 4.2、4.6、0.2。**Requirements:** 3.3、3.5、7.4、7.6。**Properties:** P5、P6、P7。
 
-  - [ ] 6.2 `space-items-micro-scene.ts`
+  - [ ] 6.2 `space-items-micro-scene.ts` （未做：src/l2/adapters/space-items-micro-scene.ts 不存在（微型场景进入/父移除适配未建））
     - 实现 `MicroSceneEntryIntent` 与 `planMicroSceneEntry(intent, context)`，`opId` 恒为 `'entity.place'`，`args` 映射到引擎层 `EntityPlaceArgs.microScene`（`hostNodeId`、`existingMicroSceneId`、`microSceneDefId`、`capacity`），字段名按 0.2 记录核对。
     - `capacity` 只能来自玩法层配置字段的解析结果；本层**不给默认值**，缺配置时为 `undefined`。
     - **不构造**独立的节点回收请求，也**不调用** `node.destroy`：占用归零后的卸载由 `entity.place` 的 Op 实现内部经 `onMicroSceneOccupantsChanged` 完成。文件头注释记录该职责划分与理由（避免两条互不同步的卸载分支）。
@@ -647,8 +666,8 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`opId` 恒为 `'entity.place'`；全文件不存在 `node.destroy` 调用点（架构测试机械断言）；父移除未解决时请求数为零。
     - **依赖：** 4.4、4.3、0.2。**Requirements:** 5.4、5.5、5.6、5.7。**Properties:** P4。
 
-- [ ] 7. 集成契约与领域投影（`src/l2/adapters/space-items-*.ts`）
-  - [ ] 7.1 `space-items-integration-contract.ts`
+- [ ] 7. 集成契约与领域投影（`src/l2/adapters/space-items-*.ts`） （未做：src/l2/adapters/space-items-integration-contract.ts 与 src/l2/adapters/space-items-projection.ts 均不存在）
+  - [ ] 7.1 `space-items-integration-contract.ts` （未做：src/l2/adapters/space-items-integration-contract.ts 不存在（提供方侧集成契约未建；消费方 src/core/ugc 已就绪，见 §6 交接项 T-02））
     - 实现集成契约，`domain` 恒为 `'space-items'`——**与既有 `src/core/ugc/model/contract-types.ts::INTEGRATION_DOMAINS` 的字面量机械比对**，该常量已含 `'space-items'`，消费方 `src/core/ugc/contracts/integration-contract-catalog.ts` 已就绪。
     - 声明 `providerVersion`、`exportedDefKinds`、`exportedFamilies`、`referenceConstraints`、`structuralBounds`、`unresolvedItems`、`sourceRecords`。
     - `structuralBounds` 导出**单一天花板 5**及其权威来源（**不是** 5/4/3 三档——旧计划任务 8.1 写的"导出 5/4/3 三档"违反 D-057，本版纠正）。
@@ -658,7 +677,7 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：导出内容可被 `integration-contract-catalog.ts` 直接消费（集成测试断言）；七项未决记录齐备且分级正确；相同输入的任意排列产出同一指纹；`structuralBounds` 中不含 4 与 3。
     - **依赖：** 1.2、1.5、2.1、5。**Requirements:** 11.8、14.1–14.6。**Properties:** P11、P13。
 
-  - [ ] 7.2 `space-items-projection.ts`
+  - [ ] 7.2 `space-items-projection.ts` （未做：src/l2/adapters/space-items-projection.ts 不存在（FieldProvenanceView 三态归属投影未建））
     - 构造领域只读投影：先经引擎层动作可用性通道取合法动作（**复用 `queryActions`，不建第二套判定**；接入点按 0.2 的核实结论），再按授权范围裁剪场景、微型场景、过渡、容器、物品、装备、载具与合法交互（要求 11.5、11.7）。
     - 实现 `FieldProvenanceView`：每个语义字段输出三态之一 `frozen-contract` / `play-layer-config` / `unresolved`（含 `unresolvedId`），并携带归属层与来源记录。玩法层提供的数值必须标记为**玩法层配置**而非基类默认值（要求 2.8、11.8）。
     - 投影为值拷贝后深度冻结：**复用 `src/l2/model/immutable.ts::deepClonePlain` + `deepFreeze`**，不自实现（旧计划要求"自实现 `deepFreezeProjection`"是重复职责，本版纠正）。不得返回活动对象别名，不得暴露任何写方法。

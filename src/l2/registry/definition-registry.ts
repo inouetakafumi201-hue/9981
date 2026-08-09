@@ -74,8 +74,12 @@ export function emptyRegistry(): ActiveRegistry {
  *
  * 建图只遍历候选包自身的定义，因此"留在活动集、本次未被重新提交"的依赖者的引用不在图内。
  * 覆盖重验证需要这份数据回头核验它们在覆盖后是否仍类型兼容（Requirements 12.6、Property 8/10）。
+ *
+ * 导出原因（PT-02）：`src/l2/ugc/ports` 的验证端口必须用与 `activate()` **完全相同**的输入调用
+ * `validateFullPackage`，否则「端口验证通过」与「注册表激活通过」会出现两套判定。
+ * 复制一份同名 helper 会固化这种分叉，因此这里把它导出而不是在端口侧再实现一遍。
  */
-function activeReferenceMap(active: ActiveRegistry): ReadonlyMap<string, readonly TypedReference[]> {
+export function activeReferenceMap(active: ActiveRegistry): ReadonlyMap<string, readonly TypedReference[]> {
   const map = new Map<string, readonly TypedReference[]>();
   for (const [id, definition] of active.definitions) {
     const references: TypedReference[] = [

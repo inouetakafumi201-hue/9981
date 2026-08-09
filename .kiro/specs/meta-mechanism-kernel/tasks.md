@@ -75,95 +75,117 @@
 - **将这些内部实现注册为公开 Op** —— `OpRegistry.register`、`withVeto` 包装、事务/journal/不变量接入 —— 统一在**任务 14** 完成。任务 14 是 design.md 3.4 节 Op 全集清单的唯一 `OpRegistry.register` 调用点，Op 实现内部调用各自在 L1 已完成的内部函数，不重写结构更新逻辑。
 - 各 L1 任务中"实现 X"均指"实现 X 的内部实现函数"；凡必须经 `OpRegistry.invoke` 才能验证的属性测试（事务原子性、veto、跨 Op 组合），一并归入任务 14 之后（L3 检查点及后续层）。
 
+
+> ## 复选框语义（PT-03a 对齐，2026-08-09）
+>
+> 本文件的复选框此前长期为全 `[ ]`（0/151），与仓库现实严重脱节。本次按 `docs/并行作战/PT-03_复选框对齐现实.md`
+> 把每一项改到与**可机械验证的证据**一致。三态约定：
+>
+> | 标记 | 含义 |
+> |---|---|
+> | `[x]` + `（证据：…）` | 代码存在**且**有直接覆盖它的测试（或被 npm 门禁直接执行的配置文件）。括号内路径均已逐条 `Test-Path` 校验存在。 |
+> | `[ ]` + `（待测：…）` | 代码已存在但缺少直接测试证据，或只覆盖了本条的一部分。 |
+> | `[ ]` + `（未做：…）` | 代码/测试确实不存在，或本条依赖的前置任务未闭合。 |
+>
+> **基线**：`npm test`（= `vitest run`，见 `vitest.config.ts`）全量 2016/2016 通过、0 失败，2026-08-09 实测。
+> "全绿"只证明**已写的**断言成立，不证明 tasks.md 的每一条都被断言覆盖——这正是本次逐条标注要区分的东西。
+>
+> **人工检查点**：检查点任务（5/9/12/16/20/23/27/32/37/41/44）的"向用户报告并等待确认"环节以
+> `docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md` 与
+> `docs/L1_引擎层/并行审查Prompt/ENGINE_KERNEL_13LAYER_REVIEW_SUMMARY.md` 的 13 层审查记录为凭据。
+>
+> 本次**不改动任何 `src/**` 或 `test/**` 代码**，也不改 requirements.md / design.md。
+> 标注过程中发现的"设计与现实矛盾"登记为交接项，不在本任务内修改设计。
+
 ## Tasks
 
-- [ ] 1. 建立项目骨架与分层边界约束
+- [x] 1. 建立项目骨架与分层边界约束 （证据：vitest.config.ts, .eslintrc.cjs（LAYER_ORDER + no-restricted-imports 分层方向规则）, src/core/kernel/testing/arbitraries.ts）
   - 创建 `src/core/kernel/{state,topology,expr,ops,events,flow,actions,decision,attachment,schedule,random,knowledge,persistence,safety}` 目录及各自的 `__tests__` 子目录
   - 配置 Vitest（`vitest.config.ts`）与 fast-check 依赖
   - 编写 ESLint 依赖方向规则，强制 `kernel/L(n)` 不得 import `kernel/L(n+1..13)`（design.md 第2章的单向 DAG 约束），并强制 `src/scene`、`src/components` 不得 import `kernel/ops`、`kernel/state` 的可写接口
   - 建立任意深度嵌套 WorldState 的 fast-check arbitrary 生成器骨架（供后续所有层复用，见 design.md 6.3节），此任务只搭生成器接口占位，具体字段生成器随每层任务补充
   - _需求：43.4_
 
-- [ ] 2. 实现 L1 State：Value/Ref/Def 与继承
-  - [ ] 2.1 实现 Value/Ref 类型与 isRef 判别、Id 前缀封闭集合校验
+- [ ] 2. 实现 L1 State：Value/Ref/Def 与继承 （待测：子项 2.3 无测试证据，其余 2.1/2.2/2.4/2.5/2.6 已有证据）
+  - [x] 2.1 实现 Value/Ref 类型与 isRef 判别、Id 前缀封闭集合校验 （证据：src/core/kernel/state/value.ts, src/core/kernel/state/ids.ts, src/core/kernel/state/__tests__/value.test.ts）
     - 实现 `ID_PREFIXES` 常量与派生的 `IdPrefix` 类型（design.md 3.1节，唯一真相源模式）
     - 实现 `WORLD_REF`（`w:0`）常量
     - 实现写入路径对 NaN/Infinity 的拒绝与诊断产出
     - _需求：1.1、1.2、1.3、1.4_
-  - [ ] 2.2 编写 Value/Ref 与 JSON 往返的属性测试
+  - [x] 2.2 编写 Value/Ref 与 JSON 往返的属性测试 （证据：src/core/kernel/state/__tests__/value.test.ts:45（Property: Value JSON 往返深度相等））
     - **Property**：*对于任意* 合法构造的 Value，`JSON.parse(JSON.stringify(v))` 应与原值深度相等
     - **Validates: Requirements 1.1, 4.2**
-  - [ ] 2.3 实现 WorldState 顶层集合与只读约束
+  - [ ] 2.3 实现 WorldState 顶层集合与只读约束 （待测：代码已存在 src/core/kernel/state/world-state.ts；readonly 仅由 tsc 保证，无任何测试断言"六顶层集合且不存在第七集合"）
     - 定义六个顶层集合（`world`/`defs`/`nodes`/`links`/`entities`/`items`），字段标记 `readonly`
     - 验证顶层集合不包含微型场景或容器作为独立第七集合
     - _需求：1.5、1.6、1.7、1.8、1.9_
-  - [ ] 2.4 实现 DefRegistry：继承展开与环检测
+  - [x] 2.4 实现 DefRegistry：继承展开与环检测 （证据：src/core/kernel/state/def.ts, src/core/kernel/state/__tests__/def.test.ts）
     - 实现 `register`/`resolve`/`isA`
     - 实现多重 `extends` 的加载期深拷贝合并（后覆盖前）
     - 实现继承环的 DFS 检测，检测到环时拒绝注册并产出诊断
     - 实现 `abstract` Def 的实例化拒绝
     - _需求：3.1、3.2、3.3、3.4、3.5_
-  - [ ] 2.5 编写 Def 继承的属性测试
+  - [x] 2.5 编写 Def 继承的属性测试 （证据：src/core/kernel/state/__tests__/def.test.ts:83,107（无环链合并一致 / 有环 register 返回 ok:false））
     - **Property**：*对于任意* 无环的 `extends` 链，`resolve()` 返回的展开结果应与手动逐层合并的结果一致；*对于任意* 构造出的环，`register` 应返回 `ok:false`
     - **Validates: Requirements 3.2, 3.4**
-  - [ ] 2.6 实现 Tag 机制
+  - [x] 2.6 实现 Tag 机制 （证据：src/core/kernel/state/tag.ts, src/core/kernel/state/__tests__/tag.test.ts:7,14（含"无硬编码分类联合类型"架构测试））
     - 实现 `hasTag` 表达式算子（占位实现，供 L2 Expr 完成后接入）
     - 验证内核不维护任何固定分类枚举（架构测试：扫描 `kernel/state` 源码不存在硬编码分类联合类型）
     - _需求：4.1、4.2、4.3、4.4_
 
-- [ ] 3. 实现 L1 State：Entity/Item/Attachment 运行时结构
-  - [ ] 3.1 实现 Entity 与 Item 结构，及 node/slot 互斥
+- [x] 3. 实现 L1 State：Entity/Item/Attachment 运行时结构 （证据：见 3.1–3.3；src/core/kernel/state/entity.ts, src/core/kernel/state/attachment.ts, src/core/kernel/ops/structural-ops.ts）
+  - [x] 3.1 实现 Entity 与 Item 结构，及 node/slot 互斥 （证据：src/core/kernel/state/entity.ts, src/core/kernel/state/__tests__/entity.test.ts, src/core/kernel/ops/__tests__/invariants.test.ts:15（node/slot 位置互斥））
     - 实现 `Entity`/`Item` 接口（design.md 3.1节），Item 可携带命名容器
     - _需求：2.1、2.2_
-  - [ ] 3.2 实现 item.promote / entity.demote 的内部实现函数
+  - [x] 3.2 实现 item.promote / entity.demote 的内部实现函数 （证据：src/core/kernel/ops/structural-ops.ts, src/core/kernel/ops/__tests__/structural-ops.test.ts:87（item.promote / entity.demote 互逆））
     - 只实现 Item↔Entity 转换的纯函数式内部实现（结构更新逻辑），不调用 `OpRegistry.register`；注册为公开 Op 留给任务 14（`OpRegistry` 在任务 13 建立）
     - _需求：2.3、2.4_
-  - [ ] 3.3 实现 Attachment 结构与 target 泛化
+  - [x] 3.3 实现 Attachment 结构与 target 泛化 （证据：src/core/kernel/state/attachment.ts, src/core/kernel/state/__tests__/attachment.test.ts:10,16,23（grantedBy 级联移除，含属性测试））
     - 实现 `Attachment` 接口，`target` 可指向 Entity/Item/Node/Link/World
     - 实现 `grantedBy` 字段与级联移除函数（design.md 3.9节"光环回收"的通用版本，本任务只做数据结构与递归移除，不含 aura 逻辑）
     - _需求：2.5、2.6、2.7_
 
-- [ ] 4. 实现 L1 State：Agent 与 Relation
-  - [ ] 4.1 实现 Agent 结构与 agent.bind/agent.unbind 的内部实现函数
+- [x] 4. 实现 L1 State：Agent 与 Relation （证据：见 4.1–4.3；src/core/kernel/state/agent.ts, src/core/kernel/state/relation.ts, src/core/kernel/ops/relation-ops.ts）
+  - [x] 4.1 实现 Agent 结构与 agent.bind/agent.unbind 的内部实现函数 （证据：src/core/kernel/state/agent.ts, src/core/kernel/ops/agent-ops.ts, src/core/kernel/ops/__tests__/agent-ops.test.ts）
     - 实现 `Agent` 接口（`kind`/`controls`/`knowledgeScope`/`omniscient`/`authority`）
     - 实现 `agent.bind`/`agent.unbind` 的内部实现函数（更新 `Agent.controls`），以及 `kind` 由 `'human'` 切换为 `'ai'` 时决策来源切换到 `policy` 的逻辑（占位：policy 求值留给 L9 任务，此处只切换来源标记）
     - 注意：不调用 `OpRegistry.register`；`agent.bind`/`agent.unbind` 注册为公开 Op 留给任务 14
     - _需求：5.1、5.2、5.3、5.4、5.5、5.6、5.7_
-  - [ ] 4.2 实现 Relation 结构、RelationIndex 纯读索引与 relation.set/relation.del 的内部实现函数
+  - [x] 4.2 实现 Relation 结构、RelationIndex 纯读索引与 relation.set/relation.del 的内部实现函数 （证据：src/core/kernel/state/relation.ts, src/core/kernel/ops/relation-ops.ts, src/core/kernel/state/__tests__/relation.test.ts, src/core/kernel/ops/__tests__/relation-ops.test.ts）
     - 实现 `Relation` 结构与 `RelationIndex` 的 `relOut`/`relIn` 两个纯读方法；`RelationIndex` 不对外暴露任何写方法
     - 实现 `relation.set`/`relation.del` 的内部实现函数：同时更新 `Entity.relations` 与全局 `RelationIndex` 投影。不调用 `OpRegistry.register`；注册为公开 Op 留给任务 14（design.md 3.4节 Op 全集清单要求二者是公开 Op，而非 `RelationIndex` 对外暴露的写方法）
     - 实现级联 Relation 清理的 helper 函数本身（占位：由 `entity.destroy`/`item.destroy` 的实现在 `after` 阶段调用，完整分发在 L4）
     - _需求：6.1、6.2、6.3、6.4、6.5、6.6、6.7、16.1_
-  - [ ] 4.3 编写 Relation 对称性与级联清理的属性测试
+  - [x] 4.3 编写 Relation 对称性与级联清理的属性测试 （证据：src/core/kernel/state/__tests__/relation.test.ts:44, src/core/kernel/ops/__tests__/relation-ops.test.ts:68, src/core/kernel/ops/__tests__/cascade-destroy.test.ts:118）
     - **Property**：*对于任意* 调用 `relation.set` 的内部实现函数写入 `{a,b,k}`，`relOut(a,k)` 应包含 `b` 且 `relIn(b,k)` 应包含 `a`；*对于任意* 销毁 `a`，全部以 `a` 为端点的 Relation 应消失（本层直接调用内部实现函数验证；经 `OpRegistry.invoke` 的端到端路径在任务 16 检查点复验）
     - **Validates: Requirements 6.6, 20.8**
 
-- [ ] 5. 检查点：L1 State 完整性
+- [x] 5. 检查点：L1 State 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/state/__tests__/, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L1 属性测试与单元测试，确认 Value/Ref/Def/Entity/Item/Attachment/Agent/Relation 六类结构与继承、级联清理逻辑全部通过（本层通过直接调用内部实现函数验证；`relation.set`/`agent.bind`/`item.promote`/`entity.demote` 作为公开 Op 经 `OpRegistry.invoke` 的端到端验证在任务 16 复验，因为 OpRegistry/事务在任务 13 才建立）
   - 人工核对 `kernel/state` 模块无 import React/DOM，没有任何绕过 `readonly` 的写入路径，且未调用 `OpRegistry.register`（注册统一在任务 14）
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 6. 实现 L1 Topology：Node/Link 与拓扑基本操作
-  - [ ] 6.1 实现 Node/Link 结构与 node.create/node.destroy、link.create/link.destroy 的内部实现函数
+- [x] 6. 实现 L1 Topology：Node/Link 与拓扑基本操作 （证据：见 6.1–6.3；src/core/kernel/topology/graph.ts, src/core/kernel/topology/container.ts）
+  - [x] 6.1 实现 Node/Link 结构与 node.create/node.destroy、link.create/link.destroy 的内部实现函数 （证据：src/core/kernel/topology/graph.ts, src/core/kernel/ops/structural-ops.ts, src/core/kernel/topology/__tests__/graph.test.ts:8,19,33,44）
     - 实现 `Node`/`Link` 结构与四个操作的纯函数式内部实现（不调用 `OpRegistry.register`；注册为公开 Op 留给任务 14）
     - 实现级联销毁（Node 销毁时其关联 Link 一并销毁）
     - 验证拓扑允许不连通分量
     - _需求：7.1、7.2、7.3、7.4、7.5、7.6_
-  - [ ] 6.2 实现 Container/Slot 与索引连续性
+  - [x] 6.2 实现 Container/Slot 与索引连续性 （证据：src/core/kernel/topology/container.ts, src/core/kernel/topology/__tests__/container.test.ts）
     - 实现 `Container`/`Slot` 接口，`insert:'fixed'|'shift'` 两种语义
     - 实现 `slot.add`/`slot.del` 的内部实现函数（不调用 `OpRegistry.register`；注册为公开 Op 留给任务 14）
     - 实现 `accepts` 谓词接口（占位，接入 L2 Expr 后生效）
     - _需求：10.1、10.2、10.3、10.4、10.5、10.6、10.7、10.8_
-  - [ ] 6.3 编写容器索引语义的属性测试
+  - [x] 6.3 编写容器索引语义的属性测试 （证据：src/core/kernel/topology/__tests__/container.test.ts:7（Property 22: 容器索引的插入语义））
     - **Property 22: 容器索引的插入语义**
     - **Validates: Requirements 10.4, 10.5**
 
-- [ ] 7. 实现 L1 Topology：微型场景生命周期
-  - [ ] 7.1 实现 ensureMicroScene 私有 helper
+- [x] 7. 实现 L1 Topology：微型场景生命周期 （证据：见 7.1–7.3；src/core/kernel/topology/micro-scene.ts）
+  - [x] 7.1 实现 ensureMicroScene 私有 helper （证据：src/core/kernel/topology/micro-scene.ts, src/core/kernel/ops/structural-ops.ts, src/core/kernel/topology/__tests__/micro-scene.test.ts）
     - 注意：不对外暴露独立的公开方法，只能被 `entity.place`/`prefab.spawn` 等 Op 的实现内部调用（design.md 写入通道情形b）
     - 实现 `props.creator` 溯源写入（仅一次，不作为占用判断依据）
     - _需求：9.1、9.2_
-  - [ ] 7.2 实现 onMicroSceneOccupantsChanged 私有 helper
+  - [x] 7.2 实现 onMicroSceneOccupantsChanged 私有 helper （证据：src/core/kernel/topology/micro-scene.ts, src/core/kernel/topology/__tests__/micro-scene.test.ts, src/core/kernel/testing/__tests__/fuzz-deep-nesting.test.ts:154）
     - 注意：只能被 `entity.place`/`prefab.despawn` 等 Op 的实现内部调用，不注册为独立 Op、不对外暴露
     - 实现基于 Query 现查占位者数量（不维护派生计数字段）
     - 实现占位者归零时调用 `node.destroy` 的内部实现完成卸载
@@ -171,33 +193,33 @@
     - 实现父节点销毁时的级联卸载
     - 验证结构性共享微型场景与普通微型场景走同一套生命周期规则
     - _需求：9.3、9.4、9.5、9.6、9.7、9.8、16.1_
-  - [ ] 7.3 编写微型场景生命周期的属性测试
+  - [x] 7.3 编写微型场景生命周期的属性测试 （证据：src/core/kernel/topology/__tests__/micro-scene.test.ts:6（Property 21: 微型场景生命周期的占用者驱动））
     - **Property 21: 微型场景生命周期的占用者驱动**
     - **Validates: Requirements 9.3-9.5**
 
-- [ ] 8. 实现 L1 Topology：度量、扩散与子图实例化
-  - [ ] 8.1 实现 dist 与 spread
+- [x] 8. 实现 L1 Topology：度量、扩散与子图实例化 （证据：见 8.1–8.3；src/core/kernel/topology/metrics.ts, src/core/kernel/topology/prefab.ts）
+  - [x] 8.1 实现 dist 与 spread （证据：src/core/kernel/topology/metrics.ts, src/core/kernel/topology/__tests__/metrics.test.ts:15,23,28,33,47,58）
     - 实现加权最短路 `dist`（支持 `via`/`maxCost`），不连通时返回 `null`
     - 实现 `spread`，返回按强度降序、NodeId 升序的有序数组
     - _需求：11.1、11.2、11.3、11.4、11.5、11.6、11.7_
-  - [ ] 8.2 实现 prefab.spawn / prefab.despawn 的内部实现函数
+  - [x] 8.2 实现 prefab.spawn / prefab.despawn 的内部实现函数 （证据：src/core/kernel/topology/prefab.ts, src/core/kernel/ops/prefab-ops.ts, src/core/kernel/topology/__tests__/prefab.test.ts, src/core/kernel/ops/__tests__/prefab-ops.test.ts）
     - 实现蓝图内部 key 到实际 Id 的重映射
     - 实现 `attachTo` 接缝逻辑
     - 实现 `despawn` 的级联回收与占位者疏散
     - 注意：不调用 `OpRegistry.register`；注册为公开 Op 留给任务 14
     - _需求：8.1、8.2、8.3、8.4、8.5、8.6、8.7_
-  - [ ] 8.3 编写 dist/spread 与 prefab 往返的属性测试
+  - [x] 8.3 编写 dist/spread 与 prefab 往返的属性测试 （证据：src/core/kernel/topology/__tests__/metrics.test.ts, src/core/kernel/ops/__tests__/prefab-ops.test.ts:165（spawn→despawn 往返等价属性测试））
     - **Property**：*对于任意* `prefab.spawn` 后立即 `prefab.despawn`，`WorldState` 的节点/边/实体集合应恢复到 spawn 前的等价状态（不计 id 分配计数器）
     - **Validates: Requirements 8.4, 8.5**
 
-- [ ] 9. 检查点：L1 Topology 完整性
+- [x] 9. 检查点：L1 Topology 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/topology/__tests__/, src/core/kernel/testing/arbitraries.ts, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L1 Topology 属性测试，确认拓扑、容器、微型场景、prefab 全部通过（本层直接调用内部实现函数验证）
   - 确认第 1 步搭建的任意深度嵌套 WorldState 生成器能够生成含多层微型场景与容器嵌套的合法状态
   - 确认 `kernel/topology` 未调用 `OpRegistry.register`（`node.create`/`link.create`/`slot.add`/`prefab.spawn` 等作为公开 Op 的注册统一在任务 14），其经 `OpRegistry.invoke` 的端到端验证在任务 16 复验
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 10. 实现 L2 Expr：表达式求值器
-  - [ ] 10.1 实现 ExprEngine 与内置算子封闭表
+- [x] 10. 实现 L2 Expr：表达式求值器 （证据：见 10.1–10.4；src/core/kernel/expr/engine.ts, src/core/kernel/expr/named-expr.ts）
+  - [x] 10.1 实现 ExprEngine 与内置算子封闭表 （证据：src/core/kernel/expr/engine.ts, src/core/kernel/expr/state-access.ts, src/core/kernel/expr/__tests__/engine.test.ts, src/core/kernel/expr/__tests__/operator-families.test.ts:282（随机算子不属于 Expr））
     - 实现字面量/path/var/op/q/call 六种形态的求值
     - 实现算术、比较、逻辑、空值、字符串、表、拓扑、状态、关系、认知各类内置算子（design.md 3.3节算子表，认知类算子先占位，L11 完成后接入）
     - 注意：`roll`/`pick`/`shuffle`/`weightedPick` 不属于此算子表，不得实现在此处——它们是 L10（第33步）注册的公开 Op，因为其求值会推进随机流状态，不满足 Expr 全函数/无副作用的要求（design.md 3.3节"分类修正"，需求12.8/35.5）
@@ -205,316 +227,316 @@
     - 实现 `isA` 算子
     - 验证内置算子表不可运行期扩展，且不含随机类算子名
     - _需求：12.1、12.2、12.3、12.4、12.5、12.6、12.7、12.8_
-  - [ ] 10.2 编写 Expr 全函数性的模糊测试
+  - [x] 10.2 编写 Expr 全函数性的模糊测试 （证据：src/core/kernel/expr/__tests__/engine.test.ts:79（任意 Expr AST eval 不抛异常）, src/core/kernel/testing/__tests__/fuzz-malformed-expr.test.ts）
     - **Property 2 的姊妹测试**：*对于任意* 结构随机但类型合法的 Expr AST 与任意 EvalContext，`eval` 都不应抛出异常
     - **Validates: Requirements 12.1**
-  - [ ] 10.3 实现具名表达式（kind:'expr'）与调用图环检测
+  - [x] 10.3 实现具名表达式（kind:'expr'）与调用图环检测 （证据：src/core/kernel/expr/named-expr.ts, src/core/kernel/expr/__tests__/named-expr.test.ts:12,17,23,52）
     - 实现 `ExprDef` 注册，`pure` 恒真校验（body 不得含 `q` 之外的 Op 调用形态）
     - 实现调用图 DFS 环检测，接入 `DefRegistry.register`
     - 实现求值深度计入总预算
     - 实现玩法包 `overrides` 替换具名表达式的接入点（占位，完整装载逻辑在 L9）
     - _需求：13.1、13.2、13.3、13.4、13.5_
-  - [ ] 10.4 编写具名表达式环检测的属性测试
+  - [x] 10.4 编写具名表达式环检测的属性测试 （证据：src/core/kernel/expr/__tests__/named-expr.test.ts:29（Property: 调用环 → E_EXPR_CALL_CYCLE））
     - **Property**：*对于任意* 构造出的具名表达式调用环，`DefRegistry.register` 应拒绝并产出 `E_EXPR_CALL_CYCLE`
     - **Validates: Requirements 13.3**
 
-- [ ] 11. 实现 L2 Query：查询引擎
-  - [ ] 11.1 实现 QueryEngine.run
+- [x] 11. 实现 L2 Query：查询引擎 （证据：见 11.1–11.2；src/core/kernel/expr/query-engine.ts）
+  - [x] 11.1 实现 QueryEngine.run （证据：src/core/kernel/expr/query-engine.ts, src/core/kernel/expr/__tests__/query-engine.test.ts:38（各 from 取值分发）, src/core/kernel/expr/__tests__/query-log.test.ts）
     - 实现十种 `from` 取值的数据源分发（`log` 先占位返回空集，L12 完成后接入）
     - 实现 `where`/`in`/`orderBy`/`desc`/`limit` 过滤与排序
     - 实现 `visibleTo` 过滤占位（L11 完成后接入具体 `visibility` 求值）
     - _需求：14.1、14.2、14.3、14.4、14.5_
-  - [ ] 11.2 编写 Query 一致性的属性测试
+  - [x] 11.2 编写 Query 一致性的属性测试 （证据：src/core/kernel/expr/__tests__/query-engine.test.ts:67（Property: 结果满足 where 且顺序符合 orderBy/desc））
     - **Property**：*对于任意* Query 与任意合法 WorldState，`run` 返回结果集中的每个 Ref 都应满足 `where` 谓词，且结果顺序与 `orderBy`/`desc` 声明一致
     - **Validates: Requirements 14.1-14.4**
 
-- [ ] 12. 检查点：L2 Expr/Query 完整性
+- [x] 12. 检查点：L2 Expr/Query 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/expr/__tests__/, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L2 属性测试，确认表达式求值器与查询引擎正确
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 13. 实现 L3 Ops：Op 注册表、Result 与事务
-  - [ ] 13.1 实现 OpRegistry 与 Result 类型
+- [x] 13. 实现 L3 Ops：Op 注册表、Result 与事务 （证据：见 13.1–13.5；src/core/kernel/ops/registry.ts, src/core/kernel/ops/transaction.ts, src/core/kernel/ops/invariants.ts）
+  - [x] 13.1 实现 OpRegistry 与 Result 类型 （证据：src/core/kernel/ops/registry.ts, src/core/kernel/ops/result.ts, src/core/kernel/ops/__tests__/registry.test.ts:10,27）
     - 实现 `register`/`invoke`
     - 验证全部结构区字段的 `readonly` 约束（编译期测试：尝试绕过 Op 直接赋值应无法通过 `tsc`）
     - _需求：16.1、16.2、16.3、16.4_
-  - [ ] 13.2 编写 Op 永不抛异常的属性测试
+  - [x] 13.2 编写 Op 永不抛异常的属性测试 （证据：src/core/kernel/ops/__tests__/registry.test.ts:56（Property 2: Op 永不抛异常））
     - **Property 2: Op 永不抛异常**
     - **Validates: Requirements 16.2, 16.3**
-  - [ ] 13.3 实现 Transaction（begin/commit/rollback）与 journal 记录
+  - [x] 13.3 实现 Transaction（begin/commit/rollback）与 journal 记录 （证据：src/core/kernel/ops/transaction.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:58,59,66,78（Journal append/since/trim））
     - 实现 `logOp` 记录 Op 及其逆操作
     - _需求：21.1、21.2_
-  - [ ] 13.4 实现 InvariantChecker 的 16 条不变量检查器
+  - [x] 13.4 实现 InvariantChecker 的 16 条不变量检查器 （证据：src/core/kernel/ops/invariants.ts（ALL_INVARIANT_CHECKS）, src/core/kernel/ops/__tests__/invariants.test.ts）
     - 逐条实现需求20列出的16条不变量检查函数（引用完整性、单一容纳、单一位置、位置互斥、无环容纳、拓扑一致、父子一致、关系对称、容器双向一致、槎位索引连续、堆叠守恒、代价守恒、附属一致、堆叠有界、决策有终、数值有界）
     - 实现 `commit()` 在提交前调用 `checkAll`，任一失败则整体回滚
     - _需求：20.1、20.2、20.3、20.4、20.5、20.6、20.7、20.8、20.9、20.10、20.11、20.12、20.13、20.14、20.15、20.16、20.17_
-  - [ ] 13.5 编写不变量恒成立与事务原子性的属性测试
+  - [x] 13.5 编写不变量恒成立与事务原子性的属性测试 （证据：src/core/kernel/ops/__tests__/registry.test.ts:87（Property 3 事务原子性）, src/core/kernel/ops/__tests__/registry.test.ts:109 与 src/core/kernel/testing/__tests__/fuzz.test.ts（Property 4 不变量恒成立））
     - **Property 3: 事务的原子性**
     - **Validates: Requirements 21.3, 21.4**
     - **Property 4: 不变量在提交后恒成立**
     - **Validates: Requirements 20.1-20.17**
 
-- [ ] 14. 实现 L3 Ops：属性/结构类 Op 全集
-  - [ ] 14.1 实现属性类 Op
+- [x] 14. 实现 L3 Ops：属性/结构类 Op 全集 （证据：见 14.1–14.7；src/core/kernel/ops/prop-ops.ts, src/core/kernel/ops/structural-ops.ts, src/core/kernel/ops/stack-ops.ts, src/core/kernel/ops/transform-ops.ts）
+  - [x] 14.1 实现属性类 Op （证据：src/core/kernel/ops/prop-ops.ts, src/core/kernel/ops/__tests__/prop-ops.test.ts:22,41,47,60,69,81）
     - `prop.set`/`prop.del`/`prop.add`（尊重 `clamp`）/`list.insert`/`list.remove`/`tag.add`/`tag.del`
     - _需求：16.5_
-  - [ ] 14.2 实现 item.move 作为唯一转移原语
+  - [x] 14.2 实现 item.move 作为唯一转移原语 （证据：src/core/kernel/ops/structural-ops.ts, src/core/kernel/ops/__tests__/structural-ops.test.ts:58,73,102（缺省槎位选取 / 无合法槎位不落地不吞掉））
     - 实现缺省槎位选取（按索引顺序取第一个合法且为空的槎位）
     - 实现无合法槎位时返回 `ok:false`，不落地不吞掉
     - 验证拾取/丢弃/装备/卸下/买卖/交易全部复用此 Op，不新增专用转移 Op
     - _需求：10.9、10.10、16.6、16.7_
-  - [ ] 14.3 实现 stack.split / stack.merge 的原子性
+  - [x] 14.3 实现 stack.split / stack.merge 的原子性 （证据：src/core/kernel/ops/stack-ops.ts, src/core/kernel/ops/__tests__/stack-ops.test.ts）
     - 实现单事务内的"扣减-创建-放置"三步，任一步失败整体回滚
     - 验证堆叠总量守恒（同 DefId 总量仅因 create/destroy 改变）
     - 实现 GUI 拖拽输入的不可信校验路径（与其他来源同一路径，无特殊分支）
     - _需求：17.1、17.2、17.3、17.4、17.5_
-  - [ ] 14.4 编写堆叠拆分原子性的属性测试
+  - [x] 14.4 编写堆叠拆分原子性的属性测试 （证据：src/core/kernel/ops/__tests__/stack-ops.test.ts:98（Property 5 堆叠守恒）, :121（Property 6 拆分失败整体回滚））
     - **Property 5: 堆叠总量守恒**
     - **Validates: Requirements 17.4**
     - **Property 6: 拆分失败即整体回滚**
     - **Validates: Requirements 17.1-17.3**
-  - [ ] 14.5 实现 entity.setDef 与 node.merge/node.split
+  - [x] 14.5 实现 entity.setDef 与 node.merge/node.split （证据：src/core/kernel/ops/transform-ops.ts, src/core/kernel/ops/__tests__/transform-ops.test.ts:38,53,64,90）
     - 实现 `carry` 字段选择器驱动的引用迁移（先接管引用再销毁来源）
     - _需求：18.1、18.2、18.3、18.4、18.5_
-  - [ ] 14.6 编写变身与节点合并引用完整性的属性测试
+  - [x] 14.6 编写变身与节点合并引用完整性的属性测试 （证据：src/core/kernel/ops/__tests__/transform-ops.test.ts:64,112（引用迁移无悬空）, src/core/kernel/testing/__tests__/fuzz-deep-nesting.test.ts:65）
     - **Property**：*对于任意* `entity.setDef` 或 `node.merge` 调用，调用前指向旧对象的全部 Relation/Attachment/Container 引用，调用后都应指向新对象（`carry` 声明的字段集合），不应产生悬空引用
     - **Validates: Requirements 18.5, 20.1**
-  - [ ] 14.7 将 L1 已实现的结构类/关系类/认知类 Op 内部实现注册为公开 Op（依赖倒置修正的落点）
+  - [x] 14.7 将 L1 已实现的结构类/关系类/认知类 Op 内部实现注册为公开 Op（依赖倒置修正的落点） （证据：src/core/kernel/ops/structural-ops.ts, src/core/kernel/ops/relation-ops.ts, src/core/kernel/ops/agent-ops.ts, src/core/kernel/ops/prefab-ops.ts, src/core/kernel/wire-hooks.ts, src/core/kernel/__tests__/wire-hooks-exhaustive.test.ts）
     - 通过 `OpRegistry.register` 注册以下 Op，每个 Op 的实现内部调用其在 L1 已完成的内部实现函数，不重写结构更新逻辑：`node.create`/`node.destroy`/`link.create`/`link.destroy`（任务 6.1）、`slot.add`/`slot.del`（任务 6.2）、`prefab.spawn`/`prefab.despawn`（任务 8.2）、`relation.set`/`relation.del`（任务 4.2）、`agent.bind`/`agent.unbind`（任务 4.1）、`item.promote`/`entity.demote`（任务 3.2）
     - 为其中的结构性 Op 套上第 15 步的 `withVeto` 包装（若本步先于 15 完成则留接口占位），全部经 `Transaction` 提交并写入 journal，提交前过 `InvariantChecker`
     - 验证 `OpRegistry.register` 的调用点与 design.md 3.4节 Op 全集清单逐一对应，且 L1/L2 层源码中不存在任何 `OpRegistry.register` 调用（架构测试）
     - _需求：5.2、6.6、7.3、7.4、8.1、8.4、10.7、16.1、16.6_
 
-- [ ] 15. 实现 L3 Ops：结构性 Op 否决机制
-  - [ ] 15.1 实现 withVeto 包装器
+- [x] 15. 实现 L3 Ops：结构性 Op 否决机制 （证据：见 15.1–15.2；src/core/kernel/ops/registry.ts, src/core/kernel/ops/__tests__/veto.test.ts）
+  - [x] 15.1 实现 withVeto 包装器 （证据：src/core/kernel/ops/registry.ts（withVeto）, src/core/kernel/wire-hooks.ts, src/core/kernel/ops/__tests__/veto.test.ts）
     - 实现 `before`/`after` 事件的发出点（占位，完整 Hook 分发逻辑在 L4；此任务只搭事件发出与取消信号的接口）
     - 实现 veto 返回时该 Op 不产生任何状态改动（`ok:false, code:'E_OP_VETOED'`，事务零改动回滚）
     - 验证内核代码本身不包含负重、容量等具体约束
     - _需求：19.1、19.2、19.3、19.4_
-  - [ ] 15.2 编写 veto 零状态改动的属性测试
+  - [x] 15.2 编写 veto 零状态改动的属性测试 （证据：src/core/kernel/ops/__tests__/veto.test.ts:17（Property 24: before Hook 否决后状态零改动））
     - **Property 24: before Hook 否决后状态零改动**
     - **Validates: Requirements 19.2, 19.4**
     - 注：此前版本没有为需求19（否决机制）编写任何属性测试，只靠 Property 3（事务原子性）间接覆盖"标记为致命"的失败，但 veto 是否算致命未明确，此处补一条专门针对 veto 路径的属性
 
-- [ ] 16. 检查点：L3 Ops/Transactions 完整性
+- [x] 16. 检查点：L3 Ops/Transactions 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/ops/__tests__/, src/core/kernel/__tests__/wire-hooks-exhaustive.test.ts, src/core/kernel/__tests__/cross-layer-regression.test.ts, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L3 属性测试，确认 Op 注册表、事务、16 条不变量、item.move 统一转移、stack.split 原子性、变身/合并引用迁移全部通过
   - 确认任务 14.7 已把 L1 内部实现函数注册为公开 Op，`relation.set`/`agent.bind`/`item.promote`/`entity.demote`/`node.create`/`link.create`/`slot.add`/`prefab.spawn`/`prefab.despawn` 等经 `OpRegistry.invoke` 的端到端路径（事务/不变量/veto 包装/journal）全部通过；复验任务 4.3 的 Relation 对称性在注册后的 Op 路径上仍成立
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 17. 实现 L4 Events/Hooks：事件与五阶段分发
-  - [ ] 17.1 实现 Event 结构与 HookDispatcher 骨架
+- [x] 17. 实现 L4 Events/Hooks：事件与五阶段分发 （证据：见 17.1–17.5；src/core/kernel/events/dispatcher.ts, src/core/kernel/events/rule-provider.ts）
+  - [x] 17.1 实现 Event 结构与 HookDispatcher 骨架 （证据：src/core/kernel/events/dispatcher.ts, src/core/kernel/events/types.ts, src/core/kernel/events/__tests__/dispatcher.test.ts:30,31,41,51,149）
     - 实现 `cause` 因果链字段
     - 实现 `before → modify → instead → default → after` 固定调度顺序
     - _需求：23.1、23.2、23.3、23.4、23.5、23.7_
-  - [ ] 17.2 实现 instead 阶段的排序裁决
+  - [x] 17.2 实现 instead 阶段的排序裁决 （证据：src/core/kernel/events/dispatcher.ts, src/core/kernel/events/__tests__/dispatcher.test.ts:68,86,98,108（Property 25 instead 排他））
     - 实现 `(priority, 宿主容器索引, 槎位索引, defId)` 四元组排序，取第一个通过者，其余不参与
     - _需求：23.6_
-  - [ ] 17.3 实现 RuleDef 与三种挂载生命周期
+  - [x] 17.3 实现 RuleDef 与三种挂载生命周期 （证据：src/core/kernel/events/rule-provider.ts, src/core/kernel/events/__tests__/rule-lifecycle.test.ts:18,27,49）
     - 实现 `RuleDef` 结构
     - 验证同一结构在 PlaypackDef 全局常驻、AttachmentDef.rules 状态期、attach.add(world,mod) 运行期开关三种挂载下正确工作（占位：AttachmentDef/PlaypackDef 完整逻辑在 L8/L9，此处验证 RuleDef 本身不因挂载方式而分叉）
     - _需求：23.8、23.9_
-  - [ ] 17.4 实现单条 Hook 失败隔离
+  - [x] 17.4 实现单条 Hook 失败隔离 （证据：src/core/kernel/events/dispatcher.ts, src/core/kernel/events/__tests__/dispatcher.test.ts:117,132（单条 Hook 报错只跳过该 Hook 并产 warn））
     - 实现 dispatch 内部对每个候选 Hook 的 try/catch 包裹，捕获异常只跳过该 Hook 并记录 warn 诊断
     - _需求：23.10_
-  - [ ] 17.5 编写 instead 裁决与单条失败隔离的属性测试
+  - [x] 17.5 编写 instead 裁决与单条失败隔离的属性测试 （证据：src/core/kernel/events/__tests__/dispatcher.test.ts:68（Property 25）, :132（失败隔离属性测试））
     - **Property 25: instead 阶段的排他执行**
     - **Validates: Requirements 23.6**
     - **Property**：*对于任意* 一条内部报错的 Hook 与同一事件的其余合法 Hook，dispatch 应继续执行其余 Hook 并返回正常结果
     - **Validates: Requirements 23.10**
 
-- [ ] 18. 实现 L4 Events/Hooks：连锁安全
-  - [ ] 18.1 实现事件连锁深度上限与重置
+- [x] 18. 实现 L4 Events/Hooks：连锁安全 （证据：见 18.1–18.3；src/core/kernel/events/dispatcher.ts）
+  - [x] 18.1 实现事件连锁深度上限与重置 （证据：src/core/kernel/events/dispatcher.ts, src/core/kernel/events/__tests__/dispatcher.test.ts:163,164,207）
     - 实现 `depth` 自增、超限拒绝并诊断、事务提交边界重置
     - _需求：24.1、24.2、24.3_
-  - [ ] 18.2 实现同优先级确定性排序与重入锁
+  - [x] 18.2 实现同优先级确定性排序与重入锁 （证据：src/core/kernel/events/dispatcher.ts, src/core/kernel/events/__tests__/dispatcher.test.ts:51（(priority,defId) 序）, :216（Property 26 重入拒绝））
     - 实现 `(priority, defId)` 字典序执行
     - 实现同一 `(type, hookId)` 组合的重入拒绝
     - _需求：24.5、24.6_
-  - [ ] 18.3 编写连锁可终止性与重入拒绝的属性测试
+  - [x] 18.3 编写连锁可终止性与重入拒绝的属性测试 （证据：src/core/kernel/events/__tests__/dispatcher.test.ts:163,183（Property 14）, :216（Property 26））
     - **Property 14: 连锁深度上限的可终止性**
     - **Validates: Requirements 24.1-24.2**
     - **Property 26: Hook 重入拒绝**
     - **Validates: Requirements 24.6**
 
-- [ ] 19. 实现 L5 Flow：效果脚本解释器
-  - [ ] 19.1 实现 FlowInterpreter 十种 Effect 形态
+- [x] 19. 实现 L5 Flow：效果脚本解释器 （证据：见 19.1–19.3；src/core/kernel/flow/interpreter.ts）
+  - [x] 19.1 实现 FlowInterpreter 十种 Effect 形态 （证据：src/core/kernel/flow/interpreter.ts, src/core/kernel/flow/__tests__/interpreter.test.ts:24–146, src/core/kernel/flow/__tests__/deferred-effects.test.ts）
     - 实现 op/let/if/forEach/while/emit/after/at/try/abort
     - 验证不提供函数定义、递归、闭包
     - _需求：22.1、22.3_
-  - [ ] 19.2 实现 step 预算与 maxIter 强制
+  - [x] 19.2 实现 step 预算与 maxIter 强制 （证据：src/core/kernel/flow/interpreter.ts, src/core/kernel/flow/__tests__/interpreter.test.ts:78,86,163,188）
     - 实现每条 Effect（含每次迭代）计入 step 计数器，超预算中止并诊断
     - 实现 `while` 缺失 `maxIter` 的运行期防御性拒绝（加载期 Linter 版本留给 L13）
     - _需求：22.4、22.5、22.6_
-  - [ ] 19.3 编写 Flow 终止性的属性测试
+  - [x] 19.3 编写 Flow 终止性的属性测试 （证据：src/core/kernel/flow/__tests__/interpreter.test.ts:162,171（Property 15: step 预算终止性））
     - **Property 15: Flow 的 step 预算终止性**
     - **Validates: Requirements 22.4-22.5**
 
-- [ ] 20. 检查点：L4 Events/Hooks 与 L5 Flow 完整性
+- [x] 20. 检查点：L4 Events/Hooks 与 L5 Flow 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/events/__tests__/, src/core/kernel/flow/__tests__/, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L4/L5 属性测试，确认事件分发、连锁安全、Flow 解释器全部通过
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 21. 实现 L6 Actions：ActionDef 与 queryActions
-  - [ ] 21.1 实现 ActionCatalog.queryActions 的 ui/ai 双模式
+- [x] 21. 实现 L6 Actions：ActionDef 与 queryActions （证据：见 21.1–21.3；src/core/kernel/actions/catalog.ts）
+  - [x] 21.1 实现 ActionCatalog.queryActions 的 ui/ai 双模式 （证据：src/core/kernel/actions/catalog.ts, src/core/kernel/actions/types.ts, src/core/kernel/actions/__tests__/catalog.test.ts:38,48,58,117）
     - 实现 `require`/`visible`/`reason` 的过滤与灰显逻辑
     - 实现同一份实现同时服务 UI 菜单、AI 着法生成、网络校验、模糊测试采样
     - _需求：25.1、25.2、25.3、25.4、25.5_
-  - [ ] 21.2 实现 TargetSpec 的 range/count 展开
+  - [x] 21.2 实现 TargetSpec 的 range/count 展开 （证据：src/core/kernel/actions/catalog.ts, src/core/kernel/actions/types.ts, src/core/kernel/actions/__tests__/catalog.test.ts:101（ai 有限采样 / ui 完整区间））
     - 实现 `mode:'ai'` 下的有限点采样（边界值、当前可承担最大值、step 网格点）
     - 实现 `mode:'ui'` 下的完整区间返回
     - _需求：25.6、25.7_
-  - [ ] 21.3 编写 queryActions 双模式一致性的属性测试
+  - [x] 21.3 编写 queryActions 双模式一致性的属性测试 （证据：src/core/kernel/actions/__tests__/catalog.test.ts:78（Property 13: queryActions ui/ai 一致性））
     - **Property 13: queryActions 对 UI/AI 模式的一致性**
     - **Validates: Requirements 25.3, 44.1**
 
-- [ ] 22. 实现 L6 Actions：代价三态 helper
-  - [ ] 22.1 实现 freezeCost/settleCost/refundCost 私有 helper
+- [x] 22. 实现 L6 Actions：代价三态 helper （证据：见 22.1；src/core/kernel/actions/cost.ts, src/core/kernel/actions/__tests__/cost.test.ts）
+  - [x] 22.1 实现 freezeCost/settleCost/refundCost 私有 helper （证据：src/core/kernel/actions/cost.ts, src/core/kernel/actions/__tests__/cost.test.ts, src/core/kernel/ops/invariants.ts（代价守恒不变量））
     - 注意：三者是 `intent.submit`/`intent.resolve`/`intent.void`（第25步）三个 Op 内部调用的私有函数，不包成独立组件对外暴露公开方法（design.md 写入通道情形b）。本步只实现 helper 本身；其守恒性属性（Property 7）依赖完整的 Intent 提交→解算/退回生命周期，因此移至第 25 步与 Intent Op 一同验证——修正此前把 Property 7 放在本步（第22步）却依赖尚未实现的第 25 步 Intent Op 的依赖倒置
     - 实现四种 CostSpec（pool/items/attach/custom）的冻结与结算
     - 实现 `cost.refunded` 诊断产出
     - 验证不存在静默退回路径
     - _需求：26.1、26.2、26.3、26.4、26.5、26.6、16.1_
 
-- [ ] 23. 检查点：L6 Actions 完整性
+- [x] 23. 检查点：L6 Actions 完整性 （证据：vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）, src/core/kernel/actions/__tests__/catalog.test.ts, src/core/kernel/actions/__tests__/cost.test.ts, docs/L1_引擎层/并行审查Prompt/L1-L6_FINAL_ACCEPTANCE_REPORT.md）
   - 运行全部 L6 属性测试，确认 queryActions 与代价泛化正确
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 24. 实现 L7 Decision：一等状态对象
-  - [ ] 24.1 实现 decision.open / decision.answer 两个公开 Op
+- [x] 24. 实现 L7 Decision：一等状态对象 （证据：见 24.1–24.4；src/core/kernel/decision/decision-ops.ts）
+  - [x] 24.1 实现 decision.open / decision.answer 两个公开 Op （证据：src/core/kernel/decision/decision-ops.ts, src/core/kernel/decision/types.ts, src/core/kernel/decision/__tests__/decision.test.ts:38,79,99）
     - 注意：必须注册进 `OpRegistry`（design.md 3.4节 Op 全集清单），不得包成独立组件对外暴露 `openDecision`/`answer` 方法
     - 实现立即返回、不阻塞
     - 实现 `DecisionDef.quorum`（all/any/majority）判定
     - 实现待答 Decision 出现在 `queryActions` 结果中
     - _需求：27.1、27.2、27.5、27.6、16.1_
-  - [ ] 24.2 实现 onResolve 前提重检与 onVoid
+  - [x] 24.2 实现 onResolve 前提重检与 onVoid （证据：src/core/kernel/decision/decision-ops.ts, src/core/kernel/decision/__tests__/decision.test.ts:143,187（Property 27 前提重检 → void））
     - 实现在新事务中执行 `onResolve`，执行前重新校验 `ctx` 快照对象的存在性
     - 实现前提失效时转 `onVoid`
     - _需求：27.3、27.4_
-  - [ ] 24.3 实现 deadline 超时处理
+  - [x] 24.3 实现 deadline 超时处理 （证据：src/core/kernel/decision/decision-ops.ts, src/core/kernel/decision/__tests__/timeout.test.ts:48,69,79,87,97,104,111,120）
     - 实现超过 `deadline` 时按 `onTimeout` 处理并推进相位（占位：相位推进本体在 L9 的 `schedule.advance`，此处只实现 Decision 侧的超时状态转换）
     - _需求：27.7_
-  - [ ] 24.4 编写 Decision 不阻塞、前提重检与 onResolve 对称性的属性测试
+  - [x] 24.4 编写 Decision 不阻塞、前提重检与 onResolve 对称性的属性测试 （证据：src/core/kernel/decision/__tests__/decision.test.ts:79（Property 8 永不阻塞）, :187（Property 27））
     - **Property 8: Decision 永不阻塞**
     - **Validates: Requirements 27.2-27.3**
     - **Property 27: Decision 的 onResolve 前提重检对称于 Intent**
     - **Validates: Requirements 27.4**
 
-- [ ] 25. 实现 L7 Intent：提交与解算分离
-  - [ ] 25.1 实现 intent.submit / intent.resolve 两个公开 Op
+- [ ] 25. 实现 L7 Intent：提交与解算分离 （未做：子项 25.3 的 resolveOrder 解算排序未实现；25.1/25.2/25.4/25.5 已有证据）
+  - [x] 25.1 实现 intent.submit / intent.resolve 两个公开 Op （证据：src/core/kernel/decision/intent-ops.ts, src/core/kernel/decision/__tests__/intent.test.ts:126,145）
     - 注意：必须注册进 `OpRegistry`，不得包成独立组件对外暴露 `submitIntent`/`resolveIntent` 方法
     - 实现解算前重跑 `require`，失败置 `void` 并在同一 Op 事务内调用第22步的 `refundCost` helper
     - _需求：29.1、29.2、29.3、29.4、16.1_
-  - [ ] 25.2 实现 hidden Intent 的可见性隔离
+  - [x] 25.2 实现 hidden Intent 的可见性隔离 （证据：src/core/kernel/decision/intent-ops.ts, src/core/kernel/decision/__tests__/intent.test.ts:307（Property 10 隐藏 Intent 不可见））
     - 实现 `hidden:true` 的 Intent 在 `queryActions` 与 `Query(from:'intents')` 对非本人 Agent 不可见
     - _需求：29.5_
-  - [ ] 25.3 实现 resolveOrder 与禁止 simultaneous
+  - [ ] 25.3 实现 resolveOrder 与禁止 simultaneous （未做：ScheduleDef.resolveOrder 只有类型与解码（src/core/kernel/schedule/types.ts、src/core/kernel/schedule/playpack-codec.ts），src/core/kernel/decision/intent-ops.ts 内没有按 resolveOrder 排序的多 Intent 解算实现；"禁止 order:'simultaneous'" 仅在 src/core/kernel/safety/safety.ts 有字面量，无对应断言）
     - 实现 `ScheduleDef.resolveOrder` 表达式驱动的多 Intent 解算排序
     - 验证内核不提供任何 `order:'simultaneous'` 或真正同时结算的机制
     - 验证 Intent 可被存档、回放、AI 搜索（占位断言，完整持久化在 L12）
     - _需求：29.6、29.7、29.8_
-  - [ ] 25.4 编写 Intent 重检与隐藏性的属性测试
+  - [x] 25.4 编写 Intent 重检与隐藏性的属性测试 （证据：src/core/kernel/decision/__tests__/intent.test.ts:145,273（Property 9）, :307（Property 10））
     - **Property 9: Intent 解算前必重检 require**
     - **Validates: Requirements 29.3-29.4**
     - **Property 10: 隐藏 Intent 的不可见性**
     - **Validates: Requirements 29.5**
-  - [ ] 25.5 编写代价守恒的属性测试（自第 22 步移入：Property 7 需完整的 Intent 提交→解算/退回生命周期，而该生命周期在本步才具备）
+  - [x] 25.5 编写代价守恒的属性测试（自第 22 步移入：Property 7 需完整的 Intent 提交→解算/退回生命周期，而该生命周期在本步才具备） （证据：src/core/kernel/actions/__tests__/cost.test.ts:80（Property 7: 代价冻结与结算守恒）, src/core/kernel/decision/intent-ops.ts）
     - 依赖第 22 步的 `freezeCost`/`settleCost`/`refundCost` helper 与本步的 `intent.submit`/`intent.resolve`/`intent.void`
     - **Property 7: 代价冻结与结算守恒**
     - **Validates: Requirements 26.2-26.6, 20.12**
 
-- [ ] 26. 实现 L7 响应相位支撑
-  - [ ] 26.1 实现响应相位判断表达式的查询接口
+- [ ] 26. 实现 L7 响应相位支撑 （待测：子项 26.1 的响应相位查询接口无测试；26.2 已有证据）
+  - [ ] 26.1 实现响应相位判断表达式的查询接口 （待测：代码已存在 src/core/kernel/decision/response-phase.ts，但全仓无任何测试引用该模块；本条的架构断言部分已由 src/core/kernel/events/__tests__/no-blocking.test.ts 覆盖）
     - 实现"是否存在以我为目标、已被反应 Intent 引用的 pending Intent"的查询表达式支持
     - 验证内核不允许在 before/其他 Hook 阶段内调用 decision.open 并等待结果（架构测试：`HookDispatcher` 内部不导出任何等待类型）
     - _需求：28.1、28.4_
-  - [ ] 26.2 实现 reactionRounds 常量校验占位
+  - [x] 26.2 实现 reactionRounds 常量校验占位 （证据：src/core/kernel/schedule/types.ts, src/core/kernel/schedule/playpack-codec.ts, src/core/kernel/schedule/__tests__/playpack-codec.test.ts:150,204）
     - 实现 `PhaseDef.kind:'response'` 与 `reactionRounds` 的类型接口（完整加载期 Linter 强制留给 L13，完整相位推进留给 L9）
     - _需求：28.2、28.3、28.5_
 
-- [ ] 27. 检查点：L7 Decision/Intent 完整性
+- [ ] 27. 检查点：L7 Decision/Intent 完整性 （未做：依赖任务 25.3（resolveOrder 解算排序）与 26.1（响应相位查询接口测试），两者均未闭合，本检查点"响应相位判断接口全部通过"无证据；Decision/Intent 部分已绿（src/core/kernel/decision/__tests__/））
   - 运行全部 L7 属性测试，确认 Decision 不阻塞、Intent 重检与隐藏性、响应相位判断接口全部通过
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 28. 实现 L8 Attachment：状态与光环
-  - [ ] 28.1 实现 Attachment 生命周期（stack 策略/delay/expiresAt）
+- [x] 28. 实现 L8 Attachment：状态与光环 （证据：见 28.1–28.4；src/core/kernel/attachment/attach-ops.ts, src/core/kernel/attachment/aura-engine.ts）
+  - [x] 28.1 实现 Attachment 生命周期（stack 策略/delay/expiresAt） （证据：src/core/kernel/attachment/attach-ops.ts, src/core/kernel/attachment/types.ts, src/core/kernel/state/attachment.ts, src/core/kernel/attachment/__tests__/attach.test.ts）
     - 实现 `stack:'unique'|'refresh'|'count'|'independent'` 四种策略
     - 实现 `delay`/`activeAt` 的未生效判定（规则不挂载、光环不授予、hasAttachment 返回假）
     - _需求：30.1、30.8_
-  - [ ] 28.2 实现 AuraEngine 触发器与光环授予/回收的 Op 化落地
+  - [x] 28.2 实现 AuraEngine 触发器与光环授予/回收的 Op 化落地 （证据：src/core/kernel/attachment/aura-engine.ts, src/core/kernel/attachment/__tests__/aura-wiring.test.ts:42,55,68,81, src/core/kernel/attachment/__tests__/attach.test.ts:198（Property 11））
     - 注意：`AuraEngine` 本身不持有写权限，只是事件驱动的重算触发器；差集运算得出的授予/回收结果必须通过调用 `attach.add`/`attach.del` 的内部实现落地（design.md 写入通道情形b），不得让 `AuraEngine` 自己直接改写 `attachments` 集合
     - 实现拓扑变化触发的无条件重算（订阅 `entity.place`/`node.merge`/`node.split` 的 after Hook）
     - 实现 `aura.deps` 声明的属性路径变化触发的定向重算（订阅 `prop.set` 的 after Hook）
     - 实现未声明 deps 的属性变化不触发重算
     - 实现重算与触发它的 Op 共享同一事务（光环授予失败应导致触发该重算的 Op 整体回滚）
     - _需求：30.2、30.3、30.4、30.5、16.1_
-  - [ ] 28.3 实现 grantedBy 级联回收
+  - [x] 28.3 实现 grantedBy 级联回收 （证据：src/core/kernel/attachment/attach-ops.ts, src/core/kernel/ops/cascade-destroy.ts, src/core/kernel/attachment/__tests__/attach.test.ts:124,136,151,174（Property 12））
     - 复用第 3 步实现的递归移除函数，作为 `attach.del` Op 唯一的内部实现，不对外单独暴露
     - 接入光环失效场景
     - _需求：30.7、16.1_
-  - [ ] 28.4 编写光环重算与级联回收的属性测试
+  - [x] 28.4 编写光环重算与级联回收的属性测试 （证据：src/core/kernel/attachment/__tests__/attach.test.ts:198（Property 11）, :136（Property 12））
     - **Property 11: 光环差集重算的正确性**
     - **Validates: Requirements 30.2-30.4**
     - **Property 12: grantedBy 级联回收完整性**
     - **Validates: Requirements 30.7, 20.13**
 
-- [ ] 29. 实现 L9 Schedule：回合表与相位推进
-  - [ ] 29.1 实现 schedule.advance 公开 Op
+- [ ] 29. 实现 L9 Schedule：回合表与相位推进 （未做：子项 29.1 的推进条件、29.2 的 reactionRounds 接线、29.3 的属性测试均缺失；schedule.advance 本体已实现且有测试）
+  - [ ] 29.1 实现 schedule.advance 公开 Op （未做：src/core/kernel/schedule/schedule-ops.ts 已实现 schedule.advance 并有测试（src/core/kernel/schedule/__tests__/schedule.test.ts:38–120），但该文件内不存在 input / timeLimit 字样，"input 齐 或 timeLimit 到期为唯一推进条件、不满足即返回 ok:false" 未实现；Decision onTimeout 接线已有（src/core/kernel/decision/__tests__/timeout.test.ts:69））
     - 注意：相位推进会修改 `turn.phaseIndex`/`turn.phaseEnteredAt`，必须注册进 `OpRegistry` 为公开 Op（design.md 3.10节修补），不得实现为独立的 `ScheduleRunner` 组件方法
     - 实现"input 齐 或 timeLimit 到期"为唯一推进条件，不满足时该 Op 返回 `ok:false`（不是静默无动作）
     - 实现 `phases` 表驱动，内核不对"回合"赋予语义
     - 接入 L7 的 Decision `onTimeout`
     - _需求：31.1、31.2、31.3、31.4、31.5、31.6、16.1_
-  - [ ] 29.2 实现响应相位的完整接线
+  - [ ] 29.2 实现响应相位的完整接线 （未做：src/core/kernel/schedule/schedule-ops.ts 内不存在 reactionRounds 接线；reactionRounds 只出现在 src/core/kernel/schedule/types.ts 与 src/core/kernel/schedule/playpack-codec.ts（类型与解码），"轮次耗尽后强制进入解算相位" 未实现）
     - 接入第 26 步的响应相位判断接口，实现 `reactionRounds` 轮次耗尽后强制进入解算相位（均在 `schedule.advance` 的 Op 实现内部完成）
     - _需求：28.5_
-  - [ ] 29.3 编写相位推进条件的属性测试
+  - [ ] 29.3 编写相位推进条件的属性测试 （未做：无"input 未齐即 ok:false"的属性测试；src/core/kernel/schedule/__tests__/schedule.test.ts 仅覆盖推进 / 循环 / 边界 effect 回滚 / ScheduleDef 缺失）
     - **Property**：*对于任意* 相位与任意未齐的 `input` 状态，`OpRegistry.invoke('schedule.advance', {})` 应返回 `ok:false`；*对于任意* `timeLimit` 到期状态，应按 `onTimeout` 处理后推进并返回 `ok:true`
     - **Validates: Requirements 31.4-31.5**
 
-- [ ] 30. 实现 L9 Playpack：装载与 MOD 叠加
-  - [ ] 30.1 实现 PlaypackDef 结构与 PoolDef/OutcomeDef
+- [x] 30. 实现 L9 Playpack：装载与 MOD 叠加 （证据：见 30.1–30.3；src/core/kernel/schedule/playpack.ts）
+  - [x] 30.1 实现 PlaypackDef 结构与 PoolDef/OutcomeDef （证据：src/core/kernel/schedule/playpack.ts, src/core/kernel/actions/pool-ops.ts, src/core/kernel/ops/outcome-ops.ts, src/core/kernel/ops/__tests__/outcome-ops.test.ts, src/core/kernel/schedule/__tests__/playpack-codec.test.ts:150）
     - 实现玩法包不内置任何数值池，全部通过 `pools` 声明
     - 实现 `outcomes[]` 取代单一胜负布尔，`scope:'agent'`+`ends:false` 场景
     - _需求：32.1、32.2、32.3、32.4、32.5、32.6、32.7、32.8_
-  - [ ] 30.2 实现 PlaypackLoader 五步装载算法
+  - [x] 30.2 实现 PlaypackLoader 五步装载算法 （证据：src/core/kernel/schedule/playpack.ts, src/core/kernel/schedule/playpack-runtime.ts, src/core/kernel/schedule/__tests__/schedule.test.ts:130,131,153,197,211,225）
     - 实现 `requires` 拓扑排序与环检测
     - 实现 `conflicts` 交集检测
     - 实现 Def 集合按拓扑序合并与 `overrides` 应用
     - 实现 Hook 排序键追加包序
     - 实现全部包 linter 运行，失败聚合报告（不短路）
     - _需求：33.1、33.2、33.3、33.4、33.5、33.6_
-  - [ ] 30.3 编写装载期冲突检测与包序确定性的属性测试
+  - [x] 30.3 编写装载期冲突检测与包序确定性的属性测试 （证据：src/core/kernel/schedule/__tests__/schedule.test.ts:176（Property 19）, :198,233（Property 23 包序确定性））
     - **Property 19: 装载期冲突优先于运行期崩溃**
     - **Validates: Requirements 33.1-33.3, 33.5**
     - **Property 23: 玩法包叠加顺序的确定性**
     - **Validates: Requirements 33.4**
     - 注：此前版本 Property 19 的验证标注误写为覆盖 33.1-33.5，但其正文只涉及循环依赖/冲突交集/linter 失败三种拒绝场景；33.4（包序确定性）由 Property 23 单独覆盖，两条属性合起来才是需求33的完整覆盖，编写测试时不要漏掉 Property 23
 
-- [ ] 31. 实现 L9 Policy：NPC 决策策略
-  - [ ] 31.1 实现 PolicyDef 三种 mode
+- [ ] 31. 实现 L9 Policy：NPC 决策策略 （未做：子项 31.2 的 search/budget 仍为占位，31.3 的属性测试未落到 Policy 层；31.1 已有证据）
+  - [x] 31.1 实现 PolicyDef 三种 mode （证据：src/core/kernel/schedule/policy.ts, src/core/kernel/schedule/__tests__/schedule.test.ts:251,252,268, src/core/kernel/schedule/__tests__/policy-fallback.test.ts）
     - 实现 `mode:'rules'` 对 `queryActions(actor,'ai')` 输出的打分选取
     - 实现 `mode:'scripted'` 的 FlowInterpreter 直跑
     - 实现 `fallback` 的转向逻辑
     - _需求：34.1、34.2、34.4、34.6_
-  - [ ] 31.2 实现 mode:'search' 与 budget 约束（占位对接 checkpoint/restore）
+  - [ ] 31.2 实现 mode:'search' 与 budget 约束（占位对接 checkpoint/restore） （未做：search 模式仍是占位：src/core/kernel/schedule/__tests__/schedule.test.ts:280 断言"search 模式 placeholder 返回 null"，src/core/kernel/schedule/__tests__/policy-fallback.test.ts:68 断言"无 resolver 时返回 null"；"budget 超支返回当前最优着法"未实现）
     - 实现 `search.budget` 超支时返回当前最优着法（此任务先用占位的 checkpoint/restore 接口，L12 完成后接入真实实现）
     - _需求：34.3、34.5、34.7_
-  - [ ] 31.3 编写 PolicyDef 新增 Action 自动可用性的属性测试
+  - [ ] 31.3 编写 PolicyDef 新增 Action 自动可用性的属性测试 （待测：src/core/kernel/actions/__tests__/catalog.test.ts:117 只覆盖 queryActions 层的"新增 ActionDef 自动纳入"，未断言 evalRulesPolicy 把新增 ActionDef 纳入评分候选）
     - **Property**：*对于任意* 满足某条 `rules[].when` 的新增 ActionDef，`evalRulesPolicy` 在不修改 PolicyDef 本身的前提下应将其纳入评分候选
     - **Validates: Requirements 34.2, 44.2**
 
-- [ ] 32. 检查点：L8 Attachment 与 L9 Schedule/Playpack/Policy 完整性
+- [ ] 32. 检查点：L8 Attachment 与 L9 Schedule/Playpack/Policy 完整性 （未做：依赖任务 29（推进条件 / reactionRounds）与 31（search 模式），两者未闭合；L8 光环与 L9 Playpack 部分已绿（src/core/kernel/attachment/__tests__/, src/core/kernel/schedule/__tests__/schedule.test.ts））
   - 运行全部 L8/L9 属性测试，确认光环、回合表、玩法包装载、NPC 策略全部通过
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 33. 实现 L10 Random：确定性随机
-  - [ ] 33.1 实现 random.roll/random.pick/random.shuffle/random.weightedPick 四个公开 Op
+- [x] 33. 实现 L10 Random：确定性随机 （证据：见 33.1–33.3；src/core/kernel/random/random-ops.ts, src/core/kernel/random/shadow-stream.ts）
+  - [x] 33.1 实现 random.roll/random.pick/random.shuffle/random.weightedPick 四个公开 Op （证据：src/core/kernel/random/random-ops.ts, src/core/kernel/random/__tests__/random.test.ts:50,106）
     - 注意：这四个操作会推进 `RngStream.counter`，是状态写入，必须注册进 `OpRegistry`（design.md 3.4/3.11节修补），不得实现为独立组件方法，也不得纳入 L2 Expr 的内置算子表（对应第10.1步已标注的分类修正）
     - 实现命名流参数强制
     - 实现流状态纳入 WorldState
     - _需求：35.1、35.2、35.3、35.5、16.1_
-  - [ ] 33.2 实现 withShadowStream 影子流
+  - [x] 33.2 实现 withShadowStream 影子流 （证据：src/core/kernel/random/shadow-stream.ts, src/core/kernel/random/__tests__/random.test.ts:144,177（Property 17））
     - 实现试探期间 `random.*` 系列 Op 读写影子流而不推进主流 counter（`withShadowStream` 本身不是 Op，见 design.md 3.11节说明）
     - _需求：35.4_
-  - [ ] 33.3 编写随机确定性与影子流隔离的属性测试
+  - [x] 33.3 编写随机确定性与影子流隔离的属性测试 （证据：src/core/kernel/random/__tests__/random.test.ts:50,106（Property 16）, :144,177（Property 17）, :329（Property 30）, src/core/kernel/expr/__tests__/operator-families.test.ts:282）
     - **Property 16: 随机流的确定性回放**
     - **Validates: Requirements 35.3, 37.3**
     - **Property 17: 影子流不污染主流**
@@ -522,131 +544,131 @@
     - **Property 30: random.* 系列 Op 不出现在 Expr 求值路径中**
     - **Validates: Requirements 12.8, 35.5**
 
-- [ ] 34. 实现 L11 Knowledge：信息不对称
-  - [ ] 34.1 实现 KnowledgeStore 纯读方法（getFacts/knows）
+- [x] 34. 实现 L11 Knowledge：信息不对称 （证据：见 34.1–34.3；src/core/kernel/knowledge/knowledge-store.ts）
+  - [x] 34.1 实现 KnowledgeStore 纯读方法（getFacts/knows） （证据：src/core/kernel/knowledge/knowledge-store.ts, src/core/kernel/knowledge/__tests__/knowledge.test.ts:13,16,22,31,45）
     - 注意：不实现 `setFact` 方法——写入 `facts` 直接复用第14.1步已实现的 `prop.set` Op（`path` 指向 `knowledge.${scopeId}.facts.${key}`），不新增第二条写入路径（design.md 3.12节修补）
     - 实现 `facts` 值域为任意 Value，不做真值校验
     - 实现 `knows`
     - _需求：36.1、36.2、36.3、36.4、16.1_
-  - [ ] 34.2 实现 visibleTo 过滤接入 QueryEngine
+  - [x] 34.2 实现 visibleTo 过滤接入 QueryEngine （证据：src/core/kernel/expr/query-engine.ts, src/core/kernel/knowledge/__tests__/knowledge.test.ts:102,103,146,168, src/core/kernel/expr/__tests__/query-log.test.ts:66）
     - 接入第 11 步的 QueryEngine 占位逻辑，实现 `visibility` 表达式求值过滤
     - 验证 AI 与人类玩家共用同一查询接口，差异仅在 `visibleTo` 参数
     - _需求：36.5、36.6、需求 44.3_
-  - [ ] 34.3 编写认知查询一致性的属性测试
+  - [x] 34.3 编写认知查询一致性的属性测试 （证据：src/core/kernel/knowledge/__tests__/knowledge.test.ts:76,168,215（认知查询一致性与隔离属性测试））
     - **Property**：*对于任意* 非 `omniscient` 的 Agent 发起的 Query，结果集不应包含其 `visibility` 谓词判定为不可见的对象
     - **Validates: Requirements 36.5**
 
-- [ ] 35. 实现 L12 Persistence：快照与回放
-  - [ ] 35.1 实现 snapshot 与结构共享
+- [ ] 35. 实现 L12 Persistence：快照与回放 （待测：子项 35.3 的 Policy search 回填与 35.4 的第三项隔离未闭合；35.1/35.2/35.5/35.6 已有证据）
+  - [x] 35.1 实现 snapshot 与结构共享 （证据：src/core/kernel/persistence/persistence.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:18,19,25,35（Property 18））
     - 实现不可变、结构共享的快照
     - _需求：37.1_
-  - [ ] 35.2 实现 journal 与 replay
+  - [x] 35.2 实现 journal 与 replay （证据：src/core/kernel/ops/transaction.ts, src/core/kernel/persistence/persistence.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:58,88,89,339）
     - 实现每个 Op 及其逆操作的记录
     - 实现 `replay(seed, ops)`
     - _需求：37.2、37.3_
-  - [ ] 35.3 实现 checkpoint/restore 并接入 L9 Policy 的 search 模式
+  - [ ] 35.3 实现 checkpoint/restore 并接入 L9 Policy 的 search 模式 （待测：checkpoint/restore 本体已实现且有测试（src/core/kernel/persistence/persistence.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:104,105,319），但"回填第 31 步 Policy search 占位接口"未完成——src/core/kernel/schedule/__tests__/schedule.test.ts:280 仍断言 search 为 placeholder）
     - 注意：`checkpoint`/`restore`/`rewind`/`replay` 属于写入通道情形(d)（切换整个 `WorldState` 引用，不是修改字段），不注册进 `OpRegistry`，但仍只能在事务边界之间调用（design.md 3.13节分类标注）
     - 回填第 31 步的占位接口为真实实现
     - _需求：37.5_
-  - [ ] 35.4 实现 rewind 与 AI 试探三项隔离
+  - [ ] 35.4 实现 rewind 与 AI 试探三项隔离 （待测：rewind 已实现且有幂等性属性测试（src/core/kernel/persistence/__tests__/persistence.test.ts:215,216,233）；"三项隔离"只有两项有落点（影子流 src/core/kernel/random/shadow-stream.ts、Query 强制 visibleTo src/core/kernel/knowledge/__tests__/knowledge.test.ts:146），"after 阶段表现层订阅静默"在 src/core/kernel/persistence 内无实现（现落在 src/core/kernel/ai/kernel/presentation-silencer.ts，属 wakeup-ai 交付，归属待裁决））
     - 实现 `rewind(phases)`
     - 实现试探期间随机走影子流、Query 强制 visibleTo、after 阶段表现层订阅静默
     - _需求：37.4、37.6、37.7_
-  - [ ] 35.5 实现有界日志与 Query(from:'log') 接入
+  - [x] 35.5 实现有界日志与 Query(from:'log') 接入 （证据：src/core/kernel/state/event-log.ts, src/core/kernel/state/__tests__/event-log.test.ts, src/core/kernel/expr/__tests__/query-log.test.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:196,204,386）
     - 回填第 11 步的 `from:'log'` 占位逻辑
     - 实现 `PlaypackDef.logRetention` 驱动的保留窗口
     - _需求：15.1、15.2、15.3、15.4_
-  - [ ] 35.6 编写快照不可变性与随机确定性回放的属性测试
+  - [x] 35.6 编写快照不可变性与随机确定性回放的属性测试 （证据：src/core/kernel/persistence/__tests__/persistence.test.ts:25,35（Property 18 快照不可变））
     - **Property 18: 快照的结构共享与不可变性**
     - **Validates: Requirements 37.1**
 
-- [ ] 36. 实现 L12 版本迁移
-  - [ ] 36.1 实现 MigrationDef 与装载时序比对
+- [x] 36. 实现 L12 版本迁移 （证据：见 36.1–36.2；src/core/kernel/persistence/persistence.ts）
+  - [x] 36.1 实现 MigrationDef 与装载时序比对 （证据：src/core/kernel/persistence/persistence.ts, src/core/kernel/persistence/__tests__/persistence.test.ts:139,140,153,186,187）
     - 实现版本相同/较旧有迁移链/较旧无迁移链/更新四种分支
     - 实现迁移在专属事务中执行，失败按 `onFail` 处理
     - 验证不支持对局中热更换玩法包
     - _需求：38.1、38.2、38.3、38.4、38.5、38.6、38.7_
-  - [ ] 36.2 编写版本迁移分支覆盖的单元测试与事务性属性测试
+  - [x] 36.2 编写版本迁移分支覆盖的单元测试与事务性属性测试 （证据：src/core/kernel/persistence/__tests__/persistence.test.ts:187（compareVersions 四种比对分支）, :153,165（Property 28 迁移事务性））
     - 覆盖四种版本比对分支各至少一个具体用例
     - **Property 28: 版本迁移的事务性**
     - **Validates: Requirements 38.4, 38.5**
     - 注：此前版本没有为迁移的事务性/回滚编写任何属性测试，只在 Testing Strategy 里被列为单元测试示例但未覆盖 `onFail` 两种分支的状态一致性，此处补齐
 
-- [ ] 37. 检查点：L10 Random、L11 Knowledge、L12 Persistence 完整性
+- [ ] 37. 检查点：L10 Random、L11 Knowledge、L12 Persistence 完整性 （未做：依赖任务 35.3（Policy search 回填）与 35.4（表现层订阅静默），两者未闭合；随机 / 认知 / 快照 / 迁移部分已绿（src/core/kernel/random/__tests__/random.test.ts, src/core/kernel/knowledge/__tests__/knowledge.test.ts, src/core/kernel/persistence/__tests__/persistence.test.ts））
   - 运行全部相关属性测试，确认随机、认知、持久化、版本迁移全部通过
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 38. 实现 L13 Safety：诊断体系
-  - [ ] 38.1 实现 ERR_CODES 唯一真相源与 ErrCode 派生类型
+- [x] 38. 实现 L13 Safety：诊断体系 （证据：见 38.1–38.6；src/core/kernel/safety/safety.ts, src/core/kernel/state/error-codes.ts）
+  - [x] 38.1 实现 ERR_CODES 唯一真相源与 ErrCode 派生类型 （证据：src/core/kernel/state/error-codes.ts（ERR_CODES / FATAL_PREFIXES）, src/core/kernel/safety/__tests__/safety.test.ts:93,519）
     - 实现 `ERR_CODES` 常量表与派生的 `ErrCode`/`FATAL_PREFIXES`
     - _需求：39.5、39.6_
-  - [ ] 38.2 实现 DiagnosticSink：四级严重度与 fatal 处理
+  - [x] 38.2 实现 DiagnosticSink：四级严重度与 fatal 处理 （证据：src/core/kernel/safety/safety.ts, src/core/kernel/safety/fatal-boundary.ts, src/core/kernel/safety/__tests__/safety.test.ts:21,22,29,93,104）
     - 实现 `emit(d, ctx)`/`onFatal`（注意 `emit` 接收调用方的 `OpContext`，本身不是游离的全局单例方法，因为它会写入 `world.log` 并可能触发 `ruleCircuitState` 更新，见 design.md 3.14节修补）
     - 实现 fatal 触发回滚+落盘+停机，error 触发事务回滚+继续
     - _需求：39.1、39.2、39.3、39.4、16.1_
-  - [ ] 38.3 实现诊断消息与 hint 提示词条机制
+  - [x] 38.3 实现诊断消息与 hint 提示词条机制 （证据：src/core/kernel/safety/safety.ts（HINT_TEMPLATES / checkHintCompleteness）, src/core/kernel/safety/__tests__/safety.test.ts:117,118,123,519）
     - 实现 `HINT_TEMPLATES` 与词条完整性自检（缺失词条即测试失败）
     - _需求：39.7_
-  - [ ] 38.4 实现规则熔断：WorldState.world.ruleCircuitState + recordRuleError helper + isDisabled 纯读函数
+  - [x] 38.4 实现规则熔断：WorldState.world.ruleCircuitState + recordRuleError helper + isDisabled 纯读函数 （证据：src/core/kernel/state/world-state.ts（ruleCircuitState）, src/core/kernel/safety/safety.ts（RuleCircuitBreaker / isDisabled）, src/core/kernel/safety/__tests__/safety.test.ts:132,142,153,174,429,452；注：design 命名的 recordRuleError helper 实现为 RuleCircuitBreaker 的类方法，命名与 design 不一致）
     - 注意：熔断的连续错误计数与停用状态必须纳入 `WorldState`（新增 `ruleCircuitState` 字段，design.md 4.1节修补），不得保存在独立组件的宿主进程内存中——否则从存档 `replay` 时，被熔断的规则会在重放中重新参与 Hook 分发，产生与原始运行不同的结果
     - 实现 `recordRuleError` 私有 helper，由 `HookDispatcher` 在捕获到 Hook 内部报错时、在触发该次分发的 Op 事务范围内调用（不开新事务）
     - 实现滑动窗口计数与规则停用（同一事务内把 `disabled` 置真并生成 `W_RULE_DISABLED`）
     - 实现 `isDisabled` 纯读函数，接入第 17 步的单条 Hook 失败隔离
     - _需求：39.8、39.13、16.1_
-  - [ ] 38.5 实现诊断去重折叠与有界日志容量
+  - [x] 38.5 实现诊断去重折叠与有界日志容量 （证据：src/core/kernel/safety/safety.ts, src/core/kernel/safety/__tests__/safety.test.ts:38,46,54,63,75,380）
     - 实现相同 `(code, at.def, at.field)` 折叠
     - 实现容量超限的丢弃优先级（info→warn，error/fatal 不丢）
     - _需求：39.9、39.10_
-  - [ ] 38.6 编写 fatal 映射不可覆盖与规则熔断可复现性的属性测试
+  - [x] 38.6 编写 fatal 映射不可覆盖与规则熔断可复现性的属性测试 （证据：src/core/kernel/safety/__tests__/safety.test.ts:93,104（Property 20）, :174（Property 29））
     - **Property 20: 诊断的 fatal 映射不可覆盖**
     - **Validates: Requirements 39.6**
     - **Property 29: 规则熔断状态的可复现性**
     - **Validates: Requirements 39.13**
 
-- [ ] 39. 实现 L13 Safety：加载期 Linter 与配额
-  - [ ] 39.1 实现九类加载期检查器
+- [ ] 39. 实现 L13 Safety：加载期 Linter 与配额 （待测：子项 39.3 的错误聚合属性测试缺失；39.1/39.2 已有证据）
+  - [x] 39.1 实现九类加载期检查器 （证据：src/core/kernel/safety/safety.ts（Linter）, src/core/kernel/safety/__tests__/safety.test.ts:197–304,470,495,506）
     - 实现引用存在性、类型一致性、while 的 maxIter、具名表达式环、Def 继承环、aura.deps 完整性、玩法包冲突、玩法包自定义 linter、配额九个独立检查函数
     - 实现 `PlaypackLoader.load` 聚合全部检查器输出（不短路）
     - _需求：39.11、39.12_
-  - [ ] 39.2 实现 QuotaEnforcer
+  - [x] 39.2 实现 QuotaEnforcer （证据：src/core/kernel/safety/safety.ts（QuotaEnforcer）, src/core/kernel/ops/structural-ops.ts, src/core/kernel/safety/__tests__/safety.test.ts:315,316,330,338）
     - 实现 entities/attachments/rules 三类配额检查
     - 实现挂在结构性 Op 的 before 阶段，超额拒绝并产出对应诊断
     - 实现配额数值本身的非负有限性校验
     - _需求：41.1、41.2、41.3、41.4_
-  - [ ] 39.3 编写加载期错误聚合的属性测试
+  - [ ] 39.3 编写加载期错误聚合的属性测试 （待测：无"同时违反多条加载期检查时诊断列表包含全部违反项、不短路"的属性测试；src/core/kernel/safety/__tests__/safety.test.ts:470 只断言 Linter 不抛异常，:290 只断言自定义 linter 结果被合并）
     - **Property**：*对于任意* 同时违反多条加载期检查的 Def 集合，`PlaypackLoader.load` 返回的诊断列表应包含全部违反项，不应只报告第一个
     - **Validates: Requirements 39.12**
 
-- [ ] 40. 实现边界不存在性架构测试
+- [ ] 40. 实现边界不存在性架构测试 （未做：全仓无任何测试断言 kernel 导出面不含坐标系 / 真实时钟 / Flow 闭包语法 / 寻路扩展点 / 网络协议类型。实测这些符号确实不存在于 src/core/kernel（coordinate / Vector2 / performance.now / WebSocket 均无命中），但"不存在"这件事没有任何机器守卫，加回来不会有任何测试失败）
   - 编写静态扫描测试，验证内核不导出坐标系类型、真实时钟接口、Flow 的函数定义/闭包语法、寻路算法自定义扩展点、网络协议相关类型
   - 验证 `kernel/index.ts` 导出面不包含任何被需求42列为排除项的接口
   - _需求：42.1、42.2、42.3、42.4、42.5、42.6、42.7_
 
-- [ ] 41. 检查点：L13 Safety 完整性
+- [ ] 41. 检查点：L13 Safety 完整性 （未做：依赖任务 40（边界排除性架构测试）缺失，本检查点的"边界排除全部通过"无证据；诊断 / Linter / 配额部分已绿（src/core/kernel/safety/__tests__/safety.test.ts））
   - 运行全部 L13 属性测试与架构测试，确认诊断体系、Linter、配额、边界排除全部通过
   - 向用户报告完成情况，等待确认后继续
 
-- [ ] 42. 实现表现层只读通道
-  - [ ] 42.1 实现 PresentationGateway
+- [x] 42. 实现表现层只读通道 （证据：见 42.1–42.2；src/core/kernel/gateway.ts, src/core/kernel/__tests__/gateway.test.ts）
+  - [x] 42.1 实现 PresentationGateway （证据：src/core/kernel/gateway.ts, src/core/kernel/__tests__/gateway.test.ts:33,34, src/core/kernel/__tests__/e2e.test.ts:172）
     - 实现 `subscribe`/`query`/`queryActions` 三个方法，分别转发到已有接口
     - 验证 Entity/Item id 在整局内稳定
     - 验证 Gateway 不导出任何 Op 类型
     - _需求：40.1、40.2、40.3、40.4、40.5_
-  - [ ] 42.2 编写表现层只读边界的属性测试
+  - [x] 42.2 编写表现层只读边界的属性测试 （证据：src/core/kernel/__tests__/gateway.test.ts:74,77（断言导出面不含 Transaction / WorldStateHolder））
     - **Property**：*对于任意* `PresentationGateway` 的公开方法集合，静态类型检查应确认其返回值与参数类型不包含 `OpRegistry`/`Transaction`
     - **Validates: Requirements 40.5**
 
-- [ ] 43. 实现拓扑可达性与 AI 可计算性的端到端验证
-  - [ ] 43.1 编写嵌套深度不变性的端到端测试
+- [ ] 43. 实现拓扑可达性与 AI 可计算性的端到端验证 （待测：子项 43.2 的两项断言缺失；43.1 已有证据）
+  - [x] 43.1 编写嵌套深度不变性的端到端测试 （证据：src/core/kernel/__tests__/e2e.test.ts:35,38,56,88, src/core/kernel/testing/__tests__/fuzz-deep-nesting.test.ts:20,65,109,154）
     - 构造容器嵌套 3 层以上、微型场景嵌套、Def 继承链 5 层以上的组合场景，验证访问任意深度要素所用的 Op/Query 调用形式与浅层场景一致
     - _需求：43.1、43.2、43.3、43.4、43.5_
-  - [ ] 43.2 编写 AI/人类决策一致性的端到端测试
+  - [ ] 43.2 编写 AI/人类决策一致性的端到端测试 （待测：src/core/kernel/__tests__/e2e.test.ts:132,135,158,198 已覆盖 queryActions ai/ui 一致性与 policy rules 选取，但 :198 自述为 "search skeleton"，"人类手动选择与 mode:'search' 可达最终状态集合一致"未断言；"具名表达式 overrides 对 AI 判定同样生效"亦无断言（src/core/kernel/expr/__tests__/named-expr.test.ts:52 只覆盖 applyOverrides 本身））
     - 构造一个简单双人零和场景，分别用人类手动 `queryActions` 选择与 `PolicyDef.mode:'search'` 走 `checkpoint`/`restore` 跑同一局面，断言可达最终状态集合一致
     - 验证新增 ActionDef 后 AI policy 自动纳入而不修改 policy 本身
     - 验证具名表达式的 `overrides` 对 AI 判定同样生效
     - _需求：44.1、44.2、44.3、44.4、44.5、44.6、44.7_
 
-- [ ] 44. 最终检查点：内核完整性验收
+- [ ] 44. 最终检查点：内核完整性验收 （未做：依赖任务 40 / 41 未闭合；"逐条核对 44 条需求与任务列表的可追溯性"与"逐一核对 design.md 3.4 节 Op 全集清单"两项核对无任何产出记录。当前全量测试为 2016/2016 通过（vitest.config.ts（npm test 全量 2016/2016 通过、0 失败，2026-08-09 实测）），但"测试全绿"不等于本检查点的两项核对已完成）
   - 运行全部单元测试与 30 条正确性属性测试，确认 `vitest` 全绿
   - 运行畸形输入模糊测试（Expr/Def JSON/越界索引/循环引用），确认零 fatal、零未捕获异常、零挂死
   - 核对 44 条需求与本任务列表的可追溯性：逐条需求确认至少一个任务覆盖

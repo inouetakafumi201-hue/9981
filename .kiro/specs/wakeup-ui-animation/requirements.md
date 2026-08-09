@@ -1,432 +1,621 @@
-# Requirements Document
+# 需求文档：UI 与动画表现系统
 
-## Introduction
+## 一、引言
 
-本文档定义 WakeUp **UI 与动画表现系统**的工程需求。该系统是规则状态的只读投影与交互入口，不是第二套规则引擎：它读取引擎层提供的只读 `Query` / `Expr`、合法动作查询、`Decision` / `Intent`、`Knowledge` / `visibleTo` 与事件投影，消费基类层提供的 `Presentation Descriptor`，并把会影响规则状态的用户操作提交为待校验的交互意图。任何最终状态变化都必须由权威运行时通过 `OpRegistry.invoke` 完成。
+本文档定义 WakeUp **UI 与动画表现系统**的工程需求。该系统是规则状态的**只读投影与交互入口**，不是第二套规则引擎。
 
-本文档依据以下优先级裁决来源：
+它的位置：
 
-1. `docs/L0_规范宪法.md`
-2. `docs/访谈决策记录.md` 中已确认的 D-024、D-025、D-026，以及 2026-08-07 访谈轮次确认的 **D-031（弱点完全公开）、D-032（招架真隐藏 + 全屏动画扩为四项）、D-033（瞄准低显著性红点线）、D-034（观战信息权限）、D-035（AP 耗尽仅置灰）、D-036（轮次栏为核心组件）、D-042（零费菜单切换与 3 秒倒计时）、D-053（招架等六项机制批准为正式规则）**。同编号冲突时以日期较晚的已确认决策为准。
-3. `.kiro/specs/meta-mechanism-kernel/requirements.md` 与 `.kiro/specs/meta-mechanism-kernel/design.md`
-4. `docs/L1_引擎层/引擎层职责边界.md`
-5. `.kiro/specs/l2-base-layer-spec/requirements.md`
-6. `docs/L2_基类层/08_图形化与UI.md`
-7. `docs/_术语表与废案清单.md`、`docs/审查状态综合报告.md` 中仍有效的约束
+- 向上读取引擎层提供的只读 `Query` / `Expr`、合法动作查询、`Decision` / `Intent`、`Knowledge` / `visibleTo` 与事件投影；
+- 向侧消费基类层提供的**表现描述符**（Presentation Descriptor）；
+- 向下把会影响规则状态的用户操作提交为**待校验的交互意图**。
 
-低优先级来源中的视觉 mockup、具体布局、像素尺寸、动画时长、素材路径、帧率、性能候选值、按键示例与玩法示例不自动成为本 Spec 的语义默认值。来源冲突时采用上述优先级；未被上游稳定契约定义的跨 Spec 字段必须保留为“待汇合契约”，不得在本 Spec 中自行补造规则。
+任何最终状态变化都必须由权威运行时通过 `OpRegistry.invoke` 完成。本系统不持有可变世界状态，不复制规则判定，不用动画、音效、资源加载或本地时钟推进规则结算。
 
-## Scope and Ownership
+本文档全文为规范正文，验收标准可机械判定。文中"应"表示强制要求，"不得"表示强制禁止，"可"表示允许但不强制。
 
-### 本 Spec 负责
+---
 
-- 将当前 Agent 有权看到的规则语义投影为 UI 与动画可消费的描述。
-- 将规则相关输入表达为交互意图，并提交给与其他调用方相同的权威校验通道。
+## 二、权威来源与适用顺序
+
+### 2.1 优先级
+
+发生冲突时，按下列顺序解释，序号小者优先：
+
+| 序号 | 来源 | 控制内容 |
+|---|---|---|
+| S-01 | `docs/L0_规范宪法.md` | 三层职责、术语铁律、数值范围、五并列原则 |
+| S-02 | `docs/访谈决策记录.md` 中**状态为"已确认"**的决策 | 项目所有者裁决，位阶高于任何 Spec 自身条款 |
+| S-03 | `.kiro/specs/meta-mechanism-kernel/requirements.md` 与 `design.md` | 引擎层不变量、唯一写入通道、可见性、持久化、诊断 |
+| S-04 | `docs/L1_引擎层/引擎层职责边界.md` | 引擎层 0 游戏知识的边界 |
+| S-05 | `.kiro/specs/l2-base-layer-spec/requirements.md` | 基类层继承/组合、数值归属、语义拒绝与表现降级 |
+| S-06 | `docs/L2_基类层/08_图形化与UI.md` | 视觉方向、轮次栏、菜单分离、悬停提示等 UI 层级权威内容 |
+| S-07 | `docs/_术语表与废案清单.md` | 术语铁律与废案清单 |
+| S-08 | `docs/00_主状态板.md`、`docs/02_项目全局报告.md` | 进度真相与信任判断（L0.5） |
+
+### 2.2 本 Spec 直接受约束的已确认决策
+
+| 决策 | 结论要点 | 落在本文件 |
+|---|---|---|
+| D-023 | 全对称信息原则：规则中所有数值理论上可见，是否呈现属表现取舍 | 要求 3、要求 10 |
+| D-024 | 视觉风格定案：像素艺术交互组件 + 简笔画地图背景 + 前后景分离合成 | 要求 6 |
+| D-025 | 动画技术方案不得以第三方游戏名命名 | 要求 6 |
+| D-026 | 全屏仪式动画收敛为低频仪式性动作 | 要求 6（已被 D-032 扩为四项） |
+| D-031 | 弱点属性完全公开，头顶图标常驻 | 要求 3 |
+| D-032 | 招架真隐藏；仅被近战攻击时全屏动画，远程/不可招架伤害静默失效 | 要求 3、要求 6 |
+| D-033 | `[瞄准中]` 低显著性：悬停显示红点线，无头顶强提示 | 要求 3 |
+| D-034 | 观战与在局信息权限一致，差别仅在视角可自主移动 | 要求 3 |
+| D-035 | 行动预算耗尽仅低显著性置灰，不移出轮次栏 | 要求 6、要求 16 |
+| D-036 | 轮次栏为核心组件：左侧常驻、兼任简易状态栏、兼任投掷/比较动效舞台 | 要求 6、要求 16 |
+| D-041 | 空手进场：出生时手部与背包槽位全空 | 要求 17 |
+| D-042 | 付费菜单与零费菜单互斥切换；预算耗尽后仅剩零费菜单 + 结束回合（3 秒倒计时） | 要求 5 |
+| D-047 | 新增「蹲下」姿态；远程可瞄准轮胎作为子目标 | 要求 17 |
+| D-049 | 弱点效果不含伤害翻倍；伤害翻倍只来自骰点超出 DC 2 点及以上 | 要求 16 |
+| D-051 | 距离基准从 1 起算，距离 1 = 贴身（同一微型场景） | 要求 17 |
+| D-052 | NPC 有独立体力池（默认上限 3、开局 0），不可用于争夺行动轮 | 要求 16 |
+| D-053 | 逆转、超逆转、处决后行动轮提升、弱点命中、招架、`[失衡]` 六项为标准默认规则 | 要求 16 |
+| D-054 | 投点固定 1d6；1d6 原始骰点判定为内部瞬时数值，不作为持久玩家可见玩法数值 | 要求 10、要求 16 |
+| D-055 | 体力过载为标准规则：体力封顶 5、未行动者失去本回合行动权、跳过一次投点后下下回合归队、过载期间仍可观察他人回合 | 要求 16 |
+| D-060 | 判定原则三条（见 2.3） | 要求 1 |
+
+### 2.3 判定原则（D-060，对本 Spec 的一切审查与修订均适用）
+
+1. **授权方向**：玩法层数值与规则**不需要宪法逐项授权**。只要不越层、且玩家可见数值落在 1–5 内即为合法。宪法给出的是区间，不是要求每个取值另找来源。
+2. **文档矛盾 ≠ 机制无效**：来源文档自相矛盾时，正确处置是**提请裁决并登记**，不是默认否决。默认否决等于让"写得乱"变成"禁止实现"。
+3. **来源清单不完备 ≠ 无权威**：上表 S-0x 是**引用便利**，不是权威白名单。`docs/L0_规范宪法.md`、已确认的访谈决策、各层定稿文档，无论是否被本表列出，都具备其固有位阶。
+
+### 2.4 非规范来源
+
+下列内容**不自动成为**本 Spec 的语义默认值或验收常量：视觉草图、具体布局、像素尺寸、Z-Index 数值、动画时长、素材路径、帧率、性能候选值、按键示例、颜色色值、玩法示例、历史里程碑与人力估算。
+
+后续设计可以为这些表现关注点选定取值，但必须保持**可替换、可见性安全、且不能影响语义状态**。
+
+未被上游稳定契约定义的跨 Spec 字段必须保留为**待汇合契约**，不得在本 Spec 中自行补造规则。
+
+---
+
+## 三、职责范围与归属
+
+### 3.1 本 Spec 负责
+
+- 把当前 Agent 有权看到的规则语义投影为 UI 与动画可消费的描述。
+- 把规则相关输入表达为交互意图，并提交给与其他调用方相同的权威校验通道。
 - 定义表现资源的加载、播放、跳过、失败、回放、回退与可访问性行为。
 - 定义语义字段拒绝与非语义表现资源降级的分界。
-- 定义项目表现配置如何承载已确认的视觉风格与动画范围。
+- 定义项目表现配置（`Presentation_Profile`）如何承载已确认的视觉风格、显著性分层、仪式动画范围与轮次栏结构。
 
-### 本 Spec 不负责
+### 3.2 本 Spec 不负责
 
 - 定义或复制动作合法性、成本、伤害、距离、状态、回合、空间、物品、AI 决策或随机规则。
-- 直接读取或修改可变 `WorldState`，也不导出绕过权威动作校验的状态写入接口。
+- 直接读取或修改可变世界状态，也不导出绕过权威动作校验的状态写入接口。
 - 把玩法专属 HUD、具体模式流程、具体美术素材或玩法提示提升为基类层默认语义。
 - 固定渲染框架、动画库、网络库、布局坐标、素材文件名、像素尺寸、帧率目标或动画时长。
 - 用动画完成、音效完成、资源加载结果或本地时钟推进规则结算。
 
-## Glossary
+---
 
-- **UI_Animation_System**：本文档定义的 UI 与动画表现系统。
-- **Semantic_State**：会影响动作合法性、规则结果、随机结果、结算顺序或持久化结果的权威状态。
-- **Read_Only_Projection**：由已验证定义与运行时状态派生、受 Agent 可见性限制且不提供写能力的视图。
-- **Presentation Descriptor**：基类层提供的可复用表现描述，包含语义角色、交互意图、动作标识、姿态、成本类别、可用性、不可用原因、可访问性标签与素材引用等字段。【2026-08-08 权威变更：已删除"攻击形状"字段，判定为冗余设计，见 docs/L0_规范宪法.md、docs/L2_基类层/基类层定义.md §4.3 最新权威内容】
-- **Presentation_Profile**：玩法层或表现资源层拥有的可替换配置，负责具体布局、资源绑定、动效参数与玩法专属界面组织；不改变规则语义。
-- **Interaction_Intent**：UI 根据一次被接受的用户操作形成的结构化请求，至少绑定当前 Agent、权威动作或 Decision 标识、参数绑定和观察到的状态修订版本；其提交不代表执行成功。
-- **Rule_Event_Projection**：从已提交规则事件派生、经过可见性过滤的只读演出增量。
-- **State_Revision**：用于识别 UI 所观察状态是否已过期的单调版本标识或等价一致性令牌；具体形态由设计阶段与上游统一。
-- **Stale_Interaction**：因状态变化、Decision 关闭、目标失效或修订版本落后而不再可执行的交互意图。
-- **Authorized_Agent**：当前窗口代表、且其 `knowledgeScope` 与权限已由权威运行时确认的 Agent。
-- **Visibility_Safe**：不会直接或间接暴露当前 Agent 不可见的实体、Intent、事实、规则条件、资源标识、计数、顺序或诊断细节。
-- **Semantic_Field**：影响类型、动作身份、目标、合法性、规则结果、可见性或可访问性所依赖的底层语义角色的字段。
-- **Presentation_Field**：只影响名称呈现、图标、纹理、音效、触觉、动画、布局或可本地化的可访问性文本且不改变规则结果的字段。
-- **Accessible_Semantic_Label**：以 Visibility_Safe 方式表达已验证语义角色的 Presentation_Field；它不得成为语义角色的唯一来源，缺失时只能依据已验证语义字段选择已声明的类型兼容替代文本。
-- **Presentation_Fallback**：非语义表现资源缺失或损坏时使用的类型兼容替代行为，并伴随结构化警告诊断。
-- **Player_Visible_Gameplay_Value**：作为玩法规则事实呈现给玩家的数值，受 1—5 范围约束。
-- **Internal_Metric**：回合编号、实体数量、距离计算、结算预算、资源尺寸、帧率、耗时和性能统计等非玩法数值；必须与玩家玩法数值分域。
-- **Reduced_Motion_Mode**：减少、替换或跳过非必要动态效果而保持全部规则信息与交互能力的可访问性模式。
-- **Pending_Convergence_Contract**：本 Spec 需要其他领域提供、但尚未经过跨 Spec 一致性审查确认字段级签名的类型化只读能力。
+## 四、术语
 
-## Upstream Contracts
+- **UI 表现系统**：本文档定义的 UI 与动画表现系统。
+- **语义状态**：会影响动作合法性、规则结果、随机结果、结算顺序或持久化结果的权威状态。
+- **只读投影**：由已验证定义与运行时状态派生、受 Agent 可见性限制且不提供写能力的视图。
+- **表现描述符**：基类层提供的可复用表现描述，包含语义角色、交互意图、动作标识、姿态、成本类别、可用性、不可用原因、无障碍标签与抽象素材引用等字段。
+- **表现配置（`Presentation_Profile`）**：玩法层或表现资源层拥有的可替换配置，负责具体布局、资源绑定、动效参数、显著性分层登记与玩法专属界面组织；不改变规则语义。
+- **交互意图**：UI 根据一次被接受的用户操作形成的结构化请求，至少绑定当前 Agent、权威动作或 `Decision` 标识、参数绑定与观察到的状态修订令牌；其提交不代表执行成功。
+- **规则事件投影**：从已提交规则事件派生、经过可见性过滤的只读演出增量。
+- **状态修订令牌（`State_Revision`）**：用于识别 UI 所观察状态是否已过期的一致性令牌。它必须同时支持**判等**与**判序**（见要求 8）。
+- **过期交互**：因状态变化、`Decision` 关闭、目标失效或修订令牌落后而不再可执行的交互意图。
+- **授权 Agent**：当前窗口代表、且其 `knowledgeScope` 与权限已由权威运行时确认的 Agent。
+- **可见性安全**：不会直接或间接暴露当前 Agent 不可见的实体、`Intent`、事实、规则条件、资源标识、计数、顺序或诊断细节。
+- **语义字段**：影响类型、动作身份、目标、合法性、规则结果、可见性或无障碍语义角色的字段。
+- **表现字段**：只影响名称呈现、图标、纹理、音效、触觉、动画、布局或可本地化无障碍文本，且不改变规则结果的字段。
+- **无障碍语义标签**：以可见性安全方式表达已验证语义角色的表现字段；它不得成为语义角色的唯一来源。
+- **表现降级**：非语义表现资源缺失或损坏时使用的类型兼容替代行为，并伴随结构化警告诊断。
+- **显著性分层**：一个被投影状态的呈现强度档位，闭合三档：`public-persistent`（常驻公开）、`public-on-inspect`（公开但需主动检视）、`hidden`（真隐藏）。
+- **玩家可见玩法数值**：作为玩法规则事实呈现给玩家的数值，受 1–5 范围约束。
+- **内部度量**：回合编号、实体数量、距离计算、结算预算、骰点原始值、资源尺寸、帧率、耗时与性能统计等非玩法数值；必须与玩家可见玩法数值分域。
+- **减弱动效模式**：减少、替换或跳过非必要动态效果而保持全部规则信息与交互能力的可访问性模式。
+- **待汇合契约**：本 Spec 需要其他领域提供、但尚未经跨 Spec 一致性审查确认字段级签名的类型化只读能力。
 
-### 已稳定的上游契约
+---
+
+## 五、上游契约
+
+### 5.1 已稳定的上游契约
 
 | 提供方 | 本 Spec 只读消费的能力 | 本 Spec 不得做的事 |
 |---|---|---|
-| 引擎层 | `Query` / `Expr`、`queryActions`、`Decision` / `Intent`、`Knowledge` / `visibleTo`、`after:*` 事件投影、稳定实体标识、snapshot / replay / rewind 结果 | 复制合法性判定、读取越权状态、直接调用状态写 helper、用动画驱动相位 |
-| 基类层 | `Read_Only_Semantic_Projection`、`UI_Adapter`、`Presentation Descriptor`、语义字段拒绝、表现字段警告降级 | 从字段名猜测资源语义、把具体玩法值或具体布局写成基类层默认值 |
-| 权威运行时 | 当前 Agent 身份、状态修订版本、意图提交结果、结构化拒绝与重同步入口 | 把本地按钮状态当作权威锁、把请求已发送当作规则已生效 |
+| 引擎层 | `Query` / `Expr`、`queryActions`、`Decision` / `Intent`、`Knowledge` / `visibleTo`、`after:*` 事件投影、稳定实体标识、快照 / 重放 / 回退结果、单调日志序号 | 复制合法性判定、读取越权状态、直接调用状态写入 helper、用动画驱动相位 |
+| 基类层 | 只读语义投影、UI 适配器、表现描述符、语义字段拒绝、表现字段警告降级、`src/l2/model/**` 规范模型常量 | 从字段名猜测资源语义、把具体玩法值或具体布局写成基类层默认值 |
+| 权威运行时 | 当前 Agent 身份、状态修订令牌、意图提交结果、结构化拒绝与重同步入口 | 把本地按钮状态当作权威锁、把请求已发送当作规则已生效 |
 
-### 待汇合契约
+> **上游落点说明（D-061，待项目所有者批准）**：L2 声明式编译 / 校验 / 解析 / 注册 / 运行时提交管线的所有权裁决为 `src/l2/`，引擎级无游戏语义的 JSON 原语留在内核。本 Spec 的基类层依赖以 `src/l2/**` 为准。该裁决仍是待批准草案，若被否决，本节需同步修订，但**不影响**本文件的任何行为要求。
 
-下列依赖只声明所需能力，不读取或复制其他并行领域 Spec 的字段定义；字段名、枚举和版本由后续跨 Spec 一致性审查统一：
+### 5.2 待汇合契约
+
+下列依赖只声明**所需能力**，不读取或复制其他并行领域 Spec 的字段定义；字段名、枚举与版本由后续跨 Spec 一致性审查统一：
 
 | 提供方 | 所需只读能力 | 汇合前约束 |
 |---|---|---|
-| `core` | 资源语义角色、当前相位或流程语义、动作合法性与不可用原因、规则结果摘要、当前 Agent 可见的 Decision / Intent | UI 只能消费类型化投影，不得从 `props` 路径、显示文案或历史示例推导规则 |
-| `space-items` | 当前 Agent 可见的天然场景、微型场景、过渡、容器、槽位、物品、装备关系与合法交互描述 | UI 不得重算距离、容量、阻挡、负重、目标范围或物品移动合法性 |
-| `AI` | 当前 Agent 可见的 AI 行动状态、公开意图、可公开解释标签与进度事件 | UI 不得读取搜索树、隐藏评估、影子随机流、未公开目标或绕过 `visibleTo` 的策略内部状态 |
+| `wakeup-core-mechanics` | 资源语义角色、当前相位或流程语义、动作合法性与不可用原因、规则结果摘要、当前 Agent 可见的 `Decision` / `Intent`、行动轮排名与其变化事件 | UI 只能消费类型化投影，不得从 `props` 路径、显示文案或历史示例推导规则 |
+| `wakeup-space-items` | 当前 Agent 可见的天然场景、微型场景、过渡、容器、槽位、物品、装备关系、距离取值与合法交互描述 | UI 不得重算距离、容量、阻挡、负重、目标范围或物品移动合法性 |
+| `wakeup-ai` | 当前 Agent 可见的 AI 行动状态、公开意图、可公开解释标签与进度事件 | UI 不得读取搜索树、隐藏评估、影子随机流、未公开目标或绕过 `visibleTo` 的策略内部状态 |
 
-## Requirements
-
-### Requirement 1: 来源优先级、层级归属与可追踪性
+---
 
-**User Story:** As a 规范维护者, I want 每项 UI 与动画行为都有唯一归属和权威来源, so that 历史示例、视觉候选值和玩法规则不会被误升为基类层契约。
+## 六、需求
 
-**权威来源：** `docs/L0_规范宪法.md` 第一至五条；`.kiro/specs/l2-base-layer-spec/requirements.md` Requirement 1、2、5、16；P05 必须审查项 6、7、10。
+### 要求 1：来源优先级、层级归属与可追踪性
+
+**用户故事：** 作为规范维护者，我想要每项 UI 与动画行为都有唯一归属和权威来源，以便历史示例、视觉候选值与玩法规则不会被误升为基类层契约。
+
+**权威来源：** S-01 第一至五条；S-05 要求 1、2、5、16；S-02 之 D-060。
+
+#### 验收标准
+
+1. 两条来源陈述冲突时，UI 表现系统应按第 2.1 节声明的优先级取值。
+2. 当低优先级的视觉草图、历史示例或路线图陈述与高优先级契约冲突时，本文件应保留高优先级契约，并把被取代的陈述归类为非规范内容。
+3. UI 表现系统应把**可复用表现语义字段**归属基类层，把**具体 HUD 组合、玩法提示、资源绑定与动效调参**归属玩法层或表现资源层。
+4. 若某项候选需求指定伤害、成本、概率、持续时间、容量、阈值、胜负行为或模式顺序，则需求评审应以"玩法层归属重复"拒绝该需求；仅当它只是显示一个已验证的上游投影时才允许保留。
+5. 若某项候选需求把布局坐标、像素尺寸、帧率、动画时长、粒子数量、素材路径、设备按键或性能目标固定为语义行为，则需求评审应将其从语义契约中剔除。
+6. 每一条规范要求应关联至少一个权威来源，以及至少一种可机械判定的验收结果。
+7. 若导入的陈述把废用术语当作规范概念使用，则需求评审应拒绝该陈述并给出规范术语。本 Spec 的废用术语至少包括：**模板**（应为"实例"）、**内容层**（应为"基类层"）、**接敌面**（正确承担者是过渡阻挡机制）、**攻击形状 / 形状轴**（已被武器属性替代）、**延长**（应为"伸长"）、单独使用的 **Layer 1/2/3**。
+8. 若某项审查以"S 表未列出该文档"或"两处来源描述不一致"为理由否决一项已确认决策，则该审查结论应被拒绝，并按 D-060 改为登记待裁决事项。
+9. 若某项候选需求要在未获得新的已确认决策的情况下改写已确认决策的结论，则需求评审应拒绝该需求，并保留原结论与其决策编号。
 
-#### Acceptance Criteria
+### 要求 2：只读语义投影与描述符完整性
 
-1. THE UI_Animation_System SHALL apply the source priority declared in this document whenever two source statements conflict.
-2. WHEN a lower-priority visual mockup, historical example or route-map statement conflicts with a higher-priority contract, THE UI_Animation_System requirements SHALL retain the higher-priority contract and classify the displaced statement as non-normative.
-3. THE UI_Animation_System SHALL classify reusable semantic presentation fields as 基类层 ownership and concrete gameplay HUD composition, gameplay hints, asset bindings and presentation tuning as 玩法层 or presentation-resource ownership.
-4. IF a proposed requirement assigns damage, cost, probability, duration, capacity, threshold, victory behavior or mode sequence, THEN the requirement review SHALL reject it as duplicated gameplay ownership unless it only displays a validated upstream projection.
-5. IF a proposed requirement fixes a layout coordinate, pixel size, frame rate, animation duration, particle count, material path, device key or performance target as semantic behavior, THEN the requirement review SHALL reject it from the semantic contract.
-6. THE UI_Animation_System SHALL associate every normative requirement with at least one authority source and a mechanically decidable acceptance result.
-7. IF an imported statement uses a deprecated architecture term as a normative concept, THEN the requirement review SHALL reject the statement and identify the canonical term.
-
-### Requirement 2: 只读语义投影与描述符完整性
-
-**User Story:** As a UI 开发者, I want 所有规则与表现信息来自类型化只读投影, so that UI 不会复制规则、猜测字段含义或持有可变状态引用。
-
-**权威来源：** 引擎层 requirements Requirement 14、25、40；引擎层 design §3.15；基类层 requirements Requirement 14。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL obtain rule state only through Agent-scoped Read_Only_Projections, legal-action results, Decision / Intent projections and Rule_Event_Projections.
-2. THE UI_Animation_System SHALL obtain reusable presentation semantics only through validated Presentation Descriptors.
-3. THE Presentation Descriptor consumed by the UI_Animation_System SHALL carry stable semantic identifiers separately from localized labels and asset references.
-4. THE UI_Animation_System SHALL render resource roles, interaction intents, postures, cost categories, availability and unavailable reasons from explicit descriptor fields rather than field-name, color, file-name or tag heuristics. [2026-08-08 权威变更（本次会话裁决，已获项目所有者授权）：已删除 attack shapes；攻击形状判定为冗余设计，已被武器属性（散射/扫射/连发）完全覆盖。详见 docs/L0_规范宪法.md、docs/L2_基类层/基类层定义.md §4.3、docs/L2_基类层/08_图形化与UI.md 最新权威内容。]
-5. IF a required Semantic_Field is absent, incompatible, unresolved or outside the supported descriptor version, THEN the UI_Animation_System SHALL reject that descriptor, omit every interaction derived from it and emit an Error_Diagnostic.
-6. IF a UI consumer attempts to obtain a mutable Semantic_State reference through any projection or descriptor, THEN the adapter SHALL return a Structured_Rejection and expose no mutable reference.
-7. WHEN the renderer is replaced or re-created, THE UI_Animation_System SHALL preserve stable action, Decision, Intent, entity and descriptor identifiers in the resulting projection.
-8. THE UI_Animation_System SHALL NOT treat a cached projection as authoritative after its State_Revision is superseded.
-
-### Requirement 3: Agent 可见性与端到端防泄漏
-
-**User Story:** As a 玩家, I want 每个界面与演出只使用我有权知道的信息, so that 隐藏信息不会通过表现侧信道泄漏。
-
-**权威来源：** 引擎层 requirements Requirement 5、14、29、36、37、40；引擎层 design §3.12、§3.13、§3.15；P05 必须审查项 5。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL bind every Query, action query, Decision / Intent projection and Rule_Event_Projection to the Authorized_Agent and its current `visibleTo` scope.
-2. IF a raw event or diagnostic has not been filtered for the Authorized_Agent, THEN the UI_Animation_System SHALL reject it as a presentation input.
-3. THE UI_Animation_System SHALL NOT reveal a hidden entity, hidden Intent, hidden Decision answer, unknown fact or unmet secret condition through HUD entries, previews, target markers, animation choice, ordering, counts or unavailable reasons.
-4. THE UI_Animation_System SHALL NOT reveal hidden information through logs, debug panels, screen-reader text, captions, tooltips, focus labels, telemetry visible to users or clipboard/export output.
-5. THE UI_Animation_System SHALL NOT reveal hidden information through asset names, resource paths, preload timing, fallback type, audio cues, haptics or animation timing.
-6. WHEN an unavailable reason contains information outside the Authorized_Agent scope, THE UI_Animation_System SHALL display a Visibility_Safe generic reason supplied or approved by the projection layer rather than the raw reason.
-7. WHEN an entity becomes invisible after having been visible, THE UI_Animation_System SHALL remove or replace its live projection according to current Knowledge semantics and SHALL NOT continue updating it from hidden world truth.
-8. WHEN multiple windows represent different Agents, EACH window SHALL receive independently filtered projections and SHALL NOT share Agent-scoped caches.
-9. WHEN an omniscient view is requested, THE UI_Animation_System SHALL require explicit authority from the upstream Agent projection and SHALL NOT infer omniscience from a local debug setting.
-10. THE UI_Animation_System SHALL support exactly three Salience_Tiers for a projected state, and SHALL take the tier of each state from an explicit descriptor field rather than inferring it from the state's rule effect（D-031 / D-032 / D-033）:
-    - `public-persistent`：常驻显示，无需用户操作即可看到
-    - `public-on-inspect`：仅在用户主动检视（如悬停）该实体时呈现，且不得使用头顶感叹号一类的主动强提示
-    - `hidden`：对该状态的所有者以外的观察者完全不呈现
-11. THE WakeUp default Presentation_Profile SHALL classify 弱点属性 as `public-persistent` and SHALL render it as a persistent icon above the character（D-031：不需要消耗 AP 侦察，也不得把悬停查询作为唯一获取途径）.
-12. THE WakeUp default Presentation_Profile SHALL classify `[瞄准中]` as `public-on-inspect`, SHALL render it on hover as a red dotted line from the aimer to its aim target, and SHALL NOT render it as a persistent above-head indicator（D-033）.
-13. THE WakeUp default Presentation_Profile SHALL classify Parry_Ready as `hidden`（D-032；参见 Requirement 6.15）.
-14. IF a Presentation_Profile assigns a Salience_Tier that contradicts the rule-layer visibility classification of that state, THEN the UI_Animation_System SHALL reject the profile entry and emit an Error_Diagnostic rather than silently choosing either value.
-
-### Requirement 4: 交互意图与唯一写入通道
-
-**User Story:** As a 玩家, I want 我的输入经过与所有调用方相同的合法性校验, so that UI 无法绕过规则或制造半生效状态。
-
-**权威来源：** 引擎层 requirements Requirement 16、20、21、25、26、27、29、40；引擎层 design §2“写入通道唯一性”、§3.4、§3.7、§3.8、§3.15；P05 必须审查项 1、2。
-
-#### Acceptance Criteria
-
-1. WHEN a user selects a rule-affecting operation, THE UI_Animation_System SHALL create an Interaction_Intent referencing an action or open Decision returned by the current authoritative projection.
-2. THE Interaction_Intent SHALL include the Authorized_Agent, stable action or Decision identifier, selected bindings and the observed State_Revision or equivalent consistency token.
-3. THE UI_Animation_System SHALL submit Interaction_Intents through the same authoritative action contract used by non-UI callers.
-4. THE UI_Animation_System SHALL NOT directly invoke mutable state helpers, assign Semantic_State fields, advance random streams, settle costs, resolve Intents or advance phases.
-5. THE authoritative action contract SHALL revalidate Agent authority, action visibility, current legality, targets, costs, Decision status and current revision before any resulting Op is invoked.
-6. IF validation fails, THEN the UI_Animation_System SHALL display a Visibility_Safe Structured_Rejection, refresh the affected projection and SHALL NOT synthesize a compensating state write.
-7. WHEN submission succeeds, THE UI_Animation_System SHALL treat the operation as complete only after observing the authoritative result or a projection containing the committed revision.
-8. WHEN a user changes a presentation-only preference, THE UI_Animation_System MAY update local presentation state without an Interaction_Intent, provided that the preference cannot alter Semantic_State, action availability, random results or rule timing.
-9. IF a drag, shortcut, gesture, accessibility command or automation source requests the same rule action, THEN the UI_Animation_System SHALL submit the same Interaction_Intent shape and SHALL NOT use an input-specific write path.
-
-### Requirement 5: 输入禁用、重复提交与过期交互
-
-**User Story:** As a 玩家, I want 界面在状态变化和网络延迟下明确处理过期操作, so that 重复点击或旧 Decision 不会被误当作有效动作。
-
-**权威来源：** 引擎层 requirements Requirement 25—29、31、37、40；引擎层 design §3.7、§3.8、§3.13；P05 必须审查项 9。
-
-#### Acceptance Criteria
-
-1. WHILE an Interaction_Intent is awaiting authoritative acknowledgement, THE UI_Animation_System SHALL mark the corresponding control as pending and SHALL NOT create another Interaction_Intent from additional activation attempts on that pending control.
-2. IF input disabling is delayed, bypassed or unavailable, THEN every Interaction_Intent that reaches the authoritative action contract SHALL still undergo complete current-state revalidation; the UI disabled state SHALL NOT be treated as a rule-safety boundary.
-3. WHEN the current State_Revision changes, THE UI_Animation_System SHALL invalidate cached action bindings and re-query affected actions before allowing a new submission.
-4. IF a Decision is resolved, timed out, voided, closed or no longer visible, THEN the UI_Animation_System SHALL remove its controls and reject attempts to submit its stale answer.
-5. IF an action target disappears, changes identity, becomes invisible or ceases to satisfy the projected binding, THEN the UI_Animation_System SHALL cancel the local selection and require a new legal-action result.
-6. WHEN an authoritative rejection reports stale state, THE UI_Animation_System SHALL reconcile to a fresh Read_Only_Projection before re-enabling the affected interaction.
-7. THE UI_Animation_System SHALL NOT infer success from a button becoming disabled, an animation starting, a sound playing or a request leaving the client.
-8. WHEN two windows for the same Agent submit competing interactions, EACH submission SHALL be independently validated against authoritative state, and every window SHALL converge to the resulting committed projection.
-9. THE UI_Animation_System SHALL present actions in exactly two mutually exclusive menu surfaces keyed on `ActionDescriptor.costCategory` — a paid surface and a zero-cost surface — and SHALL NOT place a zero-cost action and a paid action in the same surface（D-042）.
-10. WHILE the acting Agent still has an unspent action budget, THE UI_Animation_System SHALL show the paid surface by default and SHALL expose a toggle control that switches to the zero-cost surface without submitting any Interaction_Intent（D-042）.
-11. WHEN the acting Agent has no remaining action budget, THE UI_Animation_System SHALL retain only the zero-cost surface together with the end-turn control, and SHALL NOT restrict zero-cost actions to that state（D-042：零费动作不限于回合末执行）.
-12. WHEN the end-turn control becomes the only budgeted path forward per criterion 11, THE UI_Animation_System SHALL start a countdown of the Presentation_Profile's `endTurnCountdown` duration (WakeUp default: 3 秒) and SHALL allow the acting Agent to cancel it before it elapses（D-042：留出反悔窗口）.
-13. WHEN the countdown in criterion 12 elapses, THE UI_Animation_System SHALL submit the end-turn Interaction_Intent through the same authoritative channel as any other intent, and SHALL NOT treat the countdown's completion as the turn having ended.
-14. THE UI_Animation_System SHALL classify the countdown duration as a replaceable Presentation_Profile field and SHALL NOT let its value, its cancellation or its expiry alter action legality, cost or effect.
-
-### Requirement 6: 项目视觉配置与已确认动画范围
-
-**User Story:** As a 视觉设计者, I want 已确认的美术方向与仪式性动画范围得到保留, so that 实现可替换而项目视觉决策不会被历史草案重新打开。
-
-**权威来源：** `docs/访谈决策记录.md` D-024、D-025、D-026、**D-032**（2026-08-07，取代 D-026 的三项集合）、**D-053**（招架批准为正式规则）；`docs/L2_基类层/08_图形化与UI.md` 中未与高优先级来源冲突的视觉方向；P05 必须审查项 6、7。
-
-#### Acceptance Criteria
-
-1. THE WakeUp default Presentation_Profile SHALL identify pixel-art interaction components, sketch-style map backgrounds and separately composited foreground and background presentation as the approved project visual direction.
-2. THE UI_Animation_System SHALL treat the visual direction in criterion 1 as a Presentation_Profile decision rather than a rule-semantic field or a rendering-library requirement.
-3. THE UI_Animation_System SHALL use technology-descriptive animation names and SHALL NOT use a third-party game's name as the normative name of a movement or full-screen animation technique.
-4. THE WakeUp default Presentation_Profile SHALL reserve full-screen ceremonial animation for exactly the four approved action semantics: 翻窗、跳窗、令其长眠 and 招架触发（D-032 扩充 D-026；D-053 已将招架批准为玩法层正式规则）.
-5. THE WakeUp default Presentation_Profile SHALL render ordinary attacks, entering or leaving vehicles and precision-interaction completion without full-screen ceremonial animation.
-6. THE UI_Animation_System SHALL classify exact animation duration, transform curve, sprite sequence, skeleton resource and transition timing as replaceable Presentation_Profile fields.
-7. EXCEPT when a user explicitly skips animation or enables Reduced_Motion_Mode, or when Requirement 9 requires a resource-failure fallback, THE WakeUp default Presentation_Profile SHALL preserve full-screen ceremonial presentation for 翻窗、跳窗、令其长眠 and 招架触发 and SHALL NOT assign full-screen presentation to any other action semantic; changing this set requires a new confirmed decision that supersedes D-026 and D-032.
-8. THE UI_Animation_System SHALL NOT derive action legality, cost, effect strength or completion time from whether an action has a full-screen animation.
-9. THE WakeUp default Presentation_Profile SHALL define a persistent Turn_Order_Bar on the left edge of the screen as a core component, carrying one vertical entry per participant with portrait, name, 生命值 and 体力值, and SHALL keep it visible across every turn phase（D-036：轮次栏兼任简易状态栏）.
-10. THE WakeUp default Presentation_Profile SHALL anchor roll and comparison animations beside the Turn_Order_Bar entries rather than in a separate settlement panel or modal（D-036：动效舞台）.
-11. WHEN a participant has spent its whole action budget for the round, THE UI_Animation_System SHALL keep that participant's Turn_Order_Bar entry in place with a low-salience desaturation or grey-out treatment, and SHALL NOT remove the entry, add a cross-out, or add an "已结束" banner（D-035）.
-12. THE UI_Animation_System SHALL treat the entry treatment in criterion 11 as meaning only "该参与者本回合已行动过", and SHALL NOT derive turn eligibility from the visual treatment（D-035：实现应为遍历列表找第一个未行动者，而非从队列弹出）.
-13. THE UI_Animation_System SHALL render 生命值 and 体力值 in the Turn_Order_Bar under the Requirement 10 player-visible numeric constraints, using discrete segments rather than percentages or continuous bars.
-14. THE WakeUp default Presentation_Profile SHALL play the 招架触发 full-screen ceremonial animation ONLY on the 被近战攻击 resolution branch, and SHALL NOT emit any animation, prompt or other observable presentation when a Parry_Ready state lapses due to 远距离伤害命中 or 不可招架伤害（D-032：静默失效）.
-15. THE UI_Animation_System SHALL treat Parry_Ready as hidden information for every observer other than its owner, and SHALL NOT render a standby, preparing or ready indicator for another player's Parry_Ready state（D-032：真隐藏）.
-
-### Requirement 7: 动画与规则结果解耦
-
-**User Story:** As a 规则实现者, I want 动画完全从已提交结果派生, so that 素材和播放状态永远不能改变规则结算。
-
-**权威来源：** 引擎层 requirements Requirement 16、21、35、37、40；引擎层 design §3.4、§3.11、§3.13、§3.15；P05 必须审查项 3、9。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL start rule-result animation only from a committed Read_Only_Projection or Visibility_Safe Rule_Event_Projection.
-2. WHETHER an animation is loading, ready, playing, paused, skipped, reduced, failed or absent SHALL NOT change action legality, cost settlement, random output, event order, Intent status, Decision status or phase progression.
-3. THE UI_Animation_System SHALL NOT call a rule Op from an animation completion callback, timeline marker, frame event, audio event or particle event.
-4. THE authoritative runtime SHALL be able to complete rule settlement while every presentation resource is unavailable.
-5. WHEN multiple committed events require presentation, THE UI_Animation_System SHALL preserve their authoritative causal order in the observable narrative or explicitly coalesce them without changing or concealing their final semantic results.
-6. IF an animation finishes before or after another window's animation, THEN all windows SHALL still converge to the same committed Semantic_State projection.
-7. WHEN an animation is skipped, THE UI_Animation_System SHALL immediately present an equivalent final semantic state and any required accessible announcement.
-8. WHEN Reduced_Motion_Mode is enabled, THE UI_Animation_System SHALL replace nonessential motion without changing information, interaction availability or authoritative timing.
-9. THE UI_Animation_System SHALL NOT consume or advance an authoritative random stream for cosmetic variation; cosmetic variation, if any, SHALL be isolated from rule replay and SHALL NOT encode hidden information.
-
-### Requirement 8: 异步状态、回放、回退与多窗口一致性
-
-**User Story:** As a 玩家或观察者, I want 动画在重连、回放、回退和多窗口中跟随权威状态, so that 本地演出不会留下幽灵状态或改变历史。
-
-**权威来源：** 引擎层 requirements Requirement 29、35、37、40；引擎层 design §3.13、§3.15；P05 必须审查项 9。
-
-#### Acceptance Criteria
-
-1. WHEN a newer committed projection arrives during an animation, THE UI_Animation_System SHALL cancel, retarget, fast-forward or replace the obsolete animation and reconcile to the newer State_Revision.
-2. WHEN a snapshot is loaded or a client reconnects, THE UI_Animation_System SHALL render a complete first frame from the full Read_Only_Projection without requiring prior animation history.
-3. WHEN replaying a journal, THE UI_Animation_System SHALL derive presentation from replayed committed projections or event projections and SHALL NOT submit new Interaction_Intents from recorded visual callbacks.
-4. WHEN rewind or restore selects an earlier authoritative state, THE UI_Animation_System SHALL discard later local visual state, pending previews and presentation-only caches associated with superseded revisions.
-5. WHEN replay speed changes or animation is skipped, THE replayed rule result, random result and event order SHALL remain unchanged.
-6. WHEN a local presentation resource becomes ready after its originating State_Revision has been superseded, THE UI_Animation_System SHALL NOT attach that resource to the current projection unless the current descriptor still references it.
-7. WHEN multiple windows observe the same Agent and revision, THEY SHALL render semantically equivalent action availability, Decision state and visible facts even if local layout, focus or animation progress differs.
-8. WHEN a window resumes after suspension, THE UI_Animation_System SHALL obtain a fresh projection before enabling rule-affecting input.
-9. IF the event-increment channel is incomplete, out of order or reports a revision gap, THEN the UI_Animation_System SHALL request a full projection and SHALL NOT guess the missing semantic transition.
-
-### Requirement 9: 语义拒绝与非语义表现降级
-
-**User Story:** As a UGC 创作者或玩家, I want 表现资源损坏时系统仍可诊断运行，而语义损坏时明确拒绝, so that 优雅降级不会掩盖规则错误。
-
-**权威来源：** 基类层 requirements Introduction、Requirement 11、12、13、14、15；P05 必须审查项 4。
-
-#### Acceptance Criteria
-
-1. IF an action identifier, target binding, semantic role, interaction intent, availability state, visibility scope or State_Revision is missing or invalid, THEN the UI_Animation_System SHALL reject the affected descriptor or interaction with an Error_Diagnostic.
-2. THE UI_Animation_System SHALL NOT invent a missing Semantic_Field from a label, icon, asset name, neighboring field, historical example or default gameplay assumption.
-3. IF an icon, texture, sound, haptic pattern, animation clip, font, Accessible_Semantic_Label or other Presentation_Field is missing or damaged, THEN the UI_Animation_System SHALL use an explicitly declared type-compatible Presentation_Fallback derived only from validated Semantic_Fields and emit a Warning_Diagnostic.
-4. A Presentation_Fallback SHALL preserve the visible semantic role and accessible meaning carried by validated Semantic_Fields without adding, removing or enabling an action.
-5. IF the original descriptor's semantic type is itself hidden, THEN the fallback SHALL use a Visibility_Safe generic presentation rather than a type-specific fallback.
-6. WHEN an animation fallback is used, THE UI_Animation_System SHALL present the committed final semantic state even if no motion is available.
-7. WHEN an audio or haptic fallback is unavailable, THE UI_Animation_System SHALL retain an equivalent visual and accessible text channel where that feedback carries required information.
-8. EVERY fallback Warning_Diagnostic SHALL identify a stable diagnostic code, descriptor or resource reference, failure category and selected fallback without exposing hidden resource semantics to an unauthorized viewer.
-9. IF no type-compatible and Visibility_Safe fallback exists for a nonessential resource, THEN the UI_Animation_System SHALL omit that resource, retain semantic text or shape output and emit a Warning_Diagnostic; IF the missing fallback is required to make an interactive control or rule-significant status accessible, THEN the UI_Animation_System SHALL reject that affected presentation, emit an Error_Diagnostic and leave the underlying rule state unchanged.
-10. THE UI_Animation_System SHALL NOT convert a semantic rejection into a warning merely to keep a control visible or an animation playing.
-
-### Requirement 10: 玩家可见数值与内部指标隔离
-
-**User Story:** As a 玩家, I want UI 忠实显示受约束的玩法数值, so that 界面不会制造越界值或伪精确信息。
-
-**权威来源：** `docs/L0_规范宪法.md` 第四条、第五条；基类层 requirements Requirement 5、16；P05 必须审查项 8。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL display a Player_Visible_Gameplay_Value only when the upstream descriptor classifies it as player-visible and its value is within the inclusive range 1—5.
-2. IF a projected Player_Visible_Gameplay_Value is below 1, above 5, non-finite or lacks numeric ownership classification, THEN the UI_Animation_System SHALL reject the affected gameplay-value presentation and emit an Error_Diagnostic.
-3. THE UI_Animation_System SHALL NOT multiply, divide, interpolate or convert a 1—5 gameplay value into a displayed percentage, decimal score, large-scale rating or other pseudo-precise gameplay number.
-4. THE UI_Animation_System MAY use nonnumeric discrete shapes, filled segments or qualitative labels to present a valid 1—5 value, provided that the presentation does not imply a different rule value.
-5. THE UI_Animation_System SHALL display action costs, durations, capacities and thresholds only from the current validated projection and SHALL NOT recalculate them locally.
-6. Internal_Metrics SHALL use a distinct type or namespace from Player_Visible_Gameplay_Values.
-7. Resource dimensions, frame counts, frame rates, animation durations, latency, memory, entity counts, turn indices and performance statistics SHALL NOT be exposed as gameplay-value descriptors.
-8. IF an Internal_Metric is shown in an authorized development surface, THEN it SHALL be visually and semantically labeled as diagnostic or technical information and SHALL remain subject to Agent visibility filtering.
-9. Accessible text, captions, tooltips and exported UI text SHALL obey the same gameplay-value constraints as visual labels.
-10. AT any instant, THE UI_Animation_System SHALL present no more than five simultaneously selectable options to a player across all visible panels, groups, overlays and input modes; WHEN the authoritative legal-action set contains more than five options, THE UI_Animation_System SHALL use staged navigation, filtering or sequential disclosure that exposes at most five selectable options at once without changing that legal-action set.
-
-### Requirement 11: 可访问性与输入等价性
-
-**User Story:** As a 使用不同感知或输入方式的玩家, I want 获得等价的规则信息和交互能力, so that 颜色、动画或设备差异不会改变玩法。
-
-**权威来源：** 基类层 requirements Requirement 14；`docs/L0_规范宪法.md` 第五、六条；P05 必须审查项 1、5、9。
-
-#### Acceptance Criteria
-
-1. FOR every visible interactive control and rule-significant status indicator, THE Presentation Descriptor SHALL provide both a validated accessible semantic role and either a Visibility_Safe Accessible_Semantic_Label or the declared fallback key used to derive one; IF neither label path is available, THEN the UI_Animation_System SHALL reject the affected presentation under Requirement 9.9.
-2. THE UI_Animation_System SHALL NOT use color, animation, audio or haptics as the sole carrier of rule-significant information.
-3. WHEN color distinguishes semantic roles, THE UI_Animation_System SHALL provide at least one equivalent non-color cue such as shape, texture, icon structure or text.
-4. WHEN screen-reader or caption output is produced, IT SHALL consume the same Visibility_Safe projection as the visual renderer.
-5. Reduced_Motion_Mode SHALL preserve action availability, final-state feedback, event ordering meaning and required announcements while allowing nonessential animation to be replaced or removed.
-6. Keyboard, pointer, touch, controller, switch-control and assistive automation inputs SHALL resolve to the same stable interaction identifiers and Interaction_Intent schema.
-7. THE UI_Animation_System SHALL allow input bindings to be configured without changing action definitions or introducing input-source-specific legality.
-8. IF two input bindings conflict, THEN the configuration surface SHALL report a deterministic conflict and require an explicit resolution rather than silently dropping a binding.
-9. WHEN focus changes because an action disappears or a Decision closes, THE UI_Animation_System SHALL move focus to a visible, valid and deterministic location without announcing hidden alternatives.
-10. WHEN an animation, audio cue or haptic pattern fails, THE UI_Animation_System SHALL retain an accessible equivalent for every rule-significant result.
-11. THE UI_Animation_System SHALL NOT encode a hidden state in alternate text, ARIA metadata, subtitle tracks, vibration patterns or reduced-motion replacements.
-
-### Requirement 12: 日志、诊断与调试面板安全
-
-**User Story:** As a 开发者或创作者, I want 表现故障可定位但不泄漏规则秘密, so that 诊断能力不会成为越权读取通道。
-
-**权威来源：** 引擎层 requirements Requirement 15、36、39、40；基类层 requirements Requirement 13、14；P05 必须审查项 4、5、10。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL record structured diagnostics for descriptor rejection, stale interaction, projection gaps, resource failure and fallback selection.
-2. EVERY diagnostic SHALL include a stable code, severity, affected presentation location, reason and actionable hint when those fields are Visibility_Safe for its audience.
-3. User-visible diagnostics SHALL be filtered for the Authorized_Agent before rendering.
-4. Development diagnostics containing hidden identifiers, raw events or unrestricted state SHALL require explicit upstream authority and SHALL NOT be enabled by a client-only flag.
-5. THE UI_Animation_System SHALL NOT write raw hidden entity identifiers, asset names derived from hidden semantics, secret conditions or unfiltered event payloads to a user-accessible log.
-6. WHEN repeated presentation failures are folded or rate-limited, THE diagnostic system SHALL retain the first safe context, latest occurrence and count without changing rule processing.
-7. IF a diagnostic renderer fails, THEN the UI_Animation_System SHALL preserve the underlying rule projection and SHALL NOT retry a rule action as recovery.
-8. Debug overlays SHALL consume Read_Only_Projections and SHALL NOT expose mutable state controls.
-9. WHEN replay or rewind is active, presentation diagnostics SHALL be labeled with the associated State_Revision so that later-revision warnings are not attributed to earlier rule state.
-10. Resource-loader telemetry SHALL use opaque identifiers or filtered labels when a descriptive resource name would reveal hidden information.
-
-### Requirement 13: 基类层描述与玩法层表现配置边界
-
-**User Story:** As a 基类设计者, I want 可复用表现语义与具体玩法界面分离, so that 同一实例可被不同玩法和渲染实现复用。
-
-**权威来源：** `docs/L0_规范宪法.md` 第一至三条；基类层 requirements Requirement 2、4、14、16；P05 必须审查项 6、7。
-
-#### Acceptance Criteria
-
-1. THE reusable Presentation Descriptor schema SHALL be independent of a named gameplay mode, concrete map, concrete HUD layout and concrete art resource.
-2. THE Presentation Descriptor MAY declare semantic resource roles, interaction intents, postures, cost categories, visibility-safe availability, accessible labels and abstract asset references. [2026-08-08 权威变更：已删除 attack shapes 字段，见本文档 Requirement 4 变更说明。]
-3. A Presentation_Profile MAY bind descriptor roles to concrete resources, arrange gameplay-specific HUD regions and select replaceable animation parameters.
-4. IF a Presentation_Profile changes while the same semantic projection remains active, THEN action identifiers, legality, random outcomes and committed state SHALL remain unchanged.
-5. IF a concrete gameplay hint, mode-specific phase panel, named map overlay or named resource is proposed as a reusable base descriptor default, THEN the descriptor validator SHALL reject it as gameplay or resource ownership.
-6. THE UI_Animation_System SHALL NOT require modification of the reusable descriptor schema merely to change a layout, skin, animation clip, audio set or input-binding presentation.
-7. THE UI_Animation_System SHALL NOT define a new引擎层 primitive, Op, Query operator, visibility mechanism or persistence mechanism.
-8. WHEN a new reusable presentation semantic is proposed, ITS 基类层 eligibility SHALL be judged by enumerability, composability and independence from a specific gameplay profile.
-9. IF the new semantic fails any eligibility criterion, THEN it SHALL remain in a gameplay Presentation_Profile or presentation-resource configuration.
-
-### Requirement 14: 跨 Spec 只读依赖与汇合失败
-
-**User Story:** As a 跨领域设计者, I want core、space-items 与 AI 只通过明确只读契约接入 UI, so that 本 Spec 不会提前复制或猜测其他领域的规则。
-
-**权威来源：** P05 开始前读取约束与必须审查项 1、7、10；引擎层 requirements Requirement 14、25、36、40、44；基类层 requirements Requirement 10、14。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL consume `core`, `space-items` and `AI` information only through the Pending_Convergence_Contracts listed in this document until cross-Spec review promotes them to stable contracts.
-2. THE `core` contract SHALL provide projected resource roles, phase or flow semantics, legal actions, safe unavailable reasons and visible Decision / Intent state without requiring the UI to read arbitrary `props` paths.
-3. THE `space-items` contract SHALL provide projected scene, transition, container, slot, item and equipment semantics plus legal interactions without requiring the UI to calculate topology or inventory legality.
-4. THE `AI` contract SHALL provide only visible AI action state, public intent and safe explanation labels without exposing search internals or unrestricted knowledge.
-5. IF a required pending contract is unavailable, THEN the UI_Animation_System SHALL mark the dependent feature unavailable with a structured integration diagnostic and SHALL NOT implement a local rule substitute.
-6. WHEN cross-Spec field names or enums disagree, THE integration review SHALL preserve the conflict as unresolved and SHALL NOT choose a mapping solely to make a mockup render.
-7. THE UI_Animation_System SHALL version every promoted cross-Spec descriptor contract or provide an equivalent compatibility discriminator.
-8. IF a provider returns an unsupported contract version, THEN the UI_Animation_System SHALL reject affected semantic descriptors and MAY still render unrelated compatible projections.
-9. THE UI_Animation_System SHALL NOT import or depend on another domain's private mutable store in order to satisfy a pending contract.
-
-### Requirement 15: 首帧、全量重绘与增量演出一致性
-
-**User Story:** As a 玩家, I want 开局、读档、重连和日常增量更新显示同一规则事实, so that 不同进入路径不会产生不同界面语义。
-
-**权威来源：** 引擎层 requirements Requirement 37、40；引擎层 design §3.13、§3.15；基类层 requirements Requirement 14、15。
-
-#### Acceptance Criteria
-
-1. THE UI_Animation_System SHALL support full rendering from a Read_Only_Projection without requiring prior Rule_Event_Projections.
-2. THE UI_Animation_System SHALL support incremental presentation from Visibility_Safe Rule_Event_Projections after a full projection establishes the current State_Revision.
-3. GIVEN the same Authorized_Agent and State_Revision, full rendering and replaying the complete ordered incremental stream SHALL produce semantically equivalent visible state.
-4. IF the incremental stream starts before a full projection, THEN the UI_Animation_System SHALL buffer only within a declared bounded policy or request a full projection; it SHALL NOT infer the missing initial state.
-5. IF an entity retains its stable identifier across revisions, THEN the UI_Animation_System MAY reuse its view representation without reusing stale semantic fields.
-6. IF a stable identifier is absent from the latest projection, THEN the UI_Animation_System SHALL remove the corresponding live view unless current Knowledge explicitly authorizes a remembered representation.
-7. WHEN a full projection contradicts local animation state, THE full projection SHALL control the resulting visible semantic state.
-8. WHEN unrelated Presentation_Fields fail, THE UI_Animation_System SHALL continue rendering compatible semantic projections and report each deterministic failure according to Requirement 9.
-
-### Requirement 16: 可验证性与反向边界测试
-
-**User Story:** As a 质量工程师, I want 每项边界都能被正向与反向验证, so that “只读”“不泄漏”和“动画不影响规则”不是不可测试口号。
-
-**权威来源：** 基类层 requirements Requirement 15、16；P05 必须审查项 9、10 与完成前反向审查清单。
-
-#### Acceptance Criteria
-
-1. THE verification plan SHALL include a case where a UI consumer attempts direct Semantic_State mutation and SHALL expect Structured_Rejection with unchanged state.
-2. THE verification plan SHALL execute equivalent authoritative action sequences with animations enabled, skipped, reduced and failed and SHALL expect identical rule results, random results and settlement order.
-3. THE verification plan SHALL attempt hidden-information extraction through HUD, preview, unavailable reason, animation selection, log, debug panel, accessibility text, audio, haptics and resource naming and SHALL expect no unauthorized disclosure.
-4. THE verification plan SHALL omit or corrupt each required Semantic_Field and SHALL expect rejection without invented semantics.
-5. THE verification plan SHALL omit or corrupt each supported Presentation_Field with a declared fallback and SHALL expect that fallback plus Warning_Diagnostic without changed action availability; it SHALL also cover a required accessible presentation with neither a Visibility_Safe label nor a valid fallback and SHALL expect rejection under Requirement 9.9.
-6. THE verification plan SHALL cover valid gameplay values 1 and 5, invalid boundary values, non-finite values and attempted pseudo-precision conversion.
-7. THE verification plan SHALL cover pending input, additional activation attempts on a pending control, stale action bindings, expired Decision, target invalidation and state changes during submission; it SHALL expect the UI to create no second Interaction_Intent from the pending control and the authoritative contract to revalidate every Intent that it receives.
-8. THE verification plan SHALL cover asynchronous resource completion, animation interruption, replay, rewind, skip, reconnect, revision gaps and multi-window convergence.
-9. THE verification plan SHALL run visibility cases for at least two non-omniscient Agents with different knowledge scopes and an explicitly authorized omniscient Agent.
-10. THE verification plan SHALL run color-independent, screen-reader, remapped-input and Reduced_Motion_Mode cases and SHALL expect semantically equivalent information and interaction identities.
-11. THE verification plan SHALL assert that layout values, animation timing, asset paths, frame rates and performance targets cannot alter descriptor semantics or authoritative outcomes.
-12. THE verification plan SHALL assert that gameplay-specific HUD composition and concrete resources can be replaced without changing the reusable Presentation Descriptor contract.
-13. IF a requirement cannot produce an observable pass or fail result, THEN the requirement review SHALL revise or remove it before this Spec enters design.
-
-## Requirement-to-Source Summary
-
-| Requirement | Primary authority |
+**用户故事：** 作为 UI 开发者，我想要所有规则与表现信息都来自类型化只读投影，以便 UI 不会复制规则、猜测字段含义或持有可变状态引用。
+
+**权威来源：** S-03 要求 14、25、40 与其 design §3.15；S-05 要求 14。
+
+#### 验收标准
+
+1. UI 表现系统应只通过 Agent 范围内的只读投影、合法动作结果、`Decision` / `Intent` 投影与规则事件投影获得规则状态。
+2. UI 表现系统应只通过已验证的表现描述符获得可复用表现语义。
+3. UI 表现系统消费的表现描述符应把**稳定语义标识**与**本地化文案**、**素材引用**分开携带。
+4. UI 表现系统应从显式描述符字段渲染资源角色、交互意图、姿态、成本类别、可用性与不可用原因，**不得**依据字段名、颜色、文件名或标签进行启发式推断。
+5. 若某个必需语义字段缺失、类型不兼容、引用无法解析或超出受支持的描述符版本，则 UI 表现系统应拒绝该描述符、省略由它派生的全部交互，并产出错误级诊断。
+6. 若 UI 消费方试图通过任何投影或描述符取得可变语义状态引用，则适配器应返回结构化拒绝，且不暴露任何可变引用。
+7. 当渲染器被替换或重建时，UI 表现系统应在结果投影中保持动作、`Decision`、`Intent`、实体与描述符的稳定标识不变。
+8. 当缓存投影的状态修订令牌已被更新的令牌取代时，UI 表现系统不得再把该缓存视为权威。
+9. UI 表现系统不得把描述符的缺省值补全为规则语义；描述符未声明的语义视为缺失，按第 5 条处理。
+
+### 要求 3：Agent 可见性、显著性分层与端到端防泄漏
+
+**用户故事：** 作为玩家，我想要每个界面与演出只使用我有权知道的信息，以便隐藏信息不会通过表现侧信道泄漏。
+
+**权威来源：** S-03 要求 5、14、29、36、37、40 与其 design §3.12、§3.13、§3.15；S-02 之 D-023、D-031、D-032、D-033、D-034。
+
+#### 验收标准
+
+1. UI 表现系统应把每一次 `Query`、动作查询、`Decision` / `Intent` 投影与规则事件投影绑定到授权 Agent 及其当前 `visibleTo` 范围。
+2. 若某个原始事件或诊断尚未针对授权 Agent 过滤，则 UI 表现系统应拒绝把它作为表现输入。
+3. UI 表现系统不得通过 HUD 条目、预览、目标标记、动画选择、排序、计数或不可用原因，泄漏隐藏实体、隐藏 `Intent`、隐藏 `Decision` 答案、未知事实或未满足的秘密条件。
+4. UI 表现系统不得通过日志、调试面板、屏幕阅读器文本、字幕、工具提示、焦点标签、用户可见遥测或剪贴板/导出输出泄漏隐藏信息。
+5. UI 表现系统不得通过素材名称、资源路径、预加载时机、降级类型、音频提示、触觉反馈或动画时序泄漏隐藏信息。
+6. 当不可用原因包含授权 Agent 范围之外的信息时，UI 表现系统应显示由投影层提供或批准的**可见性安全通用原因**，而不是原始原因。
+7. 当某实体从可见变为不可见时，UI 表现系统应按当前 `Knowledge` 语义移除或替换其实时投影，且不得继续依据隐藏的世界真值更新它。
+8. 当多个窗口代表不同 Agent 时，每个窗口应各自接收独立过滤的投影，且不得共享 Agent 范围内的缓存。
+9. 当请求全知视角时，UI 表现系统应要求上游 Agent 投影给出显式授权，不得从本地调试开关推断全知权限。
+10. UI 表现系统应恰好支持三档显著性分层，且每个被投影状态的档位应取自**显式**的表现配置字段，不得从该状态的规则效果推断（D-031 / D-032 / D-033）：
+    - `public-persistent`：常驻显示，无需用户操作即可看到；
+    - `public-on-inspect`：仅在用户主动检视（如悬停）该实体时呈现，且不得使用头顶感叹号一类的主动强提示；
+    - `hidden`：对该状态的所有者以外的观察者**完全不产生任何呈现输出**。
+11. WakeUp 默认表现配置应把**弱点属性**登记为 `public-persistent`，并渲染为角色头顶常驻图标（D-031：不需要消耗行动点侦察，也不得把悬停查询作为唯一获取途径；悬停仅用于补充克制关系详情）。
+12. WakeUp 默认表现配置应把 `[瞄准中]` 登记为 `public-on-inspect`，在悬停时渲染为一条自瞄准者指向其瞄准目标的红色点线，且不得渲染为头顶常驻提示（D-033）。
+13. WakeUp 默认表现配置应把**招架就绪**登记为 `hidden`（D-032；另见要求 6 第 15、16 条）。
+14. 若某个表现配置条目声明的显著性分层与该状态在规则层的可见性分类矛盾，则 UI 表现系统应拒绝该条目并产出错误级诊断，不得静默选择其中任一值。
+15. 若某个规则显著状态在表现配置中**没有**显著性分层登记，则 UI 表现系统应拒绝呈现该状态并产出错误级诊断，不得回落到任一默认档位。
+16. `hidden` 档的表现配置条目不得关联任何渲染器；若关联了渲染器，则装载应被拒绝。
+17. 观战视角与在局视角应消费**同一套**授权 Agent 投影通道，二者的唯一差别是观战允许自主移动视角；UI 表现系统不得为观战建立独立的数据通道或独立的信息过滤层（D-034）。
+18. 若未来引入受限视野玩法配置，则观战的定位应表述为"解除视野可见范围限制的全知视角"，且该权限仍应由第 9 条的上游显式授权给出（D-034）。
+
+### 要求 4：交互意图与唯一写入通道
+
+**用户故事：** 作为玩家，我想要我的输入经过与所有调用方相同的合法性校验，以便 UI 无法绕过规则或制造半生效状态。
+
+**权威来源：** S-03 要求 16、20、21、25、26、27、29、40 与其 design §2 写入通道唯一性、§3.4、§3.7、§3.8、§3.15；S-01 第四条 Op 通道铁律。
+
+#### 验收标准
+
+1. 当用户选择一项会影响规则的操作时，UI 表现系统应创建一个交互意图，引用当前权威投影返回的动作或处于开启状态的 `Decision`。
+2. 交互意图应包含授权 Agent、稳定的动作或 `Decision` 标识、已选绑定，以及观察到的状态修订令牌。
+3. UI 表现系统应通过与非 UI 调用方**相同**的权威动作契约提交交互意图。
+4. UI 表现系统不得直接调用可变状态 helper、不得赋值语义状态字段、不得推进随机流、不得结算成本、不得解决 `Intent`、不得推进相位。
+5. 权威动作契约应在任何由此产生的 Op 被调用之前，重新校验 Agent 权限、动作可见性、当前合法性、目标、成本、`Decision` 状态与当前修订令牌。
+6. 若校验失败，则 UI 表现系统应显示可见性安全的结构化拒绝、刷新受影响的投影，且不得合成补偿性的状态写入。
+7. 当提交成功时，UI 表现系统应仅在观察到权威结果或包含已提交修订令牌的投影之后，才把该操作视为完成。
+8. 当用户改变仅涉及表现的偏好时，UI 表现系统**可**在不创建交互意图的情况下更新本地表现状态，前提是该偏好不能改变语义状态、动作可用性、随机结果或规则时序。
+9. 若拖拽、快捷键、手势、可访问性命令或自动化来源请求同一条规则动作，则 UI 表现系统应提交**相同形状**的交互意图，不得使用与输入方式绑定的写入路径。
+10. UI 表现系统不得把一次交互意图拆成多次部分提交；一次用户操作对应的规则效果应由权威运行时在单一事务内完成或整体拒绝。
+
+### 要求 5：输入禁用、重复提交、过期交互与双菜单
+
+**用户故事：** 作为玩家，我想要界面在状态变化和网络延迟下明确处理过期操作，以便重复点击或旧 `Decision` 不会被误当作有效动作。
+
+**权威来源：** S-03 要求 25–29、31、37、40 与其 design §3.7、§3.8、§3.13；S-02 之 D-042；S-06 动作选择 UI 一节。
+
+#### 验收标准
+
+1. 当某个交互意图正在等待权威确认时，UI 表现系统应把对应控件标记为待确认状态，且不得因该控件上的额外激活尝试而创建第二个交互意图。
+2. 若输入禁用被延迟、被绕过或不可用，则每一个到达权威动作契约的交互意图仍应经过完整的当前状态重校验；UI 的禁用状态**不得**被当作规则安全边界。
+3. 当当前状态修订令牌变化时，UI 表现系统应失效已缓存的动作绑定，并在允许新的提交之前重新查询受影响的动作。
+4. 若某个 `Decision` 已被解决、超时、作废、关闭或不再可见，则 UI 表现系统应移除其控件，并拒绝提交其过期答案。
+5. 若某个动作目标消失、身份改变、变为不可见，或不再满足被投影的绑定条件，则 UI 表现系统应取消本地选择，并要求一份新的合法动作结果。
+6. 当权威拒绝报告状态过期时，UI 表现系统应先收敛到一份新的只读投影，再重新启用受影响的交互。
+7. UI 表现系统不得从"按钮变灰""动画开始播放""音效已响""请求已离开客户端"推断操作成功。
+8. 当同一 Agent 的两个窗口提交竞争性交互时，每次提交应各自独立地按权威状态校验，且所有窗口应收敛到最终已提交的投影。
+9. UI 表现系统应把动作呈现为**恰好两个互斥的菜单面**，以 `costCategory` 为分档键——一个付费面与一个零费面——且不得把零费动作与付费动作放进同一个菜单面（D-042；铁律"0 行动点动作不得与 1 行动点动作同处一个菜单"）。
+10. 当行动 Agent 仍有未用尽的行动预算时，UI 表现系统应默认显示付费面，并提供一个切换控件切到零费面；该切换本身**不得**提交任何交互意图（D-042）。
+11. 当行动 Agent 的行动预算已用尽时，UI 表现系统应只保留零费面与结束回合控件；零费动作**不得**被限制为只能在此状态下执行（D-042：零费动作不限于回合末执行）。
+12. 当按第 11 条结束回合控件成为唯一的预算内前进路径时，UI 表现系统应启动一段时长取自表现配置 `endTurnCountdown` 的倒计时（WakeUp 默认 3 秒），并允许行动 Agent 在其走完之前取消（D-042：留出反悔窗口）。
+13. 当第 12 条的倒计时走完时，UI 表现系统应通过与其他意图相同的权威通道提交结束回合交互意图，且不得把倒计时完成本身当作回合已结束。
+14. UI 表现系统应把倒计时时长归类为可替换的表现配置字段与内部度量，且其取值、被取消或到期都不得改变动作合法性、成本或效果。
+15. 「查看装备」「检查物品」一类**不消耗行动预算且不改变语义状态**的查询操作，应归入零费面或独立的检视交互，且不得按第 1 条占用付费面的待确认状态。
+
+### 要求 6：项目视觉配置、仪式动画范围与轮次栏
+
+**用户故事：** 作为视觉设计者，我想要已确认的美术方向、仪式性动画范围与轮次栏结构得到保留，以便实现可替换而项目视觉决策不会被历史草案重新打开。
+
+**权威来源：** S-02 之 D-024、D-025、D-026、D-032（扩为四项）、D-035、D-036、D-053；S-06 中未与高优先级来源冲突的视觉方向。
+
+#### 验收标准
+
+1. WakeUp 默认表现配置应把**像素艺术交互组件**、**简笔画地图背景**、**前景与背景分离合成**认定为已批准的项目视觉方向（D-024）。
+2. UI 表现系统应把第 1 条的视觉方向视为表现配置决策，而不是规则语义字段或渲染库要求。
+3. UI 表现系统应使用**技术描述性**的动画方案名称，不得以第三方游戏名作为位移或全屏动画技术方案的规范名称（D-025）。既有的"边缘发光交互提示"即为该规则的合规命名。
+4. WakeUp 默认表现配置应把全屏分离式仪式动画**恰好保留给四项**已批准的动作语义：**翻窗**、**跳窗**、**令其长眠**、**招架触发**（D-032 扩充 D-026；D-053 已把招架批准为玩法层正式规则）。
+5. WakeUp 默认表现配置应把普通攻击、上车与下车、精密交互完成（如撬锁成功）渲染为原地效果，不使用全屏仪式动画。
+6. UI 表现系统应把精确动画时长、变换曲线、精灵序列、骨骼资源与过渡时序归类为可替换的表现配置字段。
+7. 除用户显式跳过动画、启用减弱动效模式，或要求 9 要求资源失败降级之外，WakeUp 默认表现配置应保留翻窗、跳窗、令其长眠、招架触发的全屏仪式呈现，并不得把全屏呈现赋予任何其他动作语义；改变该集合需要一项**新的、取代 D-026 与 D-032 的已确认决策**。
+8. UI 表现系统不得从"某动作是否有全屏动画"推导该动作的合法性、成本、效果强度或完成时间。
+9. 每一个仪式动画登记项应携带一个**已确认决策编号**作为其权威来源；缺少来源的登记项应在装载期被拒绝。
+10. WakeUp 默认表现配置应把**轮次栏**定义为屏幕左侧常驻的核心组件：每位参与者一条纵向条目，携带头像、名字、生命值与体力值，并在所有回合相位保持可见（D-036：轮次栏兼任简易状态栏）。
+11. WakeUp 默认表现配置应把投点动画与条形比较动效锚定在轮次栏条目旁边就地播放，不另开独立的结算面板或模态窗口（D-036：动效舞台）。
+12. 当某位参与者本回合的行动预算已全部用尽时，UI 表现系统应把其轮次栏条目**留在原位**并施加低显著性的降饱和或置灰处理，且不得移除条目、不得加打叉、不得加"已结束"横幅（D-035）。
+13. UI 表现系统应把第 12 条的条目处理**仅**解释为"该参与者本回合已行动过"，不得从该视觉处理推导行动资格（D-035：实现应为遍历列表找第一个未行动者，而非从队列弹出）。
+14. UI 表现系统应按要求 10 的玩家可见数值约束渲染轮次栏中的生命值与体力值，使用离散分段，不使用百分比或连续条。
+15. WakeUp 默认表现配置应仅在**被近战攻击**的结算分支上播放招架触发的全屏仪式动画；当招架就绪状态因**远距离伤害命中**或**不可招架伤害**而失效时，不得产出任何动画、提示或其他可观察呈现（D-032：静默失效）。
+16. UI 表现系统应把招架就绪视为对其所有者以外的每一位观察者的隐藏信息，不得为他人的招架就绪状态渲染待机、准备或就绪指示（D-032：真隐藏）。
+
+### 要求 7：动画与规则结果解耦
+
+**用户故事：** 作为规则实现者，我想要动画完全从已提交结果派生，以便素材与播放状态永远不能改变规则结算。
+
+**权威来源：** S-03 要求 16、21、35、37、40 与其 design §3.4、§3.11、§3.13、§3.15。
+
+#### 验收标准
+
+1. UI 表现系统应仅从已提交的只读投影或可见性安全的规则事件投影启动规则结果动画。
+2. 动画处于加载中、就绪、播放中、暂停、被跳过、被减弱、失败或缺失，**均不得**改变动作合法性、成本结算、随机输出、事件顺序、`Intent` 状态、`Decision` 状态或相位推进。
+3. UI 表现系统不得从动画完成回调、时间轴标记、帧事件、音频事件或粒子事件调用规则 Op。
+4. 在全部表现资源不可用的情况下，权威运行时应仍能完成规则结算。
+5. 当多个已提交事件需要呈现时，UI 表现系统应在可观察叙事中保持其权威因果顺序，或显式合并它们而不改变、不隐藏其最终语义结果。
+6. 若某个动画比另一窗口的动画更早或更晚结束，则所有窗口仍应收敛到同一份已提交语义状态投影。
+7. 当动画被跳过时，UI 表现系统应立即呈现等价的最终语义状态与任何必需的无障碍播报。
+8. 当减弱动效模式启用时，UI 表现系统应替换非必要动效，且不改变信息量、交互可用性或权威时序。
+9. UI 表现系统不得为装饰性变化消费或推进权威随机流；装饰性变化（若有）应与规则重放隔离，且不得编码隐藏信息。
+10. UI 表现系统不得依据本地时钟推进任何规则相位；本地时钟只可用于表现节奏与要求 5 第 12 条的可取消倒计时。
+
+### 要求 8：状态修订令牌、异步状态、重放、回退与多窗口一致性
+
+**用户故事：** 作为玩家或观察者，我想要动画在重连、重放、回退和多窗口中跟随权威状态，以便本地演出不会留下幽灵状态或改变历史。
+
+**权威来源：** S-03 要求 29、35、37、40 与其 design §3.13、§3.15；`docs/访谈决策记录.md` 未冻结项总表中的 C-2、C-4。
+
+#### 验收标准
+
+1. 状态修订令牌应同时支持**判等**与**判序**两种能力。引擎层的语义状态指纹只能判等，因此令牌应由一个可判序的单调段（候选来源为内核单调日志序号）与一个可判等的指纹段共同构成。
+2. 当两个令牌的单调段相同而指纹段不同时，比较结果应显式表达为**不可比较**，不得静默判定为相等。UI 表现系统在收到不可比较结果时应请求一份完整投影。
+3. 当动画播放过程中到达更新的已提交投影时，UI 表现系统应取消、重定向、快进或替换过时动画，并收敛到更新的修订令牌。
+4. 当加载快照或客户端重连时，UI 表现系统应能仅凭完整只读投影渲染出完整首帧，不要求任何先前动画历史。
+5. 当重放日志时，UI 表现系统应从被重放的已提交投影或事件投影派生表现，且不得从被记录的视觉回调提交新的交互意图。
+6. 当回退或恢复选择了更早的权威状态时，UI 表现系统应丢弃与被取代修订相关的后续本地视觉状态、待定预览与仅表现用缓存。
+7. 当重放速度改变或动画被跳过时，被重放的规则结果、随机结果与事件顺序应保持不变。
+8. 当某个本地表现资源在其发起时的修订令牌已被取代之后才就绪时，UI 表现系统不得把该资源附加到当前投影，除非当前描述符仍然引用它。
+9. 当多个窗口观察同一 Agent 与同一修订令牌时，它们应渲染语义等价的动作可用性、`Decision` 状态与可见事实，即使本地布局、焦点或动画进度不同。
+10. 当窗口从挂起状态恢复时，UI 表现系统应先取得一份新的投影，再启用会影响规则的输入。
+11. 若事件增量通道不完整、乱序或报告修订缺口，则 UI 表现系统应请求完整投影，且不得猜测缺失的语义转移。
+12. 引擎层 `rewind(n)` 的相位计数语义与按名字恢复的实现不一致（C-2）在裁决前属于上游未决项。UI 表现系统应把"回退后必须从完整投影重建首帧"作为稳定行为要求，**不得**依赖 `rewind` 的相位计数语义来决定要丢弃哪些本地表现状态。
+
+### 要求 9：语义拒绝与非语义表现降级
+
+**用户故事：** 作为 UGC 创作者或玩家，我想要表现资源损坏时系统仍可诊断运行，而语义损坏时明确拒绝，以便优雅降级不会掩盖规则错误。
+
+**权威来源：** S-05 引言与要求 11、12、13、14、15。
+
+#### 验收标准
+
+1. 若动作标识、目标绑定、语义角色、交互意图、可用性状态、可见性范围或状态修订令牌缺失或无效，则 UI 表现系统应以错误级诊断拒绝受影响的描述符或交互。
+2. UI 表现系统不得从标签、图标、素材名、相邻字段、历史示例或默认玩法假设发明缺失的语义字段。
+3. 若图标、纹理、音效、触觉模式、动画片段、字体、无障碍语义标签或其他表现字段缺失或损坏，则 UI 表现系统应使用显式声明的、类型兼容的表现降级（其内容只能由已验证语义字段派生），并产出警告级诊断。
+4. 表现降级应保留由已验证语义字段承载的可见语义角色与无障碍含义，且不得新增、移除或启用任何动作。
+5. 若原描述符的语义类型本身是隐藏的，则降级应使用可见性安全的通用呈现，而不是类型特异的降级。
+6. 当使用动画降级时，UI 表现系统应仍呈现已提交的最终语义状态，即使没有任何动效可用。
+7. 当音频或触觉降级不可用，而该反馈承载必需信息时，UI 表现系统应保留等价的视觉与无障碍文本通道。
+8. 每一条降级警告诊断应标明稳定诊断代码、描述符或资源引用、失败类别与所选降级方式，且不得向未授权的观察者暴露隐藏的资源语义。
+9. 若某个**非必需**资源不存在类型兼容且可见性安全的降级，则 UI 表现系统应省略该资源、保留语义文本或形状输出并产出警告级诊断；若缺失的降级是让某个交互控件或规则显著状态可访问的**必需**条件，则 UI 表现系统应拒绝该受影响呈现、产出错误级诊断，并保持底层规则状态不变。
+10. UI 表现系统不得仅为了让控件保持可见或让动画继续播放，而把语义拒绝降级为警告。
+
+### 要求 10：玩家可见数值、内部度量隔离与同时可选项上限
+
+**用户故事：** 作为玩家，我想要 UI 忠实显示受约束的玩法数值，以便界面不会制造越界值或伪精确信息。
+
+**权威来源：** S-01 第四条数值铁律、第四条拓扑铁律（五并列）；S-05 要求 5、16；S-02 之 D-023、D-054。
+
+#### 验收标准
+
+1. UI 表现系统应仅在上游描述符把某数值分类为玩家可见、且其取值落在闭区间 1–5 之内时，才把它显示为玩家可见玩法数值。
+2. 若被投影的玩家可见玩法数值小于 1、大于 5、非有限、非整数或缺少数值归属分类，则 UI 表现系统应拒绝该玩法数值呈现并产出错误级诊断。
+3. UI 表现系统不得把 1–5 的玩法数值乘、除、插值或换算为百分比、小数评分、大标度评级或其他伪精确玩法数字。
+4. UI 表现系统**可**用非数字的离散形状、已填充分段或定性标签呈现合法的 1–5 取值，前提是该呈现不暗示另一个规则取值。
+5. UI 表现系统应仅从当前已验证投影显示动作成本、持续时间、容量与阈值，不得在本地重新计算它们。
+6. 内部度量应使用与玩家可见玩法数值**不同的类型或命名空间**，使"把内部度量当作玩法数值渲染"在类型层不可表达；仅靠命名约定不满足本条。
+7. 资源尺寸、帧数、帧率、动画时长、延迟、内存、实体数量、回合编号与性能统计不得作为玩法数值描述符暴露。
+8. 若在获得授权的开发面板中显示内部度量，则该显示应在视觉与语义上被标注为诊断或技术信息，并仍受 Agent 可见性过滤约束。
+9. 无障碍文本、字幕、工具提示与导出的 UI 文本应遵守与视觉标签相同的玩法数值约束。
+10. 在任一时刻，UI 表现系统跨全部可见面板、分组、浮层与输入方式呈现给玩家的**同时可选项**不得超过 5 个；当权威合法动作集包含超过 5 个选项时，UI 表现系统应使用分级导航、筛选或顺序披露，使同时暴露的可选项不超过 5 个，且**不改变**该合法动作集（S-01 五并列原则）。
+11. 第 10 条的分级导航控件（上一层、上一页、下一页等）**计入**同时可选项预算；若不计入，则实际同时可选项将超过 5 个，属违规。
+12. 第 10 条的分级导航不得丢弃、截断或合并任何合法动作：每一个合法动作都应可经导航到达，且被导航覆盖的合法动作总数应作为内部度量与输入动作数恒等。
+13. 投点使用的 1d6 原始骰点应归类为**内部瞬时度量**，只作为差值结算的比较输入呈现；UI 表现系统不得把 1d6 原始骰点作为**持久的**玩家可见玩法数值展示（D-054）。
+14. 若要把 1d6 原始骰点本身升级为持久可见玩法数值（例如常驻显示骰点 6），则应先取得一项对 `docs/L0_规范宪法.md` 第四条的修订审批；在此之前该呈现应被拒绝（D-054）。
+15. UI 表现系统显示的投点结算过程应把"骰点与修正的比较输入"与"玩家可见产出（行动点、行动顺序）"在语义上区分开；玩家可见产出应全部落在 1–5 内，未分配的行动点应以离散状态而非数值 0 呈现（D-054）。
+
+### 要求 11：可访问性与输入等价性
+
+**用户故事：** 作为使用不同感知或输入方式的玩家，我想要获得等价的规则信息和交互能力，以便颜色、动画或设备差异不会改变玩法。
+
+**权威来源：** S-05 要求 14；S-01 第一条（低心智性）与第五条；S-06 可访问性一节。
+
+#### 验收标准
+
+1. 对每一个可见交互控件与规则显著状态指示，表现描述符应同时提供一个已验证的无障碍语义角色，以及一个可见性安全的无障碍语义标签或用于派生它的已声明降级键；若两条标签路径都不可用，则 UI 表现系统应按要求 9 第 9 条拒绝该呈现。
+2. UI 表现系统不得把颜色、动画、音频或触觉作为规则显著信息的**唯一**承载通道。
+3. 当颜色用于区分语义角色时，UI 表现系统应至少提供一种等价的非颜色线索，例如形状、纹理、图标结构或文本。WakeUp 默认表现配置的每一个语义色都应有对应的纹理备援登记项。
+4. 当产出屏幕阅读器或字幕输出时，它应消费与视觉渲染器**相同**的可见性安全投影。
+5. 减弱动效模式应保留动作可用性、最终状态反馈、事件顺序含义与必需播报，同时允许替换或移除非必要动画。
+6. 键盘、指针、触控、手柄、开关控制与辅助自动化输入应解析为**相同**的稳定交互标识与相同的交互意图结构。
+7. UI 表现系统应允许配置输入绑定，且不改变动作定义、不引入与输入来源绑定的合法性。
+8. 若两个输入绑定冲突，则配置界面应报告一个确定性的冲突并要求显式解决，不得静默丢弃某个绑定。
+9. 当焦点因某动作消失或某 `Decision` 关闭而改变时，UI 表现系统应把焦点移到一个可见、有效且确定的位置，且不得播报隐藏的替代项。
+10. 当动画、音频提示或触觉模式失败时，UI 表现系统应为每一个规则显著结果保留一个无障碍等价物。
+11. UI 表现系统不得在替代文本、无障碍元数据、字幕轨、振动模式或减弱动效替代物中编码隐藏状态。
+
+### 要求 12：日志、诊断与调试面板安全
+
+**用户故事：** 作为开发者或创作者，我想要表现故障可定位但不泄漏规则秘密，以便诊断能力不会成为越权读取通道。
+
+**权威来源：** S-03 要求 15、36、39、40；S-05 要求 13、14。
+
+#### 验收标准
+
+1. UI 表现系统应为描述符拒绝、过期交互、投影缺口、资源失败与降级选择记录结构化诊断。
+2. 每条诊断应包含稳定代码、严重级别、受影响的呈现位置、原因，以及在对其受众可见性安全时的可操作建议。
+3. 用户可见诊断应在渲染前针对授权 Agent 过滤。
+4. 含有隐藏标识、原始事件或未受限状态的开发诊断应要求显式的上游授权，且不得由仅客户端的开关启用。
+5. UI 表现系统不得把原始隐藏实体标识、由隐藏语义派生的素材名、秘密条件或未过滤的事件载荷写入用户可访问的日志。
+6. 当重复的表现失败被折叠或限流时，诊断系统应保留首次的安全上下文、最近一次发生与计数，且不改变规则处理。
+7. 若诊断渲染器本身失败，则 UI 表现系统应保留底层规则投影，且不得以重试规则动作作为恢复手段。
+8. 调试浮层应消费只读投影，且不得暴露可变状态控件。
+9. 当重放或回退处于激活状态时，表现诊断应标注其关联的状态修订令牌，以免把后续修订的警告归因到更早的规则状态。
+10. 当描述性的资源名会泄漏隐藏信息时，资源加载器遥测应使用不透明标识或已过滤标签。
+
+### 要求 13：基类层描述符与玩法层表现配置的边界
+
+**用户故事：** 作为基类设计者，我想要可复用表现语义与具体玩法界面分离，以便同一实例可被不同玩法和渲染实现复用。
+
+**权威来源：** S-01 第一至三条；S-05 要求 2、4、14、16。
+
+#### 验收标准
+
+1. 可复用表现描述符的结构应独立于具名玩法模式、具体地图、具体 HUD 布局与具体美术资源。
+2. 表现描述符**可**声明语义资源角色、交互意图、姿态、成本类别、可见性安全的可用性、无障碍标签与抽象素材引用。
+3. 表现配置**可**把描述符角色绑定到具体资源、编排玩法专属 HUD 区域、选择可替换的动画参数、登记显著性分层与仪式动画集合。
+4. 若表现配置在同一语义投影仍然活跃期间被更换，则动作标识、合法性、随机结果与已提交状态应保持不变。
+5. 若把具体玩法提示、模式专属相位面板、具名地图浮层或具名资源作为可复用基类描述符的默认值提出，则描述符验证器应以玩法层或资源层归属拒绝它。
+6. 仅为改变布局、皮肤、动画片段、音频集合或输入绑定呈现，不得要求修改可复用描述符结构。
+7. UI 表现系统不得定义新的引擎层原语、Op、`Query` 运算符、可见性机制或持久化机制。
+8. 当提出一项新的可复用表现语义时，应按**可枚举、可组合、不依赖特定玩法配置**三条判据判断其基类层资格。
+9. 若该新语义不满足任一判据，则它应留在玩法层表现配置或表现资源配置中。
+10. 表现配置中的数值字段应显式分类；仅允许被分类为内部度量的呈现节奏参数（如倒计时秒数、事件缓冲超时）以数字形式出现，表现配置不得携带玩家可见玩法数值字面量。
+
+### 要求 14：跨 Spec 只读依赖与汇合失败
+
+**用户故事：** 作为跨领域设计者，我想要核心机制、空间物品与 AI 只通过明确只读契约接入 UI，以便本 Spec 不会提前复制或猜测其他领域的规则。
+
+**权威来源：** S-03 要求 14、25、36、40、44；S-05 要求 10、14；第 5.2 节。
+
+#### 验收标准
+
+1. 在跨 Spec 审查把它们提升为稳定契约之前，UI 表现系统应仅通过第 5.2 节列出的待汇合契约消费 `wakeup-core-mechanics`、`wakeup-space-items` 与 `wakeup-ai` 的信息。
+2. 核心机制契约应提供被投影的资源角色、相位或流程语义、合法动作、安全的不可用原因、可见的 `Decision` / `Intent` 状态与行动轮排名及其变化事件，且不要求 UI 读取任意 `props` 路径。
+3. 空间物品契约应提供被投影的场景、过渡、容器、槽位、物品、装备语义与距离取值，以及合法交互描述，且不要求 UI 自行计算拓扑或携带合法性。
+4. AI 契约应只提供可见的 AI 行动状态、公开意图与安全的解释标签，不暴露搜索内部或未受限知识。
+5. 若某个必需的待汇合契约不可用，则 UI 表现系统应把依赖它的功能标记为不可用并给出结构化集成诊断，且不得实现本地规则替代品。
+6. 当跨 Spec 的字段名或枚举不一致时，集成审查应把冲突保留为未解决项，且不得仅为让某个草图能渲染而选定一种映射。
+7. UI 表现系统应为每一个被提升的跨 Spec 描述符契约提供版本号或等价的兼容性判别字段。
+8. 若提供方返回不受支持的契约版本，则 UI 表现系统应拒绝受影响的语义描述符，并**可**继续渲染无关的兼容投影。
+9. UI 表现系统不得为满足某个待汇合契约而导入或依赖另一领域的私有可变存储。
+10. 本 Spec 不得为满足自身进度而修改其他领域 Spec 的交付物；需要对方改动时应写成**交接项**登记，由对方领域执行。
+
+### 要求 15：首帧、全量重绘与增量演出一致性
+
+**用户故事：** 作为玩家，我想要开局、读档、重连与日常增量更新显示同一规则事实，以便不同进入路径不会产生不同界面语义。
+
+**权威来源：** S-03 要求 37、40 与其 design §3.13、§3.15；S-05 要求 14、15。
+
+#### 验收标准
+
+1. UI 表现系统应支持仅凭只读投影完成完整渲染，不要求先前的规则事件投影。
+2. UI 表现系统应支持在一份完整投影建立当前修订令牌之后，从可见性安全的规则事件投影进行增量呈现。
+3. 给定同一授权 Agent 与同一修订令牌，完整渲染与重放完整有序增量流应产生语义等价的可见状态。
+4. 若增量流早于完整投影到达，则 UI 表现系统应仅在一个已声明的有界策略内缓冲，或请求一份完整投影；它不得推断缺失的初始状态。该缓冲超时应分类为内部度量。
+5. 若某实体在跨修订间保持其稳定标识，则 UI 表现系统**可**复用其视图表示，但不得复用过期的语义字段。
+6. 若某个稳定标识在最新投影中缺席，则 UI 表现系统应移除对应的实时视图，除非当前 `Knowledge` 显式授权保留一个"记忆中的"表示。
+7. 当完整投影与本地动画状态矛盾时，应由完整投影决定最终可见语义状态。
+8. 当无关的表现字段失败时，UI 表现系统应继续渲染兼容的语义投影，并按要求 9 报告每一处确定性失败。
+
+### 要求 16：行动轮、体力博弈与六项标准机制的表现契约
+
+**用户故事：** 作为玩家，我想要行动轮争夺、弱点、招架、失衡与体力过载在界面上被正确呈现，以便这些已批准的标准机制不会因为表现层缺位而无法被理解或被误读为其他规则。
+
+**权威来源：** S-02 之 D-035、D-036、D-049、D-052、D-053、D-054、D-055；S-06 轮次栏与投点阶段 UI；`docs/L3_玩法层/01_行动轮与体力博弈系统.md`（玩法层来源，具体数值归玩法层）。
+
+> **归属声明**：本要求只定义**表现契约**。逆转、超逆转、处决后行动轮提升、弱点命中、招架、`[失衡]`、体力过载的规则内容与全部数值均由玩法层拥有；UI 表现系统只投影其已提交结果。
+
+#### 验收标准
+
+1. UI 表现系统应能呈现在玩家行动阶段内发生的**行动轮排名变化**（逆转、超逆转、处决后提升、弱点命中导致的排名下降），并在变化后重新排序轮次栏（D-053）。
+2. UI 表现系统不得在本地重算行动轮排名；排名与其变化应完全取自权威投影或规则事件投影（D-053）。
+3. UI 表现系统不得因为轮次栏正在播放排序动效而延迟、阻塞或改写权威的执行队列；排序动效与队列推进解耦（要求 7 第 2 条）。
+4. UI 表现系统应把弱点命中的效果呈现为**非伤害效果**（对方体力增加、对方行动轮排名下降、暴露的弱点装备脱落、对方获得 `[失衡]`），且**不得**把弱点呈现为使伤害翻倍（D-049）。
+5. UI 表现系统应把伤害翻倍的呈现归因于"骰点超出命中 DC 2 点及以上"这一来源，不得把它与弱点系统混同呈现（D-049）。
+6. UI 表现系统应把 `[失衡]` 呈现为破除举盾、瞄准、招架等准备动作状态的效果，其持续范围由玩法层投影给出；UI 不得在本地推断其结束时机（D-053）。
+7. UI 表现系统应把体力过载呈现为：体力封顶（永不呈现为 6）、过载者若本回合尚未行动则失去本回合行动权、跳过一次投点后重新加入投点、过载期间仍可观察其他参与者的回合（D-055）。
+8. 体力过载的**持续时长**存在三处数值分歧（登记为 `L3-DIV-01`），仍未裁决。UI 表现系统应显示投影给出的剩余时长，且**不得**为该时长选定默认值或在本地推算（D-055）。
+9. UI 表现系统应把 NPC 的体力池按与玩家体力相同的玩家可见数值约束呈现；NPC 体力上限与开局值由玩法层配置提供（D-052 默认上限 3、开局 0）。
+10. UI 表现系统不得为 NPC 呈现任何"争夺行动轮"的可用交互；NPC 体力不可用于逆转或超逆转（D-052）。
+11. UI 表现系统应把强力骰档位选择呈现为**投骰前的承诺**（滑块或等价离散选择），且该选择在提交前不得被表现层视为已生效。
+12. UI 表现系统应能呈现"投点失败（未获得行动点）导致体力退还"这一已提交结果，且不得把退还动效当作退还已生效的依据（要求 4 第 7 条）。
+13. UI 表现系统应把投点结算的因果链——比较输入 → 行动点产出 → 排名变化——锚定在轮次栏旁的同一视觉区域内闭环呈现（D-036）。
+14. 单一投点参与者的行动点结论存在两处相反陈述（`U-002`：D-037 单人 2 行动点 与 `wakeup-core-mechanics` 的中止结论），仍待项目所有者消解。UI 表现系统应显示投影给出的结果或投影给出的结构化中止原因，**不得**为单人情形选定默认行动点。
+15. 投点随机化是否启用 1d6（`U-001`）在主状态板中登记为结论相反、需消解。UI 表现系统不得依赖具体骰面数呈现语义；骰面数属内部度量（要求 10 第 13 条）。
+
+### 要求 17：空间、距离、姿态与物品栏的表现契约
+
+**用户故事：** 作为玩家，我想要空间关系、距离数字、姿态与物品栏被一致地呈现，以便界面不会与空间规则的术语基准或废案清单冲突。
+
+**权威来源：** S-02 之 D-041、D-047、D-051；S-06 叠层视图、节点可视化、物品栏 UI、姿态的物理拓扑；S-07 天然场景 / 微型场景 / 空旷地 / 废案条目；`wakeup-space-items` 的距离与拓扑契约（待汇合）。
+
+#### 验收标准
+
+1. UI 表现系统显示的距离取值应以**距离 1 = 贴身（同一微型场景）** 为基准，距离 2 = 不同微型场景但同一天然场景，距离 3 及以上按投影给出的距离取值显示（D-051）。
+2. UI 表现系统不得在本地计算或推导距离；距离取值应取自空间物品领域的只读投影（要求 14 第 3 条）。
+3. UI 表现系统显示的距离开区间上限应与投影一致；不得出现与基准 1 起算矛盾的表述（例如把最远档写成"距离 5+"而投影给出的是"距离 6+"）（D-051）。
+4. 叠层视图的图层距离参数应使用与第 1 条相同的距离基准：距离等于 1 时卸载基础图层，距离大于 1 时叠加在原图层上（D-051 平移后的表述）。
+5. UI 表现系统应把**天然场景**（大 / 中 / 小三档）与**微型场景**呈现为两套正交坐标，不得把小场景呈现为微型场景，也不得把微型场景呈现为天然场景的一个档位（S-07 术语铁律）。
+6. UI 表现系统不得使用**接敌面**及其"地垫卡槽 = 场景连接数上限"的可视化模型：该概念已被判为废案，容量约束的正确承担者是过渡阻挡机制（S-07 废案清单）。空间占用的呈现应改为投影给出的微型场景占用关系。
+7. "来到空旷地"这一交互文案应在大 / 中场景表示创建个人私有微型场景，在小场景表示进入该小场景自带的共享微型场景；两处**复用同一文案**是已定案的设计意图，UI 不得为二者拆分为不同语义按钮（S-07 空旷地条目）。
+8. UI 表现系统应支持**四类姿态**的可识别呈现：站立、蹲下、倒地、睡眠；其中倒地需区分**零血倒地（濒死，可被令其长眠）**与**普通倒地（可站起）**两种语义（S-07 倒地条目、D-047 新增蹲下）。
+9. 「蹲下」是否进入姿态物理拓扑表的**正式登记**仍是次级待确认项（D-047 派生）。UI 表现系统应把蹲下作为投影给出的姿态状态呈现，且不得为其发明未被投影声明的姿态属性。
+10. UI 表现系统应支持把载具部件（如轮胎）作为**可选子目标**呈现于远程瞄准界面，其可选性与合法性完全取自投影（D-047）；UI 不得在本地判断部件是否可被击中。
+11. UI 表现系统应把物品栏出生状态呈现为**手部与背包槽位全空**（D-041 空手进场）；界面草图中出现的物品图标仅为布局示意，不构成默认装备配置。
+12. UI 表现系统不得呈现物品体积分类（小 / 中 / 大三档）或口袋槽位：两者均为废案；占位只有"占 1 格"与"占 2 格"两种（S-07 废案清单）。
+13. UI 表现系统不得呈现尸体、搜尸或拖拽尸体交互；死者物品的正确呈现对象是**死亡背包**这一独立容器实体（S-07 废案清单）。
+14. UI 表现系统呈现的负重效果应取自投影给出的聚合结果，不得在本地沿携带关系重算负重（要求 14 第 3 条）。
+
+### 要求 18：可验证性与反向边界测试
+
+**用户故事：** 作为质量工程师，我想要每项边界都能被正向与反向验证，以便"只读""不泄漏""动画不影响规则"不是不可测试的口号。
+
+**权威来源：** S-05 要求 15、16；S-08 关于"不以复选框为准、以测试与门禁为准"的进度真相原则。
+
+#### 验收标准
+
+1. 验证计划应包含一个 UI 消费方尝试直接修改语义状态的用例，并应期望得到结构化拒绝且状态不变。
+2. 验证计划应在动画启用、跳过、减弱与失败四种条件下执行等价的权威动作序列，并应期望相同的规则结果、随机结果与结算顺序。
+3. 验证计划应尝试通过 HUD、预览、不可用原因、动画选择、日志、调试面板、无障碍文本、音频、触觉与资源命名提取隐藏信息，并应期望没有任何未授权披露。
+4. 验证计划应逐项省略或损坏每个必需语义字段，并应期望被拒绝且不发明语义。
+5. 验证计划应逐项省略或损坏每个有已声明降级的表现字段，并应期望得到该降级加警告级诊断且动作可用性不变；它还应覆盖"某个必需无障碍呈现既无可见性安全标签也无有效降级"的情形，并应期望按要求 9 第 9 条被拒绝。
+6. 验证计划应覆盖玩法数值 1 与 5、越界值、非整数、非有限值以及尝试的伪精确换算。
+7. 验证计划应覆盖待确认输入、待确认控件上的额外激活尝试、过期动作绑定、失效 `Decision`、目标失效与提交期间状态变化；它应期望 UI 不从待确认控件创建第二个交互意图，且权威契约重校验它收到的每一个意图。
+8. 验证计划应覆盖异步资源完成、动画中断、重放、回退、跳过、重连、修订缺口与多窗口收敛。
+9. 验证计划应为至少两个知识范围不同的非全知 Agent 以及一个被显式授权的全知 Agent 运行可见性用例；并应覆盖观战视角与在局视角消费同一投影通道（D-034）。
+10. 验证计划应运行不依赖颜色、屏幕阅读器、重映射输入与减弱动效模式的用例，并应期望语义等价的信息与交互标识。
+11. 验证计划应断言布局取值、动画时序、素材路径、帧率与性能目标不能改变描述符语义或权威结果。
+12. 验证计划应断言玩法专属 HUD 组合与具体资源可以被替换，而不改变可复用表现描述符契约。
+13. 验证计划应断言状态修订令牌在单调段上满足全序（自反、反对称、传递），且"单调段相同而指纹段不同"返回不可比较而非相等（要求 8 第 1、2 条）。
+14. 验证计划应断言分级导航在任一游标位置下的同时可选项（含导航控件）不超过 5 个，且全部合法动作均可达、无一被丢弃（要求 10 第 10–12 条）。
+15. 验证计划应断言仪式动画集合恰好为四项，且每一项都携带存在于已确认决策目录中的来源编号；新增或删除任一项应导致装载失败，除非同时提供新的已确认决策编号（要求 6 第 4、7、9 条）。
+16. 验证计划应断言显著性分层为闭合三档，缺少登记时拒绝呈现，且 `hidden` 档不产生任何呈现输出（要求 3 第 10、15、16 条）。
+17. 验证计划应断言 1d6 原始骰点不会作为持久玩家可见玩法数值出现在任何呈现输出、无障碍文本或导出文本中（要求 10 第 13、14 条）。
+18. 验证计划应断言废用术语与废案（接敌面、攻击形状、体积分类、口袋槽位、尸体系统）不出现在任何语义枚举、描述符字段名或用户可见文案中（要求 1 第 7 条、要求 17 第 6、12、13 条）。
+19. 若某项要求无法产生可观察的通过或失败结果，则需求评审应在本 Spec 进入设计阶段之前修订或移除它。
+20. 验证计划的执行结论应以测试套件、类型检查与 lint 三条门禁的实跑结果为准，不得以 `tasks.md` 复选框作为完成证据（S-08）。
+
+---
+
+## 七、需求—权威来源对照表
+
+| 要求 | 主要权威来源 |
 |---|---|
-| 1 | L0 layering and terminology; L2 source classification |
-| 2 | Kernel Query/action/presentation channels; L2 UI adapter |
-| 3 | Kernel Knowledge/visibleTo/hidden Intent contracts |
-| 4 | Op-only writes; action, Decision and Intent validation |
-| 5 | Action and Decision lifecycle; P05 stale-input coverage |
-| 6 | Confirmed decisions D-024—D-026, D-032（四项仪式动画）, D-035—D-036（轮次栏） |
-| 7 | Op, random, persistence and presentation-channel separation |
-| 8 | Snapshot/replay/rewind and P05 asynchronous consistency coverage |
-| 9 | L2 semantic rejection and presentation fallback boundary |
-| 10 | L0 1—5 rule and internal-metric exception |
-| 11 | L2 accessible descriptor fields and L0 low-cognitive-load rules |
-| 12 | Kernel diagnostics, visibility and read-only presentation boundary |
-| 13 | L0 layer ownership and L2 descriptor scope |
-| 14 | P05 cross-Spec isolation requirement; shared read contracts |
-| 15 | Kernel full-query plus incremental-event presentation channels |
-| 16 | L2 verifiability requirements and P05 reverse review |
+| 1 | S-01 三层职责与术语铁律；S-05 来源分类；D-060 判定原则 |
+| 2 | 引擎层 `Query` / 动作 / 表现通道；基类层 UI 适配器 |
+| 3 | 引擎层 `Knowledge` / `visibleTo` / 隐藏 `Intent` 契约；D-023、D-031、D-032、D-033、D-034 |
+| 4 | 唯一 Op 写入通道；动作、`Decision`、`Intent` 校验 |
+| 5 | 动作与 `Decision` 生命周期；D-042 双菜单与倒计时 |
+| 6 | D-024、D-025、D-026、D-032（四项仪式动画）、D-035、D-036、D-053 |
+| 7 | Op、随机、持久化与表现通道的分离 |
+| 8 | 快照 / 重放 / 回退；未决项 C-2、C-4 |
+| 9 | 基类层语义拒绝与表现降级边界 |
+| 10 | S-01 数值铁律与五并列原则；D-023、D-054 |
+| 11 | 基类层无障碍描述符字段；S-01 低心智性 |
+| 12 | 引擎层诊断、可见性与只读表现边界 |
+| 13 | S-01 层级归属；基类层描述符范围 |
+| 14 | 跨 Spec 隔离与共享只读契约；架构决策原则（不跨 Spec 改交付物） |
+| 15 | 引擎层完整查询 + 增量事件表现通道 |
+| 16 | D-035、D-036、D-049、D-052、D-053、D-054、D-055 |
+| 17 | D-041、D-047、D-051；S-07 术语铁律与废案清单 |
+| 18 | 基类层可验证性要求；S-08 进度真相原则 |
 
-## Explicit Non-Normative Examples
+---
 
-The following source elements may inform design exploration but are not semantic defaults or acceptance constants in this Spec:
+## 八、明确的非规范示例
 
-- Concrete HUD positions, Z-index numbers, panel dimensions and scene-card geometry.
-- Exact colors, glow effects, portal icons, key bindings and device mappings.
-- Exact animation durations, transform curves, particle sets, particle counts, frame rates and resource sizes.
-- Named gameplay resource bars, named weapon previews, named NPC phase panels and concrete inventory layouts.
-- Historical mockups, staffing estimates, milestones, library candidates and performance estimates.
+下列来源要素可以启发设计探索，但**不是**本 Spec 的语义默认值或验收常量：
 
-A later design may select values for these presentation concerns, but it must keep them replaceable, visibility-safe and unable to affect Semantic_State.
+- 具体 HUD 位置、Z-Index 数值、面板尺寸与场景卡片几何。
+- 具体颜色色值、发光效果、门户图标、按键绑定与设备映射。
+- 具体动画时长、变换曲线、粒子集合、粒子数量、帧率与资源尺寸。
+- 具名玩法资源条、具名武器预览、具名 NPC 相位面板与具体物品栏布局。
+- 历史草图、人员估算、里程碑、库选型候选与性能估算。
 
-## Unresolved Integration Risks
+后续设计可以为这些表现关注点选定取值，但必须保持可替换、可见性安全，且不能影响语义状态。
 
-1. `State_Revision` 的具体类型与意图提交时的并发校验字段尚需与权威运行时统一；本 Spec 只锁定“必须检测过期状态”的行为。
-2. `Rule_Event_Projection` 的 Agent 过滤封装与安全字段集合尚需在设计阶段与引擎层接口统一；原始事件不得直接进入表现层是稳定边界。
-3. `core`、`space-items`、`AI` 的字段级只读描述符仍是 Pending_Convergence_Contract，必须由后续跨 Spec 一致性审查汇合，不能由本 Spec 单方面定名。
-4. D-024—D-026、D-031—D-036、D-042 已锁定项目表现方向、显著性分层、轮次栏结构与默认动画范围（含 D-032 的四项仪式动画）；具体资源、时长、像素尺寸和实现技术仍属于可替换表现配置。**D-026 与 D-032 之间的三项/四项冲突已按 Requirement 6.7 的修订机制裁决为四项，不再是未决风险。**
-5. 具体布局、性能预算、设备覆盖矩阵与本地化资源策略属于设计阶段输入，不能反向改变本文件的规则边界。
+---
+
+## 九、上游过期文本与交接项
+
+> 本节只**登记**，不代行修改。按架构决策原则，需要其他文档或其他领域改动时写成交接项，不直接改对方交付物。
+
+| 编号 | 上游位置 | 过期或冲突内容 | 应改成什么 | 依据 |
+|---|---|---|---|---|
+| H-UI-01 | `docs/L2_基类层/08_图形化与UI.md`「五条视觉定律」第 5 条「空间与接敌的可视化」 | 仍以**接敌面**与"地垫卡槽 = 场景连接数上限"作为空间可视化模型，并称"两玩家在同一微型场景 → 共用一个接敌面" | 接敌面是废案，应改写为基于**微型场景占用关系**的可视化；容量约束由过渡阻挡机制承担 | S-07 废案清单；要求 17 第 6 条 |
+| H-UI-02 | `docs/L2_基类层/08_图形化与UI.md`「地图编辑器」属性面板示例 | 示例把"连接数上限：4"写在中场景属性面板上，读起来像基类层结构边界 | 应标注为**玩法层地图 Linter 的默认平衡值**，基类层唯一结构边界是 5 | D-057 |
+| H-UI-03 | `docs/L2_基类层/08_图形化与UI.md`「姿态的物理拓扑」表 | 标题写"四种姿态"，表内实际列出五行（站立 / 蹲下 / 倒地濒死 / 倒地击倒 / 睡眠）加一行已废弃项 | 计数与行数需一致；并明确"蹲下是否正式进入该表"这一次级待确认项的状态 | D-047 派生待确认项；要求 17 第 8、9 条 |
+| H-UI-04 | `src/ui/model/profile.ts` 的 `CONFIRMED_DECISION_IDS` | 目录缺少本 Spec 现已引用的 D-047、D-052、D-054、D-055 | 应把这四项补入可引用决策目录，并由其测试机械核对文档中的"已确认"状态 | 要求 6 第 9 条、要求 16、要求 17 |
+| H-UI-05 | `docs/00_主状态板.md` §三 | 把 `wakeup-ui-animation` 记为"🔴 早期（1/75）"，而 `src/ui/model`、`src/ui/presentation` 已落地并带测试 | 应按测试实跑结果刷新该行 | S-08 进度真相原则 |
+
+---
+
+## 十、未决与未冻结边界
+
+以下事项**不得**由本 Spec 单方面赋默认值。实现、工具或表现配置在获得控制决策之前，不得把它们当作可交付的默认行为。
+
+| 编号 | 内容 | 状态 | 本 Spec 的处置 |
+|---|---|---|---|
+| C-2 | 引擎层 `rewind(n)` 的相位计数语义与按名字恢复的实现不一致 | ⬜ 未裁决（引擎层实现问题） | 要求 8 第 12 条：回退后必须从完整投影重建首帧，不依赖相位计数语义 |
+| C-4 | 语义状态指纹只能判等不能判序 | ✅ 已在本 Spec 侧闭合 | 要求 8 第 1、2 条：状态修订令牌为"单调段判序 + 指纹段判等"的复合令牌，不可比较时请求完整投影 |
+| U-001 | 投点分布与强力骰边界（1d6 是否启用，D-054 与仍维持阻塞的会话结论相反） | ⚠️ 结论相反，待所有者消解 | 要求 16 第 15 条：骰面数属内部度量，表现不依赖具体骰面数 |
+| U-002 | 单一投点参与者的行动点（D-037 单人 2 行动点 vs 中止） | ⚠️ 两处相反，待所有者消解 | 要求 16 第 14 条：显示投影结果或结构化中止原因，不选默认值 |
+| U-003 派生 | 体力过载**持续时长**的三处数值分歧（`L3-DIV-01`） | ⬜ 未裁决 | 要求 16 第 8 条：显示投影给出的剩余时长，不推算 |
+| D-061 | L2 语义管线所有权收敛（归 `src/l2`） | ⬜ AI 裁决草案，待批准 | 第 5.1 节：基类层依赖以 `src/l2/**` 为准；若被否决需同步修订本节，行为要求不变 |
+| D-062 | L3 核心机制双实现收敛方向 | ⬜ AI 裁决草案，待批准 | 第 5.2 节：核心机制契约保持待汇合，不绑定任一实现的内部形状 |
+| P-UI-01 | 待汇合契约的字段级签名（安全字段白名单键名、安全不可用原因键名） | ⬜ 未汇合 | 默认表现配置中为空集；缺失表现为"少显示信息"而不是泄漏 |
+| P-UI-02 | 具体布局、性能预算、设备覆盖矩阵与本地化资源策略 | 设计阶段输入 | 不得反向改变本文件的任何规则边界 |
+
+---
+
+## 十一、变更记录
+
+| 日期 | 变更 | 依据 |
+|---|---|---|
+| 2026-08-08 | 删除**攻击形状**（原 `single-target` / `spread` / `area` 三选一形状轴及配套 UI 语义枚举）。判定为冗余设计：其表现层需求已完全由**武器属性**（散射 / 扫射 / 连发）覆盖。武器不声明任何属性时默认单体，无需显式标注；散射 / 扫射不设固定命中目标数上限 | 本次裁决已获项目所有者授权；`docs/L0_规范宪法.md`、`docs/L2_基类层/基类层定义.md` §4.3、`docs/L2_基类层/08_图形化与UI.md` 视觉定律 3 |
+| 2026-08-08 | D-026 的"三项仪式动画"与 D-032 的"四项"冲突（原登记为 C-1）按较晚已确认决策裁决为**四项**，不再是未决风险 | D-032 + D-053 |
+| 2026-08-09 | 全文改为中文规范正文；补入此前缺位的 D-034、D-041、D-047、D-049、D-051、D-052、D-053、D-054、D-055、D-060 的表现契约（新增要求 16、17）；把 C-4 的应对固化为复合状态修订令牌（要求 8）；把五并列的同时可选项上限细化为含导航控件计数与无丢弃保证（要求 10）；新增上游过期文本交接项一节 | 本文件第 2.1 节优先级；`docs/访谈决策记录.md`；`docs/00_主状态板.md` |
+
+---
+
+**文档状态**：需求已对齐 2026-08-09 的全部已确认决策；第十节所列未决项不得默认化。
+**最后更新**：2026-08-09
