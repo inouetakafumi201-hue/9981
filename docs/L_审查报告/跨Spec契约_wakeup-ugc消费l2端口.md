@@ -132,3 +132,34 @@ wakeup-ugc 任务 11.1/11.3 的开工条件(全部满足才动手):
   端口接口与失败关闭替身已就位,**零 l2 耦合**。11.1/11.3 阻塞,阻塞条件见第六节。
 - **l2 侧(交接项)**:实现第二节三端口 + 第三、四节桥接 + 第五节降级。
 - **本会话不修改任何 `src/l2/**` 文件**:那是 l2 Spec 的交付物,且有并行会话在处理其文档问题。
+
+---
+
+## 八、已交付（PT-02，l2 侧，2026-08-10）
+
+l2 侧端口全部落地于 `src/l2/ugc/ports/`，入口 `createL2PortBundle()`（`port-bundle.ts`）。
+`tsc --noEmit` 0 错、`vitest run` 2158 全绿、`eslint` 0 错（8 条为既有他处 warning）。
+
+| 契约条目 | 交付物 | 状态 |
+|---|---|---|
+| §2.1 `DefinitionValidationGateway` | `validation-gateway.ts` | ✅ 复用 `validateFullPackage`，与 `activate` 同输入；如实声明 `coveredCapabilities` |
+| §2.2 `ReferenceResolutionGateway` | `resolution-gateway.ts` | ✅ 重建工作图 + 活动入边补全 + 传递入边闭包重验 + 确定性边序 |
+| §2.3 `DefinitionRegistryGateway`（含 CAS） | `registry-gateway.ts` | ✅ 按层各一份；CAS 比对 `definitionRegistryVersion`；拒绝路径 `unchanged=true` 且前后指纹相同 |
+| §2.4 JSON_Codec | 不需 l2 实现 | ✅ 端口从 `canonicalJson`/`decodedValue` 起步 |
+| §三 `decodedValue→DefinitionPackage` | `package-mapping.ts` | ✅ 以 `canonicalJson` 喂 `parsePackage`，并与 `decodedValue` 语义一致性核对；operation→override/removal 授权核对 |
+| §四 诊断投影 | `diagnostic-projection.ts` | ✅ 全部 l2 代码 → UGC `DiagnosticSelector`（`satisfies Record` 编译期穷举）；scope/at/path/severity 契约由测试断言 |
+| §五 降级 `fromUgc` | `ugc-adapter.ts` 文档 | ✅ 保留为 l2 内部便捷入口并注明「非 UGC 正式接入路径」；与端口无职责重复（都复用同一 `parsePackage`） |
+| §六.4 端口自测 | `ports/__tests__/*` | ✅ bundle 通过 `inspectL2PortBundle`；验证/解析/CAS/诊断投影穷举各有断言 |
+
+**补充能力**（UGC 契约要求但 l2 核心结构上没有，由端口补齐，非职责重复）：
+- 封闭 Schema（`closed-schema.ts`，Proxy 探测；作用域=包顶层+定义级封闭字段集，见文件内已知局限说明）；
+- 提供方判定 `provider-domain`/`ambiguous-target`（`provider-domain.ts`，输入=UGC 契约目录，l2 拿不到）；
+- 包依赖环 `package-cycle`（`package-cycle.ts`，触发此前从未被使用的 `REF_PACKAGE_DEPENDENCY_CYCLE`）。
+
+**解耦守卫**：`port-bundle.ts` 不 import `src/core/ugc/integration/l2-port-contract.ts`，只实现其结构形状；
+UGC 侧 `integration/__tests__/l2-port-contract.test.ts` 的「零 l2 耦合」用例仍全绿。
+
+**交接给 wakeup-ugc（解除 task 11.1/11.3 阻塞）**：第六节 1–5 条已满足。11.1 现可写薄装配器：
+`createL2PortBundle()` → `inspectL2PortBundle` 校验 → 接入 `AtomicActivationCoordinator`。
+注意端口消费需由本提供方（`providerId='l2-base-layer'`）串起：验证产物、解析产物、注册表快照三者的
+`payload` 都带 provider 令牌，跨提供方混用会失败关闭。

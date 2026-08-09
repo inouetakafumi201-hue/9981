@@ -10,6 +10,17 @@
  * - Presentation_Field 缺失/损坏 → 类型兼容回退 + Warning（Requirements 11.11、14.9）。
  *
  * 本适配器不实现独立的 UGC 规则引擎：所有语义判定都委托给 JSON Codec 与 Definition_Validator。
+ *
+ * ## 与 `src/l2/ugc/ports/`（PT-02 端口方案 A）的关系
+ * `fromUgc` 是 l2 **自身**的便捷入口：给一段候选 JSON 文本，走 l2 的解析+验证路径。它面向
+ * 「l2 独立使用 / l2 内部属性测试」的场景（见 test/l2 的 json-normalization-ugc、P07）。
+ *
+ * `src/l2/ugc/ports/` 则实现 **wakeup-ugc 跨 Spec 消费端口**（方案 A）：那条路径上 UGC 自己完成
+ * 解码与规范化，l2 从 `decodedValue` / `canonicalJson` 起步，并额外承担 UGC 契约要求而 l2 核心没有的
+ * 能力（封闭 Schema、覆盖授权、提供方判定、包依赖环、CAS 注册）。
+ *
+ * 两者不构成职责重复（架构决策原则 §2）：都最终复用同一个 `parsePackage` 单写入口，谁都不自称
+ * 「唯一权威」；区别只在调用边界（本地便捷 vs 跨 Spec 端口）。UGC 消费方**不**调用 `fromUgc`。
  */
 
 import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';

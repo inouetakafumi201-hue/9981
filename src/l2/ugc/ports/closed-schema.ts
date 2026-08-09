@@ -16,18 +16,24 @@
  * l2 自己的 `decodePackage`。事后比对：某个对象实际拥有的成员减去被探测过的成员，就是解码器
  * 完全没看过的成员，即未声明字段。这份「已声明成员集合」始终由解码器自身定义，不会漂移。
  *
- * ## 消除误报的三条规则（误报比漏报危险得多：它会拒绝合法候选）
+ * ## 消除误报的规则（误报比漏报危险得多：它会拒绝合法候选）
  * 1. **解码出现任何 Error 时不报未声明字段。** 形状已经坏了，解码器会中止子树，
  *    未被读到的兄弟成员不构成「未声明」的证据。
  * 2. **只检查对象成员，不检查数组下标。** 解码器可能在报错后停止遍历数组尾部元素。
  * 3. **只检查「至少被探测过一次」的对象。** 一个成员都没被探测的对象说明解码器根本没下降到
  *    这一层——那是开放 JSON 值（`gameplayValues[*].value`、`defaultValue` 等按 `JsonValue`
- *    原样保留的位置）。这条规则同时给出了 `open-property-map` 能力：显式声明为开放的属性映射
- *    不会被封闭 Schema 检查误伤，而它自身若是未声明成员，会由它的**父对象**报出来。
+ *    原样保留的位置）。这条规则同时给出了 `open-property-map` 能力。
+ * 4. **只检查「解码器把它当作封闭字段集」的结构层：包顶层与每个定义对象的直接成员。**
+ *    这是本检查的作用域边界，也是它必须显式声明的**已知局限**：
+ *    - `decodePackage` 与 `decodeDefinition` 在这两层各自读取一个**固定、封闭**的具名字段集合，
+ *      因此这两层的未声明成员一定是拼写错误或幽灵字段，可放心拒绝；
+ *    - 更深的嵌套结构（`sourceLocation`、`familyContract` 内部、参数 Schema……）里，解码器会
+ *      **派生或忽略**某些已声明字段（例如 `sourceLocation.sourceFile` 由外层记录重建而从不探测
+ *      内层同名字段）。在这些层用「探测过没有」判定会把合法的已声明字段误报为未声明。
+ *      这些层的字段完整性由 l2 各自的 required/damaged 校验负责，本检查不介入。
  *
- * 附带的偏置：`ownKeys` / `getOwnPropertyDescriptor` 陷阱也记为探测，因此被枚举过的对象
- * （`Object.keys`、展开、`isJsonValue` 递归）一律视为全部成员已声明。这个偏置方向是漏报而非误报，
- * 是刻意选择的。
+ * 换言之：封闭 Schema 检查覆盖「顶层 + 定义级」的封闭字段集，深层结构视为由 l2 自有校验守护。
+ * 这不是妥协出来的特例，而是与 l2 解码器「哪几层是封闭字段集」的真实结构对齐。
  */
 
 import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids.js';
@@ -46,6 +52,20 @@ export interface UnknownMember {
   readonly key: string;
   /** 该成员自身的 JSON path，用于诊断定位。 */
   readonly jsonPath: string;
+}
+
+/**
+ * 判定某个容器路径是否是「解码器按封闭字段集处理」的层。
+ *
+ * - 根路径（空串）：包顶层，`decodePackage` 读取固定字段集。
+ * - `/definitions/{index}`：定义对象，`decodeDefinition` 读取固定字段集。
+ * 其余路径（更深的嵌套）返回 false，交由 l2 自有校验守护。
+ */
+function isClosedFieldContainer(path: string): boolean {
+  if (path === ROOT_JSON_PATH) {
+    return true;
+  }
+  return /^\/definitions\/\d+$/u.test(path);
 }
 
 interface TrackedObject {
@@ -162,6 +182,10 @@ export function scanUnknownMembers(input: ClosedSchemaScanInput): ClosedSchemaSc
   for (const tracked of tracker.objects.values()) {
     if (tracked.probed.size === 0) {
       // 规则 3：解码器从未下降到这一层，视为开放 JSON 值。
+      continue;
+    }
+    // 规则 4：只检查封闭字段集的两层（包顶层、定义直接成员）。
+    if (!isClosedFieldContainer(tracked.path)) {
       continue;
     }
     for (const key of tracked.actualKeys) {
