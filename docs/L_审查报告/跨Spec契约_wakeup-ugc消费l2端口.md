@@ -4,6 +4,27 @@
 > 本文件是**唯一权威的端口边界契约**，供 l2-base-layer-spec 会话实现。
 > 记录时间：2026-08-08。
 
+## 当前状态（2026-08-11 最终验收）
+
+**PT-02 已交付**：`src/l2/ugc/ports/index.ts` 导出 `createL2PortBundle`，返回冻结的 JSON Codec、Definition Validator、Reference Resolver 和双目标层 atomic Definition Registry。
+
+**wakeup-ugc task 11.1 完成**：`src/core/ugc/integration/l2-adapter.ts` 实现唯一 composition root，仅消费 `createL2PortBundle()`，按目标层装配 `ValidationCoordinator` / `AtomicActivationCoordinator` / `UGCIngressFacade`；无语义转换、无第二套 validator/resolver/registry。
+
+**守卫通过**：
+- `src/core/ugc/integration/l2-port-contract.ts` 运行期检查方法存在、目标层一致、provider/version 同源、双 registry 隔离。
+- `src/core/ugc/__tests__/architecture-boundary.test.ts` 更新为"imports only through frozen l2 port composition seam"。
+
+**真实全链路测试接通**：`src/core/ugc/__tests__/integration/full-pipeline.integration.test.ts` 13 个场景覆盖 base success、四类 Adapter 同路由、reject 三状态不变、success 恰好一次、跨域引用、覆盖/删除、迁移、表现、规范快照、陈旧基线、玩法缺口拒绝、配额。
+
+**质量门禁**：
+- 定向 28/28 ✅（full-pipeline 13 + l2-port-contract 8 + architecture-boundary 7）
+- 全仓 2423/2425 ✅，2 个失败均为未修改并行区域（l2 space-items ReferenceError、spec 术语位置契约）
+- TypeScript + ESLint 全部本次文件通过 ✅
+
+**剩余阻塞（task 11.3）**：l2 尚未冻结规范玩法包验证契约，valid play candidate 场景保持失败关闭（诚实验收，不虚标完成）。待 l2 交付冻结契约后补齐场景 11。
+
+**详细验收报告**：`docs/L_审查报告/UGC薄适配器最终验收报告.md`。
+
 ---
 
 ## 一、为什么不由 wakeup-ugc 写"适配 l2 当前内部形状"的适配器
@@ -128,10 +149,9 @@ wakeup-ugc 任务 11.1/11.3 的开工条件(全部满足才动手):
 
 ## 七、当前状态与交接
 
-- **wakeup-ugc 侧**:任务 1–10、11.2/11.4/11.5/11.6、12 完成,436 测试全绿,`tsc`/`eslint` 零问题。
-  端口接口与失败关闭替身已就位,**零 l2 耦合**。11.1/11.3 阻塞,阻塞条件见第六节。
-- **l2 侧(交接项)**:实现第二节三端口 + 第三、四节桥接 + 第五节降级。
-- **本会话不修改任何 `src/l2/**` 文件**:那是 l2 Spec 的交付物,且有并行会话在处理其文档问题。
+- **wakeup-ugc 侧（当前）**：任务 11.1 已完成，唯一生产装配缝为 `src/core/ugc/integration/l2-adapter.ts`；真实基类层端口 full-pipeline 测试已落地。11.3 仍因规范玩法包验证契约未冻结而部分阻塞，禁止用基类定义包写入 play registry 冒充完成。
+- **l2 侧（已交付）**：第二节三端口 + 第三、四节桥接 + 第五节降级已由 PT-02 完成；后续交接项是发布玩法包的稳定验证/组合契约，使 valid play candidate 能组合已登记基类定义而不复用基类包语义。
+- **跨 Spec 边界**：UGC 只消费 `src/l2/ugc/ports/index.ts`，不修改或依赖 l2 内部实现文件。
 
 ---
 

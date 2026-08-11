@@ -14,10 +14,12 @@
 
 | 档位 | 含义 | 条数 | 占比 |
 |---|---|---|---|
-| ✅ **有直接断言** | 存在测试明确断言该验收标准描述的行为 | **43** | 60.6% |
-| ◐ **仅间接覆盖** | 有测试路径经过该逻辑，但缺针对该条的断言（或只覆盖了该条的一部分） | **22** | 31.0% |
-| ⬜ **无覆盖** | 找不到任何断言 | **6** | 8.4% |
+| ✅ **有直接断言** | 存在测试明确断言该验收标准描述的行为 | **44** | 62.0% |
+| ◐ **仅间接覆盖** | 有测试路径经过该逻辑，但缺针对该条的断言（或只覆盖了该条的一部分） | **23** | 32.4% |
+| ⬜ **无覆盖** | 找不到任何断言 | **4** | 5.6% |
 | 合计 | | **71** | 100% |
+
+> **勘误与守卫回流（2026-08-10）**：初版记为 43✅/22◐/6⬜。第一次复核发现 **12.4 判错**——代码侧已被扫描整个 `src/` 的仓库级守卫覆盖，故先修正为 43✅/23◐/5⬜。随后落地 `test/toolchain/spec-document-discipline.test.ts`：B-20 逐要求小节验证来源 footer，使 12.1 从 ⬜ 升为 ✅；B-19 扫描活跃 `.kiro/specs/**` 与 `docs/**`，但仍以精确棘轮承认 6 个文件中的 **23 处既有违规**，故 12.4 保持 ◐。最终为 **44✅/23◐/4⬜**。
 
 **按需求聚合**：
 
@@ -34,7 +36,7 @@
 | 要求 9 行为类/NPC 配置/数值归属 | 2 | 4 | 0 | 中（1–5 数值强，状态机归属弱） |
 | 要求 10 跨系统接口契约 | 6 | 0 | 1 | 高，但 **10.7 逐字段登记完全缺失** |
 | 要求 11 可验证诊断与可解释性 | 2 | 3 | 1 | 中（状态回滚强，可重放性无断言） |
-| 要求 12 来源可追踪性与未决项保护 | 1 | 1 | 4 | **最低**，多为文档/流程类且无机器断言 |
+| 要求 12 来源可追踪性与未决项保护 | 2 | 2 | 2 | **最低**；来源追踪已机器化，术语侧仍保留 23 处既有违规基线，登记件仍缺失 |
 
 **三处最值得注意的事实**（不含裁决）：
 
@@ -169,7 +171,7 @@
 | 10.4 | UGC 以声明式数据定义可复用行为/Policy 引用/玩法配置，先经相同的基类层验证、引用解析与诊断；不得注入代码、直接写状态或绕过可见性过滤 | ✅ | `integration.test.ts:187` `accepts a registered declarative reference`；`integration.test.ts:193` `rejects code, extra privileges, unregistered policies and mismatched categories`（六个分支：`onEvaluate:'() => 1'` 代码注入、`omniscient:true` 越权、类别不匹配、`policy` 非引用形状、`schemaVersion` 不符、非对象输入，全部 → `AI_POLICY_BINDING_INVALID`）；`integration.test.ts:202` `fails closed when the base-class validator is unavailable` → `AI_CONTRACT_UNAVAILABLE` | — |
 | 10.5 | 对 UI 或 UGC 暴露的解释信息不得包含无权读取的隐藏事实/私有 Knowledge/未公开 Intent/完整世界状态 | ✅ | `integration.test.ts:102`（把隐藏实体塞进 rationale 与诊断文本后，投影序列化仍不含它）；`explanation-policy.test.ts:59` `withholds a declared key whose value references something the viewer cannot see`（即使玩法**显式声明**了该 binding key，只要其值引用不可见对象仍被扣留）；`explanation-policy.test.ts:67` `drops a rationale node that cites an invisible reference regardless of policy` | — |
 | 10.6 | 任一上下游接口缺少稳定字段/权限定义/验证结果时标记为未冻结待汇合契约，拒绝用猜测性字段/默认值/私有接口替代 | ✅ | 大量失败关闭断言：`contracts.test.ts:276`、`integration.test.ts:202`、`integration.test.ts:227`、`decision-facade.test.ts:232`、`decision-facade.test.ts:283` `fails closed instead of statically evaluating a search planner when SearchSession is unavailable`（并断言 `searchCalls===0`）、`decision-facade.test.ts:380` `converts SearchSession gateway exceptions into failure-closed diagnostics`、`simulation-search.test.ts:73` `fails closed without the unified checkpoint/shadow-stream adapter`、`sequential-kernel.test.ts:333` `fails closed when a derived AI participant has no validated behavior binding` | — |
-| 10.7 | **每项**待汇合契约必须以**逐字段登记**记录：字段名或结果投影、生产者与消费者、所属层级与权威来源、读写权限、`visibleTo` 或脱敏边界、快照与版本语义、重新验证时点、验证状态、缺失时的拒绝结果、冻结状态；登记至少覆盖 (a) 动作候选→即时 Action/Decision/Intent/Op 映射、(b) Query/Knowledge 的版本快照与刷新语义、(c) `checkpoint`/`restore`+影子随机流+表现订阅静默的共同边界、(d) AI 行为类完整 Schema 与验证结果、(e) UI 解释字段脱敏规则、(f) UGC 编辑/审核/装载/回退结果 | ⬜ | 无 | **完全没有承载物**。现有能力是"逐次拒绝时产出一条诊断"（`diagnostics.ts` 的 `unavailableContract`，字段为 `upstreamContract` / `reason` / `hint`，断言见 `contracts.test.ts:68`），这与本条要求的"**每项待汇合契约的逐字段登记**（12 个属性）× 6 个必覆盖领域"是两回事。全模块检索 `ContractRegistry` / `PendingContract` / `pendingContract` / `contractLedger` **零命中**。因此本条既无实现也无断言 |
+| 10.7 | **每项**待汇合契约必须以**逐字段登记**记录：字段名或结果投影、生产者与消费者、所属层级与权威来源、读写权限、`visibleTo` 或脱敏边界、快照与版本语义、重新验证时点、验证状态、缺失时的拒绝结果、冻结状态；登记至少覆盖 (a) 动作候选→即时 Action/Decision/Intent/Op 映射、(b) Query/Knowledge 的版本快照与刷新语义、(c) `checkpoint`/`restore`+影子随机流+表现订阅静默的共同边界、(d) AI 行为类完整 Schema 与验证结果、(e) UI 解释字段脱敏规则、(f) UGC 编辑/审核/装载/回退结果 | ⬜ | 无（AI 侧） | **AI 侧无承载物，但仓库里存在三种相邻形态——这一点初稿漏写，复核补上**：<br>① `src/core/ugc/model/contract-types.ts` + `src/core/ugc/contracts/integration-contract-catalog.ts`：UGC 侧的跨领域待汇合契约目录，其 `INTEGRATION_DOMAINS` **明确包含 `'ai'`**。但 `IntegrationContract` 只有 7 个属性（`domain`/`providerId`/`version`/`exportedDefKinds`/`exportedSemanticFamilies`/`referenceConstraintsFingerprint`/`sourceRecords`），是**提供方级**而非**逐字段级**，且不含 10.7 要求的读写权限、`visibleTo`/脱敏边界、重新验证时点、验证状态、缺失时的拒绝结果、冻结状态。<br>② `src/ui/ports/pending-contracts.ts`（PT-09 产出）：UI 侧的待汇合端口声明。<br>③ `src/play/profiles/known-divergences.ts`：L3 分歧登记。<br>**结论仍是 ⬜**：三者都不是 10.7 要求的形状，且 **AI 模块既不产出也不消费其中任何一个**。AI 侧现有能力只是"逐次拒绝时产出一条诊断"（`diagnostics.ts` 的 `unavailableContract`，字段 `upstreamContract`/`reason`/`hint`，断言见 `contracts.test.ts:68`），与"每项契约的逐字段登记（12 属性 × 6 领域）"是两回事 |
 
 ### 要求 11：可验证诊断与可解释性
 
@@ -184,14 +186,14 @@
 
 ### 要求 12：来源可追踪性与未决项保护
 
-> 本需求 6 条中有 4 条是**文档与流程约束**（针对 requirements.md 自身与冻结流程），而非运行期行为。它们并非"不可机器化"——扫描 spec 文件即可——但目前**没有任何自动断言**。这是全文档覆盖最弱的一条需求。
+> 本需求 6 条中有 4 条是**文档与流程约束**（针对 requirements.md 自身与冻结流程），而非运行期行为。B-19/B-20 已把来源追踪与文档术语增量纪律机器化；逐字段登记与冻结流程仍无承载物。
 
 | 编号 | 验收标准摘要 | 状态 | 证据 | 缺口说明 |
 |---|---|---|---|---|
-| 12.1 | 每一条需求都应包含来源追踪，至少指向一个权威来源/上游 Requirement/已确认决策/明确的待汇合契约 | ⬜ | 无自动断言 | **文档层面事实上满足**：审计者逐条核对，要求 1–12 每条都带"**来源追踪：**"段（要求 1 指向 L0 宪法+l2 R10.1–10.6+kernel R5/34/44+L2 07_AI 系统；…要求 12 指向 P03.md+L0+l2 R1/5/16+术语表）。**但没有任何测试或脚本断言这一点**，新增需求漏写来源不会被发现 |
+| 12.1 | 每一条需求都应包含来源追踪，至少指向一个权威来源/上游 Requirement/已确认决策/明确的待汇合契约 | ✅ | `test/toolchain/spec-document-discipline.test.ts:369` 自动发现全部活跃 `requirements.md` 并要求登记采纳状态；`:379` 对 `fully-adopted` 的 Spec 逐要求小节断言**恰有一个**来源 footer。`wakeup-ai` 登记为 fully-adopted，12/12 小节通过 | 守卫同时接受仓库内等价的「来源追踪」与「可追踪来源」标签；它证明 footer 存在且逐节唯一，不对 footer 所引来源的内容真实性作自动语义判定 |
 | 12.2 | 来源只提供示例/历史/候选算法/性能建议/未定数值时，应标记为候选实现/历史材料/未冻结项，不得转化为强制验收标准 | ◐ | `ai.test.ts:16`（断言 `alphaBeta` 不出现在 AI 源码 → 候选算法确实没被固化为实现）；`ai.test.ts:29` `keeps only a SearchDecisionContext-based public search contract`（公开搜索契约以上下文对象为中心，未固化具体算法） | 只覆盖 `alphaBeta` 一个候选算法，且只扫 5 个文件；requirements.md 「明确未冻结的事项」列举的其余项（剪枝条件、候选排序、缓存/置换表、随机仲裁实现、评估服务类名/对象形状、性能阈值、可视化形态、固定搜索深度、固定评分权重、NPC 状态名、巡逻线、感知距离、衰减系数、动作成本、地图策略）**均无对应的"未固化"断言** |
 | 12.3 | 涉及未确认的核心机制/NPC/UI/UGC 接口时记录依赖与未冻结状态，不得自行定义上游数据结构/数值/写入通道 | ✅ | `contracts.test.ts:276`（未冻结即失败关闭）；`contracts.test.ts:68`（`unavailableContract` 记录 `upstreamContract` 定位）；`contracts.test.ts:314`（不引入上游写通道类型）；`ai.test.ts:16`（不 import `world-state`）；`decision-facade.test.ts:283`/`:380`、`simulation-search.test.ts:73`、`sequential-kernel.test.ts:333`（四类上游未冻结均失败关闭） | 记录的是**逐次拒绝的诊断**，不是 10.7 要求的登记件（见 10.7） |
-| 12.4 | 拒绝以宪法已禁用的术语描述层级归属、可复用定义或具体产物 | ⬜ | 无 | **零覆盖，且这是最容易补的一条**：一条源码/文档扫描断言即可（禁用词见 `docs/L0_规范宪法.md` §一：`模板`、`内容层`、单独使用的 `Layer 1/2/3`）。审计时手工检索 `src/core/kernel/ai/**` 未发现 `模板`/`内容层`（中文），但**英文对应词（如 `template`）与 spec 文档本身未纳入检索**，且没有任何门禁阻止将来引入 |
+| 12.4 | 拒绝以宪法已禁用的术语描述层级归属、可复用定义或具体产物 | ◐ | **代码侧**：`src/class/__tests__/architecture-terminology.test.ts:40` 扫描整个 `src/`。**文档侧**：`test/toolchain/spec-document-discipline.test.ts:227` 扫描活跃 `.kiro/specs/**` 与 `docs/**`，对无歧义复合词建立精确条数棘轮，并验证声明禁令文件的职责豁免仍真实命中 | **已有机器守卫但尚未全量清零**：当前 6 个活跃文件合计仍有 **23 处既有违规**，由 `KNOWN_VIOLATIONS` 精确到文件与条数；任何新增都会失败，修少后也必须下调基线。历史档案目录被明确排除；单独词语因消息文案、Prompt、Vue 等合法义项未在文档侧一刀切。故本条保持 ◐，目标状态是基线空表 |
 | 12.5 | 冻结某候选算法/数值/参数/接口之前，先记录其权威来源、所属层级、可判定验收条件与对要求 1–11 的兼容性结论 | ⬜ | 无 | 与 10.7 同源：需要一份登记件+流程门禁，两者都不存在。当前没有任何机制阻止"直接把某算法写进实现而不做兼容性结论" |
 | 12.6 | 两个来源实质冲突且无更高优先级裁决时，逐字段/逐行为登记为未冻结待汇合契约（含冲突双方精确定位、冲突字段或行为、优先级裁决依据、责任层级、冻结或裁决状态、未裁决时必须拒绝的接口或效果路径）；不得将任一侧生成强制行为/默认数值/写入路径；被替代时保留被替代条款及其控制来源 | ⬜ | 无 | 与 10.7 / 12.5 同源缺口。注：仓库层面**存在**同类机制的先例（`src/play/profiles/known-divergences.ts` 用于 L3 数值分歧登记），可作为形态参考；但 AI 侧没有对应结构，也没有断言 |
 
@@ -239,10 +241,10 @@
 
 | # | 对应条 | 建议落点 | 建议断言 |
 |---|---|---|---|
-| B-19 | 12.4 | 新增 `test/toolchain/` 或 AI 侧测试 | 扫描 `src/core/kernel/ai/**` 与 `.kiro/specs/wakeup-ai/*.md`，断言不出现宪法禁用术语（`模板`、`内容层`、单独使用的 `Layer 1/2/3`，以及英文对应词）。**这是清单里最便宜的一条** |
-| B-20 | 12.1 | 同上 | 扫描 `.kiro/specs/wakeup-ai/requirements.md`，断言每个 `### 要求 N` 小节都含"来源追踪"段 |
+| B-19 | 12.4 | ✅ **已落地**：`test/toolchain/spec-document-discipline.test.ts` | 扫描活跃 `.kiro/specs/**` 与 `docs/**`，排除明确归档目录；硬禁无歧义复合词；声明禁令文件按职责豁免且有死豁免检查；6 个文件共 23 处既有违规采用精确条数棘轮，目标为空表。当前因此仍记 ◐，不是把基线当永久许可 |
+| B-20 | 12.1 | ✅ **已落地**：同文件 | 自动发现全部活跃 `.kiro/specs/*/requirements.md` 并与 adoption map 双向比对；`fully-adopted` 逐要求小节恰有一个 footer，`not-adopted` 逐节为零，`partially-adopted` 精确棘轮且禁止小节内重复。`wakeup-ai` 12/12 通过 |
 | B-21 | 9.6 / 12.2 | 扩大既有扫描 | 把 `ai.test.ts:16` 的扫描范围从 5 个文件扩到 `src/core/kernel/ai/**` 全体，并把字段清单扩到本条列举的项（声音衰减、视距、AP、DC、路线长度等） |
-| B-22 | 10.7 / 12.5 / 12.6 | **需先有承载物，非补测能解决** | 这三条要求的是"逐字段登记件"，当前**既无结构也无实现**。可参考 `src/core/ugc/integration/l2-port-contract.ts`（跨 Spec 端口契约 + 其测试）与 `src/play/profiles/known-divergences.ts`（分歧登记）的既有形态。**登记件的归属与形状属设计裁决，本审计不作裁决，仅登记事实并提请裁决** |
+| B-22 | 10.7 / 12.5 / 12.6 | **需先有承载物，非补测能解决** | 这三条要求的是"逐字段登记件"，AI 侧当前既无结构也无实现。**但不必从零设计**——仓库已有三种相邻形态可作为形状参考或直接接入点：`src/core/ugc/model/contract-types.ts` 的 `IntegrationContract`（**其 `INTEGRATION_DOMAINS` 已含 `'ai'`**，但只有 7 个属性、是提供方级而非逐字段级）、`src/ui/ports/pending-contracts.ts`（UI 侧待汇合端口声明）、`src/play/profiles/known-divergences.ts`（L3 分歧登记）。**可选路径有二**：(i) 扩展 UGC 侧目录到逐字段并让 AI 作为 provider 接入；(ii) AI 侧自建登记并与 UGC 目录建立引用关系。**选哪条属设计裁决，本审计不裁决，只登记事实并提请裁决（见裁决入口 §十一 A-AI-01）** |
 
 ---
 
@@ -253,3 +255,5 @@
 3. **未运行覆盖率工具**（无 istanbul/c8 配置）。"零覆盖代码"的结论来自静态追踪：识别分支的唯一入口条件（如 `isDeferred`、`CandidateSeed.intent`）并检索全部测试中该条件的取值。这比行覆盖率更精确地指向"哪条语义分支没被验证"，但不等价于工具产出的行/分支覆盖率数字。
 4. **未修改任何实现或测试**（PT-04 §5 黑名单）。清单里 B-04 涉及改动一条既有测试的强度，已在条目内标注需先确认归属。
 5. 9 个测试文件在 2026-08-10 的全仓运行中全部通过；本审计**不质疑其通过性**，只陈述"通过的断言覆盖了哪些验收标准、没覆盖哪些"。
+6. **初稿有一处方法论缺陷，已在 12.4 暴露并更正**：审计初稿默认"覆盖某模块的断言应该在该模块目录内"，因此只在 `src/core/kernel/ai/__tests__/` 里找证据。这漏掉了**跨目录的仓库级守卫**。复核时已针对所有 ⬜ 与源码扫描类条目重新检索全仓。
+7. **审计后守卫回流验证**：`test/toolchain/spec-document-discipline.test.ts` 8/8、`test/toolchain` 20/20、`tsc --noEmit` 0 error、lint 0 error / 8 个既有 warning。守卫落地时全量曾为 198 文件/2292 测试全绿；随后并发新增 UGC/UI 文件使套件扩到 204/2337 并出现新红灯，当前剩 UGC 零耦合守卫 1 失败。B-19 仍保留 23 处精确基线，未伪称全量清零。
