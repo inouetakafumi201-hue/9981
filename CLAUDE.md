@@ -52,6 +52,35 @@
 
 ---
 
+## 2.1 架构收敛状态（2026-08-11 更新）
+
+> **⚠️ 重要**：项目正在进行结构收敛，部分目录/文件处于锁定状态。
+> **详细状态**：见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+> **执行计划**：见 `.kiro/steering/结构收敛执行计划.md`
+
+### 关键裁决
+
+| 编号 | 裁决 | 执行状态 |
+|------|------|---------|
+| **D-061** | `src/l2/` 是 L2 语义管线唯一权威；`src/core/kernel/spec-compiler/` 编译器部分冻结退役 | Wave 1 准备中 |
+| **D-062** | `playpack.json` 是机制内容权威；`core-mechanics` 收缩为装载期 Linter | 🔒 等待 U-002 裁决（PT-07） |
+| **D-067** | 表现/创作/运营是正交架构域，不是 L4 | Wave 3 待执行 |
+
+### 当前锁定目录
+
+**🔴 禁止修改**：
+- `src/core/kernel/spec-compiler/`（Wave 1 审计中）
+- `src/play/core-mechanics/`（D-062 冻结）
+- `docs/L3_玩法层/01_*.md`、`06_*.md`、`07_*.md`（Wave 3 将迁移）
+
+**🟡 谨慎修改**：
+- `src/l2/`（Wave 1 将迁移 spec-compiler 缺口进来）
+- `src/class/*/index.json`（Wave 2.4 统一 schema 迁移）
+
+**详细锁定状态与协调机制**：见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+
+---
+
 ## 三、基类层的判定标准与已知类别
 
 > **核心原则**：基类层不能被穷举，但必须有判定标准。穷举是玩法验证阶段的事，不是宪法的事。
