@@ -72,7 +72,7 @@
         { "type": "vehicle_has_hp", "min": 1 }
       ],
       "effects": [
-        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status.class.aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
       ],
       "kernelOps": ["attach.add"],
       "description": "花费1 AP瞄准撞击目标，对方可在此期间躲避；若未躲避则造成2点伤害"
@@ -151,7 +151,7 @@
         { "type": "target_vehicle_adjacent" }
       ],
       "effects": [
-        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "蹲到轮胎旁进入准备态" }
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status.class.aiming", "durationTurns": 1, "description": "蹲到轮胎旁进入准备态" }
       ],
       "kernelOps": ["attach.add"],
       "description": "近战爆胎第一步：花费 1 AP 接近轮胎并进入准备态。该步骤本身不改变轮胎，正是文档所述留给车内乘员的 1 AP 反应窗口"
@@ -166,7 +166,7 @@
         { "type": "target_vehicle_adjacent" }
       ],
       "prerequisite": {
-        "state": "status_aiming",
+        "state": "status.class.aiming",
         "description": "必须先执行[近战爆胎（接近）]"
       },
       "effects": [

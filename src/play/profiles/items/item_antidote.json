@@ -52,14 +52,14 @@
     "商店"
   ],
   "breakCondition": {
-    "status": "status_poisoned",
+    "status": "status.class.poisoned",
     "condition": "present",
     "description": "仅当目标处于中毒状态时有效"
   },
   "itemParameters": {
     "item.capability.cure": {
       "targetSelector": "self",
-      "statusSelector": "status_poisoned",
+      "statusSelector": "status.class.poisoned",
       "applicationTiming": "on-use",
       "operation": "attach.del"
     }

@@ -1,0 +1,367 @@
+﻿
+> wakeup-meta-kernel@0.1.0 test
+> vitest run src/class/__tests__ --run --reporter=basic
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/coding/WakeUp[39m
+
+ [32m鉁?[39m src/class/__tests__/architecture-terminology.test.ts [2m([22m[2m1 test[22m[2m)[22m[90m 146[2mms[22m[39m
+ [32m鉁?[39m src/class/__tests__/class-contract-guards.test.ts [2m([22m[2m30 tests[22m[2m)[22m[33m 797[2mms[22m[39m
+ [32m鉁?[39m src/class/__tests__/scene-catalog-activation.property.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1418[2mms[22m[39m
+   [33m[2m鉁?[22m[39m scenes 鐩綍缁忚鑼冪紪璇戝櫒鍘熷瓙婵€娲伙紙D-5 scenes 鍒囩墖锛?[2m > [22mP10: 浠绘剰鍗曠偣杩濊閮借鍘熷瓙鎷掔粷锛屽叏鏂版敞鍐岃〃闆跺€欓€夊彉鏇达紙fast-check锛?00 娆＄敓鎴愶級 [33m390[2mms[22m[39m
+   [33m[2m鉁?[22m[39m scenes 鐩綍缁忚鑼冪紪璇戝櫒鍘熷瓙婵€娲伙紙D-5 scenes 鍒囩墖锛?[2m > [22mP8: 浠绘剰鎮┖缁勫悎寮曠敤琚‘瀹氭€ф嫆缁濅笖璇婃柇鍙鐜帮紙fast-check锛?00 娆＄敓鎴愶級 [33m592[2mms[22m[39m
+ [32m鉁?[39m src/class/__tests__/class-contract-completeness.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 2916[2mms[22m[39m
+   [33m[2m鉁?[22m[39m cross-catalog composition references[2m > [22mresolves every cross-catalog class reference against the canonical class catalogs [33m539[2mms[22m[39m
+   [33m[2m鉁?[22m[39m cross-catalog references resolve by identifier shape, not by a hardcoded key list[2m > [22mresolves every class-id-shaped value in every catalog against the canonical class ids [33m556[2mms[22m[39m
+ [31m鉂?[39m src/class/__tests__/formal-data-integrity.test.ts [2m([22m[2m14 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 1957[2mms[22m[39m
+   [33m[2m鉁?[22m[39m formal class and play data integrity[2m > [22mstrictly parses every formal JSON file without duplicate members or executable keys [33m475[2mms[22m[39m
+[31m   [31m脳[31m formal class and play data integrity[2m > [22mkeeps every status class paired with exactly one play profile[90m 31[2mms[22m[31m[39m
+[31m     鈫?expected 'status_aiming.json' to be 'status.class.aiming.json' // Object.is equality[39m
+[31m   [31m脳[31m formal class and play data integrity[2m > [22mvalidates every damage and vulnerability record against its single-record schema[90m 8[2mms[22m[31m[39m
+[31m     鈫?/damageTypes: must be an array[39m
+[31m   [31m脳[31m play layer references into the class layer[2m > [22mresolves every play class/status reference against the canonical class catalogs[33m 390[2mms[22m[31m[39m
+[31m     鈫?expected [ 鈥?29) ] to deeply equal [][39m
+ [31m鉂?[39m src/class/__tests__/class-semantic-families.test.ts [2m([22m[2m54 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 2114[2mms[22m[39m
+   [33m[2m鉁?[22m[39m semantic family registration[2m > [22mregisters every known semantic family in at least one class catalog [33m310[2mms[22m[39m
+[31m   [31m脳[31m semantic family registration[2m > [22mkeeps every catalog conformant to the shared metadata schema[90m 166[2mms[22m[31m[39m
+[31m     鈫?damage-types: [{"keyword":"additionalProperties","dataPath":".valueSets[0]","schemaPath":"#/additionalProperties","params":{"additionalProperty":"tokenIds"},"message":"should NOT have additional properties"},{"keyword":"required","dataPath":".valueSets[0]","schemaPath":"#/required","params":{"missingProperty":"tokens"},"message":"should have required property 'tokens'"}]: expected false to be true // Object.is equality[39m
+[31m   [31m脳[31m items, weapons, armor and vehicles[2m > [22mdistinguishes melee, non-firearm ranged and firearm type identities[90m 2[2mms[22m[31m[39m
+[31m     鈫?expected [] to deeply equal [ 'weapon-class.melee', 鈥?2) ][39m
+[31m   [31m脳[31m damage, status, skill, movement and attachment families[2m > [22mdeclares damage source, target and settlement references without assigning an amount[90m 1[2mms[22m[31m[39m
+[31m     鈫?/settlementContract: must be an object[39m
+[31m   [31m脳[31m damage, status, skill, movement and attachment families[2m > [22mkeeps the damage category axis and the damage settlement axis disjoint[90m 23[2mms[22m[31m[39m
+[31m     鈫?/damageTypes: must be an array[39m
+[31m   [31m脳[31m damage, status, skill, movement and attachment families[2m > [22mkeeps damage and vulnerability numbering independent and extensible[90m 1[2mms[22m[31m[39m
+[31m     鈫?/categoryAxis: must be an object[39m
+ [32m鉁?[39m src/class/__tests__/catalog-activation.property.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 25865[2mms[22m[39m
+   [33m[2m鉁?[22m[39m 8 涓粺涓€褰㈢姸鍩虹被灞傜洰褰曞悎骞剁粡瑙勮寖缂栬瘧鍣ㄥ師瀛愭縺娲伙紙D-5锛?[2m > [22m鐢熶骇妯″紡婵€娲绘垚鍔熴€佹棤鎮┖寮曠敤銆佷笖浜х敓纭畾鎬у揩鐓?[33m8824[2mms[22m[39m
+   [33m[2m鉁?[22m[39m 8 涓粺涓€褰㈢姸鍩虹被灞傜洰褰曞悎骞剁粡瑙勮寖缂栬瘧鍣ㄥ師瀛愭縺娲伙紙D-5锛?[2m > [22mP10 鍥炴粴锛氬悗缁寘婵€娲诲け璐ユ椂锛屽厛鍓嶅凡婵€娲荤殑鍚堝苟蹇収涓ユ牸涓嶅彉 [33m4454[2mms[22m[39m
+   [33m[2m鉁?[22m[39m 8 涓粺涓€褰㈢姸鍩虹被灞傜洰褰曞悎骞剁粡瑙勮寖缂栬瘧鍣ㄥ師瀛愭縺娲伙紙D-5锛?[2m > [22mP10: 浠绘剰鍗曠偣杩濊閮借鍘熷瓙鎷掔粷锛屽叏鏂版敞鍐岃〃闆跺€欓€夊彉鏇达紙fast-check锛?00 娆＄敓鎴愶級 [33m4544[2mms[22m[39m
+   [33m[2m鉁?[22m[39m 8 涓粺涓€褰㈢姸鍩虹被灞傜洰褰曞悎骞剁粡瑙勮寖缂栬瘧鍣ㄥ師瀛愭縺娲伙紙D-5锛?[2m > [22mP8: 浠绘剰鎮┖缁勫悎寮曠敤琚‘瀹氭€ф嫆缁濅笖璇婃柇鍙鐜帮紙fast-check锛?00 娆＄敓鎴愶級 [33m8041[2mms[22m[39m
+node.exe : [31m鈳幆鈳幆鈳幆鈳?[1m[7m Failed Tests 8 [27m[
+22m鈳幆鈳幆鈳幆鈳?[39m
+所在位置 行:1 字符: 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([31m鈳幆鈳幆 
+   鈳幆鈳...鈳幆鈳幆鈳幆鈳?[39m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/cl
+ass-semantic-families.test.ts[2m > [22msemantic family 
+registration[2m > [22mkeeps every catalog conformant to
+ the shared metadata schema
+[31m[1mAssertionError[22m: damage-types: [{"keyword":"
+additionalProperties","dataPath":".valueSets[0]","schemaP
+ath":"#/additionalProperties","params":{"additionalProper
+ty":"tokenIds"},"message":"should NOT have additional pro
+perties"},{"keyword":"required","dataPath":".valueSets[0]
+","schemaPath":"#/required","params":{"missingProperty":"
+tokens"},"message":"should have required property 'tokens
+'"}]: expected false to be true // Object.is equality[39
+m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m鉂?[22m src/class/__tests__/class-semantic-famil
+ies.test.ts:[2m125:67[22m[39m
+
+    [90m123| [39m    [35mfor[39m ([35mconst[39m dir
+ [35mof[39m [33mCATALOG_DIRS[39m) {
+    [90m124| [39m      [35mconst[39m valid [33m=[39
+m [34mvalidate[39m([34mreadCatalog[39m(dir))[33m;[3
+9m
+    [90m125| [39m      [34mexpect[39m(valid[33m,[39
+m [32m`[39m[36m${[39mdir[36m}[39m[32m: [39m[36m$
+{[39m[33mJSON[39m[33m.[39m[34mstringify[39m(valida
+te[33m.[39merrors)[36m}[39m[32m`[39m)[33m.[39m[3
+4mtoBe[39m鈥?    [90m   | [39m                         
+                                         [31m^[39m
+    [90m126| [39m    }
+    [90m127| [39m  })[33m;[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[1/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/cl
+ass-semantic-families.test.ts[2m > [22mitems, weapons, 
+armor and vehicles[2m > [22mdistinguishes melee, non-fi
+rearm ranged and firearm type identities
+[31m[1mAssertionError[22m: expected [] to deeply equal
+ [ 'weapon-class.melee', 鈥?2) ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- Array [[39m
+[32m-   "weapon-class.melee",[39m
+[32m-   "weapon-class.ranged_nonfirearm",[39m
+[32m-   "weapon-class.firearm",[39m
+[32m- ][39m
+[31m+ Array [][39m
+
+[36m [2m鉂?[22m src/class/__tests__/class-semantic-famil
+ies.test.ts:[2m448:17[22m[39m
+    [90m446| [39m  [34mit[39m([32m'distinguishes mel
+ee, non-firearm ranged and firearm type identit[39m鈥?   
+ [90m447| [39m    [35mconst[39m ids [33m=[39m [34m
+collectIds[39m(weapons[33m,[39m [[32m'classes'[39m])
+[33m;[39m
+    [90m448| [39m    [34mexpect[39m(ids)[33m.[39m[
+34mtoEqual[39m([
+    [90m   | [39m                [31m^[39m
+    [90m449| [39m      [32m'weapon-class.melee'[39m[
+33m,[39m
+    [90m450| [39m      [32m'weapon-class.ranged_nonfir
+earm'[39m[33m,[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[2/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/cl
+ass-semantic-families.test.ts[2m > [22mdamage, status, 
+skill, movement and attachment families[2m > [22mdeclar
+es damage source, target and settlement references withou
+t assigning an amount
+[31m[1mClassCatalogContractError[22m: /settlementContr
+act: must be an object[39m
+[36m [2m鉂?[22m Module.expectObject src/class/json-contr
+act.ts:[2m28:11[22m[39m
+    [90m 26| [39m[35mexport[39m [35mfunction[39m [
+34mexpectObject[39m(value[33m:[39m [33mJsonValue[39m
+ [33m|[39m undefined[33m,[39m path[33m:[39m strin鈥?
+    [90m 27| [39m  [35mif[39m (value [33m===[39m [
+35mnull[39m [33m||[39m value [33m===[39m undefined 
+[33m||[39m [33mArray[39m[33m.[39m[34misArray[39m(v
+alue) [33m||[39m鈥?    [90m 28| [39m    [35mthrow[39
+m [35mnew[39m [33mClassCatalogContractError[39m(path
+[33m,[39m [32m'must be an object'[39m)[33m;[39m
+    [90m   | [39m          [31m^[39m
+    [90m 29| [39m  }
+    [90m 30| [39m  [35mreturn[39m value[33m;[39m
+[90m [2m鉂?[22m src/class/__tests__/class-semantic-famil
+ies.test.ts:[2m671:22[22m[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[3/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/cl
+ass-semantic-families.test.ts[2m > [22mdamage, status, 
+skill, movement and attachment families[2m > [22mkeeps 
+the damage category axis and the damage settlement axis d
+isjoint
+[31m[1mClassCatalogContractError[22m: /damageTypes: mu
+st be an array[39m
+[36m [2m鉂?[22m Module.expectArray src/class/json-contra
+ct.ts:[2m34:36[22m[39m
+    [90m 32| [39m
+    [90m 33| [39m[35mexport[39m [35mfunction[39m [
+34mexpectArray[39m(value[33m:[39m [33mJsonValue[39m 
+[33m|[39m undefined[33m,[39m path[33m:[39m string鈥?
+    [90m 34| [39m  [35mif[39m ([33m![39m[33mArray
+[39m[33m.[39m[34misArray[39m(value)) [35mthrow[39m 
+[35mnew[39m [33mClassCatalogContractError[39m(path[3
+3m,[39m鈥?    [90m   | [39m                            
+       [31m^[39m
+    [90m 35| [39m  [35mreturn[39m value[33m;[39m
+    [90m 36| [39m}
+[90m [2m鉂?[22m entries src/class/__tests__/class-semant
+ic-families.test.ts:[2m79:10[22m[39m
+[90m [2m鉂?[22m src/class/__tests__/class-semantic-famil
+ies.test.ts:[2m685:26[22m[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[4/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/cl
+ass-semantic-families.test.ts[2m > [22mdamage, status, 
+skill, movement and attachment families[2m > [22mkeeps 
+damage and vulnerability numbering independent and extens
+ible
+[31m[1mClassCatalogContractError[22m: /categoryAxis: m
+ust be an object[39m
+[36m [2m鉂?[22m Module.expectObject src/class/json-contr
+act.ts:[2m28:11[22m[39m
+    [90m 26| [39m[35mexport[39m [35mfunction[39m [
+34mexpectObject[39m(value[33m:[39m [33mJsonValue[39m
+ [33m|[39m undefined[33m,[39m path[33m:[39m strin鈥?
+    [90m 27| [39m  [35mif[39m (value [33m===[39m [
+35mnull[39m [33m||[39m value [33m===[39m undefined 
+[33m||[39m [33mArray[39m[33m.[39m[34misArray[39m(v
+alue) [33m||[39m鈥?    [90m 28| [39m    [35mthrow[39
+m [35mnew[39m [33mClassCatalogContractError[39m(path
+[33m,[39m [32m'must be an object'[39m)[33m;[39m
+    [90m   | [39m          [31m^[39m
+    [90m 29| [39m  }
+    [90m 30| [39m  [35mreturn[39m value[33m;[39m
+[90m [2m鉂?[22m src/class/__tests__/class-semantic-famil
+ies.test.ts:[2m697:20[22m[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[5/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/fo
+rmal-data-integrity.test.ts[2m > [22mformal class and p
+lay data integrity[2m > [22mkeeps every status class pa
+ired with exactly one play profile
+[31m[1mAssertionError[22m: expected 'status_aiming.jso
+n' to be 'status.class.aiming.json' // Object.is equality
+[39m
+
+Expected: [32m"status[7m.class.[27maiming.json"[39m
+Received: [31m"status[7m_[27maiming.json"[39m
+
+[36m [2m鉂?[22m src/class/__tests__/formal-data-integrit
+y.test.ts:[2m205:20[22m[39m
+    [90m203| [39m      [35mconst[39m id [33m=[39m 
+[34mexpectString[39m(profile[[32m'id'[39m][33m,[39m 
+[32m`[39m[36m${[39mfile[36m}[39m[32m/id`[39m)[33
+m;[39m
+    [90m204| [39m      [35mconst[39m composition [33
+m=[39m [34mexpectObject[39m(profile[[32m'classComposi
+tion'[39m][33m,[39m [32m`[39m[36m$[39m鈥?    [90m2
+05| [39m      [34mexpect[39m(file)[33m.[39m[34mtoBe
+[39m([32m`[39m[36m${[39mid[36m}[39m[32m.json`[39
+m)[33m;[39m
+    [90m   | [39m                   [31m^[39m
+    [90m206| [39m      [34mexpect[39m(composition[[3
+2m'sourceClass'[39m])[33m.[39m[34mtoBe[39m(id)[33m;
+[39m
+    [90m207| [39m    }
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[6/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/fo
+rmal-data-integrity.test.ts[2m > [22mformal class and p
+lay data integrity[2m > [22mvalidates every damage and 
+vulnerability record against its single-record schema
+[31m[1mClassCatalogContractError[22m: /damageTypes: mu
+st be an array[39m
+[36m [2m鉂?[22m Module.expectArray src/class/json-contra
+ct.ts:[2m34:36[22m[39m
+    [90m 32| [39m
+    [90m 33| [39m[35mexport[39m [35mfunction[39m [
+34mexpectArray[39m(value[33m:[39m [33mJsonValue[39m 
+[33m|[39m undefined[33m,[39m path[33m:[39m string鈥?
+    [90m 34| [39m  [35mif[39m ([33m![39m[33mArray
+[39m[33m.[39m[34misArray[39m(value)) [35mthrow[39m 
+[35mnew[39m [33mClassCatalogContractError[39m(path[3
+3m,[39m鈥?    [90m   | [39m                            
+       [31m^[39m
+    [90m 35| [39m  [35mreturn[39m value[33m;[39m
+    [90m 36| [39m}
+[90m [2m鉂?[22m src/class/__tests__/formal-data-integrit
+y.test.ts:[2m218:23[22m[39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[7/8]鈳?[22m
+[39m
+
+[31m[1m[7m FAIL [27m[22m[39m src/class/__tests__/fo
+rmal-data-integrity.test.ts[2m > [22mplay layer referen
+ces into the class layer[2m > [22mresolves every play c
+lass/status reference against the canonical class catalog
+s
+[31m[1mAssertionError[22m: expected [ 鈥?29) ] to deepl
+y equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- Array [][39m
+[31m+ Array [[39m
+[31m+   "statuses/status_aiming.json/classComposition/so
+urceClass -> status.class.aiming",[39m
+[31m+   "statuses/status_blocking.json/classComposition/
+sourceClass -> status.class.blocking",[39m
+[31m+   "statuses/status_burning.json/classComposition/s
+ourceClass -> status.class.burning",[39m
+[31m+   "statuses/status_concealed.json/classComposition
+/sourceClass -> status.class.concealed",[39m
+[31m+   "statuses/status_downed.json/classComposition/so
+urceClass -> status.class.downed",[39m
+[31m+   "statuses/status_frozen.json/classComposition/so
+urceClass -> status.class.frozen",[39m
+[31m+   "statuses/status_hastened.json/classComposition/
+sourceClass -> status.class.hastened",[39m
+[31m+   "statuses/status_heavy.json/classComposition/sou
+rceClass -> status.class.heavy",[39m
+[31m+   "statuses/status_knocked_down.json/classComposit
+ion/sourceClass -> status.class.knocked_down",[39m
+[31m+   "statuses/status_lockpicking.json/classCompositi
+on/sourceClass -> status.class.lockpicking",[39m
+[31m+   "statuses/status_overloaded.json/classCompositio
+n/sourceClass -> status.class.overloaded",[39m
+[31m+   "statuses/status_poisoned.json/classComposition/
+sourceClass -> status.class.poisoned",[39m
+[31m+   "statuses/status_radiation.json/classComposition
+/sourceClass -> status.class.radiation",[39m
+[31m+   "statuses/status_sleeping.json/classComposition/
+sourceClass -> status.class.sleeping",[39m
+[31m+   "statuses/status_slowed.json/classComposition/so
+urceClass -> status.class.slowed",[39m
+[31m+   "statuses/status_staggered.json/classComposition
+/sourceClass -> status.class.staggered",[39m
+[31m+   "statuses/status_stunned.json/classComposition/s
+ourceClass -> status.class.stunned",[39m
+[31m+   "statuses/status_traveling.json/classComposition
+/sourceClass -> status.class.traveling",[39m
+[31m+   "statuses/status_weak.json/classComposition/sour
+ceClass -> status.class.weak",[39m
+[31m+   "weapons/wp_axe_fire.json/weaponParameters/weapo
+n.capability.damage_reference/damageTypeIds -> DMG_01",[
+39m
+[31m+   "weapons/wp_bat_baseball.json/weaponParameters/w
+eapon.capability.damage_reference/damageTypeIds -> DMG_02
+",[39m
+[31m+   "weapons/wp_knife_combat.json/weaponParameters/w
+eapon.capability.damage_reference/damageTypeIds -> DMG_01
+",[39m
+[31m+   "weapons/wp_machinegun_m249.json/weaponParameter
+s/weapon.capability.damage_reference/damageTypeIds -> DMG
+_03",[39m
+[31m+   "weapons/wp_pistol_quickdraw.json/weaponParamete
+rs/weapon.capability.damage_reference/damageTypeIds -> DM
+G_03",[39m
+[31m+   "weapons/wp_pistol_standard.json/weaponParameter
+s/weapon.capability.damage_reference/damageTypeIds -> DMG
+_03",[39m
+[31m+   "weapons/wp_rifle_assault.json/weaponParameters/
+weapon.capability.damage_reference/damageTypeIds -> DMG_0
+3",[39m
+[31m+   "weapons/wp_shotgun_pump.json/weaponParameters/w
+eapon.capability.damage_reference/damageTypeIds -> DMG_03
+",[39m
+[31m+   "weapons/wp_smg_uzi.json/weaponParameters/weapon
+.capability.damage_reference/damageTypeIds -> DMG_03",[3
+9m
+[31m+   "weapons/wp_sniper_m24.json/weaponParameters/wea
+pon.capability.damage_reference/damageTypeIds -> DMG_03",
+[39m
+[31m+ ][39m
+
+[36m [2m鉂?[22m src/class/__tests__/formal-data-integrit
+y.test.ts:[2m286:24[22m[39m
+    [90m284| [39m      })[33m;[39m
+    [90m285| [39m    }
+    [90m286| [39m    [34mexpect[39m(unresolved)[33m.
+[39m[34mtoEqual[39m([])[33m;[39m
+    [90m   | [39m                       [31m^[39m
+    [90m287| [39m  })[33m;[39m
+    [90m288| [39m
+
+[31m[2m鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[8/8]鈳?[22m
+[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m115 passed[39m[22m[90m (123)[39m
+[2m   Start at [22m 17:13:44
+[2m   Duration [22m 28.20s[2m (transform 1.81s, setup 0ms, collect 6.57s, tests 35.21s, environment 2ms, prepare 1.45s)[22m
+

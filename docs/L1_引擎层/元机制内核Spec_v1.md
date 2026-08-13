@@ -2068,7 +2068,7 @@ checkpoint(label) / restore(label)
 | 时间回溯玩法 | rewind 到 checkpoint |
 | **AI 搜索** | checkpoint → 试探 → restore（αβ 剪枝的 make/unmake move） |
 
-**AI 搜索能力是持久化的副产品，不是 AI 模块的私有实现。** 这是内核层面
+**AI 搜索能力是持久化的副产品，不是 AI 模块的私有实现。** 这是引擎层面
 最大的一次复用 —— 也解释了为什么"估值函数归底层"是对的：
 `PlaypackDef.evaluate`（9.1 定义）是玩法包提供的一个 Expr，内核负责 make/unmake 与搜索骨架。
 

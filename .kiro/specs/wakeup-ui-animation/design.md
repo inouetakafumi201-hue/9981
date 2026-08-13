@@ -2,7 +2,7 @@
 
 ## Overview
 
-本文档把 `.kiro/specs/wakeup-ui-animation/requirements.md` 的 16 条需求落成可实现、可验证的设计。
+本文档把 `.kiro/specs/wakeup-ui-animation/requirements.md` 的 18 条需求落成可实现、可验证的设计。
 
 UI_Animation_System 的定位只有两件事：**把当前 Agent 有权看到的规则语义投影出来**，以及**把用户操作打包成待校验的交互意图交给权威动作契约**。它不持有可变 `WorldState`，不复制合法性判定，不用动画推进规则。任何语义状态变化最终都由引擎层 `OpRegistry.invoke` 完成。
 
@@ -92,7 +92,8 @@ src/ui/
 │   ├── pending-registry.ts
 │   ├── submit.ts
 │   ├── menu-faces.ts               # 付费面 / 零费面分区（D-042）
-│   └── end-turn-countdown.ts       # 回合末倒计时（D-042）
+│   ├── end-turn-countdown.ts       # 回合末倒计时（D-042）
+│   └── solo-cadence.ts             # 一人模式空闲计时与权威推进意图（D-064）
 ├── presentation/                   # 描述符校验、降级、无障碍、数值
 │   ├── descriptor-validator.ts
 │   ├── fallback.ts
@@ -201,7 +202,7 @@ src/ui/
 
 **C-2｜`rewind` 语义不一致。** `meta-mechanism-kernel/requirements.md` 要求 37.4 描述 `rewind(n)` 为"将状态回退 n 个相位边界"，但实现 `persistence.ts` 的 `rewind(store, targetName)` 是**按名字 restore 检查点**，没有相位计数语义。本设计的回退处理只依赖"权威侧选定了一个更早状态并给出其修订令牌"这一行为，不依赖 `rewind(n)`。**待人工复核。**
 
-**C-3｜L2 文档的 D-025 违规命名 —— 已修正，冲突关闭。** 原问题：`docs/L2_基类层/08_图形化与UI.md`「五条视觉定律 / 2」标题后带"（Among Us 风格）"字样；`docs/L1_引擎层/元机制内核Spec_v1.md` 的 `after:entity.place` 示例带"Among Us 式跳跃"。两处均已改为 §9.1 的技术描述性命名（**边缘发光交互语法** / **程序化跳跃位移**）。`docs/访谈决策记录.md` 中 D-024 / D-025 条目内的"Among Us"字样是该决策自身的历史记录，**应当保留**，不属违规。`docs/L_归档/` 与 `docs/_归档/` 下的历史草案同样不在修正范围。
+**C-3｜L2 文档的 D-025 违规命名 —— 已修正，冲突关闭。** 原问题：`docs/表现系统/01_图形化与UI.md`「五条视觉定律 / 2」标题后带"（Among Us 风格）"字样；`docs/L1_引擎层/元机制内核Spec_v1.md` 的 `after:entity.place` 示例带"Among Us 式跳跃"。两处均已改为 §9.1 的技术描述性命名（**边缘发光交互语法** / **程序化跳跃位移**）。`docs/访谈决策记录.md` 中 D-024 / D-025 条目内的"Among Us"字样是该决策自身的历史记录，**应当保留**，不属违规。`docs/L_归档/` 与 `docs/_归档/` 下的历史草案同样不在修正范围。
 
 **C-5｜`PresentationGateway` 没有按 Agent 过滤，与它自己的设计和需求不符（安全相关，优先级最高）。** meta-mechanism-kernel design §3.15 写明 `query` 的 "`visibleTo` 固定传该客户端 Agent"，要求 40.1 也要求事件通道服务于该客户端。但 `src/core/kernel/gateway.ts` 的实现：
 
@@ -438,7 +439,7 @@ export interface SelectableOptionSet {
 > **2026-08-08 权威变更（本次会话裁决，已获项目所有者授权）**：`ATTACK_SHAPES = ['single-target','spread','area']` 已删除。攻击形状（三选一形状轴）判定为冗余设计，其表现层需求已被
 > **武器属性**（散射/扫射/连发）完全覆盖，改为通过 `descriptor-validator.ts` 校验武器属性组合而非
 > 独立的形状枚举字段。详见 `docs/L0_规范宪法.md`、`docs/L2_基类层/基类层定义.md` §4.3、
-> `docs/L2_基类层/08_图形化与UI.md` 最新权威内容。
+> `docs/表现系统/01_图形化与UI.md` 最新权威内容。
 
 `posture` 在 L2 契约里是**开放字符串**（`readonly posture?: string`，注释明确"L2 不枚举具体姿态，原样透传"）。因此 UI 也不得枚举姿态取值，只能原样透传给 profile 做资源绑定；profile 缺该姿态的资源时走表现降级，**不是**语义拒绝。这一点很容易做错：把姿态当闭合枚举会导致基类层新增姿态时 UI 直接拒绝渲染。
 
@@ -493,7 +494,7 @@ D-031、D-033、D-032 分别确定了三种不同的"可见程度"，它们不�
 | 档位 | 语义 | 默认 profile 实例 | 呈现方式 | 来源 |
 |---|---|---|---|---|
 | `public-persistent` | 完全公开，常驻呈现，无需操作即可获知 | 弱点属性 | 头顶图标常驻 | D-031 |
-| `public-on-inspect` | 公开但不主动提示，需玩家主动检视 | `[瞄准中]` | 悬停时显示红色点线指向其目标 | D-033 |
+| `public-on-inspect` | 公开但不主动提示，需玩家主动检视 | `[瞄准中]` | 悬停时显示紫色点线指向其目标 | D-033（可见性）+ D-066（颜色） |
 | `hidden` | 真隐藏，对所有者以外的观察者不存在 | `Parry_Ready` | 无任何呈现 | D-032 |
 
 三条设计约束：
@@ -605,11 +606,11 @@ D-025 与 Requirement 6.3 都禁止用第三方游戏名作为技术方案的规
 | 全屏分离式仪式动画 | 关键动作触发的全屏、前后景分离合成动画 |
 | 边缘发光交互提示 | 悬停高亮 + 边缘发光的交互提示语法 |
 
-第三处命名是为替换 `docs/L2_基类层/08_图形化与UI.md` 仍在使用的违规命名（C-3）而给出的规范名称。
+第三处命名是为替换 `docs/表现系统/01_图形化与UI.md` 仍在使用的违规命名（C-3）而给出的规范名称。
 
 ### 9.2 默认 Presentation_Profile
 
-`wakeup-default.profile.json` 承载 D-024 的视觉方向、D-026 + D-032 的仪式动画范围、D-031/D-032/D-033 的显著性分层、D-035/D-036 的轮次栏结构与 D-042 的回合末倒计时。全部字段都是**可替换表现配置**，不是规则语义字段（Requirement 6.2、6.6）。
+`wakeup-default.profile.json` 承载 D-024 的视觉方向、D-026 + D-032 的仪式动画范围、D-031/D-032/D-033 的显著性分层、D-035/D-036 的轮次栏结构、D-042 的回合末倒计时、D-064 的节奏呈现三态与 D-066 的全局颜色语义。全部字段都是**可替换表现配置**，不是规则语义字段（Requirement 6.2、6.6）。
 
 ```json
 {
@@ -620,6 +621,26 @@ D-025 与 Requirement 6.3 都禁止用第三方游戏名作为技术方案的规
     "compositing": "separated-foreground-background",
     "authoritativeSource": "D-024"
   },
+  "colorSemantics": {
+    "damage-life-danger": "red",
+    "technology-wakefulness-stamina-execution": "blue",
+    "sense-attention-alert": "yellow",
+    "ap-action-progress": "orange",
+    "safe-positive-free-discount": "green",
+    "relation-gateway-ranged": "purple",
+    "melee-aggression-violence": "coral",
+    "social-communication-economy": "cyan",
+    "cooldown-delay": "gray",
+    "neutral-material-base": "gray-white",
+    "gradeHighlights": ["gold", "silver"],
+    "authoritativeSource": "D-066"
+  },
+  "pacingPresentations": {
+    "standard-combat": "dynamic-turn-order-bar",
+    "solo-cadence": "static-player-status-bar",
+    "minimal-ui": "hide-combat-hud",
+    "authoritativeSource": "D-064"
+  },
   "ceremonialActionSemantics": [
     { "actionSemanticId": "vault-window", "authoritativeSource": "D-026" },
     { "actionSemanticId": "jump-window", "authoritativeSource": "D-026" },
@@ -628,7 +649,7 @@ D-025 与 Requirement 6.3 都禁止用第三方游戏名作为技术方案的规
   ],
   "salienceTiers": [
     { "stateSemanticId": "weakness", "tier": "public-persistent", "renderer": "above-head-icon", "authoritativeSource": "D-031" },
-    { "stateSemanticId": "aiming", "tier": "public-on-inspect", "renderer": "red-dotted-aim-line", "authoritativeSource": "D-033" },
+    { "stateSemanticId": "aiming", "tier": "public-on-inspect", "renderer": "purple-dotted-aim-line", "authoritativeSource": "D-033, D-066" },
     { "stateSemanticId": "parry-ready", "tier": "hidden", "renderer": null, "authoritativeSource": "D-032" }
   ],
   "turnOrderBar": {
@@ -655,6 +676,22 @@ D-025 与 Requirement 6.3 都禁止用第三方游戏名作为技术方案的规
 Requirement 6.8：不得从"某动作是否有全屏动画"推导合法性、成本、效果强度或完成时间。设计上仪式集合的查询方向是**单向**的——演出编排器读 profile 决定怎么播，规则侧从不读它。`animation/ceremonial.ts` 不 import 任何合法性或成本模块。
 
 三个例外允许跳过仪式呈现（Requirement 6.7）：用户显式跳过、启用减少动态模式、Requirement 9 要求的资源失败回退。三者都只影响呈现，不影响最终语义状态。
+
+### 9.4 全局颜色与节奏呈现（D-064 / D-066）
+
+颜色配置保存**语义角色到颜色角色**的绑定，不保存具体色值。十个语义角色为闭合集合；金银是可叠加的高光通道，不进入主色互斥判定。
+
+双重分类由 `resolvePrimaryColorRole` 处理：调用方必须给出当前对象的“下一项主要功能”角色，profile 只校验该角色已登记，不根据对象名称、标签或所在界面自行猜测。商店的主角色是 `social-communication-economy`，折扣是局部 `safe-positive-free-discount` 徽章；上锁门的主角色是 `relation-gateway-ranged`，AP 进度用橙色局部通道。
+
+灰阶交互不以色相判断：`gray-white` 是中性材质基底；`gray` 表示冷却或延迟。可点击性由独立材质状态 `raised-highlighted` / `flat-unavailable` 表达，禁止从“灰色”直接推导不可点击。
+
+轮次栏呈现配置为三态判别联合：
+
+- `standard-combat`：消费权威行动轮并播放排序变化；
+- `solo-cadence`：轮次栏静止为玩家状态栏，不在 UI 本地计算 AP 或推进回合；
+- `minimal-ui`：隐藏轮次栏及战斗 HUD，仅允许无战斗活动使用。
+
+一人模式计时器与回合末倒计时复用同一安全原则：本地时间到期只能创建待校验意图。AI/其他玩家导致的节奏升降来自权威投影，不由 UI 扫描实体列表自行判定；切换呈现状态不得清空投影缓存或重建对局。
 
 ---
 
@@ -739,7 +776,7 @@ L2 契约里 `accessibleLabel: string` 是必填且没有回退键字段（§2.2
 
 | 需求 | 设计 |
 |---|---|
-| 11.2、11.3 | 颜色、动画、音频、触觉都不得单独承载规则显著信息；颜色区分语义角色时至少提供一个非颜色等价线索（形状、纹理、图标结构、文本）。08 文档的七色语义映射据此需要配套的非颜色线索，属 profile 职责 |
+| 11.2、11.3 | 颜色语义仍配合已经存在的图标、文字、轮廓和材质差异以服务低心智识别；MVP **不建立**逐色纹理矩阵、专用色盲调色或无色完全等价门禁。完整色盲模式为 Post-MVP 专题（D-066） |
 | 11.4 | 读屏与字幕输出消费**同一份** `Visibility_Safe` 投影，不走第二条数据路径 |
 | 11.5 | 减少动态模式保留动作可用性、最终态反馈、事件顺序含义与必需播报，只替换或移除非必要动效 |
 | 11.6 | 键盘、指针、触摸、手柄、开关控制、辅助自动化经 `input-normalizer` 解析到**同一组稳定交互标识**与同一个 intent 形状 |
@@ -1022,11 +1059,11 @@ UI 不为待汇合字段"先起个名字用着"。理由：一旦 UI 侧先定�
 
 **Validates: Requirements 5.9, 5.10, 5.11**
 
-### Property 15: 倒计时不改变规则语义
+### Property 15: 表现计时器不改变规则语义
 
-*对于任意*倒计时时长取值、任意时刻的取消、以及倒计时自然结束，动作合法性、成本与效果都应保持不变；倒计时结束都应通过与其他意图相同的权威通道提交结束回合意图，而不应把倒计时结束本身当作回合已结束。
+*对于任意*回合末倒计时或一人模式空闲计时的时长取值、任意时刻的取消/重置以及自然到期，动作合法性、成本与效果都应保持不变；到期都只能通过与其他意图相同的权威通道提交相应请求，不应把计时结束本身当作回合已结束或已流逝。
 
-**Validates: Requirements 5.12, 5.13, 5.14**
+**Validates: Requirements 5.12, 5.13, 5.14, 6.24, 7.10**
 
 ### Property 16: 轮次栏保持全员在列
 
@@ -1185,7 +1222,7 @@ Requirement 16 全部 13 条都是对**验证计划本身**的要求，因此它
 | 16.7 待决输入、重复激活、陈旧绑定、过期 Decision、目标失效、提交期状态变化 | P11, P12, P13 | 属性测试 |
 | 16.8 异步资源完成、动画中断、回放、回退、跳过、重连、修订缺口、多窗口收敛 | P21, P22 | 属性测试（事件丢弃与令牌缺口作为生成维度） |
 | 16.9 至少两个知识范围不同的非全知 Agent + 一个显式授权的全知 Agent | P5, P22, P24 | 属性测试（Agent 生成器固定产出该三元组） |
-| 16.10 无色、读屏、重映射输入、减少动态四类等价性 | P18, P19 | 无障碍等价测试（信息集合相等断言） |
+| 16.10 屏幕阅读器、重映射输入、减少动态三类等价性；完整无色等价 Post-MVP | P18, P19 | 无障碍等价测试（当前不含逐色纹理/无色矩阵） |
 | 16.11 布局值、动效时长、资源路径、帧率、性能目标不得改变描述符语义或权威结果 | P9, P15 | 属性测试（表现参数作为生成维度，断言语义不变） |
 | 16.12 玩法专属 HUD 组合与具体资源可替换而描述符契约不变 | P8 + profile 装载测试 | 换 profile 后重跑全部属性测试，断言全绿 |
 | 16.13 无法产出可观察通过/失败的需求应在进入设计前修订或移除 | 需求评审门禁 | 本表即该门禁的执行记录：13 条全部有可观察落点，无一条需要移除 |
@@ -1203,7 +1240,7 @@ Requirement 16 全部 13 条都是对**验证计划本身**的要求，因此它
 | 3 Agent 可见性与防泄漏 | §6、§6.4、§12.2 | P5, P6, P7, P22, P24 |
 | 4 交互意图与唯一写入通道 | §7、§3.2 | P10, P13 |
 | 5 输入禁用、重复提交与过期交互 | §8、§8.4、§4.3 | P11, P12, P13, P14, P15 |
-| 6 项目视觉配置与已确认动画范围 | §9 | P8, P9, P16 |
+| 6 项目视觉配置、颜色与节奏呈现 | §9、§9.4 | P8, P9, P15, P16 |
 | 7 动画与规则结果解耦 | §9.3、§16 | P9, P10 |
 | 8 异步、回放、回退与多窗口 | §4.1、§15、§17 | P21, P22 |
 | 9 语义拒绝与非语义降级 | §10 | P2, P19, P20 |

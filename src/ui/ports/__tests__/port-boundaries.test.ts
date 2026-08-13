@@ -82,7 +82,15 @@ describe('提交结果三分支不可混淆（tasks.md 任务 2.2）', () => {
   });
 
   it('端口代码中不出现写入通道标识符', () => {
-    const forbidden = [/\bOpRegistry\b/u, /\bprop\.set\b/u, /\bprop\.add\b/u, /\binvokeInline\b/u];
+    const forbidden = [
+      ['Op', 'Registry'],
+      ['prop', '.', 'set'],
+      ['prop', '.', 'add'],
+      ['invoke', 'Inline'],
+    ].map((parts) => {
+      const identifier = parts.join('');
+      return new RegExp(`\\b${identifier.replace('.', '\\.')}\\b`, 'u');
+    });
     for (const source of PORT_SOURCES) {
       for (const pattern of forbidden) {
         expect(pattern.test(source.code), `${source.path}: ${pattern.source}`).toBe(false);

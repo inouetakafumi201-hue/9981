@@ -46,6 +46,7 @@ export const CONFIRMED_DECISION_IDS = [
   'D-026',
   'D-031',
   'D-032',
+  'D-033',
   'D-035',
   'D-036',
   'D-042',

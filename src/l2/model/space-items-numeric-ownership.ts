@@ -16,16 +16,18 @@ import type { HumanReadableText } from './ids.js';
 import { joinJsonPath } from './ids.js';
 import type { OwningLayer, SourceRecord } from './source.js';
 import type { DeclaredRange, ParameterField } from './schema.js';
+import { NUMERIC_DECLARED_TYPES } from './schema.js';
 import { GAMEPLAY_VALUE_RANGE } from './constitution.js';
 import { compareStrings } from './ordering.js';
+import { deepFreeze } from './immutable.js';
 
 /** 数值归属四分类。与 `./schema.ts` 的 `ParameterClassification` 同取值。 */
-export const NUMERIC_OWNERSHIPS = [
+export const NUMERIC_OWNERSHIPS = Object.freeze([
   'Gameplay_Value',
   'Structural_Bound',
   'Constitutional_Constant',
   'Internal_Metric',
-] as const;
+] as const);
 
 export type NumericOwnership = (typeof NUMERIC_OWNERSHIPS)[number];
 
@@ -48,7 +50,7 @@ export interface NumericFieldClassification {
 }
 
 /** 分类失败原因（映射到诊断条件标识）。 */
-export const CLASSIFICATION_FAILURES = [
+export const CLASSIFICATION_FAILURES = Object.freeze([
   'classification-missing',
   'conflicting-classification',
   'unlabeled-internal-metric',
@@ -57,7 +59,7 @@ export const CLASSIFICATION_FAILURES = [
   'structural-bound-missing-source',
   'structural-bound-missing-rationale',
   'constitutional-constant-missing-layer',
-] as const;
+] as const);
 
 export type ClassificationFailure = (typeof CLASSIFICATION_FAILURES)[number];
 
@@ -68,18 +70,53 @@ export interface ClassificationOutcome {
 }
 
 /**
- * 对单个参数字段做归属分类判定。
- *
- * 只对数值型字段（`number` / `integer`）执行；非数值字段返回空 `failures` 与
- * `classification: undefined`，由调用方跳过。
+ * JSON/UGC 输入在完成 Schema 校验前可能缺少分类，或错误地提供多个分类。
+ * 这里显式接收该运行时形状，避免通过 `as ParameterField` 掩盖冲突输入。
  */
-export function classifyNumericField(field: ParameterField, fieldPath: string): ClassificationOutcome {
-  const failures: ClassificationFailure[] = [];
-  if (!isNumericOwnership(field.classification)) {
-    return { fieldPath, failures: Object.freeze(['classification-missing']) };
-  }
-  const ownership: NumericOwnership = field.classification;
+export type NumericFieldCandidate = Omit<ParameterField, 'classification'> & {
+  readonly classification?: unknown;
+};
 
+function resolveOwnership(value: unknown): {
+  readonly ownership?: NumericOwnership;
+  readonly failure?: 'classification-missing' | 'conflicting-classification';
+} {
+  if (Array.isArray(value)) {
+    const valid = [...new Set(value.filter(isNumericOwnership))];
+    if (valid.length > 1) {
+      return { failure: 'conflicting-classification' };
+    }
+    if (valid.length === 1 && value.length === 1) {
+      return { ownership: valid[0] };
+    }
+    return { failure: 'classification-missing' };
+  }
+  return isNumericOwnership(value)
+    ? { ownership: value }
+    : { failure: 'classification-missing' };
+}
+
+/**
+ * 对单个数值参数字段做归属分类判定。非数值字段不进入本领域判定。
+ */
+export function classifyNumericField(
+  field: NumericFieldCandidate,
+  fieldPath: string,
+): ClassificationOutcome {
+  if (!NUMERIC_DECLARED_TYPES.has(field.dataType)) {
+    return { fieldPath, failures: Object.freeze([]) };
+  }
+
+  const resolved = resolveOwnership(field.classification);
+  if (resolved.ownership === undefined) {
+    return {
+      fieldPath,
+      failures: Object.freeze([resolved.failure ?? 'classification-missing']),
+    };
+  }
+
+  const ownership = resolved.ownership;
+  const failures: ClassificationFailure[] = [];
   if (ownership === 'Gameplay_Value') {
     if (typeof field.playerVisible !== 'boolean') {
       failures.push('gameplay-value-missing-visibility');
@@ -111,15 +148,14 @@ export function classifyNumericField(field: ParameterField, fieldPath: string): 
     return { fieldPath, failures: Object.freeze(failures.slice()) };
   }
 
-  const classification: NumericFieldClassification = Object.freeze({
+  const classification = deepFreeze({
     fieldPath,
     ownership,
     unit: field.unit ?? 'dimensionless',
     owningLayer: field.owningLayer ?? (ownership === 'Gameplay_Value' ? '玩法层' : '基类层'),
     playerVisible: field.playerVisible ?? false,
-    authoritativeSources: Object.freeze(
+    authoritativeSources:
       field.authoritativeSource === undefined ? [] : [field.authoritativeSource],
-    ),
     ...(field.range === undefined ? {} : { declaredRange: field.range }),
     ...(field.structuralRationale === undefined
       ? {}
@@ -127,14 +163,19 @@ export function classifyNumericField(field: ParameterField, fieldPath: string): 
     ...(field.internalMetricSchema === undefined
       ? {}
       : { internalMetric: field.internalMetricSchema.metric }),
-  });
+  }) as NumericFieldClassification;
   return { fieldPath, classification, failures: Object.freeze([]) };
 }
 
 /** 玩家可见玩法数值的取值判定结果。 */
 export interface GameplayValueVerdict {
   readonly acceptable: boolean;
-  readonly reason?: 'not-finite' | 'not-integer' | 'out-of-range' | 'not-gameplay-value';
+  readonly reason?:
+    | 'not-finite'
+    | 'not-integer'
+    | 'out-of-range'
+    | 'not-gameplay-value'
+    | 'missing-exemption-source';
   readonly allowedMin: number;
   readonly allowedMax: number;
 }
@@ -153,7 +194,13 @@ export function validateGameplayValue(
 ): GameplayValueVerdict {
   const allowedMin = GAMEPLAY_VALUE_RANGE.min;
   const allowedMax = GAMEPLAY_VALUE_RANGE.max;
-  if (classification.ownership !== 'Gameplay_Value' || !classification.playerVisible) {
+  if (classification.ownership !== 'Gameplay_Value') {
+    return { acceptable: true, reason: 'not-gameplay-value', allowedMin, allowedMax };
+  }
+  if (!classification.playerVisible) {
+    if (classification.authoritativeSources.length === 0) {
+      return { acceptable: false, reason: 'missing-exemption-source', allowedMin, allowedMax };
+    }
     return { acceptable: true, reason: 'not-gameplay-value', allowedMin, allowedMax };
   }
   if (!Number.isFinite(value)) {
@@ -183,14 +230,14 @@ export function validateInternalMetric(field: ParameterField): boolean {
  * `ParameterField.defaultValue` 是**赋值**（"这里就是 3"）。两者都是数值叶，但前者合法、
  * 后者在基类层违规。若不区分，任何声明了值域的合法字段都会被误判为内嵌玩法数值。
  */
-export const NUMERIC_LEAF_REGIONS = [
+export const NUMERIC_LEAF_REGIONS = Object.freeze([
   'parameter-declaration',
   'parameter-default',
   'gameplay-value-assignment',
   'domain-contract',
   'composition-parameters',
   'other',
-] as const;
+] as const);
 
 export type NumericLeafRegion = (typeof NUMERIC_LEAF_REGIONS)[number];
 

@@ -126,13 +126,16 @@ describe('Feature: wakeup-ugc, architecture boundary', () => {
     expect(unexpected).toEqual([]);
   });
 
-  it('never imports the base layer while it is unfrozen', () => {
-    // 实施基线记录 §1.2.5：src/l2 正在被并行会话写入，未冻结，禁止耦合。
-    const violations = productionFiles
+  it('imports the base layer only through the frozen l2 port composition seam', () => {
+    // PT-02 已冻结 `src/l2/ugc/ports/index.ts`。UGC 只能在单一 composition root 消费该稳定端口；
+    // 任何第二处 import 或对 l2 内部文件的依赖都会扩大跨 Spec 耦合面并立即失败。
+    const l2Imports = productionFiles
       .flatMap((file) => importedModules(file.text).map((specifier) => ({ file, specifier })))
       .filter(({ specifier }) => specifier.replace(/\\/g, '/').includes('/l2/'))
       .map(({ file, specifier }) => `${file.relativePath} -> ${specifier}`);
-    expect(violations).toEqual([]);
+    expect(l2Imports).toEqual([
+      'integration/l2-adapter.ts -> ../../../l2/ugc/ports/index.js',
+    ]);
   });
 });
 

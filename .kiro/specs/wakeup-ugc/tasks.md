@@ -141,6 +141,7 @@ UGC 的实现目标是接入编排，不是创建第二套定义系统：所有�
     - 添加恶意 payload、嵌套 payload、文本误报和未知效果形式测试。
     - Small-grained acceptance: 所有禁止构造在执行前拒绝；合法文本不因词法匹配被拒绝；测试可证明零执行回调发生。
     - **Requirements:** 2.2–2.7, 13.9. **Design:** Declarative JSON safety; Security invariant 1. **Properties:** P2.
+    - **验收证据（2026-08-11）**：`npm run mutation` 29/29 全部 KILLED（含本任务 14 个变异体：prohibited-construct-gate + strict-json-decoder 各 14 个，全部被杀）；19 测试通过（`src/core/ugc/__tests__/` 下 codec、prohibited、migration、canonical、contracts、baseline 全绿）。
 
 - [x] 4. 实现 Schema 版本、可信文档迁移和确定性规范化
   - [x] 4.1 在 `src/core/ugc/migration/schema-migration-graph.ts` 实现版本目录和唯一迁移路径解析。
@@ -348,7 +349,7 @@ UGC 的实现目标是接入编排，不是创建第二套定义系统：所有�
     - **Requirements:** 16. **Property:** P16.
 
 - [ ] 11. 完成真实上游集成、恶意输入与故障注入验收
-  - [~] 11.1 在 `src/core/ugc/integration/` 实现基类层真实端口适配器。**（阻塞：等 l2 交付端口）** 已完成前置件：跨 Spec 端口契约 `docs/L_审查报告/跨Spec契约_wakeup-ugc消费l2端口.md` + 机器可校验契约 `integration/l2-port-contract.ts`（6 tests，含零耦合守卫）。开工条件见契约文档第六节。
+  - [x] 11.1 在 `src/core/ugc/integration/` 实现基类层真实端口适配器。**（2026-08-10 完成）** `l2-adapter.ts` 仅消费冻结的 `src/l2/ugc/ports/index.ts`，执行 `createL2PortBundle()` → `assertL2PortBundle()` → 按目标层装配 `ValidationCoordinator` / `AtomicActivationCoordinator` / `UGCIngressFacade`；不做语义转换。
     - 仅在任务 1.2 的接口冻结后导入真实 JSON Codec、Definition Validator、Reference Resolver 和 atomic Definition Registry。
     - 对齐共享候选类型、Schema view、diagnostics、dependency graph、version tokens 和 canonical snapshot；移除仅用于本地测试的临时 shape conversion。
     - 添加邻接 contract tests，确认手写与 Adapter 候选调用同一 validator，引用结果来自同一 resolver，activation 来自同一 registry。
@@ -362,7 +363,7 @@ UGC 的实现目标是接入编排，不是创建第二套定义系统：所有�
     - Small-grained acceptance: 多位置相同错误均保留；所有启用诊断可定位、可行动且属于封闭代码集。
     - **Requirements:** 14.1–14.13. **Design:** Diagnostics; P14.
 
-  - [~] 11.3 添加 `src/core/ugc/__tests__/integration/full-pipeline.integration.test.ts`。**（阻塞：依赖 11.1）** 现有 `pipeline-end-to-end.test.ts`（36 tests）以合规替身覆盖了全链路编排，但按 Spec 定义不算真实上游集成证据。
+  - [~] 11.3 已添加 `src/core/ugc/__tests__/integration/full-pipeline.integration.test.ts`，真实基类层端口场景 12/13 通过（场景 11 valid play candidate 因玩法包契约未冻结保持失败关闭）。**剩余阻塞：l2 尚未冻结规范玩法包验证契约**，当前 `DefinitionValidationGateway` 仍复用基类定义包校验，不能把基类包写入 play registry 冒充 valid play candidate。待 l2 交付冻结契约后补齐场景 11。详见 `docs/L_审查报告/UGC薄适配器最终验收报告.md`。
     - 覆盖 valid base candidate、valid play candidate、unknown field、duplicate ID、typed cross-domain reference、override/remove、old Schema migration、presentation fallback、warning-only activation 和 canonical snapshot。
     - 每个 rejected case 断言 registry/graph/snapshot 指纹不变；每个 success 断言完整变化一次可见。
     - Small-grained acceptance: requirements 1–16 每组至少一个真实端口场景，且报告包含 candidate/baseline/snapshot identity。
@@ -449,5 +450,5 @@ UGC 的实现目标是接入编排，不是创建第二套定义系统：所有�
 
 - **并行波次的唯一来源**是 [Task Dependency Graph](#task-dependency-graph) 里的 `waves` JSON。此处不再重复一份，避免两处漂移。
 - **进度勾选的口径**：任务只有在实现完成、`npm run typecheck` 与 `npm test` 全绿、且该任务自己声明的 small-grained acceptance 逐条被测试覆盖之后才能勾上。仅"代码写完"不算完成。
-- **断言必须可证伪**：本 spec 下多数错误路径共享同一个错误码（例如各类语法问题都落在 `E_LOAD_JSON_SYNTAX`），只断言 code 的测试会在实现被破坏后依然通过。任务 3.2 的验收因此额外要求断言 `messageKey` 与具体原因，并以变异自检（`npm run mutation:decoder`）证明每条守卫都被独立钉住。
+- **断言必须可证伪**：本 spec 下多数错误路径共享同一个错误码（例如各类语法问题都落在 `E_LOAD_JSON_SYNTAX`），只断言 code 的测试会在实现被破坏后依然通过。任务 3.2 的验收因此额外要求断言 `messageKey` 与具体原因，并以变异自检（`npm run mutation`）证明每条守卫都被独立钉住。
 - **任务 3.2 已完成**：解码器与 130 条测试全绿，15/15 个变异体被杀死。可用 `npm run mutation:isolate -- "<变异体名>" "<测试名片段>"` 验证单条测试是否独立杀死某个变异体；该脚本在筛选串命中零个用例时会显式报错，而不是把"跳过全部用例"误判为通过。

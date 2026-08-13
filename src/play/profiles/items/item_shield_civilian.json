@@ -22,7 +22,7 @@
   "stackable": false,
   "slot": "shield",
   "grantedStates": [
-    "status_blocking"
+    "status.class.blocking"
   ],
   "description": "民间防暴盾牌，小巧轻便但防护面积有限。",
   "actions": [
@@ -34,7 +34,7 @@
       "effects": [
         {
           "op": "attach.add",
-          "def": "status_blocking",
+          "def": "status.class.blocking",
           "target": "{actor}",
           "grantedBy": "item_shield_civilian",
           "description": "获得格挡状态"
@@ -52,7 +52,7 @@
       "effects": [
         {
           "op": "attach.del",
-          "def": "status_blocking",
+          "def": "status.class.blocking",
           "target": "{actor}",
           "description": "移除格挡状态"
         }
@@ -102,7 +102,7 @@
     },
     "item.capability.status_grant": {
       "targetSelector": "self",
-      "statusSelector": "status_blocking",
+      "statusSelector": "status.class.blocking",
       "lifecycle": "until-hit-or-cancel",
       "operation": "attach.add"
     }

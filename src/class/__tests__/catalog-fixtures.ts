@@ -125,17 +125,17 @@ export const CATALOG_ID_FIELDS: ReadonlyMap<string, readonly string[]> = Object.
     ['actions', ['classes', 'capabilities']],
     ['attachments', ['classes', 'capabilities']],
     ['containers', ['classes', 'capabilities']],
-    ['damage-types', ['damageTypes']],
+    ['damage-types', ['classes', 'capabilities']],
     ['gateways', ['classes', 'capabilities']],
     ['items', ['classes', 'capabilities']],
     ['movement', ['classes', 'capabilities']],
-    ['npcs', ['behaviorClasses', 'capabilities']],
+    ['npcs', ['classes', 'capabilities']],
     ['scenes', ['classes', 'capabilities']],
     ['skills', ['classes', 'capabilities']],
-    ['statuses', ['statuses', 'capabilities']],
+    ['statuses', ['classes', 'capabilities']],
     ['vehicles', ['classes', 'capabilities']],
-    ['vulnerability-types', ['vulnerabilityTypes']],
-    ['weapons', ['weaponClasses', 'spectrumClasses', 'damageClasses', 'weightTiers', 'rangeTiers', 'capabilities']],
+    ['vulnerability-types', ['classes', 'capabilities']],
+    ['weapons', ['classes', 'capabilities']],
   ]),
 );
 
@@ -152,4 +152,96 @@ export function canonicalClassIds(): ReadonlySet<string> {
     throw new Error(`canonical class ids must be globally unique; duplicates: ${duplicates.join(', ')}`);
   }
   return new Set(ids);
+}
+
+/** 从 catalog 中提取所有 operationChannels。 */
+export function getOperationChannels(catalog: JsonObject): readonly string[] {
+  const ops: string[] = [];
+  
+  // 从 classes/capabilities 中提取 operationChannels
+  const sections = ['classes', 'capabilities', 'behaviorClasses', 'weaponClasses', 'statuses'];
+  for (const section of sections) {
+    const entries = catalog[section];
+    if (entries === undefined || !Array.isArray(entries)) continue;
+    
+    for (const entry of entries) {
+      if (typeof entry !== 'object' || entry === null) continue;
+      const channels = (entry as JsonObject)['operationChannels'];
+      if (Array.isArray(channels)) {
+        ops.push(...channels.filter((ch): ch is string => typeof ch === 'string'));
+      }
+    }
+  }
+  
+  return Object.freeze([...new Set(ops)].sort((a, b) => a.localeCompare(b, 'en')));
+}
+
+/** 从 catalog 中提取运行时状态边界。 */
+export function getRuntimeStateBoundary(catalog: JsonObject): JsonObject {
+  // 从 valueSets 中查找 runtime_state_boundary
+  const valueSets = catalog['valueSets'];
+  if (!Array.isArray(valueSets)) {
+    return Object.freeze({ forbiddenConceptTokens: [] });
+  }
+  
+  for (const valueSet of valueSets) {
+    if (typeof valueSet !== 'object' || valueSet === null) continue;
+    const vs = valueSet as JsonObject;
+    if (vs['id'] === 'status.valueset.runtime_state_boundary') {
+      const tokens = vs['tokens'];
+      if (!Array.isArray(tokens)) return Object.freeze({ forbiddenConceptTokens: [] });
+      const forbiddenTokens = tokens
+        .filter((t): t is JsonObject => typeof t === 'object' && t !== null)
+        .map((t) => String(t['id'] || ''))
+        .filter(Boolean);
+      return Object.freeze({ forbiddenConceptTokens: [...forbiddenTokens] });
+    }
+  }
+  
+  return Object.freeze({ forbiddenConceptTokens: [] });
+}
+
+/** 从 weapons catalog 提取 weight tiers。 */
+export function getWeightTiers(catalog: JsonObject): readonly string[] {
+  const tiers = catalog['weightTiers'];
+  if (!Array.isArray(tiers)) return Object.freeze([]);
+  return Object.freeze(tiers.map((t: any) => String(t?.id || '')).filter(Boolean));
+}
+
+/** 从 weapons catalog 提取 range tiers。 */
+export function getRangeTiers(catalog: JsonObject): readonly string[] {
+  const tiers = catalog['rangeTiers'];
+  if (!Array.isArray(tiers)) return Object.freeze([]);
+  return Object.freeze(tiers.map((t: any) => String(t?.id || '')).filter(Boolean));
+}
+
+/** 从 weapons catalog 提取 band axes。 */
+export function getBandAxes(catalog: JsonObject): readonly string[] {
+  const axes = catalog['bandAxes'];
+  if (!Array.isArray(axes)) return Object.freeze([]);
+  return Object.freeze(axes.map((a: any) => String(a?.id || '')).filter(Boolean));
+}
+
+/** 从 weapons catalog 提取 settlement contract。 */
+export function getSettlementContract(catalog: JsonObject): JsonObject | null {
+  return catalog['settlementContract'] as JsonObject || null;
+}
+
+/** 从 weapons catalog 提取 mode selection contract。 */
+export function getModeSelectionContract(catalog: JsonObject): JsonObject | null {
+  return catalog['modeSelectionContract'] as JsonObject || null;
+}
+
+/** 从 npcs catalog 提取 behavior classes。 */
+export function getBehaviorClasses(catalog: JsonObject): readonly string[] {
+  const classes = catalog['behaviorClasses'];
+  if (!Array.isArray(classes)) return Object.freeze([]);
+  return Object.freeze(classes.map((c: any) => String(c?.id || '')).filter(Boolean));
+}
+
+/** 从 statuses catalog 提取 category axis。 */
+export function getCategoryAxis(catalog: JsonObject): readonly string[] {
+  const axis = catalog['categoryAxis'];
+  if (!Array.isArray(axis)) return Object.freeze([]);
+  return Object.freeze(axis.map((a: any) => String(a || '')).filter(Boolean));
 }

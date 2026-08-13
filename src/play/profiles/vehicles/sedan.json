@@ -54,7 +54,7 @@
         { "type": "vehicle_has_hp", "min": 1 }
       ],
       "effects": [
-        { "op": "attach.add", "target": "agent", "attachmentClassId": "status_aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
+        { "op": "attach.add", "target": "agent", "attachmentClassId": "status.class.aiming", "durationTurns": 1, "description": "进入撞击瞄准准备态，等待目标反应" }
       ],
       "kernelOps": ["attach.add"],
       "description": "花费1 AP瞄准撞击目标，对方可在此期间躲避；若未躲避则造成3点伤害"

@@ -1,30 +1,61 @@
 {
-  "id": "status_overloaded",
+  "id": "status.class.overloaded",
   "name": "过载",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_overloaded"
+    "sourceClass": "status.class.overloaded",
+    "capabilityIds": [
+      "status.capability.resource_boundary"
+    ]
   },
   "duration": "until_event",
   "durationUnit": "until_event",
   "stacking": "none",
   "stackBehavior": "unique",
   "effects": {
-    "passive": {"blockedActions": ["attack", "move", "use_item", "prepare"], "description": "过载期间无法执行任何主动动作"}
+    "passive": {
+      "blockedActions": [
+        "attack",
+        "move",
+        "use_item",
+        "prepare"
+      ],
+      "description": "过载期间无法执行任何主动动作"
+    }
   },
   "breakConditions": [
-    {"type": "turn", "turns": 3, "effect": "recover", "description": "3 回合后自动恢复（过载持续 3 回合）"},
-    {"type": "action", "actionId": "wait", "effect": "recover", "description": "等待恢复"}
+    {
+      "type": "turn",
+      "turns": 3,
+      "effect": "recover",
+      "description": "3 回合后自动恢复（过载持续 3 回合）"
+    },
+    {
+      "type": "action",
+      "actionId": "wait",
+      "effect": "recover",
+      "description": "等待恢复"
+    }
   ],
   "interactionMatrix": [],
-  "kernelEvents": ["OnTurnStart", "OnTurnEnd", "OnActionCheck"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnTurnEnd",
+    "OnActionCheck"
+  ],
   "icon": "exclamation-triangle",
   "color": "orange",
   "priority": 99,
   "description": "体力超过上限（>5）时触发过载，失去本回合行动权，3 回合后恢复",
-  "tags": ["stamina", "debuff", "overload"],
-  "source": ["系统: 体力超过上限"],
+  "tags": [
+    "stamina",
+    "debuff",
+    "overload"
+  ],
+  "source": [
+    "系统: 体力超过上限"
+  ],
   "mvp": true,
   "notes": "过载是体力系统的核心惩罚机制，优先级 99（仅次于零血倒地的 100）"
 }

@@ -1,10 +1,13 @@
 {
-  "id": "status_heavy",
+  "id": "status.class.heavy",
   "name": "重装",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_heavy"
+    "sourceClass": "status.class.heavy",
+    "capabilityIds": [
+      "status.capability.burden"
+    ]
   },
   "duration": "until_drop",
   "durationUnit": "until_event",
@@ -12,23 +15,56 @@
   "stackBehavior": "unique",
   "effects": {
     "actionModifiers": [
-      {"actionType": "move", "sceneType": "macro", "apModifier": "+1", "description": "大场景移动+1 AP"},
-      {"actionType": "move", "transitionType": ["stair", "window"], "apModifier": "+1", "description": "楼梯或窗户过渡场景+1 AP"}
+      {
+        "actionType": "move",
+        "sceneType": "macro",
+        "apModifier": "+1",
+        "description": "大场景移动+1 AP"
+      },
+      {
+        "actionType": "move",
+        "transitionType": [
+          "stair",
+          "window"
+        ],
+        "apModifier": "+1",
+        "description": "楼梯或窗户过渡场景+1 AP"
+      }
     ]
   },
   "breakConditions": [
-    {"type": "action", "actionId": "drop_item", "itemTag": "heavy", "effect": "remove_heavy", "description": "放下重型物品"}
+    {
+      "type": "action",
+      "actionId": "drop_item",
+      "itemTag": "heavy",
+      "effect": "remove_heavy",
+      "description": "放下重型物品"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_slowed", "type": "amplify", "description": "与迟缓叠加：大场景移动+2 AP"}
+    {
+      "with": "status.class.slowed",
+      "type": "amplify",
+      "description": "与迟缓叠加：大场景移动+2 AP"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnItemDropped"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnActionCheck",
+    "OnItemDropped"
+  ],
   "icon": "weight",
   "color": "brown",
   "priority": 5,
   "description": "携带重型物品导致的移动惩罚，大场景移动+1 AP",
-  "tags": ["movement-penalty", "equipment", "passive"],
-  "source": ["装备: 重型物品（带heavy标签）"],
+  "tags": [
+    "movement-penalty",
+    "equipment",
+    "passive"
+  ],
+  "source": [
+    "装备: 重型物品（带heavy标签）"
+  ],
   "mvp": true,
   "notes": "这是被动状态，来源于装备而非独立施加；只要携带重型物品就一直存在"
 }

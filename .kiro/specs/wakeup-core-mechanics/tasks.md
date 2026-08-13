@@ -4,14 +4,14 @@
 
 本计划把 `requirements.md` 的 19 项需求与 `design.md` 的组件、Op 映射、事务边界和 41 条正确性属性，转成可增量执行、可机械验证的编码任务。实现语言为 **TypeScript**（仓库既有语言，`design.md` 全篇以 TypeScript 表达接口，无需再选语言）。
 
-> ## ⚠️ D-062 冻结提示（PT-03 对齐，2026-08-09）
+> ## ⚠️ D-062 冻结提示（PT-03 对齐，2026-08-09；U-002 已裁决，2026-08-12）
 >
 > **本 Spec 的实现线（`src/play/core-mechanics/`）已被 `docs/访谈决策记录.md` 的 D-062 认定为与
 > `src/play/action-turn/`（`playpack.json`，纯声明式数据，已有 30 + 若干集成测试全绿）存在
-> 结构性重复，且结论互相矛盾（例如单人投点 U-002：`core-mechanics/allocation.ts` 按
-> requirements.md 5.11/D-037 实现为单人 2 AP，而 `action-turn/playpack.json` 的
-> `resolutionPolicy.singleParticipant` 反过来声称"以 wakeup-core-mechanics 为完全权威"应
-> abort 阻塞——两者互相指向对方为权威，形成循环矛盾）。
+> 结构性重复。**
+>
+> **U-002 单人投点裁决（2026-08-12）**：已按 D-037 确定为单人得 2 AP，不再 abort 阻塞。
+> `action-turn/playpack.json` 的 `resolutionPolicy.singleParticipant` 已更新为该裁决结论。
 >
 > D-062 裁决草案：声明式 `playpack` 数据是机制内容权威形态，`core-mechanics` 的价值收缩为
 > "装载期治理层"（玩法层 Linter），而不是内嵌第二份机制 `Def`。**该裁决尚待项目所有者复核批准**，
@@ -81,7 +81,7 @@
 - [ ] 2. 玩法层纯函数（无随机、无 WorldState） （待测：代码已存在 src/play/core-mechanics/allocation.ts；D-062 冻结 + core-mechanics 目录零测试（无 __tests__/），正确性与可装载性未被任何断言验证）
   - [ ] 2.1 在 `src/play/core-mechanics/allocation.ts` 实现 AP 差值分配 （待测：代码已存在 src/play/core-mechanics/allocation.ts（allocateAp）；D-062 冻结 + core-mechanics 目录零测试（无 __tests__/），正确性与可装载性未被任何断言验证）
     - 定义 `RollTier`（`1 | 2 | 3 | 4 | 5`）、`ApAllocation`（`{kind:'allocated', ap:1|2|3}` 或 `{kind:'unallocated'}`）、`RollParticipant`、`RollOutcome`
-    - `allocateAp(participants)` 按 design.md 3.3 的四步判定顺序实现：参与者为 1 名 → 返回 `E_LOAD_UNRESOLVED_CONTRACT`（`reason='U-002'`）且不返回任何分配值；恰好 2 名 → 不低于对方者 2 AP、较低者按差 1 / 差 ≥2 得 1 AP / 未分配，且**不产生 3 AP**；>2 名 → 唯一最高且领先第二高 ≥2 得 3 AP，并列最高或领先不足 2 的最高者各 2 AP，与最高差 1 得 1 AP，差 ≥2 未分配
+    - `allocateAp(participants)` 按 design.md 3.3 的四步判定顺序实现：参与者为 1 名 → 分配 2 AP（**U-002 已裁决为 D-037：单人得 2 AP，2026-08-12**）；恰好 2 名 → 不低于对方者 2 AP、较低者按差 1 / 差 ≥2 得 1 AP / 未分配，且**不产生 3 AP**；>2 名 → 唯一最高且领先第二高 ≥2 得 3 AP，并列最高或领先不足 2 的最高者各 2 AP，与最高差 1 得 1 AP，差 ≥2 未分配
     - `staminaRefunded = (allocation.kind === 'unallocated')`，且仅当 `committedStamina > 0` 时代表实际退还写入
     - 函数签名与实现体内**不得**出现 `random.*`、`Math.random`、`WorldState`、`OpRegistry`：入参只有外部提供的合法最终等级，返回值只有 `Result<readonly RollOutcome[]>`（复用 `../../core/kernel/ops/result.js`）
     - _需求：5.4, 5.5, 5.6, 5.7, 5.8, 5.11, 5.12_
@@ -309,8 +309,8 @@
   - [ ] 10.12 `__tests__/property/p12-settle-atomicity-guard.test.ts` （未做：属性测试文件 src/play/core-mechanics/__tests__/property/p12-*.test.ts 不存在（41 条必交付属性测试全部未写）；D-062 冻结中）
     - `// Feature: wakeup-core-mechanics, Property 12: 结算事务四项原子性与策略守卫先于副作用`
     - _需求：5.2, 5.3, 5.9, 6.7_
-  - [ ] 10.13 `__tests__/property/p13-single-participant-blocked.test.ts` （未做：属性测试文件 src/play/core-mechanics/__tests__/property/p13-*.test.ts 不存在（41 条必交付属性测试全部未写）；D-062 冻结中）
-    - `// Feature: wakeup-core-mechanics, Property 13: 单一投点参与者阻塞而非推断默认`
+  - [ ] 10.13 `__tests__/property/p13-single-participant-2ap.test.ts` （未做：属性测试文件 src/play/core-mechanics/__tests__/property/p13-*.test.ts 不存在（41 条必交付属性测试全部未写）；D-062 冻结中）
+    - `// Feature: wakeup-core-mechanics, Property 13: 单一投点参与者得 2 AP（**U-002 已裁决为 D-037，2026-08-12**）`
     - _需求：5.11_
   - [ ] 10.14 `__tests__/property/p14-deterministic-replay.test.ts` （未做：属性测试文件 src/play/core-mechanics/__tests__/property/p14-*.test.ts 不存在（41 条必交付属性测试全部未写）；D-062 冻结中）
     - `// Feature: wakeup-core-mechanics, Property 14: 相同快照、输入与随机流产生相同结果`

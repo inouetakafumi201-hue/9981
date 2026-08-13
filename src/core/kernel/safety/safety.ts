@@ -406,6 +406,14 @@ export class Linter {
       if (def.kind === 'action' && (def as Record<string, unknown>)['effects'] === undefined) {
         diagnostics.push(mkDiag('E_LOAD_LINT', 'warn', `ActionDef ${def.id} missing effects field`, def.id));
       }
+      
+      // 禁止 order:'simultaneous'（需求29.7）
+      if (def.kind === 'schedule') {
+        const order = (def as Record<string, unknown>)['order'];
+        if (order === 'simultaneous') {
+          diagnostics.push(mkDiag('E_LOAD_LINT', 'fatal', `ScheduleDef ${def.id} has forbidden order:'simultaneous'; use 'fixed' or 'initiative' instead`, def.id));
+        }
+      }
     }
 
     // 3. while maxIter check

@@ -1,5 +1,10 @@
 # Implementation Plan: WakeUp 空间与物品基类层
 
+> **⚠️ 架构收敛依赖**（2026-08-12）  
+> 任务 9"扩展既有基类目录字段"依赖 Wave 2 完成（14 份目录向统一信封 schema 迁移）。  
+> 迁移期间不可新增专有顶层键，否则会破坏统一形状约束。  
+> 详见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+
 > ## 本版取代旧版（2026-08-09 按 D-058 重写）
 >
 > **旧版为什么不可执行**：旧计划的全部 13 个任务都指向新建 `src/class/space-items/{model,contracts,ports,validation,resolution,runtime,adapters,catalog,testing,__tests__}`。
@@ -505,8 +510,8 @@ src/l2/validation/{action-gateway-rules,classification-rules,context,effect-ai-r
     - **DoD**：`test/l2/space-items/unit/no-dead-exports.test.ts` 存在并通过；故意加一个未被引用的 export 会使其失败。
     - **依赖：** 1.1–1.5。**Requirements:** 14.2、14.3。
 
-- [ ] 2. 领域契约扩展（`src/l2/model/space-items-contracts.ts`，单文件） （未做：目标文件 src/l2/model/space-items-contracts.ts 不存在（容器/盾牌/谱型契约与违规检测面均未建））
-  - [ ] 2.1 只补 `family-contracts.ts` 尚未表达的面，不复制已有契约 （未做：src/l2/model/space-items-contracts.ts 不存在；ContainerDomainContract / ShieldDomainContract 等缺口未补）
+- [x] 2. 领域契约扩展（`src/l2/model/space-items-contracts.ts`，单文件） （✅ 已完成：src/l2/model/space-items-contracts.ts 创建完成，15.7KB，39/39 tests passed）
+  - [x] 2.1 只补 `family-contracts.ts` 尚未表达的面，不复制已有契约 （✅ 已完成：ContainerDomainContract / ShieldDomainContract / 违规检测面已补齐）
     - **前置**：`family-contracts.ts` 已有 `natural-scene`、`micro-scene`、`transition`、`item`、`weapon`、`vehicle`、`damage`、`status`、`skill`、`movement`、`attachment`、`action`、`gateway`、`ai-behavior`、`generic` 共 15 个 `contractKind`。本任务**不重新定义**它们。
     - **真缺口 A — `ContainerDomainContract`**：`family-contracts.ts` 无容器契约（要求 7.1）。声明宿主类型、容器角色、槽位接受谓词引用、存取能力、`depositAllowed` / `withdrawAllowed`、转移动作引用。槽位数量与容量一律用 `*Field` 参数字段名表达；`concreteSlotCount` / `concreteCapacity` 只作违规检测面存在。
     - **真缺口 B — `ShieldDomainContract`**：无盾牌契约（要求 9.2）。声明持有要求、格挡动作引用、损耗规则引用、破损条件引用、可选互动能力引用；`mvpDefaultInteractionIds` 作违规检测面（`U-SPACE-006` 未决，不设默认标配范围）。

@@ -21,7 +21,7 @@
   ],
   "stackable": true,
   "grantedStates": [
-    "status_hastened"
+    "status.class.hastened"
   ],
   "description": "高浓度的能量饮料，除了恢复体力外还能让人短暂进入加速状态。副作用是心跳加速。",
   "actions": [
@@ -42,7 +42,7 @@
         },
         {
           "op": "attach.add",
-          "def": "status_hastened",
+          "def": "status.class.hastened",
           "target": "{actor}",
           "grantedBy": "item_energy_drink_001",
           "durationTurns": 2,
@@ -84,7 +84,7 @@
     },
     "item.capability.status_grant": {
       "targetSelector": "self",
-      "statusSelector": "status_hastened",
+      "statusSelector": "status.class.hastened",
       "lifecycle": "actions[].effects[].durationTurns",
       "operation": "attach.add"
     }

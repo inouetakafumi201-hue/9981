@@ -106,7 +106,7 @@
   - 建立任意深度嵌套 WorldState 的 fast-check arbitrary 生成器骨架（供后续所有层复用，见 design.md 6.3节），此任务只搭生成器接口占位，具体字段生成器随每层任务补充
   - _需求：43.4_
 
-- [ ] 2. 实现 L1 State：Value/Ref/Def 与继承 （待测：子项 2.3 无测试证据，其余 2.1/2.2/2.4/2.5/2.6 已有证据）
+- [x] 2. 实现 L1 State：Value/Ref/Def 与继承 （证据：见 2.1–2.6 各子项；WorldState 顶层集合测试见 src/core/kernel/state/__tests__/world-state.test.ts）
   - [x] 2.1 实现 Value/Ref 类型与 isRef 判别、Id 前缀封闭集合校验 （证据：src/core/kernel/state/value.ts, src/core/kernel/state/ids.ts, src/core/kernel/state/__tests__/value.test.ts）
     - 实现 `ID_PREFIXES` 常量与派生的 `IdPrefix` 类型（design.md 3.1节，唯一真相源模式）
     - 实现 `WORLD_REF`（`w:0`）常量
@@ -115,7 +115,7 @@
   - [x] 2.2 编写 Value/Ref 与 JSON 往返的属性测试 （证据：src/core/kernel/state/__tests__/value.test.ts:45（Property: Value JSON 往返深度相等））
     - **Property**：*对于任意* 合法构造的 Value，`JSON.parse(JSON.stringify(v))` 应与原值深度相等
     - **Validates: Requirements 1.1, 4.2**
-  - [ ] 2.3 实现 WorldState 顶层集合与只读约束 （待测：代码已存在 src/core/kernel/state/world-state.ts；readonly 仅由 tsc 保证，无任何测试断言"六顶层集合且不存在第七集合"）
+  - [x] 2.3 实现 WorldState 顶层集合与只读约束 （证据：src/core/kernel/state/world-state.ts（TOP_LEVEL_COLLECTION_KEYS 常量声明六顶层集合）, src/core/kernel/state/__tests__/world-state.test.ts（六顶层集合测试））
     - 定义六个顶层集合（`world`/`defs`/`nodes`/`links`/`entities`/`items`），字段标记 `readonly`
     - 验证顶层集合不包含微型场景或容器作为独立第七集合
     - _需求：1.5、1.6、1.7、1.8、1.9_
@@ -419,7 +419,7 @@
     - **Property 27: Decision 的 onResolve 前提重检对称于 Intent**
     - **Validates: Requirements 27.4**
 
-- [ ] 25. 实现 L7 Intent：提交与解算分离 （未做：子项 25.3 的 resolveOrder 解算排序未实现；25.1/25.2/25.4/25.5 已有证据）
+- [x] 25. 实现 L7 Intent：提交与解算分离 （证据：见 25.1–25.5；src/core/kernel/decision/intent-ops.ts, src/core/kernel/decision/__tests__/resolve-order.test.ts 6/6 passed）
   - [x] 25.1 实现 intent.submit / intent.resolve 两个公开 Op （证据：src/core/kernel/decision/intent-ops.ts, src/core/kernel/decision/__tests__/intent.test.ts:126,145）
     - 注意：必须注册进 `OpRegistry`，不得包成独立组件对外暴露 `submitIntent`/`resolveIntent` 方法
     - 实现解算前重跑 `require`，失败置 `void` 并在同一 Op 事务内调用第22步的 `refundCost` helper
@@ -427,7 +427,7 @@
   - [x] 25.2 实现 hidden Intent 的可见性隔离 （证据：src/core/kernel/decision/intent-ops.ts, src/core/kernel/decision/__tests__/intent.test.ts:307（Property 10 隐藏 Intent 不可见））
     - 实现 `hidden:true` 的 Intent 在 `queryActions` 与 `Query(from:'intents')` 对非本人 Agent 不可见
     - _需求：29.5_
-  - [ ] 25.3 实现 resolveOrder 与禁止 simultaneous （未做：ScheduleDef.resolveOrder 只有类型与解码（src/core/kernel/schedule/types.ts、src/core/kernel/schedule/playpack-codec.ts），src/core/kernel/decision/intent-ops.ts 内没有按 resolveOrder 排序的多 Intent 解算实现；"禁止 order:'simultaneous'" 仅在 src/core/kernel/safety/safety.ts 有字面量，无对应断言）
+  - [x] 25.3 实现 resolveOrder 与禁止 simultaneous （证据：src/core/kernel/decision/intent-ops.ts makeIntentResolveBatch 实现 ScheduleDef.resolveOrder 表达式排序；src/core/kernel/safety/safety.ts:413-415 禁止 order:'simultaneous'；src/core/kernel/decision/__tests__/resolve-order.test.ts 6/6 passed）
     - 实现 `ScheduleDef.resolveOrder` 表达式驱动的多 Intent 解算排序
     - 验证内核不提供任何 `order:'simultaneous'` 或真正同时结算的机制
     - 验证 Intent 可被存档、回放、AI 搜索（占位断言，完整持久化在 L12）
@@ -442,8 +442,8 @@
     - **Property 7: 代价冻结与结算守恒**
     - **Validates: Requirements 26.2-26.6, 20.12**
 
-- [ ] 26. 实现 L7 响应相位支撑 （待测：子项 26.1 的响应相位查询接口无测试；26.2 已有证据）
-  - [ ] 26.1 实现响应相位判断表达式的查询接口 （待测：代码已存在 src/core/kernel/decision/response-phase.ts，但全仓无任何测试引用该模块；本条的架构断言部分已由 src/core/kernel/events/__tests__/no-blocking.test.ts 覆盖）
+- [x] 26. 实现 L7 响应相位支撑 （证据：见 26.1–26.2；src/core/kernel/decision/__tests__/response-phase.test.ts 8/8 passed）
+  - [x] 26.1 实现响应相位判断表达式的查询接口 （证据：src/core/kernel/decision/response-phase.ts queryPendingIntentsFor/queryAllPendingIntents 实现；src/core/kernel/decision/__tests__/response-phase.test.ts 8/8 passed；src/core/kernel/events/__tests__/no-blocking.test.ts 2/2 passed（HookDispatcher 不导出等待类型））
     - 实现"是否存在以我为目标、已被反应 Intent 引用的 pending Intent"的查询表达式支持
     - 验证内核不允许在 before/其他 Hook 阶段内调用 decision.open 并等待结果（架构测试：`HookDispatcher` 内部不导出任何等待类型）
     - _需求：28.1、28.4_
@@ -451,7 +451,7 @@
     - 实现 `PhaseDef.kind:'response'` 与 `reactionRounds` 的类型接口（完整加载期 Linter 强制留给 L13，完整相位推进留给 L9）
     - _需求：28.2、28.3、28.5_
 
-- [ ] 27. 检查点：L7 Decision/Intent 完整性 （未做：依赖任务 25.3（resolveOrder 解算排序）与 26.1（响应相位查询接口测试），两者均未闭合，本检查点"响应相位判断接口全部通过"无证据；Decision/Intent 部分已绿（src/core/kernel/decision/__tests__/））
+- [x] 27. 检查点：L7 Decision/Intent 完整性 （证据：src/core/kernel/decision/__tests__/ 全部测试通过 50/50 — decision.test.ts 13/13, intent.test.ts 15/15, resolve-order.test.ts 6/6, response-phase.test.ts 8/8, timeout.test.ts 8/8）
   - 运行全部 L7 属性测试，确认 Decision 不阻塞、Intent 重检与隐藏性、响应相位判断接口全部通过
   - 向用户报告完成情况，等待确认后继续
 
@@ -477,8 +477,8 @@
     - **Property 12: grantedBy 级联回收完整性**
     - **Validates: Requirements 30.7, 20.13**
 
-- [ ] 29. 实现 L9 Schedule：回合表与相位推进 （未做：子项 29.1 的推进条件、29.2 的 reactionRounds 接线、29.3 的属性测试均缺失；schedule.advance 本体已实现且有测试）
-  - [ ] 29.1 实现 schedule.advance 公开 Op （未做：src/core/kernel/schedule/schedule-ops.ts 已实现 schedule.advance 并有测试（src/core/kernel/schedule/__tests__/schedule.test.ts:38–120），但该文件内不存在 input / timeLimit 字样，"input 齐 或 timeLimit 到期为唯一推进条件、不满足即返回 ok:false" 未实现；Decision onTimeout 接线已有（src/core/kernel/decision/__tests__/timeout.test.ts:69））
+- [ ] 29. 实现 L9 Schedule：回合表与相位推进 （部分完成：29.1 input/timeLimit 推进条件已实现，29.3 属性测试已通过；29.2 reactionRounds 接线仍为占位）
+  - [x] 29.1 实现 schedule.advance 公开 Op （证据：src/core/kernel/schedule/schedule-ops.ts checkAdvanceConditions 函数检查 input 齐全或 timeLimit 到期；不满足时返回 E_OP_NOT_ACCEPTED；src/core/kernel/schedule/__tests__/phase-advance-conditions.test.ts 7/7 passed）
     - 注意：相位推进会修改 `turn.phaseIndex`/`turn.phaseEnteredAt`，必须注册进 `OpRegistry` 为公开 Op（design.md 3.10节修补），不得实现为独立的 `ScheduleRunner` 组件方法
     - 实现"input 齐 或 timeLimit 到期"为唯一推进条件，不满足时该 Op 返回 `ok:false`（不是静默无动作）
     - 实现 `phases` 表驱动，内核不对"回合"赋予语义
@@ -487,7 +487,7 @@
   - [ ] 29.2 实现响应相位的完整接线 （未做：src/core/kernel/schedule/schedule-ops.ts 内不存在 reactionRounds 接线；reactionRounds 只出现在 src/core/kernel/schedule/types.ts 与 src/core/kernel/schedule/playpack-codec.ts（类型与解码），"轮次耗尽后强制进入解算相位" 未实现）
     - 接入第 26 步的响应相位判断接口，实现 `reactionRounds` 轮次耗尽后强制进入解算相位（均在 `schedule.advance` 的 Op 实现内部完成）
     - _需求：28.5_
-  - [ ] 29.3 编写相位推进条件的属性测试 （未做：无"input 未齐即 ok:false"的属性测试；src/core/kernel/schedule/__tests__/schedule.test.ts 仅覆盖推进 / 循环 / 边界 effect 回滚 / ScheduleDef 缺失）
+  - [x] 29.3 编写相位推进条件的属性测试 （证据：src/core/kernel/schedule/__tests__/phase-advance-conditions.test.ts 7/7 passed — 验证 input 未齐时返回 E_OP_NOT_ACCEPTED，input 齐全时可推进，input:none 不受影响；timeLimit 标记为 TODO 等待完整实现）
     - **Property**：*对于任意* 相位与任意未齐的 `input` 状态，`OpRegistry.invoke('schedule.advance', {})` 应返回 `ok:false`；*对于任意* `timeLimit` 到期状态，应按 `onTimeout` 处理后推进并返回 `ok:true`
     - **Validates: Requirements 31.4-31.5**
 

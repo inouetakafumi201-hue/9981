@@ -32,6 +32,13 @@ import type { ClassCatalog } from '../class-contract.js';
 import {
   CATALOG_DIRS,
   CATALOG_ID_FIELDS,
+  getBandAxes,
+  getBehaviorClasses,
+  getCategoryAxis,
+  getModeSelectionContract,
+  getRangeTiers,
+  getSettlementContract,
+  getWeightTiers,
   PLAY_PROFILE_ROOT,
   UNIFORM_CATALOG_DIRS,
   canonicalClassIds,
@@ -437,14 +444,14 @@ describe('items, weapons, armor and vehicles', () => {
   const vehicles = readCatalog('vehicles');
 
   it('distinguishes melee, non-firearm ranged and firearm type identities', () => {
-    const ids = collectIds(weapons, ['weaponClasses']);
+    const ids = collectIds(weapons, ['classes']);
     expect(ids).toEqual([
       'weapon-class.melee',
       'weapon-class.ranged_nonfirearm',
       'weapon-class.firearm',
     ]);
-    const firearm = entryById(weapons, 'weaponClasses', 'weapon-class.firearm');
-    const melee = entryById(weapons, 'weaponClasses', 'weapon-class.melee');
+    const firearm = entryById(weapons, 'classes', 'weapon-class.firearm');
+    const melee = entryById(weapons, 'classes', 'weapon-class.melee');
     expect(firearm['requiresAmmunition']).toBe(true);
     expect(melee['requiresAmmunition']).toBe(false);
     expect(stringArray(firearm, 'requiredCapabilityIds')).toContain('weapon.capability.ammunition_binding');

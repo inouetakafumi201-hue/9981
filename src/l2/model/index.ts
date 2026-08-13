@@ -22,3 +22,11 @@ export * from './snapshot.js';
 export * from './immutable.js';
 export * from './ordering.js';
 export * from './diagnostic-factory.js';
+
+// 空间与物品领域公共面：仅只读目录、纯函数与类型。
+export * from './space-items-domain-ids.js';
+export * from './space-items-structural-bounds.js';
+export * from './space-items-numeric-ownership.js';
+export * from './space-items-diagnostic-categories.js';
+export * from './space-items-unresolved.js';
+export * from './space-items-contracts.js';

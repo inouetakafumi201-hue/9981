@@ -7,7 +7,7 @@
   "scripts": {
     "test": "vitest run",
     "verify": "npm run typecheck && npm run lint && npm run test",
-    "verify:docs": "bash scripts/verify-doc-consistency.sh",
+    "verify:docs": "node scripts/verify-doc-consistency.mjs",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "typecheck:l2": "tsc --noEmit -p tsconfig.l2.json",

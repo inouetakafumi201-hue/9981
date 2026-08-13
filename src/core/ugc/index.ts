@@ -141,5 +141,16 @@ export { createAtomicActivationCoordinator } from './activation/atomic-activatio
 export type { FacadeDeps, UGCIngressFacade } from './facade/ugc-ingress-facade.js';
 export { createUGCIngressFacade } from './facade/ugc-ingress-facade.js';
 
+// 基类层真实端口的唯一生产装配边界。
+export type { L2UGCHostDependencies, L2UGCIntegration } from './integration/l2-adapter.js';
+export { assembleL2UGCIntegration, createL2UGCIntegration } from './integration/l2-adapter.js';
+export type { L2PortBundle, L2PortBundleProblem } from './integration/l2-port-contract.js';
+export {
+  L2PortBundleContractError,
+  assertL2PortBundle,
+  inspectL2PortBundle,
+  isL2PortBundleReady,
+} from './integration/l2-port-contract.js';
+
 // 上游 Schema 视图与效果契约端口（由基类层实现）。
 export type { UpstreamSchemaView, PresentationGap, FieldClassification } from './model/upstream.js';

@@ -4,9 +4,10 @@
  * UGC 只声明"我需要什么"，不声明"上游怎么算"。每个端口都刻意窄：它接收封存的规范化请求、只读快照、
  * 契约快照和预算，返回结构化结果。端口不接受也不返回 `WorldState`、`OpRegistry`、Hook、事务或持久化写入器。
  *
- * 任务 1.2 的核实结论：本文件的四个端口在当前仓库**全部 unavailable**。禁止用
- * `DefRegistry.register`（逐项可变写入、重复 ID 静默覆盖、无入边重验）或 `Linter.run`（只覆盖部分规则）
- * 近似代替；缺失时使用 `ports/unavailable.ts` 的失败关闭适配器。
+ * 任务 1.2 的初始核实结论是四端口当时全部 unavailable。PT-02 现已由 `src/l2/ugc/ports/index.ts`
+ * 交付真实 Definition Validator、Reference Resolver 与双层 atomic registry，并由
+ * `integration/l2-adapter.ts` 作为唯一生产装配缝消费；运行时兼容端口仍由可信宿主注入。禁止在任何
+ * 真实端口缺失时用 `DefRegistry.register` 或 `Linter.run` 近似代替，缺失路径必须继续失败关闭。
  */
 import type { Diagnostic } from '../../kernel/state/diagnostic.js';
 import type { CanonicalizedChangeRequest } from '../model/canonical-types.js';

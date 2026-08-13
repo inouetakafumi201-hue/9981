@@ -31,6 +31,8 @@ function loadPlaypackDef(): PlaypackDef {
 /**
  * Reference AP allocation, transcribed from wakeup-core-mechanics Requirement 5.4-5.8 (NOT copied
  * from the playpack Flow, so the two implementations cross-check each other). `null` = unallocated.
+ * 
+ * U-002 resolved via D-037: single participant (n=1) receives 2 AP via apTierCap algorithm.
  */
 function referenceAllocate(tiers: readonly number[]): (number | null)[] {
   const n = tiers.length;
@@ -42,7 +44,8 @@ function referenceAllocate(tiers: readonly number[]): (number | null)[] {
 
   return tiers.map((t) => {
     const diff = maxTier - t;
-    if (n === 2) {
+    if (n === 1 || n === 2) {
+      // D-037: apTierCap disables 3 AP tier for 1-2 participants
       if (t === maxTier) return 2;
       if (diff === 1) return 1;
       return null;
@@ -139,12 +142,24 @@ describe('action-turn playpack: initiative + AP allocation (cross-layer)', () =>
     }
   });
 
-  it('blocks the single-participant roll (U-002) and fails activation closed', () => {
+  it('allocates 2 AP for single participant (U-002 resolved via D-037)', () => {
     const harness = createFullHarness();
-    createAgents(harness, 1);
+    const ids = createAgents(harness, 1);
     const activation = harness.playpackActivator.activate(loadPlaypackDef());
-    expect(activation.ok).toBe(false);
-    expect(activation.diagnostics.length).toBeGreaterThan(0);
+    
+    // U-002 resolved: single participant receives 2 AP (natural result of apTierCap algorithm
+    // with 3 AP tier disabled, not a special case branch).
+    expect(activation.ok).toBe(true);
+    expect(activation.diagnostics).toEqual([]);
+    
+    const singleId = ids[0] as string;
+    const actualAp = apReal(harness, singleId);
+    expect(actualAp, 'single participant must receive 2 AP via D-037').toBe(2);
+    
+    // Cross-check with reference algorithm
+    const tier = agentTier(harness, singleId);
+    const expected = referenceAllocate([tier]);
+    expect(actualAp).toBe(expected[0] ?? 0);
   });
 
   it('assigns 3 AP only to a unique leader ahead by at least 2 (property over observed tiers)', () => {

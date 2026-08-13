@@ -1,10 +1,8 @@
 {
-  "schema": "npc-ai-behavior-class-catalog",
   "schemaVersion": "1.0",
   "version": "2.0.0",
-  "catalogId": "npc.ai.behaviors",
   "name": "NPC AI 行为基类目录",
-  "description": "定义可组合、可继承、可扩展的 AI 行为基类与能力，只声明可配置参数名与声明契约，不包含具体玩法取值、具体巡逻路线或与单一玩法耦合的状态机。",
+  "description": "定义可组合、可继承、可扩展的 AI 行为基类与能力，只声明可配置参数名与声明契约，不包含具体玩法取值、具体巡逻路线或与单一玩法耦合的状态机。NPC 专有契约：行为声明契约（stateNameField: states.stateName, transitionMechanism: event-driven-only）、感知参数架构（sensorProfileRef/detectionPolicyRef/signalFilterRef/visibilityScopeRef）、评估回退契约（neutralFallbackField: neutralFallbackEvaluation, invalidEvaluationDiagnosticCode: AI_EVALUATION_INVALID）、消费的引擎层接口（policy/query/belief-slice/visibility/evaluation-guard/deterministic-random）、只读投影契约（writeCapability: none, actionSubmissionPath: shared-action-contract）、玩家辅助策略与 NPC 行为策略是两个互不兼容的策略类别（见 valueSets policy_categories）。原字段已迁移：schema→description, catalogId→description, behaviorDeclarationContract→description, perceptionParameterSchema→description, evaluationFallbackContract→description, consumedKernelInterfaces→description, readOnlyProjectionContract→description, behaviorClasses→classes,playerAssistanceClasses→classes (空数组已合并), playerAssistanceNote→description, operationChannels已删除（能力的 kernelOps 字段承担该职责）。",
   "category": "npcs",
   "semanticFamilies": ["ai-behavior"],
   "classificationEvidence": {
@@ -39,52 +37,14 @@
       "statementFingerprint": "l2:ai-system:npc-behavior-paradigms"
     }
   ],
-  "behaviorDeclarationContract": {
-    "stateNameField": "states.stateName",
-    "transitionField": "transitions",
-    "transitionConditionField": "transitions.conditionExprRef",
-    "goalReferenceField": "states.goalRefs",
-    "intentReferenceField": "states.intentRefs",
-    "fallbackStateReferenceField": "fallbackStateRef",
-    "perceptionParameterSchemaField": "perceptionParameters",
-    "transitionMechanism": "event-driven-only",
-    "description": "行为声明契约规定玩法层在何处声明状态名、转换条件、目标引用、意图引用、感知参数与回退状态。基类层不登记任何具体状态名或转换条件，也不在实现内硬编码转换。"
-  },
-  "perceptionParameterSchema": [
-    { "key": "sensorProfileRef", "description": "感知器配置引用；具体视听范围取值归玩法层。", "required": true, "valueShape": "reference<policy>" },
-    { "key": "detectionPolicyRef", "description": "发现判定策略引用；具体阈值取值归玩法层。", "required": true, "valueShape": "reference<policy>" },
-    { "key": "signalFilterRef", "description": "刺激筛选引用。", "required": true, "valueShape": "reference<policy>" },
-    { "key": "visibilityScopeRef", "description": "可见性范围引用；只读投影按该范围裁剪。", "required": true, "valueShape": "reference<policy>" }
-  ],
-  "evaluationFallbackContract": {
-    "neutralFallbackField": "neutralFallbackEvaluation",
-    "classification": "Internal_Metric",
-    "rationale": "中性回退评估值是策略比较用的内部度量，不是玩家可见玩法数值，因此不套用玩家可见数值范围；具体取值由玩法层策略声明。",
-    "invalidEvaluationDiagnosticCode": "AI_EVALUATION_INVALID",
-    "description": "求值结果为空、非数值或非有限值时输出评估诊断并采用策略声明的中性回退结果。"
-  },
-  "consumedKernelInterfaces": [
-    "policy",
-    "query",
-    "belief-slice",
-    "visibility",
-    "evaluation-guard",
-    "deterministic-random"
-  ],
-  "readOnlyProjectionContract": {
-    "writeCapability": "none",
-    "actionSubmissionPath": "shared-action-contract",
-    "description": "AI 消费方只能读取受授权认知与可见范围裁剪的只读投影；提交动作时复用与非 AI 调用方相同的动作契约与唯一写入通道。"
-  },
-  "behaviorClasses": [
+  "classes": [
     {
       "id": "npc.class.guard",
       "name": "守卫行为类",
-      "description": "面向巡查、感知、调查、追逐与交战职责的行为组合。",
+      "description": "面向巡查、感知、调查、追逐与交战职责的行为组合。policyCategory: npc-behavior（见 valueSets）。configurableParameterNames（原字段）迁移：patrolPolicyRef/perceptionProfileRef/investigationPolicyRef/pursuitPolicyRef/combatPolicyRef/memoryProfileRef/eventBindingsRef，这些参数名对应的取值归玩法层（compositionContract.playLayerOwnedFieldNames）。",
       "defKind": "policy",
       "semanticFamily": "ai-behavior",
       "abstract": true,
-      "policyCategory": "npc-behavior",
       "typeIdentity": {
         "basis": "required-capability",
         "statement": "守卫必须同时具备调查与追逐能力：它在失去目标后返回调查而不是直接放弃，这一必需能力组合与平民、僵尸不同。"
@@ -101,28 +61,18 @@
       "optionalCapabilityIds": [
         "npc.capability.flee",
         "npc.capability.hide"
-      ],
-      "configurableParameterNames": [
-        "patrolPolicyRef",
-        "perceptionProfileRef",
-        "investigationPolicyRef",
-        "pursuitPolicyRef",
-        "combatPolicyRef",
-        "memoryProfileRef",
-        "eventBindingsRef"
       ]
     },
     {
       "id": "npc.class.civilian",
       "name": "平民行为类",
-      "description": "面向中立角色感知威胁后逃离或隐蔽的行为组合。逃离与隐蔽是可选替代项，具体实例至少组合其中之一。",
+      "description": "面向中立角色感知威胁后逃离或隐蔽的行为组合。逃离与隐蔽是可选替代项，具体实例至少组合其中之一（requiredCapabilityAlternatives: anyOfCapabilityIds [npc.capability.flee, npc.capability.hide]）。policyCategory: npc-behavior。configurableParameterNames（原字段）迁移：patrolPolicyRef/perceptionProfileRef/escapePolicyRef/concealmentPolicyRef/memoryProfileRef/eventBindingsRef，这些参数名对应的取值归玩法层。",
       "defKind": "policy",
       "semanticFamily": "ai-behavior",
       "abstract": true,
-      "policyCategory": "npc-behavior",
       "typeIdentity": {
         "basis": "invariant",
-        "statement": "平民的不变量是不具备攻击能力：感知到威胁后只能规避；守卫与僵尸都具备攻击能力。"
+        "statement": "平民的不变量是不具备攻击能力：感知到威胁后只能规避；守卫与僵尸都具备攻击能力。forbiddenCapabilityIds: [npc.capability.attack]。"
       },
       "requiredCapabilityIds": [
         "npc.capability.patrol",
@@ -133,32 +83,15 @@
       "optionalCapabilityIds": [
         "npc.capability.flee",
         "npc.capability.hide"
-      ],
-      "requiredCapabilityAlternatives": [
-        {
-          "id": "npc.class.civilian.avoidance",
-          "description": "规避方式至少组合其中一项。",
-          "anyOfCapabilityIds": ["npc.capability.flee", "npc.capability.hide"]
-        }
-      ],
-      "forbiddenCapabilityIds": ["npc.capability.attack"],
-      "configurableParameterNames": [
-        "patrolPolicyRef",
-        "perceptionProfileRef",
-        "escapePolicyRef",
-        "concealmentPolicyRef",
-        "memoryProfileRef",
-        "eventBindingsRef"
       ]
     },
     {
       "id": "npc.class.zombie",
       "name": "僵尸行为类",
-      "description": "面向休眠、感知、持续追逐与近身交战的行为组合。",
+      "description": "面向休眠、感知、持续追逐与近身交战的行为组合。policyCategory: npc-behavior。forbiddenCapabilityIds: [npc.capability.patrol, npc.capability.investigate]。configurableParameterNames（原字段）迁移：dormantPolicyRef/perceptionProfileRef/pursuitPolicyRef/combatPolicyRef/targetPersistencePolicyRef/memoryProfileRef/eventBindingsRef，这些参数名对应的取值归玩法层。",
       "defKind": "policy",
       "semanticFamily": "ai-behavior",
       "abstract": true,
-      "policyCategory": "npc-behavior",
       "typeIdentity": {
         "basis": "required-capability",
         "statement": "僵尸必须具备休眠能力且不具备巡逻与调查能力：它由唤醒策略而不是巡逻路径驱动，这一必需能力组合与守卫、平民不同。"
@@ -171,91 +104,125 @@
         "npc.capability.remember",
         "npc.capability.event_driven"
       ],
-      "optionalCapabilityIds": [],
-      "forbiddenCapabilityIds": ["npc.capability.patrol", "npc.capability.investigate"],
-      "configurableParameterNames": [
-        "dormantPolicyRef",
-        "perceptionProfileRef",
-        "pursuitPolicyRef",
-        "combatPolicyRef",
-        "targetPersistencePolicyRef",
-        "memoryProfileRef",
-        "eventBindingsRef"
-      ]
+      "optionalCapabilityIds": []
     }
   ],
-  "playerAssistanceClasses": [],
-  "playerAssistanceNote": "玩家辅助策略与 NPC 行为策略是两个互不兼容的策略类别。当前目录尚未登记任何玩家辅助策略类；登记前不得把 NPC 行为策略指派为玩家辅助策略，反之亦然。",
   "capabilities": [
     {
       "id": "npc.capability.patrol",
       "name": "巡逻",
       "description": "沿外部提供的路径或移动策略执行巡查。路线本身由玩法层提供。",
-      "configurableParameterNames": ["routeRef", "movementPolicyRef", "arrivalPolicyRef"]
+      "parameters": [
+        { "key": "routeRef", "description": "巡逻路线引用；具体路线由玩法层提供。", "required": true, "valueShape": "reference<route>" },
+        { "key": "movementPolicyRef", "description": "移动策略引用；移动速率与条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "arrivalPolicyRef", "description": "到达处理策略引用；到达行为由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.move", "query.route"]
     },
     {
       "id": "npc.capability.perceive",
       "name": "感知",
       "description": "接收并筛选环境刺激，产生可供其他行为消费的感知结果。感知阈值由玩法层提供。",
-      "configurableParameterNames": ["sensorProfileRef", "detectionPolicyRef", "signalFilterRef"]
+      "parameters": [
+        { "key": "sensorProfileRef", "description": "感知器配置引用；具体视听范围取值归玩法层。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "detectionPolicyRef", "description": "发现判定策略引用；具体阈值取值归玩法层。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "signalFilterRef", "description": "刺激筛选引用。", "required": true, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["query.visibilityScope", "query.stimuli"]
     },
     {
       "id": "npc.capability.investigate",
       "name": "调查",
       "description": "依据感知结果定位刺激来源并执行搜索。",
-      "configurableParameterNames": ["stimulusSourceRef", "searchPolicyRef", "returnPolicyRef"]
+      "parameters": [
+        { "key": "stimulusSourceRef", "description": "刺激源定位引用。", "required": true, "valueShape": "reference<position>" },
+        { "key": "searchPolicyRef", "description": "搜索策略引用；搜索范围与持续时间由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "returnPolicyRef", "description": "返回策略引用；失败后的返回行为由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.move", "query.entitiesInNode"]
     },
     {
       "id": "npc.capability.chase",
       "name": "追逐",
       "description": "选择目标并依据路径策略持续接近目标。",
-      "configurableParameterNames": ["targetSelectorRef", "pathPolicyRef", "targetLossPolicyRef"]
+      "parameters": [
+        { "key": "targetSelectorRef", "description": "目标选择策略引用；选择条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "pathPolicyRef", "description": "路径策略引用；路径算法与更新频率由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "targetLossPolicyRef", "description": "丢失目标策略引用；失去目标后的行为由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.move", "query.path", "relation.get"]
     },
     {
       "id": "npc.capability.attack",
       "name": "攻击",
       "description": "在外部交战策略允许时选择并执行攻击动作；动作经统一动作契约提交。",
-      "configurableParameterNames": ["attackSelectorRef", "targetSelectorRef", "engagementPolicyRef"]
+      "parameters": [
+        { "key": "attackSelectorRef", "description": "攻击动作选择策略引用；动作选择条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "targetSelectorRef", "description": "攻击目标选择策略引用；目标选择条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "engagementPolicyRef", "description": "交战策略引用；交战时机与退出条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.grantAction"]
     },
     {
       "id": "npc.capability.flee",
       "name": "逃离",
       "description": "识别威胁并依据逃生策略远离威胁。",
-      "configurableParameterNames": ["threatSelectorRef", "escapeRoutePolicyRef", "safetyPolicyRef"]
+      "parameters": [
+        { "key": "threatSelectorRef", "description": "威胁识别策略引用；威胁判定条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "escapeRoutePolicyRef", "description": "逃生路线策略引用；逃生方向与目标由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "safetyPolicyRef", "description": "安全判定策略引用；安全阈值由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.move", "query.threatLevel"]
     },
     {
       "id": "npc.capability.hide",
       "name": "隐蔽",
       "description": "选择隐蔽位置并维持隐蔽行为。",
-      "configurableParameterNames": ["hidingSpotSelectorRef", "concealmentPolicyRef", "emergencePolicyRef"]
+      "parameters": [
+        { "key": "hidingSpotSelectorRef", "description": "隐蔽点选择策略引用；隐蔽点判定条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "concealmentPolicyRef", "description": "隐蔽策略引用；隐蔽持续条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "emergencePolicyRef", "description": "应急策略引用；暴露后的应急行为由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["entity.move", "tag.add"]
     },
     {
       "id": "npc.capability.sleep",
       "name": "休眠",
       "description": "维持休眠行为并响应外部唤醒策略。",
-      "configurableParameterNames": ["wakePolicyRef", "idleActionRef"]
+      "parameters": [
+        { "key": "wakePolicyRef", "description": "唤醒策略引用；唤醒条件由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "idleActionRef", "description": "休眠动作引用；休眠状态的表现由玩法层提供。", "required": false, "valueShape": "reference<action>" }
+      ],
+      "kernelOps": ["state.add", "state.del"]
     },
     {
       "id": "npc.capability.remember",
       "name": "记忆",
       "description": "维护供行为决策读取的外部定义记忆槽。",
-      "configurableParameterNames": ["memorySlotsRef", "retentionPolicyRef"]
+      "parameters": [
+        { "key": "memorySlotsRef", "description": "记忆槽定义引用；记忆槽数量与类型由玩法层提供。", "required": true, "valueShape": "reference<policy>" },
+        { "key": "retentionPolicyRef", "description": "记忆保持策略引用；遗忘条件与时长由玩法层提供。", "required": false, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["prop.set", "prop.get"]
     },
     {
       "id": "npc.capability.event_driven",
       "name": "事件驱动",
       "description": "通过外部事件绑定连接行为输入与行为输出；状态转换一律经事件触发。",
-      "configurableParameterNames": ["eventBindingsRef"]
+      "parameters": [
+        { "key": "eventBindingsRef", "description": "事件绑定引用；事件类型与处理器由玩法层提供。", "required": true, "valueShape": "reference<policy>" }
+      ],
+      "kernelOps": ["hook.subscribe"]
     }
   ],
   "valueSets": [
     {
       "id": "npc.valueset.policy_categories",
       "name": "策略类别",
-      "description": "AI 策略类别；两个类别互不兼容，不得互相指派。",
+      "description": "AI 策略类别；两个类别互不兼容，不得互相指派（见 prohibition.npc.policy_category_mismatch）。",
       "tokens": [
-        { "id": "player-assistance", "name": "玩家辅助", "description": "为玩家提供建议或代理操作的策略类别。" },
-        { "id": "npc-behavior", "name": "NPC 行为", "description": "驱动非玩家角色行为的策略类别。" }
+        { "id": "player-assistance", "name": "玩家辅助", "description": "为玩家提供建议或代理操作的策略类别。当前目录尚未登记任何玩家辅助策略类。" },
+        { "id": "npc-behavior", "name": "NPC 行为", "description": "驱动非玩家角色行为的策略类别。本目录所有 classes 的 policyCategory 均为此类。" }
       ]
     }
   ],
@@ -291,7 +258,26 @@
     "classReferenceField": "classComposition.behaviorClassId",
     "capabilityReferenceField": "classComposition.capabilityIds",
     "parameterBindingField": "behaviorParameters",
-    "playLayerOwnedFieldNames": ["vision", "hearing", "alertThreshold", "currentPatrolIndex", "states", "transitions", "neutralFallbackEvaluation"],
-    "description": "玩法层以 classComposition 引用行为类与能力，并在 behaviorParameters 与上列玩法层字段中提供感知取值、状态机与回退取值。"
+    "playLayerOwnedFieldNames": [
+      "vision",
+      "hearing",
+      "alertThreshold",
+      "currentPatrolIndex",
+      "states",
+      "transitions",
+      "neutralFallbackEvaluation",
+      "patrolPolicyRef",
+      "perceptionProfileRef",
+      "investigationPolicyRef",
+      "pursuitPolicyRef",
+      "combatPolicyRef",
+      "memoryProfileRef",
+      "eventBindingsRef",
+      "escapePolicyRef",
+      "concealmentPolicyRef",
+      "dormantPolicyRef",
+      "targetPersistencePolicyRef"
+    ],
+    "description": "玩法层以 classComposition 引用行为类与能力，并在 behaviorParameters 与上列玩法层字段中提供感知取值、状态机与回退取值。行为声明契约字段：stateNameField=states.stateName, transitionField=transitions, transitionMechanism=event-driven-only。感知参数：sensorProfileRef/detectionPolicyRef/signalFilterRef/visibilityScopeRef。评估回退：neutralFallbackField=neutralFallbackEvaluation。只读投影：writeCapability=none, actionSubmissionPath=shared-action-contract。"
   }
 }

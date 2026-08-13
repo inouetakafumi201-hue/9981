@@ -5,14 +5,6 @@
   "description": "基类层伤害语义目录：伤害类别轴（本目录）与伤害结算语义轴（weapons/index.json 的 damageClasses）正交。类别本身不携带伤害值、克制关系或具体玩法效果。",
   "category": "damage-types",
   "semanticFamilies": ["damage"],
-  "categoryAxis": {
-    "id": "damage-axis.category",
-    "name": "伤害类别轴",
-    "description": "描述伤害的作用性质。与结算语义轴正交：同一类别可由不同结算语义投递。",
-    "cardinality": "one-or-more",
-    "extensible": true,
-    "extensionRule": "新增类别需要权威来源与分类理由；类别编号不隐含上限。"
-  },
   "classificationEvidence": {
     "enumerable": true,
     "enumerationRationale": "伤害类别在当前玩法范围内可有限列举，且登记表允许在有权威来源时扩展。",
@@ -34,35 +26,182 @@
       "statementFingerprint": "l2:damage-family:category-source-target-settlement-without-amount"
     }
   ],
-  "settlementContract": {
-    "sourceRequirementField": "sourceRequirements",
-    "targetRequirementField": "targetRequirements",
-    "settlementPipelineReferenceField": "settlementPipelineRefs",
-    "amountField": "amount",
-    "amountOwnership": "玩法层",
-    "description": "伤害族声明来源要求、目标要求与结算管线引用的字段名；伤害量字段归玩法层，基类层不赋值。"
-  },
-  "configurableParameters": [
-    "amount",
-    "source",
-    "spectrum",
-    "delivery",
-    "resolutionPolicy",
-    "sourceRequirements",
-    "targetRequirements",
-    "settlementPipelineRefs"
+  "classes": [
+    {
+      "id": "DMG_01",
+      "name": "锐器",
+      "description": "由锐利接触产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "锐器伤害的类型身份由其伤害类别（锐利接触）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_02",
+      "name": "钝器",
+      "description": "由钝性冲击产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "钝器伤害的类型身份由其伤害类别（钝性冲击）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_03",
+      "name": "穿刺",
+      "description": "由贯穿作用产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "穿刺伤害的类型身份由其伤害类别（贯穿作用）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_04",
+      "name": "烈焰",
+      "description": "由高温或燃烧产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "烈焰伤害的类型身份由其伤害类别（高温燃烧）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_05",
+      "name": "冰冻",
+      "description": "由低温或冻结产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "冰冻伤害的类型身份由其伤害类别（低温冻结）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_06",
+      "name": "电流",
+      "description": "由电能传导产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "电流伤害的类型身份由其伤害类别（电能传导）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_07",
+      "name": "毒素",
+      "description": "由有毒物质作用产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "毒素伤害的类型身份由其伤害类别（有毒物质）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_08",
+      "name": "凋零",
+      "description": "由生命机能衰败产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "凋零伤害的类型身份由其伤害类别（机能衰败）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_09",
+      "name": "侵蚀",
+      "description": "由腐蚀作用产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "侵蚀伤害的类型身份由其伤害类别（腐蚀作用）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    },
+    {
+      "id": "DMG_10",
+      "name": "精神",
+      "description": "由感知或精神干扰产生的伤害语义。",
+      "defKind": "attachment",
+      "semanticFamily": "damage",
+      "abstract": true,
+      "typeIdentity": {
+        "basis": "required-capability",
+        "statement": "精神伤害的类型身份由其伤害类别（精神干扰）确定，与其他伤害类别可区分。"
+      },
+      "requiredCapabilityIds": [],
+      "optionalCapabilityIds": []
+    }
   ],
-  "damageTypes": [
-    { "id": "DMG_01", "name": "锐器", "axis": "category", "description": "由锐利接触产生的伤害语义。" },
-    { "id": "DMG_02", "name": "钝器", "axis": "category", "description": "由钝性冲击产生的伤害语义。" },
-    { "id": "DMG_03", "name": "穿刺", "axis": "category", "description": "由贯穿作用产生的伤害语义。" },
-    { "id": "DMG_04", "name": "烈焰", "axis": "category", "description": "由高温或燃烧产生的伤害语义。" },
-    { "id": "DMG_05", "name": "冰冻", "axis": "category", "description": "由低温或冻结产生的伤害语义。" },
-    { "id": "DMG_06", "name": "电流", "axis": "category", "description": "由电能传导产生的伤害语义。" },
-    { "id": "DMG_07", "name": "毒素", "axis": "category", "description": "由有毒物质作用产生的伤害语义。" },
-    { "id": "DMG_08", "name": "凋零", "axis": "category", "description": "由生命机能衰败产生的伤害语义。" },
-    { "id": "DMG_09", "name": "侵蚀", "axis": "category", "description": "由腐蚀作用产生的伤害语义。" },
-    { "id": "DMG_10", "name": "精神", "axis": "category", "description": "由感知或精神干扰产生的伤害语义。" }
+  "capabilities": [
+    {
+      "id": "damage.capability.settlement",
+      "name": "伤害结算能力",
+      "description": "声明伤害类别参与结算管线。具体结算逻辑、来源要求、目标要求由玩法层策略声明。",
+      "parameters": [
+        {
+          "key": "settlementPolicyRef",
+          "description": "结算策略引用；具体结算管线由玩法层声明。",
+          "required": false,
+          "valueShape": "reference<policy>"
+        }
+      ],
+      "kernelOps": ["prop.add", "prop.set"]
+    }
+  ],
+  "valueSets": [
+    {
+      "id": "damage.valueset.categories",
+      "name": "伤害类别轴",
+      "description": "描述伤害的作用性质。与结算语义轴正交：同一类别可由不同结算语义投递。类别编号可扩展，新增类别需要权威来源与分类理由。",
+      "tokens": [
+        { "id": "DMG_01", "name": "锐器", "description": "由锐利接触产生的伤害语义。" },
+        { "id": "DMG_02", "name": "钝器", "description": "由钝性冲击产生的伤害语义。" },
+        { "id": "DMG_03", "name": "穿刺", "description": "由贯穿作用产生的伤害语义。" },
+        { "id": "DMG_04", "name": "烈焰", "description": "由高温或燃烧产生的伤害语义。" },
+        { "id": "DMG_05", "name": "冰冻", "description": "由低温或冻结产生的伤害语义。" },
+        { "id": "DMG_06", "name": "电流", "description": "由电能传导产生的伤害语义。" },
+        { "id": "DMG_07", "name": "毒素", "description": "由有毒物质作用产生的伤害语义。" },
+        { "id": "DMG_08", "name": "凋零", "description": "由生命机能衰败产生的伤害语义。" },
+        { "id": "DMG_09", "name": "侵蚀", "description": "由腐蚀作用产生的伤害语义。" },
+        { "id": "DMG_10", "name": "精神", "description": "由感知或精神干扰产生的伤害语义。" }
+      ]
+    }
   ],
   "structuralBounds": [],
   "prohibitions": [
@@ -93,10 +232,10 @@
   ],
   "unresolvedItems": [],
   "compositionContract": {
-    "damageTypeReferenceField": "classComposition.damageTypeIds",
-    "damageClassReferenceField": "classComposition.damageClassId",
+    "classReferenceField": "classComposition.damageTypeIds",
+    "capabilityReferenceField": "classComposition.capabilityIds",
     "parameterBindingField": "damageParameters",
-    "playLayerOwnedFieldNames": ["amount", "damage", "multiplier", "matrix"],
-    "description": "玩法层以 classComposition 同时引用伤害类别与结算语义，并在上列玩法层字段中提供伤害量与映射取值。"
+    "playLayerOwnedFieldNames": ["amount", "damage", "multiplier", "matrix", "sourceRequirements", "targetRequirements", "settlementPipelineRefs"],
+    "description": "玩法层以 classComposition.damageTypeIds 引用伤害类别，并在 playLayerOwnedFieldNames 列出的字段中提供伤害量、来源要求、目标要求与结算管线引用。伤害结算字段名：sourceRequirements（来源要求）、targetRequirements（目标要求）、settlementPipelineRefs（结算管线引用）、amount（伤害量，归玩法层）。"
   }
 }

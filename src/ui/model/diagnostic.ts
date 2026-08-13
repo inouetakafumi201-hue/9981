@@ -52,14 +52,16 @@ export const UI_DIAGNOSTIC_CODES = {
   EVENT_PAYLOAD_KEY_NOT_WHITELISTED: 'EVENT_PAYLOAD_KEY_NOT_WHITELISTED',
   EVENT_PAYLOAD_VALUE_UNSAFE: 'EVENT_PAYLOAD_VALUE_UNSAFE',
   PROJECTION_REVISION_GAP: 'PROJECTION_REVISION_GAP',
+  INTERACTION_STALE: 'INTERACTION_STALE',
+  PRESENTATION_RESOURCE_FAILED: 'PRESENTATION_RESOURCE_FAILED',
 } as const;
 
 export type UiDiagnosticCode = (typeof UI_DIAGNOSTIC_CODES)[keyof typeof UI_DIAGNOSTIC_CODES];
 
 /**
- * 本 Spec 在 design.md「UI 侧诊断码」表之外新增的三个码，及其必要性。
+ * 本 Spec 在 design.md「UI 侧诊断码」表之外新增的五个码，及其必要性。
  *
- * 三者都是"design.md 正文要求产出结构化诊断、但未给码名"的位置。宁可显式登记新码，
+ * 这些码都是"design.md 正文要求产出结构化诊断、但未给码名"的位置。宁可显式登记新码，
  * 也不复用语义不符的既有码（例如把白名单丢弃记成 `PROJECTION_SCOPE_VIOLATION`
  * 会把 `warn` 级的字段未登记误报成 `error` 级的越权）。三者都属于**本 Spec 的自主判断**，
  * 待人工复核；若审查判定应并入 L2 码表，改动路径是"加到 L2 码表 + 走跨 Spec 审查"（J-20）。
@@ -75,6 +77,8 @@ export const UI_OWN_ADDITIONAL_CODES: readonly UiDiagnosticCode[] = Object.freez
   UI_DIAGNOSTIC_CODES.EVENT_PAYLOAD_KEY_NOT_WHITELISTED,
   UI_DIAGNOSTIC_CODES.EVENT_PAYLOAD_VALUE_UNSAFE,
   UI_DIAGNOSTIC_CODES.PROJECTION_REVISION_GAP,
+  UI_DIAGNOSTIC_CODES.INTERACTION_STALE,
+  UI_DIAGNOSTIC_CODES.PRESENTATION_RESOURCE_FAILED,
 ]);
 
 /**
@@ -106,6 +110,8 @@ export const UI_DIAGNOSTIC_SEVERITY: Readonly<Record<UiDiagnosticCode, UiDiagnos
     [UI_DIAGNOSTIC_CODES.EVENT_PAYLOAD_KEY_NOT_WHITELISTED]: 'warn',
     [UI_DIAGNOSTIC_CODES.EVENT_PAYLOAD_VALUE_UNSAFE]: 'warn',
     [UI_DIAGNOSTIC_CODES.PROJECTION_REVISION_GAP]: 'warn',
+    [UI_DIAGNOSTIC_CODES.INTERACTION_STALE]: 'info',
+    [UI_DIAGNOSTIC_CODES.PRESENTATION_RESOURCE_FAILED]: 'warn',
     [UI_DIAGNOSTIC_CODES.EVENT_ARRIVED_STALE]: 'info',
   });
 

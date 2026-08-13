@@ -77,6 +77,23 @@ export interface SourceLocation {
   readonly column?: number;
 }
 
+/**
+ * 来源跨度定位（精确 UTF-8 字节映射）
+ *
+ * 用于诊断输出时的精确定位，支持行列号与字节偏移转换。
+ * sourceSliceHash 用于完整性验证，防止来源文档被篡改。
+ */
+export interface SourceSpan {
+  readonly startLine: number;
+  readonly startColumn: number;
+  readonly startByteOffset: number;
+  readonly endLine: number;
+  readonly endColumn: number;
+  readonly endByteOffset: number;
+  /** 跨度内容的 SHA-256 哈希（UTF-8 字节）。用于来源完整性验证。 */
+  readonly sourceSliceHash: string;
+}
+
 /** Source_Record：design.md 数据模型的直接实现。 */
 export interface SourceRecord {
   readonly sourceFile: SourceFileId;
@@ -86,6 +103,13 @@ export interface SourceRecord {
   readonly classification: SourceClassificationKind;
   readonly owningLayer: OwningLayer;
   readonly statementFingerprint: StableFingerprint;
+  /**
+   * 精确的来源跨度定位（若可用）
+   *
+   * 当来源由 JSON codec 或标准化工具解析时包含。
+   * 若来源是手动输入或不支持精确映射，可为 undefined。
+   */
+  readonly span?: SourceSpan;
 }
 
 /**
@@ -185,7 +209,63 @@ export interface SourceStatement {
   readonly payload?: Readonly<Record<string, unknown>>;
 }
 
-/** 已裁决的规范契约。 */
+/**
+ * 验证来源跨度的完整性
+ *
+ * 检查：
+ * - 行列号与字节偏移的单调性
+ * - SHA-256 哈希格式（64 个十六进制字符）
+ */
+export function validateSourceSpan(span: SourceSpan): readonly string[] {
+  const issues: string[] = [];
+
+  if (span.startLine > span.endLine) {
+    issues.push('startLine must be <= endLine');
+  }
+  if (span.startLine === span.endLine && span.startColumn > span.endColumn) {
+    issues.push('on same line, startColumn must be <= endColumn');
+  }
+  if (span.startByteOffset > span.endByteOffset) {
+    issues.push('startByteOffset must be <= endByteOffset');
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(span.sourceSliceHash)) {
+    issues.push('sourceSliceHash must be a 64-character hex string (SHA-256)');
+  }
+
+  return issues;
+}
+
+/**
+ * 计算两个 SourceSpan 的并集（假设来自同一文件）
+ *
+ * 用于诊断聚合时合并相关位置。
+ */
+export function mergeSourceSpans(a: SourceSpan, b: SourceSpan): SourceSpan {
+  const startLine = Math.min(a.startLine, b.startLine);
+  const startColumn = startLine === a.startLine ? Math.min(a.startColumn, b.startColumn) : 
+                      startLine === b.startLine ? Math.min(a.startColumn, b.startColumn) : 0;
+  const startByteOffset = Math.min(a.startByteOffset, b.startByteOffset);
+
+  const endLine = Math.max(a.endLine, b.endLine);
+  const endColumn = endLine === a.endLine && endLine === b.endLine ? Math.max(a.endColumn, b.endColumn) :
+                    endLine === a.endLine ? a.endColumn :
+                    endLine === b.endLine ? b.endColumn : 0;
+  const endByteOffset = Math.max(a.endByteOffset, b.endByteOffset);
+
+  // 并集后的 hash 无法精确计算（需要原始文本），设为 undefined 或取 a 的 hash 作占位
+  // 这里采用占位策略（实际诊断不应依赖并集的 hash）
+  return {
+    startLine,
+    startColumn,
+    startByteOffset,
+    endLine,
+    endColumn,
+    endByteOffset,
+    sourceSliceHash: a.sourceSliceHash, // 占位
+  };
+}
+
 export interface NormativeContract {
   readonly claimKey: string;
   readonly statement: SourceStatement;

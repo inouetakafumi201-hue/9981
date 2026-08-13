@@ -1,8 +1,9 @@
 /**
  * UGC 上游端口导出根。
  *
- * 这里只导出**接口**、失败关闭适配器和默认指纹实现。刻意不导出任何"能直接写活动注册表"的实现：
- * 真实适配器属于任务 11.1，且必须等基类层端口冻结（见实施基线记录 §1.2.5）。
+ * 这里只导出接口、失败关闭适配器和默认指纹实现。真实基类层端口实现仍由 `src/l2/ugc/ports`
+ * 拥有；UGC 只在 `integration/l2-adapter.ts` 的唯一装配缝消费其冻结导出，不从本端口根再导出
+ * registry 实现或 l2 内部形状。
  */
 export type { UpstreamPortIdentity, UnresolvedPortEvidence } from './availability.js';
 export {

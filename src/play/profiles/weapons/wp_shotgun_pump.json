@@ -8,11 +8,11 @@
     "weaponClassId": "weapon-class.firearm",
     "damageClassId": "damage-class.firearm",
     "capabilityIds": [
+      "weapon.capability.scatter_shot",
       "weapon.capability.ammunition_binding",
       "weapon.capability.damage_reference",
       "weapon.capability.handling_profile",
-      "weapon.capability.range_profile",
-      "weapon.capability.scatter_attribute"
+      "weapon.capability.range_profile"
     ]
   },
   "weightClass": "medium",
@@ -70,6 +70,11 @@
   },
   "unresolvedIssues": [],
   "weaponParameters": {
+    "weapon.capability.scatter_shot": {
+      "activationRange": 1,
+      "autoTargetScope": "subscene",
+      "requiresAiming": false
+    },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",
       "ammunitionTypeField": "ammoType",

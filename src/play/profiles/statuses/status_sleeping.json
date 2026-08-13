@@ -1,32 +1,73 @@
 {
-  "id": "status_sleeping",
+  "id": "status.class.sleeping",
   "name": "睡眠",
   "category": "positive",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_sleeping"
+    "sourceClass": "status.class.sleeping",
+    "capabilityIds": [
+      "status.capability.action_eligibility"
+    ]
   },
   "duration": "until_wake",
   "durationUnit": "until_event",
   "stacking": "none",
   "stackBehavior": "unique",
   "effects": {
-    "onTurnEnd": {"effect": "restore_stamina", "amount": 1, "max": 5, "description": "回合结束时恢复1点体力（上限5）"},
-    "passive": {"blockedActions": ["attack", "move", "use_item"], "description": "无法执行主动动作"}
+    "onTurnEnd": {
+      "effect": "restore_stamina",
+      "amount": 1,
+      "max": 5,
+      "description": "回合结束时恢复1点体力（上限5）"
+    },
+    "passive": {
+      "blockedActions": [
+        "attack",
+        "move",
+        "use_item"
+      ],
+      "description": "无法执行主动动作"
+    }
   },
   "breakConditions": [
-    {"type": "action", "actionId": "wake_up", "apCost": 1, "effect": "wake", "description": "1 AP 起床"},
-    {"type": "damage", "effect": "wake", "description": "受到伤害时起床"},
-    {"type": "noise", "threshold": 5, "effect": "wake", "description": "噪音刻度达到5时起床"}
+    {
+      "type": "action",
+      "actionId": "wake_up",
+      "apCost": 1,
+      "effect": "wake",
+      "description": "1 AP 起床"
+    },
+    {
+      "type": "damage",
+      "effect": "wake",
+      "description": "受到伤害时起床"
+    },
+    {
+      "type": "noise",
+      "threshold": 5,
+      "effect": "wake",
+      "description": "噪音刻度达到5时起床"
+    }
   ],
   "interactionMatrix": [],
-  "kernelEvents": ["OnTurnEnd", "OnDamageTaken", "OnNoise", "OnWakeUp"],
+  "kernelEvents": [
+    "OnTurnEnd",
+    "OnDamageTaken",
+    "OnNoise",
+    "OnWakeUp"
+  ],
   "icon": "moon",
   "color": "indigo",
   "priority": 35,
   "description": "在床上睡眠，体力每回合恢复1点，受到伤害起床",
-  "tags": ["rest", "stamina-regen", "buff"],
-  "source": ["动作: 睡下"],
+  "tags": [
+    "rest",
+    "stamina-regen",
+    "buff"
+  ],
+  "source": [
+    "动作: 睡下"
+  ],
   "mvp": true,
   "notes": "前置条件：必须在床上实体旁边"
 }

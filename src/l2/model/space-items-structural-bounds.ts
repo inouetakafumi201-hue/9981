@@ -23,18 +23,17 @@ import {
   NODE_CONNECTION_BOUND,
   NODE_CONNECTION_BOUND_SOURCE,
 } from './constitution.js';
-import { linksTouching } from '../../core/kernel/topology/graph.js';
-import type { Link } from '../../core/kernel/topology/types.js';
+import { deepFreeze } from './immutable.js';
 
-/** 天然场景三档尺度。与 `./family-contracts.ts` 的 `SceneScale` 同义、同取值。 */
-export const SPACE_ITEMS_SCENE_SCALES = ['large', 'medium', 'small'] as const;
-export type SceneScale = (typeof SPACE_ITEMS_SCENE_SCALES)[number];
+/** 天然场景三档尺度。与 `./family-contracts.ts` 的 `SpaceItemsSceneScale` 同义、同取值。 */
+export const SPACE_ITEMS_SCENE_SCALES = Object.freeze(['large', 'medium', 'small'] as const);
+export type SpaceItemsSceneScale = (typeof SPACE_ITEMS_SCENE_SCALES)[number];
 
-export function isSceneScale(value: unknown): value is SceneScale {
+export function isSpaceItemsSceneScale(value: unknown): value is SpaceItemsSceneScale {
   return typeof value === 'string' && (SPACE_ITEMS_SCENE_SCALES as readonly string[]).includes(value);
 }
 
-export function sceneScaleRank(scale: SceneScale): number {
+export function sceneScaleRank(scale: SpaceItemsSceneScale): number {
   const index = SPACE_ITEMS_SCENE_SCALES.indexOf(scale);
   return index === -1 ? Number.MAX_SAFE_INTEGER : index;
 }
@@ -55,10 +54,10 @@ export interface StructuralBound {
 }
 
 function frozenBound(bound: StructuralBound): StructuralBound {
-  return Object.freeze({
+  return deepFreeze({
     ...bound,
-    authoritativeSources: Object.freeze(bound.authoritativeSources.slice()),
-  });
+    authoritativeSources: bound.authoritativeSources.slice(),
+  }) as StructuralBound;
 }
 
 /**
@@ -161,7 +160,7 @@ export function isWellSourcedBound(bound: StructuralBound): boolean {
  * - 小场景独有 `shared_micro_scene` 且排除个人空旷地；
  * - 三档都具备 `micro_scene_parenthood`（D-056：微型场景父级可为任一档）。
  */
-export const SCENE_SCALE_IDENTITY: Readonly<Record<SceneScale, readonly string[]>> = Object.freeze({
+export const SCENE_SCALE_IDENTITY: Readonly<Record<SpaceItemsSceneScale, readonly string[]>> = Object.freeze({
   large: Object.freeze([
     'scene.capability.occupancy',
     'scene.capability.transition_endpoint',
@@ -184,7 +183,7 @@ export const SCENE_SCALE_IDENTITY: Readonly<Record<SceneScale, readonly string[]
 });
 
 /** 微型场景的合法父级尺度：三档全含（D-056）。 */
-export const ADMITTED_MICRO_SCENE_PARENT_SCALES: readonly SceneScale[] = Object.freeze([
+export const ADMITTED_MICRO_SCENE_PARENT_SCALES: readonly SpaceItemsSceneScale[] = Object.freeze([
   'large',
   'medium',
   'small',
@@ -204,21 +203,42 @@ export interface ConnectionCountMetric {
 }
 
 /**
- * 现查某节点的连接数。内部调用引擎层 `linksTouching`，不自建图遍历。
+ * 连接计数所需的稳定最小输入端口。
  *
- * `linksTouching` 是 `src/core/kernel/topology/graph.ts` 的纯函数：它只读传入的普通对象，
- * 不持有 `WorldState` 写权限，因此本领域对它的值导入不构成旁路写入通道。
+ * 该端口只表达「一条连接有两个端点」，不依赖引擎层内部 `Link` 类的属性、标签、权重或存储形状。
+ * 调用方（例如引擎层或运行时适配器）负责从自身图存储投影为只读端点对；
+ * 因此引擎层可以独立演进内部表示，而领域层保持稳定的纯输入契约。
+ *
+ * **实施前要求 1.2**：L2 层不得直接 import `src/core/kernel/topology/graph` 或 `Link` 的内部形状；
+ * 该端口形状必须在 `tsconfig.l2.json` 允许范围内通过类型检查。
+ */
+export interface ConnectionEndpoints {
+  readonly a: string;
+  readonly b: string;
+}
+
+/**
+ * 从纯端点输入现查节点连接数。每个端点对最多计数一次，自环也只表示一条连接。
+ *
+ * **实施前要求 1.2**：本函数只接受纯数据输入 `ConnectionEndpoints[]` 与 `nodeId`，
+ * 不依赖引擎层拓扑模块的任何运行时状态、类或方法；调用方负责在投影或适配器层提供端点对数据。
  */
 export function measureConnectionCount(
-  links: Readonly<Record<string, Link>>,
+  links: readonly ConnectionEndpoints[],
   nodeId: string,
 ): ConnectionCountMetric {
-  return {
+  let count = 0;
+  for (const link of links) {
+    if (link.a === nodeId || link.b === nodeId) {
+      count += 1;
+    }
+  }
+  return Object.freeze({
     kind: 'Internal_Metric',
     metric: 'natural-scene-connection-count',
     nodeId,
-    count: linksTouching(links as Record<string, Link>, nodeId).length,
-  };
+    count,
+  });
 }
 
 /**
@@ -231,16 +251,16 @@ export function measureConnectionCount(
 export interface ScaleTighteningVerdict {
   readonly acceptable: boolean;
   /** 越界的档位与其取值。 */
-  readonly outOfRange: readonly { readonly scale: SceneScale; readonly value: number }[];
+  readonly outOfRange: readonly { readonly scale: SpaceItemsSceneScale; readonly value: number }[];
   /** 是否至少有一档严格小于天花板。 */
   readonly tightensAtLeastOnce: boolean;
 }
 
 export function validateScaleTightening(
-  table: Readonly<Record<SceneScale, number>>,
+  table: Readonly<Record<SpaceItemsSceneScale, number>>,
 ): ScaleTighteningVerdict {
   const ceiling = SCENE_CONNECTION_CEILING.value;
-  const outOfRange: { readonly scale: SceneScale; readonly value: number }[] = [];
+  const outOfRange: { readonly scale: SpaceItemsSceneScale; readonly value: number }[] = [];
   let tightensAtLeastOnce = false;
   for (const scale of SPACE_ITEMS_SCENE_SCALES) {
     const value = table[scale];

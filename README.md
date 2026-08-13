@@ -4,9 +4,17 @@
 
 ---
 
-## ⚠️ 架构收敛进行中（2026-08-11）
+## ⚠️ 架构收敛进行中（2026-08-12）
 
-**当前状态**：Wave 0 完成，准备进入 Wave 1（spec-compiler 退役前置）
+**当前状态**：Wave 0 完成（2026-08-12），准备进入 Wave 1（spec-compiler 冻结与审计）
+
+**关键裁决**：
+- **D-061**（2026-08-11）：`src/l2/` 是 L2 语义管线唯一权威；`src/core/kernel/spec-compiler/` 编译器部分判为重复实现，冻结并逐步退役
+- **D-062**（2026-08-11）：`src/play/action-turn/playpack.json` 是机制内容权威形态；`src/play/core-mechanics/` 收缩为装载期 Linter，全线冻结
+
+**禁止触碰**：`src/core/kernel/spec-compiler/`、`src/play/core-mechanics/`
+
+**详细规则** → `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
 
 **🔴 禁止修改的目录**：
 - `src/core/kernel/spec-compiler/`（Wave 1 审计中）

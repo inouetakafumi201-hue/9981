@@ -134,19 +134,6 @@ function checkMember(
   }
 }
 
-function checkMembers(
-  registry: ReadonlySet<string>,
-  values: readonly JsonValue[],
-  code: string,
-  sourceId: string,
-  jsonPath: string,
-  family: string,
-  findings: Finding[],
-): void {
-  values.forEach((value, index) => {
-    checkMember(registry, value, code, sourceId, `${jsonPath}/${index}`, family, findings);
-  });
-}
 
 /**
  * 校验每个 profile 的 `classComposition` 只引用基类层已登记的语义 id，且组合关系被显式声明。
@@ -707,6 +694,10 @@ const VEHICLE_META_FIELDS = new Set([
   'pendingKernelOps',
   'pendingKernelOpsNote',
   'unresolvedIssues',
+  // D-038 裁决：载具内部不建模为微型场景（interior.isMicroScene 固定为 false）。
+  // interior 块是架构声明字段（isMicroScene/interactionModel/note），不是玩法参数，
+  // 因此不受能力支撑校验约束——同 metadata/description/tags 同类处理。
+  'interior',
 ]);
 
 /** 纯说明性子字段；出现在任何层级都不需要能力支撑。 */

@@ -1,33 +1,74 @@
 {
-  "id": "status_weak",
+  "id": "status.class.weak",
   "name": "虚弱",
   "category": "negative",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status_weak"
+    "sourceClass": "status.class.weak",
+    "capabilityIds": [
+      "status.capability.output_modulation"
+    ]
   },
   "duration": 2,
   "durationUnit": "turns",
   "stacking": "none",
   "stackBehavior": "extend",
   "effects": {
-    "onDamageDealt": {"damageModifier": -1, "minimum": 0, "description": "造成的伤害-1，最低为0"}
+    "onDamageDealt": {
+      "damageModifier": -1,
+      "minimum": 0,
+      "description": "造成的伤害-1，最低为0"
+    }
   },
   "breakConditions": [
-    {"type": "turn", "turns": 2, "description": "2回合后自动解除"},
-    {"type": "item", "itemId": "stimulant", "action": "use", "effect": "remove_weak", "description": "兴奋剂"},
-    {"type": "action", "actionId": "execute", "effect": "remove_on_kill", "description": "令其长眠后虚弱解除（击杀奖励）"}
+    {
+      "type": "turn",
+      "turns": 2,
+      "description": "2回合后自动解除"
+    },
+    {
+      "type": "item",
+      "itemId": "stimulant",
+      "action": "use",
+      "effect": "remove_weak",
+      "description": "兴奋剂"
+    },
+    {
+      "type": "action",
+      "actionId": "execute",
+      "effect": "remove_on_kill",
+      "description": "令其长眠后虚弱解除（击杀奖励）"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_poisoned", "type": "amplify", "description": "与中毒叠加：生存压力倍增"},
-    {"with": "status_weak", "type": "none", "description": "同名不叠加"}
+    {
+      "with": "status.class.poisoned",
+      "type": "amplify",
+      "description": "与中毒叠加：生存压力倍增"
+    },
+    {
+      "with": "status.class.weak",
+      "type": "none",
+      "description": "同名不叠加"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnDamageCalc", "OnItemUsed", "OnKill"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnDamageCalc",
+    "OnItemUsed",
+    "OnKill"
+  ],
   "icon": "skull",
   "color": "purple",
   "priority": 14,
   "description": "伤害输出-1（最低为0），持续2回合",
-  "tags": ["damage-penalty", "debuff"],
-  "source": ["物品: 虚弱弹", "NPC技能: 虚弱攻击"],
+  "tags": [
+    "damage-penalty",
+    "debuff"
+  ],
+  "source": [
+    "物品: 虚弱弹",
+    "NPC技能: 虚弱攻击"
+  ],
   "mvp": true
 }

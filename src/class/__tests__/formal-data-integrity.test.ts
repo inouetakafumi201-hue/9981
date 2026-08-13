@@ -31,6 +31,8 @@ import {
   canonicalClassIds,
   classJsonFiles,
   classSourceId,
+  getOperationChannels,
+  getRuntimeStateBoundary,
   jsonFilesUnder,
   readCatalog,
   readClassJson,
@@ -81,8 +83,8 @@ function statusFiles(): readonly string[] {
 
 function statusEntries(): readonly JsonObject[] {
   const index = readCatalog('statuses');
-  return expectArray(index['statuses'], '/statuses')
-    .map((entry, position) => expectObject(entry, `/statuses/${position}`));
+  return expectArray(index['classes'], '/classes')
+    .map((entry, position) => expectObject(entry, `/classes/${position}`));
 }
 
 describe('formal class and play data integrity', () => {
@@ -118,7 +120,7 @@ describe('formal class and play data integrity', () => {
 
   it('keeps the status index and per-status files in an exact schema-validated bijection', () => {
     const entries = statusEntries();
-    const indexedIds = entries.map((entry, position) => expectString(entry['id'], `/statuses/${position}/id`));
+    const indexedIds = entries.map((entry, position) => expectString(entry['id'], `/classes/${position}/id`));
     expect(new Set(indexedIds).size).toBe(indexedIds.length);
     expect(statusFiles()).toEqual(sortedStrings(indexedIds.map((id) => `${id}.json`)));
 
@@ -141,7 +143,7 @@ describe('formal class and play data integrity', () => {
     const unresolved: string[] = [];
     const used = new Set<string>();
     for (const entry of statusEntries()) {
-      const id = expectString(entry['id'], '/statuses/id');
+      const id = expectString(entry['id'], '/classes/id');
       const definition = expectObject(readClassJson(join(CLASS_ROOT, 'statuses', `${id}.json`)), id);
       for (const [index, capability] of expectArray(definition['capabilityIds'], `${id}/capabilityIds`).entries()) {
         const capabilityId = expectString(capability, `${id}/capabilityIds/${index}`);
@@ -156,7 +158,7 @@ describe('formal class and play data integrity', () => {
 
   it('keeps every status class distinguishable by form, category, capabilities and parameters', () => {
     const entries = statusEntries().map((entry) => {
-      const id = expectString(entry['id'], '/statuses/id');
+      const id = expectString(entry['id'], '/classes/id');
       const definition = expectObject(readClassJson(join(CLASS_ROOT, 'statuses', `${id}.json`)), id);
       const capabilityIds = expectArray(definition['capabilityIds'], `${id}/capabilityIds`)
         .map((value, index) => expectString(value, `${id}/capabilityIds/${index}`));
@@ -177,19 +179,19 @@ describe('formal class and play data integrity', () => {
   });
 
   it('keeps engine runtime bookkeeping out of the status family', () => {
-    const boundary = expectObject(readCatalog('statuses')['runtimeStateBoundary'], '/runtimeStateBoundary');
+    const boundary = getRuntimeStateBoundary(readCatalog('statuses'));
     const tokens = expectArray(boundary['forbiddenConceptTokens'], '/forbiddenConceptTokens')
       .map((value, index) => expectString(value, `/forbiddenConceptTokens/${index}`));
     const entries = statusEntries().map((entry) => ({
-      id: expectString(entry['id'], '/statuses/id'),
-      name: expectString(entry['name'], '/statuses/name'),
-      path: `statuses/${expectString(entry['id'], '/statuses/id')}.json`,
+      id: expectString(entry['id'], '/classes/id'),
+      name: expectString(entry['name'], '/classes/name'),
+      path: `statuses/${expectString(entry['id'], '/classes/id')}.json`,
     }));
     expect(formatViolations(findRuntimeStateDisguises(entries, tokens))).toEqual([]);
   });
 
   it('keeps every status class paired with exactly one play profile', () => {
-    const classIds = statusEntries().map((entry) => expectString(entry['id'], '/statuses/id'));
+    const classIds = statusEntries().map((entry) => expectString(entry['id'], '/classes/id'));
     const profileRoot = join(PLAY_PROFILE_ROOT, 'statuses');
     const profileFiles = readdirSync(profileRoot)
       .filter((name) => /^status_[a-z_]+\.json$/.test(name))
@@ -207,8 +209,8 @@ describe('formal class and play data integrity', () => {
 
   it('validates every damage and vulnerability record against its single-record schema', () => {
     const cases = [
-      ['damage-types', 'damageTypes', 'damage-type.schema.json'],
-      ['vulnerability-types', 'vulnerabilityTypes', 'vulnerability-type.schema.json'],
+      ['damage-types', 'classes', 'damage-type.schema.json'],
+      ['vulnerability-types', 'classes', 'vulnerability-type.schema.json'],
     ] as const;
 
     for (const [dir, field, schemaName] of cases) {
@@ -311,8 +313,7 @@ describe('play layer references into the class layer', () => {
     const registry = createFullHarness(defaultSeedDefs()).registry;
     const registeredOps = new Set(registry.listOpNames());
     const vehicleCatalog = readCatalog('vehicles');
-    const operationChannels = expectArray(vehicleCatalog['operationChannels'], '/operationChannels')
-      .map((value, index) => expectString(value, `/operationChannels/${index}`));
+    const operationChannels = getOperationChannels(vehicleCatalog);
     expect(operationChannels.filter((op) => !registeredOps.has(op))).toEqual([]);
 
     const mismatches: string[] = [];

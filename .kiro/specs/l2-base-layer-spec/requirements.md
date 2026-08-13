@@ -15,12 +15,10 @@
 - `docs/L2_基类层/04_物品装备.md`
 - `docs/L2_基类层/06_UGC系统.md`
 - `docs/L2_基类层/07_AI系统.md`
-- `docs/L2_基类层/08_图形化与UI.md`
-- `docs/L2_基类层/09_开发路线图.md`
-- `docs/L2_基类层/10_技术栈.md`
-- `docs/L2_基类层/11_测试与质量.md`
 - `docs/_术语表与废案清单.md`
 - `docs/访谈决策记录.md`
+
+> **2026-08-11 架构变更**：`08_图形化与UI`、`09_开发路线图`、`10_技术栈`、`11_测试与质量` 已从 L2 迁移至正交域（表现系统与工程治理），不再作为 L2 权威来源。详见交接项 H-L2-01~H-L2-03。
 
 来源发生冲突时，本规范采用以下优先级：L0 规范宪法 → 已确认访谈决策 → L1 职责边界与不变量 → L2 定稿契约 → L2 待定内容 → 历史示例。低优先级来源不能覆盖高优先级来源；同优先级来源的实质冲突必须保留为 `Unresolved_Item`，不得由编译器、验证器或实现者自行选择结论。
 
@@ -80,7 +78,7 @@
 - **Attachment_Family**：状态附件、属性附件和技能附件的宿主、来源、持续与回收接口组成的契约族。
 - **AI_Behavior_Family**：供 L3 声明状态、目标、意图、转换和感知参数的 AI 行为契约族。
 - **Read_Only_Semantic_Projection**：从已验证定义和运行时状态派生、不能直接写入语义状态的受限视图。
-- **Presentation_Descriptor**：UI 使用的资源语义、交互意图、姿态、成本类别、可访问性标签和素材引用描述。【2026-08-08 权威变更：已删除"攻击形状"字段，判定为冗余设计，见本文档 Requirement 8.3 变更说明与 docs/L0_规范宪法.md 最新内容。】
+- **Presentation_Descriptor**：UI 使用的资源语义、交互意图、姿态、成本类别、可访问性标签和素材引用描述。【2026-08-08 权威变更：已删除"攻击形状"字段，判定为冗余设计，见本文档 Requirement 8.3 变更说明与 docs/L0_规范宪法.md 最新内容。2026-08-11 所有权迁移：`Presentation_Descriptor` 所有权已迁移至表现系统端口契约（见交接项 H-L2-02），L2 仅提供通用只读语义投影。】
 - **Declarative_JSON**：只描述数据、条件、引用和已知效果组合，不包含任意代码、命令式循环或变量赋值的 JSON。
 - **Semantic_Field**：影响类型、规则、参数、引用或运行结果的字段。
 - **Presentation_Field**：只影响名称、图标、纹理、动画或辅助文本且不改变规则结果的字段。
@@ -403,3 +401,17 @@
 11. WHEN a future decision resolves an Unresolved_Item, THE Specification_Compiler SHALL require the resolving decision identifier and Source_Record before promoting the item to a Normative_Contract.
 12. WHEN a Historical_Example is displayed in documentation or tooling, THE UI_Adapter SHALL label the example as non-default and non-normative.
 13. WHEN an L3_Profile value is displayed in L2 documentation or tooling, THE UI_Adapter SHALL label the value with L3 ownership and source provenance.
+
+
+---
+
+## 交接项（Handoff Items）
+
+以下为跨 Spec 架构变更产生的交接项。按架构决策原则，不跨 Spec 改对方交付物，需要对方改动时写成交接项登记。
+
+| 编号 | 目标 Spec/文档 | 待办内容 | 依据 |
+|------|--------------|---------|------|
+| H-L2-01 | 表现系统 | `docs/L2_基类层/08_图形化与UI.md` 已迁移至 `docs/表现系统/01_图形化与UI.md`。表现系统需确认该文档作为表现层权威来源，并在 `.kiro/specs/wakeup-ui-animation/requirements.md` §2.1 S-06 中正确引用新路径。 | 2026-08-11 架构重组：表现从 L2 迁移至正交域 |
+| H-L2-02 | 表现系统端口契约 | `Presentation_Descriptor` 所有权已从 L2 迁移至表现系统端口契约。L2 仅提供通用只读语义投影接口（`UI_Adapter`），不再拥有 `Presentation_Descriptor` 的字段定义权威。表现系统需定义完整的 `Presentation_Descriptor` Schema 与端口契约。 | 2026-08-11 所有权裁决；`src/l2/adapters/ui-adapter.ts` 已登记迁移债务 |
+| H-L2-03 | 工程治理 | `docs/L2_基类层/09_开发路线图.md`、`10_技术栈.md`、`11_测试与质量.md` 已迁移至 `docs/工程治理/**`（具体路径待工程治理域确认）。工程治理域需确认这些文档的最终归属路径与维护责任。 | 2026-08-11 架构重组：工程横切关注点从 L2 迁移至正交域 |
+

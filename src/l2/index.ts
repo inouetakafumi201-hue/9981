@@ -14,5 +14,13 @@ export * as registry from './registry/index.js';
 export * as adapters from './adapters/index.js';
 export * as testing from './testing/index.js';
 
+// 空间与物品领域的稳定公共面；与 model namespace 同步转出。
+export * from './model/space-items-domain-ids.js';
+export * from './model/space-items-structural-bounds.js';
+export * from './model/space-items-numeric-ownership.js';
+export * from './model/space-items-diagnostic-categories.js';
+export * from './model/space-items-unresolved.js';
+export * from './model/space-items-contracts.js';
+
 export * from './kernel/kernel-contract.js';
 export * from './kernel/op-registry-adapter.js';

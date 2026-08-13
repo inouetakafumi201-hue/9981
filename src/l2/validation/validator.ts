@@ -34,6 +34,15 @@ import { validateActionsAndGateways } from './action-gateway-rules.js';
 import { validateSpatial } from './spatial-rules.js';
 import { validateItemsAndVehicles } from './item-vehicle-rules.js';
 import { validateEffectsAndAi } from './effect-ai-rules.js';
+import { validateUnresolvedItems } from './space-items-unresolved-gate-rules.js';
+import { validateWriteChannel } from './space-items-write-channel-rules.js';
+import { validateSceneRules } from './space-items-scene-rules.js';
+import { validateMicroSceneRules } from './space-items-micro-scene-rules.js';
+import { validateTransitionRules } from './space-items-transition-rules.js';
+import { validateItemRules } from './space-items-item-rules.js';
+import { validateVehicleRules } from './space-items-vehicle-rules.js';
+import { validateContainerCapabilityBinding } from './space-items-container-rules.js';
+import { validateReferenceCapabilityShape } from './space-items-reference-shape.js';
 
 /** 全部定义级规则，按确定性顺序执行。 */
 export const DEFINITION_RULES: readonly DefinitionRule[] = Object.freeze([
@@ -51,6 +60,16 @@ export const DEFINITION_RULES: readonly DefinitionRule[] = Object.freeze([
   validateSpatial,
   validateItemsAndVehicles,
   validateEffectsAndAi,
+  // 空间与物品基类层特定规则（按依赖顺序）
+  validateUnresolvedItems,
+  validateWriteChannel,
+  validateSceneRules,
+  validateMicroSceneRules,
+  validateTransitionRules,
+  validateItemRules,
+  validateVehicleRules,
+  validateContainerCapabilityBinding,
+  validateReferenceCapabilityShape,
 ]);
 
 export interface BuildContextInput {

@@ -1,0 +1,393 @@
+﻿
+> wakeup-meta-kernel@0.1.0 test
+> vitest run src/class/__tests__/formal-data-integrity.test.ts --run --reporter=verbose
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/coding/WakeUp[39m
+
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mstrictly parses every formal JSON file without duplicate members or executable keys[33m 385[2mms[22m[39m
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mloads the item catalog through its runtime TypeScript contract and freezes nested data
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mkeeps the status index and per-status files in an exact schema-validated bijection
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mresolves every per-status capability reference against the status capability registry
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mkeeps every status class distinguishable by form, category, capabilities and parameters
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mkeeps engine runtime bookkeeping out of the status family
+ [31m脳[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mkeeps every status class paired with exactly one play profile
+[31m   鈫?expected 'status_aiming.json' to be 'status.class.aiming.json' // Object.is equality[39m
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mformal class and play data integrity[2m > [22mvalidates every damage and vulnerability record against its single-record schema
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mgameplay value ownership[2m > [22mkeeps concrete gameplay fields and unclassified numbers out of class catalogs
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mgameplay value ownership[2m > [22mdeclares which field names the play layer owns for every catalog[33m 319[2mms[22m[39m
+ [31m脳[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mplay layer references into the class layer[2m > [22mresolves every play class/status reference against the canonical class catalogs[33m 541[2mms[22m[39m
+[31m   鈫?expected [ 鈥?19) ] to deeply equal [][39m
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mplay layer references into the class layer[2m > [22muses only operation names registered by the full engine harness in every play profile
+ [31m脳[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mplay layer references into the class layer[2m > [22muses only registered operation channels and keeps each vehicle action declaration exact
+[31m   鈫?getOperationChannels is not a function[39m
+ [32m鉁?[39m src/class/__tests__/formal-data-integrity.test.ts[2m > [22mstrict formal-data parser regression[2m > [22mrejects duplicate members before ordinary JSON parsing can hide them
+
+node.exe : [31m鈳
+幆鈳幆鈳幆鈳?[1m[7m
+ Failed Tests 3 
+[27m[22m鈳幆鈳幆鈳
+幆鈳?[39m
+所在位置 行:1 字符: 1
++ & "C:\Program F
+iles\nodejs/node.
+exe" "C:\Program 
+Files\nodejs/node
+_mo ...
++ ~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryIn 
+   fo            
+  : NotSpecifi   
+ ed: ([31m鈳    
+幆鈳幆鈳幆鈳...鈳    
+幆鈳幆鈳幆鈳?[3    9m
+:String) [    ], 
+RemoteExc    epti
+on
+    + FullyQuali 
+   fiedErrorId   
+  : NativeComm   
+ andError
+ 
+
+[31m[1m[7m FAI
+L [27m[22m[39m
+ src/class/__test
+s__/formal-data-i
+ntegrity.test.ts
+[2m > [22mformal
+ class and play d
+ata integrity[2m
+ > [22mkeeps eve
+ry status class p
+aired with exactl
+y one play profil
+e
+[31m[1mAssertio
+nError[22m: expe
+cted 'status_aimi
+ng.json' to be 's
+tatus.class.aimin
+g.json' // Object
+.is equality[39m
+
+Expected: [32m"s
+tatus[7m.class.
+[27maiming.json"
+[39m
+Received: [31m"s
+tatus[7m_[27mai
+ming.json"[39m
+
+[36m [2m鉂?[22m 
+src/class/__tests
+__/formal-data-in
+tegrity.test.ts:
+[2m205:20[22m[3
+9m
+    [90m203| [3
+9m      [35mcons
+t[39m id [33m=
+[39m [34mexpectS
+tring[39m(profil
+e[[32m'id'[39m]
+[33m,[39m [32m
+`[39m[36m${[39
+mfile[36m}[39m
+[32m/id`[39m)[3
+3m;[39m
+    [90m204| [3
+9m      [35mcons
+t[39m compositio
+n [33m=[39m [3
+4mexpectObject[3
+9m(profile[[32m'
+classComposition'
+[39m][33m,[39m
+ [32m`[39m[36m
+$[39m鈥?    [90m
+205| [39m      
+[34mexpect[39m(f
+ile)[33m.[39m[
+34mtoBe[39m([32
+m`[39m[36m${[3
+9mid[36m}[39m[
+32m.json`[39m)[
+33m;[39m
+    [90m   | [3
+9m               
+    [31m^[39m
+    [90m206| [3
+9m      [34mexpe
+ct[39m(compositi
+on[[32m'sourceCl
+ass'[39m])[33m.
+[39m[34mtoBe[3
+9m(id)[33m;[39m
+    [90m207| [3
+9m    }
+
+[31m[2m鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆[1/3]鈳
+?[22m[39m
+
+[31m[1m[7m FAI
+L [27m[22m[39m
+ src/class/__test
+s__/formal-data-i
+ntegrity.test.ts
+[2m > [22mplay l
+ayer references i
+nto the class lay
+er[2m > [22mres
+olves every play 
+class/status refe
+rence against the
+ canonical class 
+catalogs
+[31m[1mAssertio
+nError[22m: expe
+cted [ 鈥?19) ] to
+ deeply equal []
+[39m
+
+[32m- Expected[
+39m
+[31m+ Received[
+39m
+
+[32m- Array [][
+39m
+[31m+ Array [[3
+9m
+[31m+   "statuse
+s/status_aiming.j
+son/classComposit
+ion/sourceClass -
+> status.class.ai
+ming",[39m
+[31m+   "statuse
+s/status_blocking
+.json/classCompos
+ition/sourceClass
+ -> status.class.
+blocking",[39m
+[31m+   "statuse
+s/status_burning.
+json/classComposi
+tion/sourceClass 
+-> status.class.b
+urning",[39m
+[31m+   "statuse
+s/status_conceale
+d.json/classCompo
+sition/sourceClas
+s -> status.class
+.concealed",[39m
+[31m+   "statuse
+s/status_downed.j
+son/classComposit
+ion/sourceClass -
+> status.class.do
+wned",[39m
+[31m+   "statuse
+s/status_frozen.j
+son/classComposit
+ion/sourceClass -
+> status.class.fr
+ozen",[39m
+[31m+   "statuse
+s/status_hastened
+.json/classCompos
+ition/sourceClass
+ -> status.class.
+hastened",[39m
+[31m+   "statuse
+s/status_heavy.js
+on/classCompositi
+on/sourceClass ->
+ status.class.hea
+vy",[39m
+[31m+   "statuse
+s/status_knocked_
+down.json/classCo
+mposition/sourceC
+lass -> status.cl
+ass.knocked_down"
+,[39m
+[31m+   "statuse
+s/status_lockpick
+ing.json/classCom
+position/sourceCl
+ass -> status.cla
+ss.lockpicking",
+[39m
+[31m+   "statuse
+s/status_overload
+ed.json/classComp
+osition/sourceCla
+ss -> status.clas
+s.overloaded",[3
+9m
+[31m+   "statuse
+s/status_poisoned
+.json/classCompos
+ition/sourceClass
+ -> status.class.
+poisoned",[39m
+[31m+   "statuse
+s/status_radiatio
+n.json/classCompo
+sition/sourceClas
+s -> status.class
+.radiation",[39m
+[31m+   "statuse
+s/status_sleeping
+.json/classCompos
+ition/sourceClass
+ -> status.class.
+sleeping",[39m
+[31m+   "statuse
+s/status_slowed.j
+son/classComposit
+ion/sourceClass -
+> status.class.sl
+owed",[39m
+[31m+   "statuse
+s/status_staggere
+d.json/classCompo
+sition/sourceClas
+s -> status.class
+.staggered",[39m
+[31m+   "statuse
+s/status_stunned.
+json/classComposi
+tion/sourceClass 
+-> status.class.s
+tunned",[39m
+[31m+   "statuse
+s/status_travelin
+g.json/classCompo
+sition/sourceClas
+s -> status.class
+.traveling",[39m
+[31m+   "statuse
+s/status_weak.jso
+n/classCompositio
+n/sourceClass -> 
+status.class.weak
+",[39m
+[31m+ ][39m
+
+[36m [2m鉂?[22m 
+src/class/__tests
+__/formal-data-in
+tegrity.test.ts:
+[2m286:24[22m[3
+9m
+    [90m284| [3
+9m      })[33m;
+[39m
+    [90m285| [3
+9m    }
+    [90m286| [3
+9m    [34mexpect
+[39m(unresolved)
+[33m.[39m[34mt
+oEqual[39m([])[
+33m;[39m
+    [90m   | [3
+9m               
+        [31m^[3
+9m
+    [90m287| [3
+9m  })[33m;[39m
+    [90m288| [3
+9m
+
+[31m[2m鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆[2/3]鈳
+?[22m[39m
+
+[31m[1m[7m FAI
+L [27m[22m[39m
+ src/class/__test
+s__/formal-data-i
+ntegrity.test.ts
+[2m > [22mplay l
+ayer references i
+nto the class lay
+er[2m > [22muse
+s only registered
+ operation channe
+ls and keeps each
+ vehicle action d
+eclaration exact
+[31m[1mTypeErro
+r[22m: getOperat
+ionChannels is no
+t a function[39m
+[36m [2m鉂?[22m 
+src/class/__tests
+__/formal-data-in
+tegrity.test.ts:
+[2m316:31[22m[3
+9m
+    [90m314| [3
+9m    [35mconst
+[39m registeredOp
+s [33m=[39m [3
+5mnew[39m [33mS
+et[39m(registry
+[33m.[39m[34mli
+stOpNames[39m())
+[33m;[39m
+    [90m315| [3
+9m    [35mconst
+[39m vehicleCatal
+og [33m=[39m [
+34mreadCatalog[3
+9m([32m'vehicles
+'[39m)[33m;[39
+m
+    [90m316| [3
+9m    [35mconst
+[39m operationCha
+nnels [33m=[39m
+ [34mgetOperatio
+nChannels[39m(ve
+hicleCatalog)[33
+m;[39m
+    [90m   | [3
+9m               
+               [
+31m^[39m
+    [90m317| [3
+9m    [34mexpect
+[39m(operationCh
+annels[33m.[39m
+[34mfilter[39m(
+(op) [33m=>[39m
+ [33m![39mregis
+teredOps[33m.[3
+9m[34mhas[39m(o
+p)))[33m.[39m[
+34mt[39m鈥?    [
+90m318| [39m
+
+[31m[2m鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳
+幆鈳幆鈳幆鈳幆[3/3]鈳
+?[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (14)[39m
+[2m   Start at [22m 16:48:42
+[2m   Duration [22m 4.05s[2m (transform 733ms, setup 0ms, collect 1.14s, tests 2.04s, environment 0ms, prepare 147ms)[22m
+

@@ -1,33 +1,72 @@
 {
-  "id": "status_knocked_down",
+  "id": "status.class.knocked_down",
   "name": "击倒",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_knocked_down"
+    "sourceClass": "status.class.knocked_down",
+    "capabilityIds": [
+      "status.capability.posture"
+    ]
   },
   "duration": "until_stand",
   "durationUnit": "until_event",
   "stacking": "none",
   "stackBehavior": "unique",
   "effects": {
-    "onAction": {"allowed": ["crawl", "drop_item", "stand_up"], "description": "只能爬行、丢弃物品、站起"},
-    "onMovement": {"type": "crawl", "cost": 1, "scope": "micro_scene", "description": "可爬行（1 AP），范围限制在微型场景内"},
-    "onStandUp": {"cost": 1, "description": "站起消耗1 AP"}
+    "onAction": {
+      "allowed": [
+        "crawl",
+        "drop_item",
+        "stand_up"
+      ],
+      "description": "只能爬行、丢弃物品、站起"
+    },
+    "onMovement": {
+      "type": "crawl",
+      "cost": 1,
+      "scope": "micro_scene",
+      "description": "可爬行（1 AP），范围限制在微型场景内"
+    },
+    "onStandUp": {
+      "cost": 1,
+      "description": "站起消耗1 AP"
+    }
   },
   "breakConditions": [
-    {"type": "action", "actionId": "stand_up", "apCost": 1, "effect": "recover", "description": "1 AP 站起"}
+    {
+      "type": "action",
+      "actionId": "stand_up",
+      "apCost": 1,
+      "effect": "recover",
+      "description": "1 AP 站起"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_downed", "type": "none", "description": "与零血倒地（濒死）是不同状态，不冲突"}
+    {
+      "with": "status.class.downed",
+      "type": "none",
+      "description": "与零血倒地（濒死）是不同状态，不冲突"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnStandUp"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnActionCheck",
+    "OnStandUp"
+  ],
   "icon": "fall",
   "color": "orange",
   "priority": 26,
   "description": "普通倒地状态，可爬行、站起（1 AP），不可执行其他动作",
-  "tags": ["knockdown", "movement-restricted", "debuff"],
-  "source": ["技能: 重击", "动作: 过肩摔（降级为可选）"],
+  "tags": [
+    "knockdown",
+    "movement-restricted",
+    "debuff"
+  ],
+  "source": [
+    "技能: 重击",
+    "动作: 过肩摔（降级为可选）"
+  ],
   "mvp": true,
   "notes": "区别于零血倒地（濒死），击倒是可恢复的倒地状态"
 }

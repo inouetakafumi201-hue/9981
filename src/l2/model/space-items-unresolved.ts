@@ -25,16 +25,17 @@ import type {
 } from './space-items-diagnostic-categories.js';
 import { codeOf } from './space-items-diagnostic-categories.js';
 import { compareStrings } from './ordering.js';
+import { deepFreeze } from './immutable.js';
 
 export type { UnresolvedItemId } from './space-items-diagnostic-categories.js';
 
 /** 未决项的冻结状态（要求 13、14.5）。 */
-export const UNRESOLVED_FREEZE_STATUSES = [
+export const UNRESOLVED_FREEZE_STATUSES = Object.freeze([
   'fully-unresolved',
   'structure-frozen-numeric-unresolved',
   'partially-frozen',
   'closed',
-] as const;
+] as const);
 
 export type UnresolvedFreezeStatus = (typeof UNRESOLVED_FREEZE_STATUSES)[number];
 
@@ -98,13 +99,13 @@ function reviewSource(section: string, decisionId: DecisionId, fingerprint: stri
 }
 
 function record(entry: UnresolvedItemRecord): UnresolvedItemRecord {
-  return Object.freeze({
+  return deepFreeze({
     ...entry,
-    upstreamIds: Object.freeze(entry.upstreamIds.slice()),
-    closingDecisionIds: Object.freeze(entry.closingDecisionIds.slice()),
-    forbiddenSurfaces: Object.freeze([...entry.forbiddenSurfaces].sort(compareStrings)),
-    sourceRecords: Object.freeze(entry.sourceRecords.slice()),
-  });
+    upstreamIds: entry.upstreamIds.slice(),
+    closingDecisionIds: entry.closingDecisionIds.slice(),
+    forbiddenSurfaces: [...entry.forbiddenSurfaces].sort(compareStrings),
+    sourceRecords: entry.sourceRecords.slice(),
+  }) as UnresolvedItemRecord;
 }
 
 const U001: UnresolvedItemRecord = record({

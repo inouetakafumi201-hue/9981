@@ -1,31 +1,62 @@
 {
-  "id": "status_hastened",
+  "id": "status.class.hastened",
   "name": "加速",
   "category": "positive",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status_hastened"
+    "sourceClass": "status.class.hastened",
+    "capabilityIds": [
+      "status.capability.action_efficiency"
+    ]
   },
   "duration": 2,
   "durationUnit": "turns",
   "stacking": "none",
   "stackBehavior": "extend",
   "effects": {
-    "onAction": {"actionType": "move", "apModifier": "-1", "minimum": 0, "description": "移动消耗-1 AP，最低为0"}
+    "onAction": {
+      "actionType": "move",
+      "apModifier": "-1",
+      "minimum": 0,
+      "description": "移动消耗-1 AP，最低为0"
+    }
   },
   "breakConditions": [
-    {"type": "turn", "turns": 2, "description": "2回合后自动解除"},
-    {"type": "damage", "effect": "remove", "description": "受击时解除"}
+    {
+      "type": "turn",
+      "turns": 2,
+      "description": "2回合后自动解除"
+    },
+    {
+      "type": "damage",
+      "effect": "remove",
+      "description": "受击时解除"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_slowed", "type": "neutralize", "description": "与迟缓互斥，叠加时取较高效果（+1 vs -1 = 抵消）"}
+    {
+      "with": "status.class.slowed",
+      "type": "neutralize",
+      "description": "与迟缓互斥，叠加时取较高效果（+1 vs -1 = 抵消）"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnDamageTaken"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnActionCheck",
+    "OnDamageTaken"
+  ],
   "icon": "wind",
   "color": "lightblue",
   "priority": 18,
   "description": "移动消耗-1 AP，持续2回合",
-  "tags": ["movement-bonus", "speed", "buff"],
-  "source": ["物品: 加速药水", "环境: 加速区域"],
+  "tags": [
+    "movement-bonus",
+    "speed",
+    "buff"
+  ],
+  "source": [
+    "物品: 加速药水",
+    "环境: 加速区域"
+  ],
   "mvp": true
 }

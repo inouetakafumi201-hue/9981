@@ -20,7 +20,7 @@
   "stackable": false,
   "grantedStates": [
     {
-      "id": "status_stunned",
+      "id": "status.class.stunned",
       "target": "target",
       "condition": "stunRoll == 1",
       "duration": 1,
@@ -46,7 +46,7 @@
         },
         {
           "op": "attach.add",
-          "def": "status_stunned",
+          "def": "status.class.stunned",
           "target": "{target}",
           "durationTurns": 1,
           "condition": "stunRoll == 1"

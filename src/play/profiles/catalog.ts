@@ -308,34 +308,51 @@ export interface ClassLayerIndex {
  * 详见 `docs/L0_规范宪法.md`、`docs/L2_基类层/基类层定义.md` §4.3 最新权威内容。
  */
 
-function tierIdsByToken(
+/**
+ * W2 统一信封迁移（2026-08-12）：weaponClasses/weightTiers/rangeTiers 等顶层字段已迁入
+ * `valueSets` 数组（每项 {id, tokens:[{id, playLayerTokens:[string,...]}]}）。
+ * 档位 token 由 `playLayerTokens[0]` 给出（旧结构用顶层 `token` 字段）。
+ */
+function findValueSet(
   catalog: Readonly<Record<string, JsonValue>>,
-  collection: string,
+  valueSetId: string,
+  path: string,
+): readonly JsonValue[] {
+  const valueSets = catalog['valueSets'];
+  if (!Array.isArray(valueSets)) throw new TypeError(`${path}/valueSets must be a JSON array`);
+  const vs = valueSets.find((entry): entry is Record<string, JsonValue> => {
+    return typeof entry === 'object' && entry !== null && !Array.isArray(entry)
+      && (entry as Record<string, JsonValue>)['id'] === valueSetId;
+  });
+  if (vs === undefined) throw new TypeError(`${path}/valueSets: cannot find valueSet id=${valueSetId}`);
+  return asArray((vs as Record<string, JsonValue>)['tokens'], `${path}/valueSets[id=${valueSetId}]/tokens`);
+}
+
+function tierIdsByTokenFromValueSet(
+  catalog: Readonly<Record<string, JsonValue>>,
+  valueSetId: string,
   path: string,
 ): ReadonlyMap<string, string> {
   const byToken = new Map<string, string>();
-  for (const [index, entry] of asArray(catalog[collection], `${path}/${collection}`).entries()) {
-    const record = asObject(entry, `${path}/${collection}/${index}`);
-    const id = requiredString(record['id'], `${path}/${collection}/${index}/id`);
-    const token = record['token'];
-    byToken.set(typeof token === 'string' && token.length > 0 ? token : id.slice(id.lastIndexOf('.') + 1), id);
+  for (const [index, entry] of findValueSet(catalog, valueSetId, path).entries()) {
+    const record = asObject(entry, `${path}/valueSets[id=${valueSetId}]/tokens/${index}`);
+    const id = requiredString(record['id'], `${path}/valueSets[id=${valueSetId}]/tokens/${index}/id`);
+    // playLayerTokens[0] 是玩法层用于引用该档位的 token
+    const playLayerTokens = optionalStrings(record['playLayerTokens']);
+    const token = playLayerTokens[0] ?? id.slice(id.lastIndexOf('.') + 1);
+    byToken.set(token, id);
   }
   return byToken;
 }
 
-/** 读取档位集合声明的 token；缺 token 时退回按 id 末段推导。 */
-function tierTokens(
+function tierTokensFromValueSet(
   catalog: Readonly<Record<string, JsonValue>>,
-  collection: string,
+  valueSetId: string,
   path: string,
 ): ReadonlySet<string> {
-  return new Set(asArray(catalog[collection], `${path}/${collection}`).map((entry, index) => {
-    const record = asObject(entry, `${path}/${collection}/${index}`);
-    const token = record['token'];
-    if (typeof token === 'string' && token.length > 0) return token;
-    const id = requiredString(record['id'], `${path}/${collection}/${index}/id`);
-    return id.slice(id.lastIndexOf('.') + 1);
-  }));
+  return new Set(
+    [...tierIdsByTokenFromValueSet(catalog, valueSetId, path).keys()]
+  );
 }
 
 /** 读取基类层语义目录并建立索引。基类层文件在此只读，不做任何写入。 */
@@ -349,18 +366,27 @@ export function loadClassLayerIndex(): ClassLayerIndex {
   const vulnerabilityTypes = loadClassCatalog('vulnerability-types/index.json');
 
   return {
-    weapons: readFamily(weapons, 'weaponClasses', 'weapons'),
+    // W2 统一信封迁移（2026-08-12）：所有目录的语义集合字段统一为 'classes'。
+    // 旧字段名：weapons→weaponClasses, npcs→behaviorClasses, statuses→statuses
+    weapons: readFamily(weapons, 'classes', 'weapons'),
     items: readFamily(items, 'classes', 'items'),
-    npcs: readFamily(npcs, 'behaviorClasses', 'npcs'),
+    npcs: readFamily(npcs, 'classes', 'npcs'),
     vehicles: readFamily(vehicles, 'classes', 'vehicles'),
-    statuses: readFamily(statuses, 'statuses', 'statuses'),
-    damageClasses: idSet(weapons, 'damageClasses', 'weapons'),
-    weightTierTokens: tierTokens(weapons, 'weightTiers', 'weapons'),
-    rangeTierTokens: tierTokens(weapons, 'rangeTiers', 'weapons'),
-    weightTierIdByToken: tierIdsByToken(weapons, 'weightTiers', 'weapons'),
-    rangeTierIdByToken: tierIdsByToken(weapons, 'rangeTiers', 'weapons'),
-    damageTypes: idSet(damageTypes, 'damageTypes', 'damage-types'),
-    vulnerabilityTypes: idSet(vulnerabilityTypes, 'vulnerabilityTypes', 'vulnerability-types'),
+    statuses: readFamily(statuses, 'classes', 'statuses'),
+    // damageClasses 不再是 weapons 顶层数组；W2 迁移后 damage-class.* 条目在
+    // weapons.classes 里，用前缀过滤取出。
+    damageClasses: new Set(
+      Array.from(readFamily(weapons, 'classes', 'weapons').classes.keys())
+        .filter((id) => id.startsWith('damage-class.')),
+    ),
+    // weightTiers/rangeTiers 迁入 weapons.valueSets 数组，token 用 playLayerTokens[0]。
+    weightTierTokens: tierTokensFromValueSet(weapons, 'weapon.valueset.weight_tiers', 'weapons'),
+    rangeTierTokens: tierTokensFromValueSet(weapons, 'weapon.valueset.range_tiers', 'weapons'),
+    weightTierIdByToken: tierIdsByTokenFromValueSet(weapons, 'weapon.valueset.weight_tiers', 'weapons'),
+    rangeTierIdByToken: tierIdsByTokenFromValueSet(weapons, 'weapon.valueset.range_tiers', 'weapons'),
+    // damage-types 与 vulnerability-types 的集合字段已由 W2 统一为 'classes'。
+    damageTypes: idSet(damageTypes, 'classes', 'damage-types'),
+    vulnerabilityTypes: idSet(vulnerabilityTypes, 'classes', 'vulnerability-types'),
     itemClasses: idSet(items, 'classes', 'items'),
   };
 }

@@ -8,8 +8,8 @@
     "weaponClassId": "weapon-class.firearm",
     "damageClassId": "damage-class.firearm",
     "capabilityIds": [
+      "weapon.capability.ready_stance",
       "weapon.capability.ammunition_binding",
-      "weapon.capability.burst_attribute",
       "weapon.capability.damage_reference",
       "weapon.capability.handling_profile",
       "weapon.capability.range_profile",
@@ -89,6 +89,11 @@
   },
   "unresolvedIssues": [],
   "weaponParameters": {
+    "weapon.capability.mount_weapon": {
+      "mountActionId": "action.mount_rifle",
+      "autoTargetScope": "subscene",
+      "breaksOnMove": true
+    },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",
       "ammunitionTypeField": "ammoType",

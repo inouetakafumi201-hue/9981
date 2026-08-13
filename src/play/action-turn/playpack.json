@@ -13,7 +13,7 @@
       "weaknessStagger": "采用 5.4 与 6.4 的完整连锁：弱点命中必然施加失衡。",
       "initiativeDie": "D-054 裁决：投点固定使用 1d6。原始骰点为内部瞬时比较值（Internal_Metric），仅作为最高点差距结算法（allocateAp）的输入，不作为玩家可见玩法数值持久展示；玩家可见产出为 AP（1-3，未分配以离散状态呈现）与行动顺序，均落在 1-5 内，故不违反 L0 第四条。",
       "apAllocation": "AP 按 wakeup-core-mechanics Requirement 5 的差值分配算法（allocateAp）在投点相位结算：2 人局最终点数不低于对方者得 2AP、差 1 得 1AP、差≥2 未分配、不产生 3AP；3+ 人局唯一最高且领先第二高≥2 得 3AP、并列最高或领先不足 2 得 2AP、差 1 得 1AP、差≥2 未分配。原始骰点不再直接充当 AP。",
-      "singleParticipant": "U-002 未冻结：仅 1 名合法投点参与者时，投点结算 abort 阻塞，不推断默认 AP（取代 01 文档 D-037 的单人 2AP 旧陈述，因 wakeup-core-mechanics 为完全权威）。",
+      "singleParticipant": "U-002 已裁决（D-037）：仅 1 名合法投点参与者时，按差值分配算法（apTierCap）自然得 2 AP（算法在屏蔽 3 AP 档后的自然结果，非特例分支）。",
       "parryProbability": "文档未定义成功率；实现为满足声明条件时确定性拦截，不擅自加入概率。"
     },
     "eventContracts": {
@@ -376,12 +376,6 @@
               "be": { "op": "len", "args": [ { "path": "world.props.actionTurn.queue" } ] }
             },
             {
-              "if": { "op": "eq", "args": [ { "var": "apParticipantCount" }, 1 ] },
-              "then": [
-                { "abort": "U-002 未冻结（wakeup-core-mechanics Requirement 5.11）：仅 1 名投点参与者时标准 AP 分配未裁决，投点结算阻塞，不推断默认 AP。" }
-              ]
-            },
-            {
               "let": "apMaxTier",
               "be": {
                 "op": "refGet",
@@ -507,7 +501,7 @@
                 },
                 { "let": "apValue", "be": 0 },
                 {
-                  "if": { "op": "eq", "args": [ { "var": "apParticipantCount" }, 2 ] },
+                  "if": { "op": "lte", "args": [ { "var": "apParticipantCount" }, 2 ] },
                   "then": [
                     {
                       "if": { "op": "eq", "args": [ { "var": "apTier" }, { "var": "apMaxTier" } ] },

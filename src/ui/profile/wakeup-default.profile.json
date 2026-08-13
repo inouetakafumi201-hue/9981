@@ -1,0 +1,51 @@
+{
+  "version": "1.1.0",
+  "visualDirection": {
+    "interactionComponents": "pixel-art",
+    "mapBackground": "sketch",
+    "compositing": "separated-foreground-background",
+    "authoritativeSource": "D-024"
+  },
+  "ceremonialActionSemantics": [
+    { "actionSemanticId": "vault-window", "authoritativeSource": "D-026" },
+    { "actionSemanticId": "jump-window", "authoritativeSource": "D-026" },
+    { "actionSemanticId": "lay-to-rest", "authoritativeSource": "D-026" },
+    { "actionSemanticId": "parry-trigger", "authoritativeSource": "D-032" }
+  ],
+  "salienceTiers": [
+    {
+      "stateSemanticId": "weakness",
+      "tier": "public-persistent",
+      "renderer": "above-head-icon",
+      "authoritativeSource": "D-031"
+    },
+    {
+      "stateSemanticId": "aiming",
+      "tier": "public-on-inspect",
+      "renderer": "red-dotted-aim-line",
+      "authoritativeSource": "D-033"
+    },
+    {
+      "stateSemanticId": "parry-ready",
+      "tier": "hidden",
+      "renderer": null,
+      "authoritativeSource": "D-032"
+    }
+  ],
+  "turnOrderBar": {
+    "edge": "left",
+    "persistent": true,
+    "entryFields": ["portrait", "name", "health", "stamina"],
+    "spentEntryTreatment": "desaturate",
+    "rollAnimationAnchor": "beside-entry",
+    "authoritativeSource": "D-035, D-036"
+  },
+  "endTurnCountdown": {
+    "seconds": 3,
+    "cancellable": true,
+    "authoritativeSource": "D-042"
+  },
+  "safeFieldWhitelist": [],
+  "safeUnavailabilityReasons": {},
+  "eventBufferTimeout": 2000
+}

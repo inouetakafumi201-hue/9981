@@ -8,6 +8,7 @@
     "weaponClassId": "weapon-class.firearm",
     "damageClassId": "damage-class.firearm",
     "capabilityIds": [
+      "weapon.capability.quickdraw",
       "weapon.capability.ammunition_binding",
       "weapon.capability.damage_reference",
       "weapon.capability.handling_profile",
@@ -68,6 +69,9 @@
     "原基类目录汇总声明全部11项均已可用于MVP，但本实例的 mvp 为 false；迁移时保留实例原值。"
   ],
   "weaponParameters": {
+    "weapon.capability.quickdraw": {
+      "swapActionId": "action.quickdraw_swap"
+    },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",
       "ammunitionTypeField": "ammoType",

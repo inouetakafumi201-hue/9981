@@ -2,10 +2,9 @@
   "schemaVersion": "1.0",
   "version": "2.0.0",
   "name": "WakeUp 载具族语义目录",
-  "description": "基类层载具语义目录：载具是实体，不是微型场景也不是物品。目录声明座位角色、货舱容器、可独立寻址的门引用、锁定、移动、碰撞与损毁处置接口；具体载具、玩法数值与出现规则由玩法层提供。",
+  "description": "基类层载具语义目录：载具是实体（entityBacked: true），不是微型场景也不是物品。目录声明座位角色、货舱容器、可独立寻址的门引用、锁定、移动、碰撞与损毁处置接口；具体载具、玩法数值与出现规则由玩法层提供。载具专有契约：interactionSeparationContract（交互分离契约，adjacencyCapabilityId: vehicle.capability.adjacency_interaction, doorTargetCapabilityId: vehicle.capability.door_target_interaction, separation: independent-composition-inputs, doorIdentifierStability: stable-within-resolved-definition, d030PolicyOwnership: 玩法层，见 prohibition.vehicle.adjacency_coupled_to_door 和 prohibition.vehicle.d030_policy_in_class_layer）、operationChannels 已删除（能力的 kernelOps 字段承担该职责）。",
   "category": "vehicle_classes",
   "semanticFamilies": ["vehicle"],
-  "entityBacked": true,
   "classificationEvidence": {
     "enumerable": true,
     "enumerationRationale": "载具按通行介质可有限列举；当前玩法范围内只登记陆地载具类，新增介质需要权威来源与分类理由。",
@@ -38,19 +37,11 @@
       "statementFingerprint": "l0:known-base-categories:vehicle-class"
     }
   ],
-  "interactionSeparationContract": {
-    "adjacencyCapabilityId": "vehicle.capability.adjacency_interaction",
-    "doorTargetCapabilityId": "vehicle.capability.door_target_interaction",
-    "separation": "independent-composition-inputs",
-    "description": "车辆邻接与门特定目标是两个独立的可组合交互输入：任一方的组合变化不得改写另一方，二者不得合并为同一能力或同一参数。",
-    "doorIdentifierStability": "stable-within-resolved-definition",
-    "d030PolicyOwnership": "玩法层"
-  },
   "classes": [
     {
       "id": "vehicle.class.land",
       "name": "陆地载具类",
-      "description": "在陆地空间关系上通行的载具实体类。不指定具体载具、玩法数值或出现规则。",
+      "description": "在陆地空间关系上通行的载具实体类。不指定具体载具、玩法数值或出现规则。configurableParameters（原字段）迁移：type/volume/interior.interactionModel/interior.isMicroScene，这些参数名对应的取值归玩法层（compositionContract.playLayerOwnedFieldNames）。",
       "defKind": "entity",
       "semanticFamily": "vehicle",
       "abstract": true,
@@ -84,12 +75,6 @@
         "vehicle.capability.armor",
         "vehicle.capability.reinforced_tire",
         "vehicle.capability.intimidation"
-      ],
-      "configurableParameters": [
-        "type",
-        "volume",
-        "interior.interactionModel",
-        "interior.isMicroScene"
       ]
     }
   ],
@@ -97,187 +82,228 @@
     {
       "id": "vehicle.capability.durable",
       "name": "耐久能力",
-      "description": "声明载具可持有并响应耐久状态。",
-      "configurableParameters": ["hp", "maxHp"]
+      "description": "声明载具可持有并响应耐久状态。configurableParameters（原字段）迁移：hp/maxHp。",
+      "parameters": [
+        { "key": "hp", "description": "当前耐久值字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "maxHp", "description": "最大耐久值字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.set", "prop.get"]
     },
     {
       "id": "vehicle.capability.seat_binding",
       "name": "座位绑定能力",
-      "description": "声明角色可按座位角色绑定到载具实体或从中解绑。座位索引在已解析定义内保持稳定。",
-      "configurableParameters": [
-        "seats",
-        "seats.index",
-        "seats.role",
-        "seats.accessible",
-        "seats.label"
+      "description": "声明角色可按座位角色绑定到载具实体或从中解绑。座位索引在已解析定义内保持稳定（identifierStability: stable-within-resolved-definition）。configurableParameters（原字段）迁移：seats/seats.index/seats.role/seats.accessible/seats.label。",
+      "parameters": [
+        { "key": "seats", "description": "座位配置数组字段名；具体配置由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "seatIndex", "description": "座位索引字段名；在已解析定义内保持稳定。", "required": true, "valueShape": "field-name" },
+        { "key": "seatRole", "description": "座位角色字段名（如driver/passenger）；具体角色由玩法层提供。", "required": true, "valueShape": "field-name" }
       ],
-      "identifierStability": "stable-within-resolved-definition"
+      "kernelOps": ["agent.bind", "agent.unbind"]
     },
     {
       "id": "vehicle.capability.cargo",
       "name": "货舱能力",
-      "description": "声明载具可持有物品并定义货舱访问方式；货舱本身引用容器族的容器类。",
-      "configurableParameters": [
-        "cargo.capacity",
-        "cargo.accessibleFrom",
-        "cargo.accessibleApCost",
-        "cargo.unlockable"
+      "description": "声明载具可持有物品并定义货舱访问方式；货舱本身引用容器族的容器类（containerClassRefs: [container.class.stationary]）。configurableParameters（原字段）迁移：cargo.capacity/cargo.accessibleFrom/cargo.accessibleApCost/cargo.unlockable。",
+      "parameters": [
+        { "key": "cargoCapacity", "description": "货舱容量字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "cargoAccessibleFrom", "description": "货舱访问方式字段名；具体方式由玩法层提供。", "required": false, "valueShape": "field-name" },
+        { "key": "cargoAccessApCost", "description": "货舱访问AP成本字段名；具体成本由玩法层提供。", "required": false, "valueShape": "field-name" }
       ],
-      "containerClassRefs": ["container.class.stationary"]
+      "kernelOps": ["slot.add", "slot.del"]
     },
     {
       "id": "vehicle.capability.lockable",
       "name": "可上锁能力",
-      "description": "声明载具访问入口可受锁定状态约束。",
-      "configurableParameters": ["canLock", "lockState", "unlockConditions"]
+      "description": "声明载具访问入口可受锁定状态约束。configurableParameters（原字段）迁移：canLock/lockState/unlockConditions。",
+      "parameters": [
+        { "key": "canLock", "description": "可上锁标志字段名；具体标志由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "lockState", "description": "锁定状态字段名；具体状态由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.set", "tag.add", "tag.del"]
     },
     {
       "id": "vehicle.capability.door_addressing",
       "name": "门寻址能力",
-      "description": "声明载具的每一道门可被独立寻址与引用。门标识在已解析定义内保持稳定，且不随座位索引或组合顺序变化。",
-      "configurableParameters": [
-        "doors",
-        "doors.doorId",
-        "doors.label",
-        "doors.lockCapabilityRef",
-        "doors.adjacentSeatRoles"
+      "description": "声明载具的每一道门可被独立寻址与引用。门标识在已解析定义内保持稳定，且不随座位索引或组合顺序变化（identifierStability: stable-within-resolved-definition）。configurableParameters（原字段）迁移：doors/doors.doorId/doors.label/doors.lockCapabilityRef/doors.adjacentSeatRoles。",
+      "parameters": [
+        { "key": "doors", "description": "门配置数组字段名；具体配置由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "doorId", "description": "门标识字段名；在已解析定义内保持稳定。", "required": true, "valueShape": "field-name" },
+        { "key": "doorLabel", "description": "门标签字段名；具体标签由玩法层提供。", "required": false, "valueShape": "field-name" }
       ],
-      "identifierStability": "stable-within-resolved-definition"
+      "kernelOps": ["relation.set"]
     },
     {
       "id": "vehicle.capability.adjacency_interaction",
       "name": "车辆邻接交互能力",
-      "description": "声明外部角色与整车之间的邻接关系作为交互输入。该能力只描述与整车的邻接，不描述任何具体门；它与门特定目标交互是两个独立组合输入。",
-      "configurableParameters": [
-        "adjacencyRelationRef",
-        "adjacencyConditionRefs",
-        "grantedActions"
+      "description": "声明外部角色与整车之间的邻接关系作为交互输入。该能力只描述与整车的邻接，不描述任何具体门；它与门特定目标交互是两个独立组合输入（separatedFrom: [vehicle.capability.door_target_interaction]）。configurableParameters（原字段）迁移：adjacencyRelationRef/adjacencyConditionRefs/grantedActions。",
+      "parameters": [
+        { "key": "adjacencyRelationRef", "description": "邻接关系引用字段名；具体关系由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": false, "valueShape": "field-name" }
       ],
-      "separatedFrom": ["vehicle.capability.door_target_interaction"]
+      "kernelOps": ["entity.grantAction", "query.adjacentEntities"]
     },
     {
       "id": "vehicle.capability.door_target_interaction",
       "name": "门特定目标交互能力",
-      "description": "声明以某一道具体门为目标的交互输入。该能力只描述门目标选择，不描述整车邻接；它与车辆邻接交互是两个独立组合输入。",
-      "configurableParameters": [
-        "doorRef",
-        "doorTargetConditionRefs",
-        "grantedActions"
+      "description": "声明以某一道具体门为目标的交互输入。该能力只描述门目标选择，不描述整车邻接；它与车辆邻接交互是两个独立组合输入（separatedFrom: [vehicle.capability.adjacency_interaction]，requiresCapabilityIds: [vehicle.capability.door_addressing]）。configurableParameters（原字段）迁移：doorRef/doorTargetConditionRefs/grantedActions。",
+      "parameters": [
+        { "key": "doorRef", "description": "门引用字段名；具体门ID由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": false, "valueShape": "field-name" }
       ],
-      "separatedFrom": ["vehicle.capability.adjacency_interaction"],
-      "requiresCapabilityIds": ["vehicle.capability.door_addressing"]
+      "kernelOps": ["entity.grantAction"]
     },
     {
       "id": "vehicle.capability.drive",
       "name": "驾驶能力",
-      "description": "声明驾驶者可通过结构化动作改变载具所在节点；该能力引用移动族的载具移动类。",
-      "configurableParameters": [
-        "speed",
-        "moveEffect.apCost",
-        "moveEffect.range",
-        "moveEffect.description"
+      "description": "声明驾驶者可通过结构化动作改变载具所在节点；该能力引用移动族的载具移动类（movementClassRefs: [movement.class.vehicle]）。configurableParameters（原字段）迁移：speed/moveEffect.apCost/moveEffect.range/moveEffect.description。",
+      "parameters": [
+        { "key": "speed", "description": "速度字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "moveApCost", "description": "移动AP成本字段名；具体成本由玩法层提供。", "required": true, "valueShape": "field-name" }
       ],
-      "movementClassRefs": ["movement.class.vehicle"]
+      "kernelOps": ["entity.move"]
     },
     {
       "id": "vehicle.capability.collision",
       "name": "碰撞能力",
-      "description": "声明载具移动可产生碰撞效果。",
-      "configurableParameters": ["damageOnCollision", "collisionConditions", "collisionEffects"]
+      "description": "声明载具移动可产生碰撞效果。configurableParameters（原字段）迁移：damageOnCollision/collisionConditions/collisionEffects。",
+      "parameters": [
+        { "key": "damageOnCollision", "description": "碰撞伤害字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.add"]
     },
     {
       "id": "vehicle.capability.boarding",
       "name": "上下车能力",
-      "description": "声明角色与载具之间的进入、座位分配、离开及拓扑同步语义。",
-      "configurableParameters": ["grantedActions", "boardingConditions", "disembarkConditions"]
+      "description": "声明角色与载具之间的进入、座位分配、离开及拓扑同步语义。configurableParameters（原字段）迁移：grantedActions/boardingConditions/disembarkConditions。",
+      "parameters": [
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.grantAction", "agent.bind", "agent.unbind"]
     },
     {
       "id": "vehicle.capability.occupant_extraction",
       "name": "乘员移出能力",
-      "description": "声明外部角色可在条件满足时解除乘员与载具的绑定。",
-      "configurableParameters": ["grantedActions", "extractionConditions"]
+      "description": "声明外部角色可在条件满足时解除乘员与载具的绑定。configurableParameters（原字段）迁移：grantedActions/extractionConditions。",
+      "parameters": [
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["agent.unbind"]
     },
     {
       "id": "vehicle.capability.tire_sabotage",
       "name": "轮胎破坏能力",
-      "description": "声明轮胎可作为破坏目标并影响载具移动状态。",
-      "configurableParameters": ["grantedActions", "tireStatus", "speedModifier"]
+      "description": "声明轮胎可作为破坏目标并影响载具移动状态。configurableParameters（原字段）迁移：grantedActions/tireStatus/speedModifier。",
+      "parameters": [
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "speedModifier", "description": "速度修正字段名；具体修正值由玩法层提供。", "required": false, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.set"]
     },
     {
       "id": "vehicle.capability.targetable_parts",
       "name": "可交互部件能力",
-      "description": "声明载具部件可被独立引用、交互或破坏。",
-      "configurableParameters": ["interactions"]
+      "description": "声明载具部件可被独立引用、交互或破坏。configurableParameters（原字段）迁移：interactions。",
+      "parameters": [
+        { "key": "interactions", "description": "交互配置字段名；具体配置由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["relation.set"]
     },
     {
       "id": "vehicle.capability.damage_stages",
       "name": "损伤阶段能力",
-      "description": "声明载具耐久区间可映射到不同损伤状态及效果。",
-      "configurableParameters": ["damageStates"]
+      "description": "声明载具耐久区间可映射到不同损伤状态及效果。configurableParameters（原字段）迁移：damageStates。",
+      "parameters": [
+        { "key": "damageStates", "description": "损伤状态配置字段名；具体配置由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.set", "attach.add"]
     },
     {
       "id": "vehicle.capability.destruction_sequence",
       "name": "损毁序列能力",
-      "description": "声明载具进入损毁后可按顺序触发结构化效果，并声明乘员与货舱的处置引用。",
-      "configurableParameters": ["destructionSequence", "occupantDisposition", "cargoDisposition"]
+      "description": "声明载具进入损毁后可按顺序触发结构化效果，并声明乘员与货舱的处置引用。configurableParameters（原字段）迁移：destructionSequence/occupantDisposition/cargoDisposition。",
+      "parameters": [
+        { "key": "destructionSequence", "description": "损毁序列配置字段名；具体序列由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "occupantDisposition", "description": "乘员处置配置字段名；具体处置由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "cargoDisposition", "description": "货舱处置配置字段名；具体处置由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["agent.unbind", "prefab.spawn", "entity.place"]
     },
     {
       "id": "vehicle.capability.offroad",
       "name": "越野能力",
-      "description": "声明载具可配置不同地形上的通行条件。",
-      "configurableParameters": ["terrainAccess", "terrainMovementModifiers"]
+      "description": "声明载具可配置不同地形上的通行条件。configurableParameters（原字段）迁移：terrainAccess/terrainMovementModifiers。",
+      "parameters": [
+        { "key": "terrainAccess", "description": "地形通行配置字段名；具体配置由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": []
     },
     {
       "id": "vehicle.capability.pushable_transition",
       "name": "推行过渡能力",
-      "description": "声明未被驾驶的载具可由角色推动并穿越允许的场景连接。",
-      "configurableParameters": ["specialAbilities", "grantedActions", "transitionAccess"]
+      "description": "声明未被驾驶的载具可由角色推动并穿越允许的场景连接。configurableParameters（原字段）迁移：specialAbilities/grantedActions/transitionAccess。",
+      "parameters": [
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.move"]
     },
     {
       "id": "vehicle.capability.mounted_melee",
       "name": "载具上近战能力",
-      "description": "声明载具乘员可在座位绑定状态下使用允许的近战动作。",
-      "configurableParameters": ["specialAbilities", "allowedSeatRoles", "allowedActionTypes"]
+      "description": "声明载具乘员可在座位绑定状态下使用允许的近战动作。configurableParameters（原字段）迁移：specialAbilities/allowedSeatRoles/allowedActionTypes。",
+      "parameters": [
+        { "key": "allowedSeatRoles", "description": "允许的座位角色字段名；具体角色由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "allowedActionTypes", "description": "允许的动作类型字段名；具体类型由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.grantAction"]
     },
     {
       "id": "vehicle.capability.medical_bay",
       "name": "医疗舱能力",
-      "description": "声明特定座位或舱位可授予结构化治疗动作。",
-      "configurableParameters": ["specialAbilities", "grantedActions", "medicalBaySeats", "healRate"]
+      "description": "声明特定座位或舱位可授予结构化治疗动作。configurableParameters（原字段）迁移：specialAbilities/grantedActions/medicalBaySeats/healRate。",
+      "parameters": [
+        { "key": "grantedActions", "description": "授予的动作集合字段名；具体动作由玩法层提供。", "required": true, "valueShape": "field-name" },
+        { "key": "healRate", "description": "治疗速率字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["entity.grantAction", "prop.add"]
     },
     {
       "id": "vehicle.capability.emergency_signal",
       "name": "警示信号能力",
-      "description": "声明载具可广播供其他实体或行为系统查询的警示状态。",
-      "configurableParameters": ["specialAbilities", "signalConditions", "signalEffects"]
+      "description": "声明载具可广播供其他实体或行为系统查询的警示状态。configurableParameters（原字段）迁移：specialAbilities/signalConditions/signalEffects。",
+      "parameters": [
+        { "key": "signalConditions", "description": "信号条件字段名；具体条件由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["tag.add", "tag.del"]
     },
     {
       "id": "vehicle.capability.armor",
       "name": "装甲能力",
-      "description": "声明载具可在伤害结算时应用可配置的防护规则。减免与伤害结算的先后顺序由玩法层的伤害公式确定。",
-      "configurableParameters": ["armorRating", "specialAbilities", "armorConditions", "armorEffects"]
+      "description": "声明载具可在伤害结算时应用可配置的防护规则。减免与伤害结算的先后顺序由玩法层的伤害公式确定。configurableParameters（原字段）迁移：armorRating/specialAbilities/armorConditions/armorEffects。",
+      "parameters": [
+        { "key": "armorRating", "description": "装甲值字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.add"]
     },
     {
       "id": "vehicle.capability.reinforced_tire",
       "name": "强化轮胎能力",
-      "description": "声明轮胎部件可具有独立耐久及破坏条件。",
-      "configurableParameters": ["interactions.hitPoints", "reinforcedTireConditions"]
+      "description": "声明轮胎部件可具有独立耐久及破坏条件。configurableParameters（原字段）迁移：interactions.hitPoints/reinforcedTireConditions。",
+      "parameters": [
+        { "key": "tireHitPoints", "description": "轮胎耐久字段名；具体数值由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["prop.set"]
     },
     {
       "id": "vehicle.capability.intimidation",
       "name": "威慑能力",
-      "description": "声明载具可产生供行为系统消费的区域威慑效果。",
-      "configurableParameters": ["specialAbilities", "intimidationConditions", "intimidationEffects"]
+      "description": "声明载具可产生供行为系统消费的区域威慑效果。configurableParameters（原字段）迁移：specialAbilities/intimidationConditions/intimidationEffects。",
+      "parameters": [
+        { "key": "intimidationConditions", "description": "威慑条件字段名；具体条件由玩法层提供。", "required": true, "valueShape": "field-name" }
+      ],
+      "kernelOps": ["tag.add"]
     }
   ],
-  "operationChannels": [
-    "agent.bind",
-    "agent.unbind",
-    "prop.set",
-    "attach.add",
-    "prefab.spawn",
-    "entity.place"
-  ],
+  "valueSets": [],
   "structuralBounds": [],
   "prohibitions": [
     {
@@ -295,13 +321,13 @@
     {
       "id": "prohibition.vehicle.adjacency_coupled_to_door",
       "diagnosticCode": "VEHICLE_ADJACENCY_COUPLED_TO_DOOR_TARGET",
-      "statement": "车辆邻接与门特定目标不得合并为同一能力或同一参数，也不得互相改写。",
+      "statement": "车辆邻接与门特定目标不得合并为同一能力或同一参数，也不得互相改写（interactionSeparationContract: separation=independent-composition-inputs）。",
       "correction": "分别组合邻接交互能力与门目标交互能力。"
     },
     {
       "id": "prohibition.vehicle.d030_policy_in_class_layer",
       "diagnosticCode": "VEHICLE_D030_POLICY_NOT_L3",
-      "statement": "乘员交互策略不得在基类层裁决；基类层只暴露可组合接口。",
+      "statement": "乘员交互策略不得在基类层裁决；基类层只暴露可组合接口（interactionSeparationContract: d030PolicyOwnership=玩法层）。",
       "correction": "由玩法层 profile 声明策略并引用基类层的邻接与门目标接口。"
     },
     {
@@ -337,7 +363,21 @@
     "classReferenceField": "classComposition.classIds",
     "capabilityReferenceField": "classComposition.capabilityIds",
     "parameterBindingField": "vehicleParameters",
-    "playLayerOwnedFieldNames": ["hp", "maxHp", "speed", "armorRating", "healRate", "damageOnCollision", "seats", "cargo", "kernelTopologyOps", "grantedActions"],
+    "playLayerOwnedFieldNames": [
+      "hp",
+      "maxHp",
+      "speed",
+      "armorRating",
+      "healRate",
+      "damageOnCollision",
+      "seats",
+      "cargo",
+      "kernelTopologyOps",
+      "grantedActions",
+      "type",
+      "volume",
+      "interior"
+    ],
     "description": "玩法层以 classComposition 引用载具类与能力，并在上列玩法层字段中提供耐久、速度、装甲、座位与货舱取值。"
   }
 }

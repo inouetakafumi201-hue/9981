@@ -1,3 +1,27 @@
+/**
+ * FROZEN NOTICE (2026-08-12)
+ *
+ * 本模块被判为与 src/l2 重复实现（D-061 架构裁决），执行状态为冻结。
+ *
+ * 冻结政策：
+ * - ✅ 已完成：引擎层基础设施迁出（Phase 1，src/core/kernel/codec|state|security）
+ * - ✅ 已完成：9 个独有缺口识别与迁移方案（src/l2/ & 引擎层）
+ * - 🔒 冻结：此文件不再接受新功能或优化
+ * - ⏳ 等待：其他规范确认已消费 src/l2 端口后才执行物理删除（Wave 3）
+ * 
+ * 新功能必须：
+ * 1. 优先落 src/l2/（语义层）
+ * 2. 其次落 src/core/kernel/（引擎基础设施）
+ * 3. 严禁直接改本文件
+ *
+ * 依据：
+ * - docs/L_审查报告/D-061_spec-compiler_L2_功能差集审计.md（完整对比）
+ * - docs/L_审查报告/Wave1.2_缺口迁移并行Prompt.md（迁移方案）
+ * - .kiro/steering/结构收敛执行计划.md（Wave 1-4 执行波次）
+ *
+ * 联系：若需绕过冻结，请在架构评审会上讨论修订 D-061。
+ */
+
 import type { CompilationStage, Diagnostic, DiagnosticArgument, SourceRecord } from '../state/diagnostic.js';
 import type { ErrCode } from '../state/error-codes.js';
 import { CompilationHaltedError, FatalErrorBoundary } from '../safety/fatal-boundary.js';

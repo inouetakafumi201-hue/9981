@@ -6,8 +6,9 @@
  * - 不能跳过配额记账；
  * - 不能直接改写活动注册表（注册表替身自身实现工作副本 + CAS 语义）。
  *
- * 重要：替身**不能**替代任务 11 的真实上游集成证据。基类层四端口在当前仓库未冻结
- * （见 .kiro/specs/wakeup-ugc/实施基线与决策记录.md §1.2），因此这里只能验证 UGC 侧的编排行为。
+ * 重要：这些替身只验证 UGC 自身编排与故障注入，不构成任务 11 的真实上游集成证据。PT-02 后的
+ * 真实基类层端口证据位于 `__tests__/integration/full-pipeline.integration.test.ts`；保留本 harness 是为了
+ * 精确注入上游失败、能力缺口和 TOCTOU，而不是替代生产 `l2-adapter.ts`。
  */
 import { createDiagnosticCodeCatalog } from '../diagnostics/code-catalog.js';
 import { createDiagnosticFactory } from '../diagnostics/factory.js';

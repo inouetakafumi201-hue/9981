@@ -1,32 +1,62 @@
 {
-  "id": "status_staggered",
+  "id": "status.class.staggered",
   "name": "失衡",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_staggered"
+    "sourceClass": "status.class.staggered",
+    "capabilityIds": [
+      "status.capability.preparation_invalidation"
+    ]
   },
   "duration": "until_end_turn",
   "durationUnit": "until_event",
   "stacking": "none",
   "stackBehavior": "unique",
   "effects": {
-    "onAction": {"blocked": true, "actionTypes": ["prepare"], "description": "准备动作失效（招架动作无法使用）"},
-    "passive": {"description": "本回合无法执行任何准备类动作"}
+    "onAction": {
+      "blocked": true,
+      "actionTypes": [
+        "prepare"
+      ],
+      "description": "准备动作失效（招架动作无法使用）"
+    },
+    "passive": {
+      "description": "本回合无法执行任何准备类动作"
+    }
   },
   "breakConditions": [
-    {"type": "turn", "turns": 1, "description": "回合结束时自动解除"}
+    {
+      "type": "turn",
+      "turns": 1,
+      "description": "回合结束时自动解除"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_stunned", "type": "none", "description": "眩晕优先，失衡不冲突"}
+    {
+      "with": "status.class.stunned",
+      "type": "none",
+      "description": "眩晕优先，失衡不冲突"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnActionCheck", "OnTurnEnd"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnActionCheck",
+    "OnTurnEnd"
+  ],
   "icon": "balance-scale",
   "color": "red",
   "priority": 27,
   "description": "被招架或弱点命中后陷入失衡，准备动作失效，持续到回合结束",
-  "tags": ["control", "debuff", "stagger"],
-  "source": ["招架成功", "弱点命中"],
+  "tags": [
+    "control",
+    "debuff",
+    "stagger"
+  ],
+  "source": [
+    "招架成功",
+    "弱点命中"
+  ],
   "mvp": true,
   "notes": "失衡状态使招架动作在本回合内不可用"
 }

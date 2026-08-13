@@ -24,9 +24,10 @@ import type { Diagnostic, DiagnosticSeverity } from './diagnostic.js';
 import { createDiagnostic } from './diagnostic-factory.js';
 import type { SourceLocation, SourceRecord } from './source.js';
 import { canonicalSort, compareDiagnostics } from './ordering.js';
+import { deepFreeze } from './immutable.js';
 
 /** 本领域拥有的诊断类别（封闭集合）。 */
-export const SPACE_ITEMS_DIAGNOSTIC_CATEGORIES = [
+export const SPACE_ITEMS_DIAGNOSTIC_CATEGORIES = Object.freeze([
   'LAYER_L1_OWNERSHIP',
   'LAYER_L3_OWNERSHIP',
   'VALUE_L3_OWNERSHIP',
@@ -48,7 +49,7 @@ export const SPACE_ITEMS_DIAGNOSTIC_CATEGORIES = [
   'PRESENTATION_FALLBACK',
   'PROJECTION_WRITE',
   'RUNTIME_PRECONDITION',
-] as const;
+] as const);
 
 export type DomainDiagnosticCategory = (typeof SPACE_ITEMS_DIAGNOSTIC_CATEGORIES)[number];
 
@@ -62,7 +63,7 @@ export function categoryRank(category: DomainDiagnosticCategory): number {
  *
  * `satisfies` 提供编译期完整性检查：任何类别遗漏或任何未登记码都会使类型检查失败。
  */
-export const DOMAIN_CODE_MAP = {
+export const DOMAIN_CODE_MAP = deepFreeze({
   LAYER_L1_OWNERSHIP: {
     'redefines-runtime-primitive': 'E_LOAD_LAYER_OWNERSHIP',
   },
@@ -177,7 +178,30 @@ export const DOMAIN_CODE_MAP = {
     'op-not-registered': 'E_OP_NOT_FOUND',
     'vetoed': 'E_OP_VETOED',
   },
-} as const satisfies Record<DomainDiagnosticCategory, Readonly<Record<string, ErrCode>>>;
+} as const satisfies Record<DomainDiagnosticCategory, Readonly<Record<string, ErrCode>>>);
+
+/**
+ * requirements 中的领域措辞与既有已登记码之间的显式等价关系（任务 0.3 / 1.4）。
+ *
+ * 一个类别可能按条件落到多个既有码，因此这里保留完整条件映射，而不是用单一码静默兜底。
+ * 这些值直接引用 `DOMAIN_CODE_MAP`，任何新增条件仍必须先通过 `ErrCode` 编译期校验。
+ */
+export const REQUIREMENT_DIAGNOSTIC_EQUIVALENCES = deepFreeze({
+  VALUE_L3_OWNERSHIP: DOMAIN_CODE_MAP.VALUE_L3_OWNERSHIP,
+  VALUE_CLASSIFICATION_MISSING: DOMAIN_CODE_MAP.VALUE_CLASSIFICATION_MISSING,
+  MICRO_SCENE_CREATOR_MISUSE: DOMAIN_CODE_MAP.MICRO_SCENE_CREATOR_MISUSE,
+  OP_BYPASS_FORBIDDEN: DOMAIN_CODE_MAP.OP_BYPASS_FORBIDDEN,
+  DEPRECATED_MECHANIC: DOMAIN_CODE_MAP.DEPRECATED_MECHANIC,
+});
+
+/**
+ * `src/core/kernel/state/error-codes.ts::ERR_CODES` 的实施前形状快照。
+ * 顶层前缀 11 组，展开后 127 个稳定码；领域接线不得改变该权威表。
+ */
+export const ERR_CODES_SHAPE_SNAPSHOT = Object.freeze({
+  groupCount: 11,
+  memberCount: 127,
+} as const);
 
 /** 某类别下的合法条件标识联合。 */
 export type DomainConditionOf<C extends DomainDiagnosticCategory> = keyof (typeof DOMAIN_CODE_MAP)[C] &
@@ -215,7 +239,7 @@ export interface DomainDiagnostic extends Diagnostic {
 }
 
 /** 诊断作用域：决定哪些定位字段适用。 */
-export const DIAGNOSTIC_SCOPES = ['definition', 'package', 'runtime'] as const;
+export const DIAGNOSTIC_SCOPES = Object.freeze(['definition', 'package', 'runtime'] as const);
 export type DiagnosticScope = (typeof DIAGNOSTIC_SCOPES)[number];
 
 export interface DomainDiagnosticInput<C extends DomainDiagnosticCategory> {
@@ -295,5 +319,5 @@ export function allCategoryConditions(): readonly {
       out.push({ category, condition, code: conditions[condition]! });
     }
   }
-  return Object.freeze(out);
+  return deepFreeze(out);
 }

@@ -1,33 +1,70 @@
 {
-  "id": "status_frozen",
+  "id": "status.class.frozen",
   "name": "冰冻",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status_frozen"
+    "sourceClass": "status.class.frozen",
+    "capabilityIds": [
+      "status.capability.movement_restriction"
+    ]
   },
   "duration": 2,
   "durationUnit": "turns",
   "stacking": "none",
   "stackBehavior": "extend",
   "effects": {
-    "onAction": {"actionType": "move", "apModifier": "+1", "description": "移动动作消耗+1 AP"},
-    "passive": {"description": "无法使用快速动作", "blockedActions": ["sprint", "dash"]}
+    "onAction": {
+      "actionType": "move",
+      "apModifier": "+1",
+      "description": "移动动作消耗+1 AP"
+    },
+    "passive": {
+      "description": "无法使用快速动作",
+      "blockedActions": [
+        "sprint",
+        "dash"
+      ]
+    }
   },
   "breakConditions": [
-    {"type": "damage", "damageType": "fire", "effect": "melt", "description": "受到火焰伤害"},
-    {"type": "turn", "turns": 2, "description": "2回合后自动解除"}
+    {
+      "type": "damage",
+      "damageType": "fire",
+      "effect": "melt",
+      "description": "受到火焰伤害"
+    },
+    {
+      "type": "turn",
+      "turns": 2,
+      "description": "2回合后自动解除"
+    }
   ],
   "interactionMatrix": [
-    {"with": "status_burning", "type": "counter", "description": "被燃烧克制：冰冻目标受到燃烧时，冰冻立即解除"}
+    {
+      "with": "status.class.burning",
+      "type": "counter",
+      "description": "被燃烧克制：冰冻目标受到燃烧时，冰冻立即解除"
+    }
   ],
-  "kernelEvents": ["OnTurnStart", "OnDamage", "OnActionCheck"],
+  "kernelEvents": [
+    "OnTurnStart",
+    "OnDamage",
+    "OnActionCheck"
+  ],
   "icon": "ice",
   "color": "cyan",
   "priority": 15,
   "description": "限制移动能力，移动动作额外消耗1 AP，持续2回合",
-  "tags": ["movement-penalty", "cold", "debuff"],
-  "source": ["物品: 冰冻手雷", "环境: 冰冻区域"],
+  "tags": [
+    "movement-penalty",
+    "cold",
+    "debuff"
+  ],
+  "source": [
+    "物品: 冰冻手雷",
+    "环境: 冰冻区域"
+  ],
   "mvp": true,
   "notes": "冰冻不阻止所有动作，只增加移动AP成本"
 }

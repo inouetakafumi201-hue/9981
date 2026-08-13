@@ -16,10 +16,14 @@ import {
   type PresentationDescriptor,
   type ReadOnlySemanticProjection,
   type UiActionView,
+  type UiDecisionStatus,
+  type UiDecisionView,
   type UiEntityView,
+  type UiTurnOrderEntry,
+  type UiView,
   type UpstreamAgentAuthority,
 } from '../../model/view.js';
-import type { ProjectedViewBase } from '../../projection/reconcile.js';
+import { reduceView, type ProjectedViewBase } from '../../projection/reconcile.js';
 
 /** 递归冻结。夹具专用，产品代码不做就地冻结。 */
 export function deepFreeze<T>(value: T): T {
@@ -223,4 +227,44 @@ export function profileFixture(overrides: Partial<PresentationProfile> = {}): Pr
     eventBufferTimeout: makeInternalMetric(2_000, 'ms'),
     ...overrides,
   }) as PresentationProfile;
+}
+
+/** 构造一个已归约的 `UiView`。走 `reduceView` 而不是手搓字面量，避免夹具与产品代码分叉。 */
+export function uiViewFixture(
+  options: BaseOptions & {
+    readonly decisions?: readonly UiDecisionView[];
+    readonly turnOrder?: readonly UiTurnOrderEntry[];
+  } = {},
+): UiView {
+  const base = viewBase(options);
+  const withExtras: ProjectedViewBase = Object.freeze({
+    ...base,
+    decisions: Object.freeze([...(options.decisions ?? [])]),
+    turnOrder: Object.freeze([...(options.turnOrder ?? [])]),
+  });
+  return reduceView(withExtras, []).view;
+}
+
+export function decisionView(
+  decisionId: string,
+  status: UiDecisionStatus = 'open',
+  optionIds: readonly string[] = ['opt.a', 'opt.b'],
+): UiDecisionView {
+  return deepFreeze({
+    decisionId,
+    status,
+    optionIds: [...optionIds],
+    accessibleLabel: `决定 ${decisionId}`,
+  }) as UiDecisionView;
+}
+
+export function turnOrderEntry(participantId: string, spent = false): UiTurnOrderEntry {
+  return deepFreeze({
+    participantId,
+    portraitAssetRef: `portrait.${participantId}`,
+    displayName: participantId,
+    resources: [],
+    spent,
+    accessibleLabel: `参与者 ${participantId}`,
+  }) as UiTurnOrderEntry;
 }
