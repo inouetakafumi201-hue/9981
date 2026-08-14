@@ -5,7 +5,7 @@ import type { OpImpl } from './registry.js';
 import type { OpRegistry } from './registry.js';
 import { ok, err } from './result.js';
 import type { Id, Ref } from '../state/ids.js';
-import { nextId, rollbackNextIdCounter } from '../state/ids.js';
+import { nextId } from '../state/ids.js';
 import { createEntityShape, createItemShape } from '../state/entity.js';
 import { createNodeShape, createLinkShape, createContainerShape, createSlotShape } from '../topology/types.js';
 import type { Node } from '../topology/types.js';
@@ -563,9 +563,9 @@ export function makeEntityDemote(itemMoveImpl: OpImpl<ItemMoveArgs, void>): OpIm
     ctx.tx.setDraft({ ...draft, entities: restEntities, items: { ...draft.items, [newId]: item } });
     const moveResult = itemMoveImpl({ itemId: newId, toContainerId: args.toContainerId, atSlot: args.atSlot }, ctx);
     if (!moveResult.ok) {
-      // 降权失败 → 整体回滚：原 entity 恢复、新 item 不存在、ID 计数器同时回滚（与 stack.split 对称）。
-      // 否则一次失败的 demote 会永久吞掉一个 i 编号，破坏「成功 Op 序列 → 幂等快照重放」的持久化定见。
-      rollbackNextIdCounter('i');
+      // 降权失败 → 整体回滚：原 entity 恢复、新 item 不存在。
+      // Id 计数器推进由 OpRegistry.invoke 的顶层事务作用域统一对齐（state/ids.ts），
+      // 失败 Op 不残留编号，无需在此手工回滚（bombardment-l12 属性 8 实测暴露点）。
       return moveResult;
     }
     ctx.tx.logOp('entity.demote', args, () => {});
