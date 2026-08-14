@@ -457,7 +457,7 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
   }],
   ['.kiro/specs/wakeup-base-layer-ecs/requirements.md', {
     state: 'not-adopted',
-    note: '10 条要求，0 采纳。2026-08-14 基类层 ECS 收敛专项（收束专项）。结构规则规范：组件契约单一源、家族目录收敛为组件形状、原子 System 接线、vehicle 降级为组合型组件族；接受标准体 + 要求子句回溯，无逐条来源追踪 footer',
+    note: '10 条要求，0 采纳。保持 not-adopted 的原因：本 spec 用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer，不能改 fully-adopted（改 fully 会让守卫要求每节恰一个来源 footer而立即撞红）。2026-08-14 基类层 ECS 收敛专项（收束专项）PT-11 已完成实施且门禁全绿（tsc0/vitest3125/lint0err/verify:docs/verify:data/spec-document-discipline 8 绿）；产出=composition-registry.ts（component.* 集中登记）+ family-component-shapes.ts（8 族组件形状）+ composition-alignment-rules.ts（COMPOSITION_KIND_*/SYSTEM_BINDING_*）+ 10 属性测试（test/l2/properties/ecs-*）。基类层↔玩法层对接未闭合，登记为交接项 H-ECS-06/07。结构规则规范：组件契约单一源、家族目录收敛为组件形状、原子 System 接线、vehicle 降级为组合型组件族；接受标准体 + 要求子句回溯，无逐条来源追踪 footer',
   }],
 ]);
 

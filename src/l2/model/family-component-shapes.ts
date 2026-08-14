@@ -95,6 +95,13 @@ const FAMILY_SHAPES: readonly FamilyShape[] = Object.freeze([
   ),
 
   // container：入/出舱经固定槽 Slot 承载（static 只描述插槽形状，Values 不内嵌）
+  // 收敛 ContainerDomainContract（Requirements 7.2）：
+  // - 可配置字段与 space-items-contracts.ts 契约一一对应，不新造词汇；
+  // - concreteSlotCount / concreteCapacity 是违规检测面（越层声明证据），
+  //   只是契约接口字段，不进入组件 `parameters`（值由 L3/UGC 填，L2 不声明）；
+  // - D-059 死亡容器义务：depositDisabledMechanismRef 是**可替换的机制引用**
+  //   （非字面量 `before-item-move-veto`），depositMarkTiming 恒为
+  //   `'after-infusion-commit'`，contentSource 恒为 `'deceased-entity-transaction'`。
   shape(
     'container',
     Object.freeze([
@@ -103,6 +110,13 @@ const FAMILY_SHAPES: readonly FamilyShape[] = Object.freeze([
         'container',
         ['hostType', 'containerRole', 'slotAcceptancePredicateRef', 'accessibilityCapabilityRefs', 'depositAllowedField', 'withdrawAllowedField', 'transferActionRef'],
         ['container.deposit', 'container.withdraw', 'agent.bind', 'agent.unbind'],
+        'static',
+      ),
+      buildComponent(
+        'component.container.deathObligation',
+        'container',
+        ['depositDisabledMechanismRef', 'depositMarkTiming', 'contentSource'],
+        ['item.move', 'stack.merge'],
         'static',
       ),
     ]),

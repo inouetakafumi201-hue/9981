@@ -27,6 +27,8 @@ const invariantChecker = new InvariantChecker();
 // driver 用模块内自持种子的 LCG 解析挂起的 `existing`/prefab 挂起 Id（见 op-sequence-driver.ts），
 // 采集 run 与重放 run 各自从同一默认种子独立起步，从而在同位置解析出完全一致的挂起 Id——
 // 不再需要替换全局 Math.random。这里在每次 run 前刻意 reset 到初始种子，保证跨 run 可复现。
+// （bdb3f5b「checkpoint: design-currency sub-batch …」已记录此改动；op-sequence-driver.ts 的
+//   seedDriverRng/resetDriverRng 见同 commit。）
 function seedDeterministicRandom(): void {
   // driver 默认种子即 0x9e3779b9；这里显式复原一次，锁定跨重复 run 的一致性。
   resetDriverRng();

@@ -196,5 +196,7 @@
 | H-ECS-03 | `wakeup-engine-layer` | 若收紧 `kernelOps` 许可集合需要引擎层补充某个语义无关的 Op 注册证据面，属引擎层改动，本 spec 只登记此交接项、不直接改引擎层目录。 | Requirement 3.3 |
 | H-ECS-04 | 表现系统 / 玩法层 | 组合模板实例化与玩法数值下沉（`compositionContract.playLayerOwnedFieldNames`）落在玩法层结构；只读投影对 static 组件承载项的展示为表现层/玩法层消费。 | Requirement 4、Requirement 7.1 |
 | H-ECS-05 | `docs/L0_规范宪法.md` | vehicle 从 `defKind:"entity"` 基类降级为组合型组件族，若宪法已有 vehicle 属于基类类别之描述，需复核是否需随此裁决同步措辞（本 spec 不直接改宪法，只登记是否需同步）。 | Requirement 6.2 |
+| H-ECS-06 | `src/class` / 型号契约线 | `class-contract.ts` 需支持 `compositionKind`（四形）与 `familyId` 解析与校验，使 `ComponentContract` 与 `class-contract.ts` 两条能力契约链合并为单一源。当前 `CAPABILITY_ENTRY_KEYS` 无这两字段，`src/class` 目录仍是与 ECS 分离的旧能力形状（详见 `src/l2/决策与风险记录.md` §7）。 | Requirement 1.2、7.x |
+| H-ECS-07 | `src/play` / 玩法层线 | `src/play` 尚无任何对 ECS 组件契约（`composition-registry` / `family-component-shapes`）的消费；对齐需建立 play 侧对接线并加 PBT 守卫，否则要求 8.3 / 10.3 的"玩法层数值下沉与组件复用"无可观察执行链。 | Requirement 8.1、8.3、10.3 |
 
 **未决关联**：本 spec 不裁决 Q-01（武器谱型"特殊"档机制）、Q-04（载具内部微型场景边界）、Q-05（盾牌 MVP 覆盖）。转换期间相关字段只保留引用与接口，不推导默认机制。

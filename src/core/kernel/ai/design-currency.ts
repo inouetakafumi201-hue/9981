@@ -80,6 +80,17 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     field: 'range',
     unit: 1,
   },
+  // 敌方目标生命（e:enemy.vitality）：对称的「进攻」维度。目标越残血，把它打死的
+  // 攻击直接收益越高——活体零血即被淘汰，是 AI 唯一能「终结一局」的直接杠杆。
+  // 生命越高反而越要避开（打不死还白送反击机会），故这是单位当量表里方向相反的一行：
+  // 目标生命越低、单位贡献越高，直到归零时的终止奖励。
+  {
+    field: 'enemy.vitality',
+    unit: 5,
+    adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.deathAnchor * -1 },
+    // 目标血越少，击杀那刀的价值越接近满当量（补刀/终场动力）。
+    scarcity: { floor: 1, ceiling: 5, coefficient: 0.5 },
+  },
   // AP（回合预算）：保有 AP 即保有行动机会。真实场在 world.props.pools.ap.<scope>.real，
   // 经 read-adapter 的资源池投影实体化到实体 props `pool.ap`。压零 = 动作机会清零，绝对值负分。
   {
@@ -118,8 +129,10 @@ function observedNumber(slice: BeliefSlice, field: string): number | null {
  *
  * 规则：
  *  - 逐费目求当量，未观测到该字段的费目不加减；
- *  - 分水岭修正（死亡锚）覆盖单位当量；
- *  - 稀缺系数对低值上调（亚线性）；但死亡锚是绝对负分，优先于一切。
+ *  - 分水岭修正（死亡锚/资源耗尽锚）覆盖单位当量；
+ *  - 稀缺系数对低值上调（亚线性）；
+ *  - 敌方维度是「进攻」向：目标越残血当量越接近满值；自身维度是「防守」向。两者同入
+ *    一张分数表、互不覆盖，AI 才能既会在满血时压敌人、又会在残血时保自己（阶段 2）。
  */
 export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
   let v = 0;
@@ -127,7 +140,7 @@ export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
     const value = observedNumber(context.slice, entry.field);
     if (value === null) continue; // 未知不打分
 
-    // 死亡锚优先：一旦触发，直接给绝对负分并跳过其余（避免被边缘收益倒挂）。
+    // 分水岭修正优先：一旦触发，直接给绝对修正并跳过该费目的常规当量（避免被边缘收益倒挂）。
     if (entry.adjustment !== undefined && entry.adjustment.when(value)) {
       v += entry.adjustment.value;
       continue;
