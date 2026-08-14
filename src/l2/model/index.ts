@@ -22,6 +22,9 @@ export * from './snapshot.js';
 export * from './immutable.js';
 export * from './ordering.js';
 export * from './diagnostic-factory.js';
+export * from './composition-registry.js';
+export * from './composition-shape.js';
+export * from './family-component-shapes.js';
 
 // 空间与物品领域公共面：仅只读目录、纯函数与类型。
 export * from './space-items-domain-ids.js';

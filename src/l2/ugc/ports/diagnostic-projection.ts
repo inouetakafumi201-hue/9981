@@ -252,6 +252,15 @@ export const L2_DIAGNOSTIC_SELECTORS = {
   // ── UI 与 UI 描述符 ──────────────────────────────────────────────
   [DIAGNOSTIC_CODES.UI_UNKNOWN_RESOURCE_ROLE]: { category: 'SCHEMA_CONTRACT', condition: 'schema-contract' },
   [DIAGNOSTIC_CODES.UI_DESCRIPTOR_TARGET_UNRESOLVED]: { category: 'REFERENCE_CONTRACT', condition: 'missing-target' },
+
+  // ── ECS 收敛：原子 System 接线（Requirements 3、5；见 D-ECS-001 范围说明） ──
+  [DIAGNOSTIC_CODES.SYSTEM_BINDING_MALFORMED]: { category: 'LAYER_L1_OWNERSHIP', condition: 'engine-primitive-request' },
+  [DIAGNOSTIC_CODES.SYSTEM_BINDING_MISSING_KERNELOPS]: { category: 'LAYER_L1_OWNERSHIP', condition: 'engine-primitive-request' },
+  [DIAGNOSTIC_CODES.SYSTEM_BINDING_MISSING_FAMILY]: { category: 'LAYER_L1_OWNERSHIP', condition: 'engine-primitive-request' },
+  [DIAGNOSTIC_CODES.COMPOSITION_KIND_NOT_DECLARED]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
+  [DIAGNOSTIC_CODES.COMPOSITION_KIND_INVALID]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
+  [DIAGNOSTIC_CODES.COMPONENT_ID_CONFLICT]: { category: 'IDENTITY_CONFLICT', condition: 'duplicate-id' },
+  [DIAGNOSTIC_CODES.MISSING_CAPABILITY_FOR_COMPOSE]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
 } as const satisfies Readonly<Record<DiagnosticCode, DiagnosticSelector>>;
 
 /** 投影时无法识别 l2 代码或严重级别不可表达时使用的失败关闭选择器。 */

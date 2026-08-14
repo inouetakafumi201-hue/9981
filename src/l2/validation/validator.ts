@@ -43,6 +43,7 @@ import { validateItemRules } from './space-items-item-rules.js';
 import { validateVehicleRules } from './space-items-vehicle-rules.js';
 import { validateContainerCapabilityBinding } from './space-items-container-rules.js';
 import { validateReferenceCapabilityShape } from './space-items-reference-shape.js';
+import { validateCompositionAlignment } from './composition-alignment-rules.js';
 
 /** 全部定义级规则，按确定性顺序执行。 */
 export const DEFINITION_RULES: readonly DefinitionRule[] = Object.freeze([
@@ -70,6 +71,8 @@ export const DEFINITION_RULES: readonly DefinitionRule[] = Object.freeze([
   validateVehicleRules,
   validateContainerCapabilityBinding,
   validateReferenceCapabilityShape,
+  // ECS 收敛：原子 System 接线与 compositionKind（Requirements 3、5）
+  validateCompositionAlignment,
 ]);
 
 export interface BuildContextInput {
