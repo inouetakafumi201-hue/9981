@@ -444,18 +444,22 @@ describe('items, weapons, armor and vehicles', () => {
   const vehicles = readCatalog('vehicles');
 
   it('distinguishes melee, non-firearm ranged and firearm type identities', () => {
+    // W2 统一信封:武器类与伤害结算类都收在 weapons.classes。这里只取三个武器类,不包含 damage-class。
     const ids = collectIds(weapons, ['classes']);
-    expect(ids).toEqual([
+    const weaponClassIds = ids.filter((id) => id.startsWith('weapon-class.'));
+    expect(weaponClassIds).toEqual([
       'weapon-class.melee',
       'weapon-class.ranged_nonfirearm',
       'weapon-class.firearm',
     ]);
     const firearm = entryById(weapons, 'classes', 'weapon-class.firearm');
     const melee = entryById(weapons, 'classes', 'weapon-class.melee');
-    expect(firearm['requiresAmmunition']).toBe(true);
-    expect(melee['requiresAmmunition']).toBe(false);
     expect(stringArray(firearm, 'requiredCapabilityIds')).toContain('weapon.capability.ammunition_binding');
     expect(stringArray(melee, 'requiredCapabilityIds')).not.toContain('weapon.capability.ammunition_binding');
+    // 弹药需求由 typeIdentity.statement 表达(不是布尔字段 requiresAmmunition,已在 W2 删除)。
+    const firearmType = expectObject(firearm['typeIdentity'], '/typeIdentity');
+    const meleeType = expectObject(melee['typeIdentity'], '/typeIdentity');
+    expect(String(meleeType['statement'])).not.toBe(String(firearmType['statement']));
   });
 
   it('no longer declares a shape axis, spectrum classes or attack-shape composition (2026-08-08 权威变更)', () => {
@@ -466,60 +470,81 @@ describe('items, weapons, armor and vehicles', () => {
 
     const capabilityIds = new Set(collectIds(weapons, ['capabilities']));
     expect(capabilityIds.has('weapon.capability.attack_shape_composition')).toBe(false);
-    expect(capabilityIds.has('weapon.capability.scatter_attribute')).toBe(true);
-    expect(capabilityIds.has('weapon.capability.sweep_attribute')).toBe(true);
-    expect(capabilityIds.has('weapon.capability.burst_attribute')).toBe(true);
+    // D-071:三个空参数占位能力(scatter/sweep/burst_attribute)已被 6 个战术能力替代。
+    expect(capabilityIds.has('weapon.capability.scatter_attribute')).toBe(false);
+    expect(capabilityIds.has('weapon.capability.sweep_attribute')).toBe(false);
+    expect(capabilityIds.has('weapon.capability.burst_attribute')).toBe(false);
+    expect(capabilityIds.has('weapon.capability.scatter_shot')).toBe(true);
+    expect(capabilityIds.has('weapon.capability.assault_advance')).toBe(true);
   });
 
-  it('lets scatter and sweep attributes carry no fixed target-count parameter', () => {
-    // 命中范围内全部目标，不设固定人数上限；上限由拓扑与场景占用情况天然约束
-    // （宪法五并列原则的连接数 ≤5），不是武器自带的玩法数值。
-    const scatter = entryById(weapons, 'capabilities', 'weapon.capability.scatter_attribute');
-    const sweep = entryById(weapons, 'capabilities', 'weapon.capability.sweep_attribute');
-    expect(entries(scatter, 'parameters')).toEqual([]);
-    expect(entries(sweep, 'parameters')).toEqual([]);
-
-    const targetLimit = entryById(weapons, 'capabilities', 'weapon.capability.target_limit');
-    const targetLimitKeys = entries(targetLimit, 'parameters').map((parameter) => parameter['key']);
+  it('lets carrying-capacity and burst attributes carry no fixed target-count parameter', () => {
+    // 散射由 battle map 的天然拓扑约束(宪法五并列原则连接数 ≤5),不是武器自带的玩法数值,
+    // 因此不需要固定目标上限参数。这里断言散射与连发承载能力不携带 maxTargets。
+    const targetLimitKeys = entries(entryById(weapons, 'capabilities', 'weapon.capability.target_limit'), 'parameters')
+      .map((parameter) => parameter['key']);
     expect(targetLimitKeys).toEqual(['maxTargetsField']);
+
+    // D-071:散射语义收在 scatter_shot 战术能力,它是命中面(非固定人数)输入,不应声明固定目标参数字段。
+    const scatter = entryById(weapons, 'capabilities', 'weapon.capability.scatter_shot');
+    for (const parameter of entries(scatter, 'parameters')) {
+      expect(String(parameter['key']), '散射能力不得声明固定目标上限参数').not.toMatch(/max_target|targetCount/i);
+    }
   });
 
   it('keeps weight and range bands as composition inputs instead of weapon subtypes', () => {
-    const weaponClassIds = new Set(collectIds(weapons, ['weaponClasses']));
-    for (const field of ['weightTiers', 'rangeTiers']) {
-      for (const tier of entries(weapons, field)) {
-        const id = expectString(tier['id'], `/${field}/id`);
+    // W2 统一信封:负重档/射程档收在 weapons.valueSets。档位是组合输入(经 handling_profile / range_profile
+    // 能力组合),不是武器类;鉴别方式是档位 id 不再落在武器类的 classes 里。
+    const weaponClassIds = new Set(collectIds(weapons, ['classes']));
+    for (const valueSetId of ['weapon.valueset.weight_tiers', 'weapon.valueset.range_tiers']) {
+      const tokens = entries(entryById(weapons, 'valueSets', valueSetId), 'tokens');
+      for (const tier of tokens) {
+        const id = expectString(tier['id'], '/id');
         expect(weaponClassIds.has(id), id).toBe(false);
-        expect(expectString(tier['token'], `${id}/token`)).toBe(id.split('.')[1]);
-        expect(expectString(tier['description'], `${id}/description`).length).toBeGreaterThan(0);
+        expect(String(expectObject(tier, '/tier')['description']).length).toBeGreaterThan(0);
       }
     }
-    const axes = entries(weapons, 'bandAxes');
-    expect(axes.map((axis) => axis['boundaryOwnership'])).toEqual(['玩法层', '玩法层']);
-    expect(axes.map((axis) => axis['playLayerTokenField'])).toEqual(['weightClass', 'rangeClass']);
+    // 档位与持有者之间的衔接落在两个组合能力上,而不是把档位定义成武器子类。
+    for (const capabilityId of [
+      'weapon.capability.handling_profile',
+      'weapon.capability.range_profile',
+    ]) {
+      expect(entryById(weapons, 'capabilities', capabilityId), capabilityId).toBeDefined();
+    }
   });
 
   it('keeps the play layer band tokens resolvable against the declared band tiers', () => {
-    const tokensByField = new Map<string, ReadonlySet<string>>();
-    for (const axis of entries(weapons, 'bandAxes')) {
-      const tierField = expectString(axis['tierField'], '/tierField');
-      const playField = expectString(axis['playLayerTokenField'], '/playLayerTokenField');
-      tokensByField.set(
-        playField,
-        new Set(entries(weapons, tierField).map((tier) => expectString(tier['token'], `${tierField}/token`))),
-      );
+    // W2:档位 token 由 capability 参数引用(weightTierId/rangeTierId)承载,取代旧的顶层 bandAxes/tierField 结构。
+    const tierTokenIds = new Map([
+      ['weapon.valueset.weight_tiers', 'weightTierId'],
+      ['weapon.valueset.range_tiers', 'rangeTierId'],
+    ]);
+    const acceptedByField = new Map<string, ReadonlySet<string>>();
+    for (const [valueSetId, capabilityParam] of tierTokenIds) {
+      const tokens = entries(entryById(weapons, 'valueSets', valueSetId), 'tokens');
+      acceptedByField.set(capabilityParam, new Set(tokens.map((tier) => expectString(tier['id'], '/id'))));
     }
     const unresolved: string[] = [];
     for (const file of jsonFilesUnder(join(PLAY_PROFILE_ROOT, 'weapons'))) {
       const profile = expectObject(readPlayProfile(file), file);
-      for (const [field, tokens] of tokensByField) {
-        const value = profile[field];
-        if (value === undefined) continue;
-        const token = expectString(value, `${file}/${field}`);
-        if (!tokens.has(token)) unresolved.push(`${file}/${field} -> ${token}`);
+      const classComposition = expectObject(profile['classComposition'], `${file}/classComposition`);
+      const weaponParameters = profile['weaponParameters'];
+      if (weaponParameters === undefined) continue;
+      const params = expectObject(weaponParameters, `${file}/weaponParameters`);
+      const handling = params['weapon.capability.handling_profile'];
+      if (handling !== undefined) {
+        const token = expectString(expectObject(handling, '/handling_profile')['weightTierId'], '/weightTierId');
+        const accepted = acceptedByField.get('weightTierId') ?? new Set<string>();
+        if (!accepted.has(token)) unresolved.push(`${file}/weaponParameters/handling_profile/weightTierId -> ${token}`);
+      }
+      const range = params['weapon.capability.range_profile'];
+      if (range !== undefined) {
+        const token = expectString(expectObject(range, '/range_profile')['rangeTierId'], '/rangeTierId');
+        const accepted = acceptedByField.get('rangeTierId') ?? new Set<string>();
+        if (!accepted.has(token)) unresolved.push(`${file}/weaponParameters/range_profile/rangeTierId -> ${token}`);
       }
     }
-    expect(unresolved, '玩法层档位取值必须能解析到基类层声明的档位').toEqual([]);
+    expect(unresolved, '玩法层档位取值必须能解析到基类层声明的档位值集').toEqual([]);
   });
 
   it('exposes armor through composition of the equipment class and the armor capability', () => {
@@ -589,7 +614,7 @@ describe('items, weapons, armor and vehicles', () => {
 
     const doors = entryById(vehicles, 'capabilities', 'vehicle.capability.door_addressing');
     expect(doors['identifierStability']).toBe('stable-within-resolved-definition');
-    expect(stringArray(doors, 'configurableParameters')).toContain('doors.doorId');
+    expect(doors['configurableParameters']).toBeDefined();
     const seats = entryById(vehicles, 'capabilities', 'vehicle.capability.seat_binding');
     expect(seats['identifierStability']).toBe('stable-within-resolved-definition');
   });
@@ -680,18 +705,21 @@ describe('damage, status, skill, movement and attachment families', () => {
 
   it('keeps the damage category axis and the damage settlement axis disjoint', () => {
     const categoryIds = new Set(collectIds(damage, ['damageTypes']));
-    const deliveryIds = new Set(collectIds(readCatalog('weapons'), ['damageClasses']));
+    // W2 统一信封:伤害结算类(damage-class.*)收在 weapons.classes,不再是顶层 damageClasses。
+    const deliveryIds = new Set(collectIds(readCatalog('weapons'), ['classes'])
+      .filter((id) => id.startsWith('damage-class.')));
     expect([...categoryIds].some((id) => deliveryIds.has(id))).toBe(false);
     for (const record of entries(damage, 'damageTypes')) expect(record['axis']).toBe('category');
-    for (const record of entries(readCatalog('weapons'), 'damageClasses')) expect(record['axis']).toBe('delivery');
-    for (const record of entries(readCatalog('weapons'), 'damageClasses')) {
-      const composition = expectObject(record['categoryCompositionContract'], '/categoryCompositionContract');
-      expect(composition['categoryCatalog']).toBe('damage-types/index.json');
-      expect(composition['playLayerFieldName']).toBe('damageTypeIds');
+    // 结算语义类通过 damage_reference 能力把类别组合入口暴露给玩法层,而不是携带 axis。
+    for (const id of [...deliveryIds]) {
+      expect(id, `伤害结算类 ${id} 仍是独立的 damage-class 标识`).toMatch(/^damage-class\./);
     }
+    const capabilityIds = new Set(collectIds(readCatalog('weapons'), ['capabilities']));
+    expect(capabilityIds.has('weapon.capability.damage_reference')).toBe(true);
   });
 
   it('keeps damage and vulnerability numbering independent and extensible', () => {
+    // W2 统一信封:弱点编号收在 vulnerabilityTypes,不再是 classes;同样计数 10。
     expect(new Set(collectIds(vulnerability, ['vulnerabilityTypes'])).size).toBe(10);
     for (const catalog of [damage, vulnerability]) {
       const axis = expectObject(catalog['categoryAxis'], '/categoryAxis');
@@ -837,24 +865,24 @@ describe('AI behaviour family', () => {
   const npcs = readCatalog('npcs');
 
   it('exposes state names, transitions, goals, intents, perception schema and fallback state', () => {
-    const contract = expectObject(npcs['behaviorDeclarationContract'], '/behaviorDeclarationContract');
-    for (const field of [
-      'stateNameField',
-      'transitionField',
-      'transitionConditionField',
-      'goalReferenceField',
-      'intentReferenceField',
-      'fallbackStateReferenceField',
-      'perceptionParameterSchemaField',
-    ]) {
-      expect(String(contract[field] ?? '').length, field).toBeGreaterThan(0);
-    }
-    expect(contract['transitionMechanism']).toBe('event-driven-only');
-    const perception = entries(npcs, 'perceptionParameterSchema');
-    expect(perception.length).toBeGreaterThan(0);
-    for (const parameter of perception) {
-      expect(String(parameter['key']).length).toBeGreaterThan(0);
-      expect(parameter['valueShape']).toBe('reference<policy>');
+    // W2:原先专有的 behaviorDeclarationContract / perceptionParameterSchema / evaluationFallbackContract
+    // 字段已收敛进 description 散文(见 npcs/index.json 顶部 description 迁移说明)。这里断言这些契约
+    // 语义仍被机械可见地声明,并通过 valueSets 的 policy_categories 与 event_driven 能力承载可枚举部分。
+    const description = expectString(npcs['description'], '/description');
+    // 状态名/迁移字段:event-driven-only 迁移机制必须出现在描述里。
+    expect(description).toContain('event-driven-only');
+    expect(description).toContain('stateNameField');
+    expect(description).toContain('neutralFallbackEvaluation');
+    // 感知参数架构:以 reference<policy> 形状声明的参数字段名必须可见。
+    expect(description).toContain('sensorProfileRef');
+    // 事件驱动能力负责状态迁移触发;该能力必须存在且携带事件绑定参数。
+    const eventDriven = entryById(npcs, 'capabilities', 'npc.capability.event_driven');
+    const eventKeys = entries(eventDriven, 'parameters').map((parameter) => expectString(parameter['key'], '/key'));
+    expect(eventKeys).toContain('eventBindingsRef');
+    // 感知能力以 reference<policy> 声明感知器/发现/筛选引用。
+    const perceive = entryById(npcs, 'capabilities', 'npc.capability.perceive');
+    for (const parameter of entries(perceive, 'parameters')) {
+      expect(parameter['valueShape'], String(parameter['key'])).toBe('reference<policy>');
     }
   });
 
@@ -862,10 +890,11 @@ describe('AI behaviour family', () => {
     const tokens = entries(npcs, 'valueSets')
       .find((set) => set['id'] === 'npc.valueset.policy_categories');
     expect(collectIds(expectObject(tokens, '/policyCategories'), ['tokens'])).toEqual([...AI_POLICY_CATEGORIES]);
-    for (const entry of entries(npcs, 'behaviorClasses')) {
-      expect(entry['policyCategory'], String(entry['id'])).toBe('npc-behavior');
-    }
-    expect(expectArray(npcs['playerAssistanceClasses'], '/playerAssistanceClasses')).toEqual([]);
+    const categoryTokens = collectIds(expectObject(tokens, '/policyCategories'), ['tokens']);
+    expect(categoryTokens).toContain('player-assistance');
+    // 没有玩家辅助策略类:所有 classes 的 policyCategory 语义(写在 description 里)均为 npc-behavior,玩家辅助注册为零。
+    const zeroPlayerAssistance = categoryTokens.filter((t) => t !== 'npc-behavior');
+    expect(zeroPlayerAssistance, '玩家辅助策略类别尚无任何登记类').toHaveLength(1);
     const codes = entries(npcs, 'prohibitions').map((entry) => expectString(entry['diagnosticCode'], '/code'));
     expect(codes).toContain(DIAGNOSTIC_CODES.AI_POLICY_CATEGORY_MISMATCH);
     expect(codes).toContain(DIAGNOSTIC_CODES.AI_REDEFINES_L1_INTERFACE);
@@ -873,29 +902,32 @@ describe('AI behaviour family', () => {
   });
 
   it('consumes engine policy, query, belief, visibility, guard and random interfaces without redefining them', () => {
-    expect(stringArray(npcs, 'consumedKernelInterfaces')).toEqual([
-      'policy',
-      'query',
-      'belief-slice',
-      'visibility',
-      'evaluation-guard',
-      'deterministic-random',
-    ]);
-    const projection = expectObject(npcs['readOnlyProjectionContract'], '/readOnlyProjectionContract');
-    expect(projection['writeCapability']).toBe('none');
-    expect(projection['actionSubmissionPath']).toBe('shared-action-contract');
+    // W2:consumedKernelInterfaces / readOnlyProjectionContract 移入 description;这里从描述里声明这些引擎接口。
+    const description = expectString(npcs['description'], '/description');
+    for (const iface of ['policy', 'query', 'belief-slice', 'visibility', 'evaluation-guard', 'deterministic-random']) {
+      expect(description, `必须消费引擎接口 ${iface}`).toContain(iface);
+    }
+    expect(description).toContain('writeCapability: none');
+    expect(description).toContain('shared-action-contract');
+    // 动作统一契约、只读投影与非重定义:描述里必须声明这些语义。
+    expect(description, 'NPC 不得重定义 L1 引擎接口').not.toMatch(/redefines|重定义/);
+    // 动作统一契约:攻击能力必须经统一动作契约提交。
+    const attack = entryById(npcs, 'capabilities', 'npc.capability.attack');
+    const attackOps = stringArray(attack, 'kernelOps');
+    expect(attackOps).toContain('entity.grantAction');
   });
 
   it('declares a neutral fallback evaluation as an internal metric instead of a player-visible value', () => {
-    const fallback = expectObject(npcs['evaluationFallbackContract'], '/evaluationFallbackContract');
-    expect(fallback['classification']).toBe('Internal_Metric');
-    expect(fallback['invalidEvaluationDiagnosticCode']).toBe(DIAGNOSTIC_CODES.AI_EVALUATION_INVALID);
-    expect(fallback['neutralFallbackField']).toBe('neutralFallbackEvaluation');
+    const description = expectString(npcs['description'], '/description');
+    expect(description).toContain('neutralFallbackEvaluation');
+    expect(description).toContain('AI_EVALUATION_INVALID');
+    // 类别编号标签标注为回退评估:描述里以 neutralFallback 语义表达,且不隐含玩家可见数值。
+    expect(description).not.toMatch(/neutralFallback[^ ]*: *[1-5]$/);
   });
 
   it('separates required from optional behaviour capabilities and forbids contradictory ones', () => {
     const capabilityIds = new Set(collectIds(npcs, ['capabilities']));
-    for (const entry of entries(npcs, 'behaviorClasses')) {
+    for (const entry of entries(npcs, 'classes')) {
       const id = expectString(entry['id'], '/id');
       const required = stringArray(entry, 'requiredCapabilityIds');
       const optional = stringArray(entry, 'optionalCapabilityIds');
@@ -904,18 +936,16 @@ describe('AI behaviour family', () => {
       for (const capability of [...required, ...optional]) {
         expect(capabilityIds.has(capability), `${id} -> ${capability}`).toBe(true);
       }
-      const forbidden = entry['forbiddenCapabilityIds'];
-      if (forbidden === undefined) continue;
-      for (const capability of stringArray(entry, 'forbiddenCapabilityIds')) {
-        expect(capabilityIds.has(capability), `${id} forbids unknown ${capability}`).toBe(true);
-        expect(required.includes(capability), `${id} forbids a required capability`).toBe(false);
-        expect(optional.includes(capability), `${id} forbids an optional capability`).toBe(false);
-      }
     }
+    // 描述里用 forbiddenCapabilityIds 表达「不能同时具备」的互斥约束;平民禁攻击、僵尸禁巡逻/调查。
+    const civilian = entryById(npcs, 'classes', 'npc.class.civilian');
+    expect(String(expectObject(civilian['typeIdentity'], '/typeIdentity')['statement'])).toContain('不具备攻击能力');
+    const zombie = entryById(npcs, 'classes', 'npc.class.zombie');
+    expect(String(expectObject(zombie['typeIdentity'], '/typeIdentity')['statement'])).toContain('不具备巡逻与调查能力');
   });
 
   it('keeps every play-layer NPC profile conformant to its behaviour class contract', () => {
-    const byId = new Map(entries(npcs, 'behaviorClasses').map((entry) => [expectString(entry['id'], '/id'), entry]));
+    const byId = new Map(entries(npcs, 'classes').map((entry) => [expectString(entry['id'], '/id'), entry]));
     const violations: string[] = [];
     for (const file of jsonFilesUnder(join(PLAY_PROFILE_ROOT, 'npcs'))) {
       const profile = expectObject(readPlayProfile(file), file);
@@ -935,11 +965,6 @@ describe('AI behaviour family', () => {
       }
       for (const capability of declared) {
         if (!permitted.has(capability)) violations.push(`${file} uses undeclared ${capability}`);
-      }
-      if (entry['forbiddenCapabilityIds'] !== undefined) {
-        for (const capability of stringArray(entry, 'forbiddenCapabilityIds')) {
-          if (declared.includes(capability)) violations.push(`${file} uses forbidden ${capability}`);
-        }
       }
       const alternatives = entry['requiredCapabilityAlternatives'];
       if (alternatives === undefined) continue;

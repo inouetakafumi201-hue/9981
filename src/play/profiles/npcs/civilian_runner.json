@@ -105,5 +105,26 @@
       "npc.capability.event_driven"
     ]
   },
+  "behaviorParameters": {
+    "npc.capability.patrol": {
+      "routeRef": "route.civilian_random",
+      "movementPolicyRef": "policy.civilian_patrol_move"
+    },
+    "npc.capability.perceive": {
+      "sensorProfileRef": "policy.civilian_perception",
+      "detectionPolicyRef": "policy.civilian_detection",
+      "signalFilterRef": "policy.civilian_signal_filter"
+    },
+    "npc.capability.flee": {
+      "threatSelectorRef": "policy.civilian_flee_threat",
+      "escapeRoutePolicyRef": "policy.civilian_escape"
+    },
+    "npc.capability.remember": {
+      "memorySlotsRef": "policy.civilian_memory"
+    },
+    "npc.capability.event_driven": {
+      "eventBindingsRef": "policy.civilian_event_bindings"
+    }
+  },
   "version": "1.0"
 }

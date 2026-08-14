@@ -1,10 +1,10 @@
 {
-  "id": "status.class.radiation",
-  "name": "辐射",
+  "id": "status_radiation",
+  "name": "梦境侵蚀度（泛白）",
   "category": "environmental",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.radiation",
+    "sourceClass": "status_radiation",
     "capabilityIds": [
       "status.capability.environment_exposure"
     ]
@@ -16,9 +16,10 @@
   "effects": {
     "onTurnStart": {
       "op": "prop.add",
-      "path": "entities.{self}.props.hp",
-      "delta": -1,
-      "description": "每回合开始扣1生命"
+      "path": "entities.{self}.props.sp",
+      "delta": 1,
+      "clamp": { "path": "entities.{self}.props.sp", "max": 5 },
+      "description": "泛白侵蚀：每回合体力（清醒度）持续上升并被钳到上限 5，逼近过载阈值"
     }
   },
   "breakConditions": [
@@ -26,36 +27,36 @@
       "type": "zone",
       "zoneType": "safe",
       "effect": "remove",
-      "description": "离开辐射区域到达安全区域"
+      "description": "离开泛白侵蚀区域回到未侵蚀区域"
     }
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.poisoned",
+      "with": "status_overloaded",
       "type": "amplify",
-      "description": "与中毒叠加：双重持续伤害"
+      "description": "泛白推高体力至越过 5 即触发过载：梦境侵蚀是过载的环境来源（§9.4）"
     }
   ],
   "kernelEvents": [
     "OnTurnStart",
     "OnZoneChange",
-    "OnDamage"
+    "OnStaminaChange"
   ],
   "kernelOps": [
     "prop.add"
   ],
-  "icon": "radiation",
-  "color": "yellowgreen",
+  "icon": "cloud-w",
+  "color": "salmon",
   "priority": 40,
-  "description": "辐射区域效果，每回合扣1生命，持续到离开区域",
+  "description": "梦境侵蚀度·泛白（旧「辐射毒区」）：进入泛白区域后每回合体力持续上升并被钳到上限 5，移动减慢；体力越过 5 即触发过载。",
   "tags": [
-    "area-damage",
+    "dream-erosion",
     "zone",
     "environmental"
   ],
   "source": [
-    "环境: 辐射毒区"
+    "环境: 梦境侵蚀泛白区（旧「辐射毒区」）"
   ],
   "mvp": true,
-  "notes": "属于环境区域效果，不是独立状态但可通过区域检测触发"
+  "notes": "2026-08-13 梦境侵蚀度取代旧「毒圈」：本状态承接区域侵蚀的第二态泛白，表现为推高体力逼近过载（§9.4）。原「每回合扣1生命」的辐射伤害不再作为区域默认伤害——纯白档的迷失死亡由缩圈直接结算，不在此做持续伤害。"
 }

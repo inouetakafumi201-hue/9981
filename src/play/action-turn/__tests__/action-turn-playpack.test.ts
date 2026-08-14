@@ -263,17 +263,17 @@ describe('action-turn playpack: stamina window actions', () => {
     expect(attachmentsOf(scenario, 'attachment:reversal-choice', actor)).toHaveLength(0);
   });
 
-  it('charges 1 AP for the regular reversal and 2 SP for the super reversal', () => {
+  it('charges 1 SP for the regular reversal and 2 SP for the super reversal', () => {
     const scenario = startScenario();
     const reverser = scenario.agents[0]!;
     const superReverser = scenario.agents[1]!;
-    setPool(scenario, 'AP', reverser, 3);
+    setPool(scenario, 'SP', reverser, 3);
     setPool(scenario, 'SP', superReverser, 4);
 
     expect(submitAndResolve(scenario, 'action:reverse', reverser).ok).toBe(true);
     expect(submitAndResolve(scenario, 'action:super-reverse', superReverser).ok).toBe(true);
 
-    expect(pool(scenario, 'AP', reverser)).toBe(2);
+    expect(pool(scenario, 'SP', reverser)).toBe(2);
     expect(pool(scenario, 'SP', superReverser)).toBe(2);
     expect(attachmentsOf(scenario, 'attachment:reversal-choice', reverser)[0]!.props['places']).toBe(1);
     expect(attachmentsOf(scenario, 'attachment:reversal-choice', superReverser)[0]!.props['places']).toBe(2);
@@ -282,7 +282,7 @@ describe('action-turn playpack: stamina window actions', () => {
   it('applies a pending reversal as a rank gain at the next roll phase', () => {
     const scenario = startScenario();
     const last = scenario.agents.find((agent) => agent.$ === queue(scenario)[queue(scenario).length - 1])!;
-    setPool(scenario, 'AP', last, 3);
+    setPool(scenario, 'SP', last, 2);
     expect(submitAndResolve(scenario, 'action:reverse', last).ok).toBe(true);
 
     advancePhase(scenario); // action

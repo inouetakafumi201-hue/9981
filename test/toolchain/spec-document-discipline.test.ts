@@ -148,13 +148,8 @@ const DECLARATION_FILES: ReadonlyMap<string, DeclarationFileBaseline> = new Map(
     ],
   }],
   ['docs/访谈决策记录.md', {
-    reason: 'D-001/D-022 的历史裁决原文必须保持原貌',
-    contexts: [
-      { anchor: '这11项因此不是', counts: { 'play-package': 1 } },
-      { anchor: '从"审查内核缺口"', counts: { 'play-package': 1 } },
-      { anchor: '\u73a9\u6cd5\u5305\u5c42用内核零件拼装出来的产物', counts: { 'play-package': 1 } },
-      { anchor: '"内核=零件,\u73a9\u6cd5\u5305\u5c42=范式"', counts: { 'play-package': 1 } },
-    ],
+    reason: 'D-001/D-022 的裁决原文按新术语重述，不再包含旧层名',
+    contexts: [],
   }],
   ['docs/L1_引擎层/引擎层职责边界.md', {
     reason: '文件头记录 2026-08-05 术语迁移',
@@ -183,11 +178,8 @@ const DECLARATION_FILES: ReadonlyMap<string, DeclarationFileBaseline> = new Map(
   ['.kiro/specs/l2-base-layer-spec/tasks.md', {
     reason: '任务计划记录术语纪律的依据、实现与验收标准',
     contexts: [
-      { anchor: '禁用项只有', counts: { 'base-content': 1 } },
-      { anchor: '宪法八·术语演变', counts: { 'base-content': 1 } },
-      { anchor: '- 禁用术语：', counts: { 'base-content': 1 } },
-      { anchor: '作规范概念即拒', counts: { 'base-content': 1 } },
-      { anchor: '源码不含', counts: { 'base-content': 1 } },
+      { anchor: '`内容层/模板/Layer 1/2/3` 作规范概念即拒', counts: { 'base-content': 1 } },
+      { anchor: '源码不含 `内容层/模板/Layer N` 等废用标签', counts: { 'base-content': 1 } },
     ],
   }],
   ['.kiro/specs/wakeup-core-mechanics/design.md', {
@@ -235,12 +227,18 @@ const DECLARATION_FILES: ReadonlyMap<string, DeclarationFileBaseline> = new Map(
  * 不会出现"登记表说还有 23 处、其实早就改完了"的漂移。
  */
 const KNOWN_VIOLATIONS: ReadonlyMap<string, { readonly count: number; readonly owner: string }> = new Map([
-  ['docs/审查状态综合报告.md', { count: 13, owner: '文档所有者：历史审查状态汇总，多处以旧层名描述 D-001 的定性结论' }],
-  ['docs/12_根基完备性审查_v2.md', { count: 4, owner: '文档所有者：含文末「本文档状态」与「下一步」两处' }],
-  ['docs/AI完备性与文档对齐分析.md', { count: 2, owner: '文档所有者：引述 D-001/D-022 的"内核=零件"框架时用了旧层名' }],
-  ['docs/L1_引擎层/05_底层引擎架构.md', { count: 2, owner: 'L1 引擎层文档所有者：其中一处是章节标题，属现行架构文档的层名，优先级最高' }],
-  ['docs/工程治理/02_技术栈与开发流程.md', { count: 1, owner: '工程治理文档所有者：目录树注释里的层名；由原 L2 技术栈文档重组迁入' }],
 ]);
+
+/** 已修好的历史违规被移出本表（棘轮只登记"本轮无权改动的既有违规"，目标状态是空表）。 */
+const KNOWN_VIOLATIONS_RETIRED: readonly string[] = [
+  'docs/审查状态综合报告.md',
+  'docs/12_根基完备性审查_v2.md',
+  'docs/AI完备性与文档对齐分析.md',
+  'docs/L1_引擎层/05_底层引擎架构.md',
+  'docs/工程治理/02_技术栈与开发流程.md',
+  'docs/L_审查报告/PT-09_UI投影完成报告.md',
+  'docs/并行作战/PT-09_执行完成总结.md',
+];
 
 interface DocumentTermHit {
   readonly file: string;
@@ -374,6 +372,12 @@ describe('T1: 活跃规范文档的废用术语纪律（L0 §一 术语铁律的
         drift.push(`${file}: 基线 ${baseline.count} 处，实测 ${now} 处（归属：${baseline.owner}）`);
       }
     }
+    // 已移出本表（已修好）的文件不得复现旧层名——若再现就必须重新登记，而不是悄悄回到未点名状态。
+    for (const file of KNOWN_VIOLATIONS_RETIRED) {
+      if ((actual.get(file) ?? 0) > 0) {
+        drift.push(`${file}: 已修好并移出基线表，但实测又出现 ${actual.get(file)} 处旧层名，需重新登记或改回规范术语`);
+      }
+    }
 
     expect(
       drift.sort(),
@@ -442,6 +446,18 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
   ['.kiro/specs/wakeup-ui-animation/requirements.md', {
     state: 'not-adopted',
     note: '18 条要求，0 采纳',
+  }],
+  ['.kiro/specs/wakeup-engine-layer/requirements.md', {
+    state: 'not-adopted',
+    note: '12 条要求，0 采纳。2026-08-14 引擎层增量审查与载器专项 Spec；the requirements use the same acceptance-criteria body style with a References section instead of per-requirement 来源追踪 footer',
+  }],
+  ['.kiro/specs/wakeup-engine-bombardment/requirements.md', {
+    state: 'not-adopted',
+    note: '11 条要求，0 采纳。2026-08-14 引擎层收官属性与压力测试 Spec（测试/验收规格）；接受标准体 + 要求子句回溯，无逐条来源追踪 footer',
+  }],
+  ['.kiro/specs/wakeup-base-layer-ecs/requirements.md', {
+    state: 'not-adopted',
+    note: '10 条要求，0 采纳。2026-08-14 基类层 ECS 收敛专项（收束专项）。结构规则规范：组件契约单一源、家族目录收敛为组件形状、原子 System 接线、vehicle 降级为组合型组件族；接受标准体 + 要求子句回溯，无逐条来源追踪 footer',
   }],
 ]);
 

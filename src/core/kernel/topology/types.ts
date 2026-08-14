@@ -25,6 +25,8 @@ export interface Link {
   readonly a: Id;
   readonly b: Id;
   readonly directed: boolean;
+  /** 透传的完整方向 token（L-07/D-074，去布尔压缩）：`'bidirectional'|'unidirectional'|'one-way-down'|'one-way-up'`。 */
+  readonly direction?: string;
   readonly weight: number;
   readonly tags: string[];
   readonly props: Record<string, Value>;
@@ -52,8 +54,8 @@ export function createNodeShape(id: Id, def: Id, opts?: { weight?: number; paren
   return { id, def, tags: [], props: {}, weight: opts?.weight ?? 1, parent: opts?.parent, attachments: [] };
 }
 
-export function createLinkShape(id: Id, a: Id, b: Id, opts?: { def?: Id; directed?: boolean; weight?: number }): Link {
-  return { id, def: opts?.def ?? 'd:link', a, b, directed: opts?.directed ?? false, weight: opts?.weight ?? 1, tags: [], props: {}, attachments: [] };
+export function createLinkShape(id: Id, a: Id, b: Id, opts?: { def?: Id; directed?: boolean; weight?: number; direction?: string }): Link {
+  return { id, def: opts?.def ?? 'd:link', a, b, directed: opts?.directed ?? false, weight: opts?.weight ?? 1, tags: [], props: {}, attachments: [], ...(opts?.direction !== undefined ? { direction: opts.direction } : {}) };
 }
 
 export function createSlotShape(id: Id, tags?: string[], accepts?: Expr): Slot {

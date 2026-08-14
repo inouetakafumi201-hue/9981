@@ -114,7 +114,7 @@ export const L2_DIAGNOSTIC_SELECTORS = {
   [DIAGNOSTIC_CODES.REF_DEPENDENCY_CYCLE]: { category: 'REFERENCE_CONTRACT', condition: 'reference-cycle' },
   [DIAGNOSTIC_CODES.REF_PACKAGE_DEPENDENCY_CYCLE]: { category: 'REFERENCE_CONTRACT', condition: 'package-cycle' },
   [DIAGNOSTIC_CODES.REF_INBOUND_LEFT_DANGLING]: { category: 'REFERENCE_CONTRACT', condition: 'undefined-reference' },
-  [DIAGNOSTIC_CODES.REF_OVERRIDE_INVALIDATES_DEPENDENT]: { category: 'IDENTITY_CONFLICT', condition: 'override-invalid' },
+  [DIAGNOSTIC_CODES.REF_OVERRIDE_INVALIDATES_DEPENDENT]: { category: 'REFERENCE_CONTRACT', condition: 'invalidates-dependent' },
   [DIAGNOSTIC_CODES.REF_REMOVAL_TARGET_MISSING]: { category: 'REFERENCE_CONTRACT', condition: 'missing-target' },
   [DIAGNOSTIC_CODES.REF_OVERRIDE_TARGET_MISSING]: { category: 'IDENTITY_CONFLICT', condition: 'override-invalid' },
   [DIAGNOSTIC_CODES.REF_OVERRIDE_NOT_DECLARED]: { category: 'IDENTITY_CONFLICT', condition: 'override-invalid' },

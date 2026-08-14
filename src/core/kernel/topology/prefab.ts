@@ -10,7 +10,7 @@ import type { Def } from '../state/def.js';
 export interface PrefabDef extends Def {
   readonly kind: 'prefab';
   readonly nodes: { key: string; def: Id; props?: Record<string, Expr> }[];
-  readonly links: { a: string; b: string; def: Id; directed?: boolean }[];
+  readonly links: { a: string; b: string; def: Id; directed?: boolean; direction?: string; weight?: number }[];
   readonly entities?: { at: string; def: Id; overrides?: Record<string, Expr> }[];
   readonly attachTo?: string;
 }

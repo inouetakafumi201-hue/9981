@@ -1,10 +1,10 @@
 {
-  "id": "status.class.frozen",
+  "id": "status_frozen",
   "name": "冰冻",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.frozen",
+    "sourceClass": "status_frozen",
     "capabilityIds": [
       "status.capability.movement_restriction"
     ]
@@ -16,8 +16,8 @@
   "effects": {
     "onAction": {
       "actionType": "move",
-      "apModifier": "+1",
-      "description": "移动动作消耗+1 AP"
+      "transition": true,
+      "description": "移动受冰冻限制，需一次中间状态（1 AP 进入过渡态，1 AP 完成）。单段恒为 1 AP。"
     },
     "passive": {
       "description": "无法使用快速动作",
@@ -42,7 +42,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.burning",
+      "with": "status_burning",
       "type": "counter",
       "description": "被燃烧克制：冰冻目标受到燃烧时，冰冻立即解除"
     }
@@ -55,7 +55,7 @@
   "icon": "ice",
   "color": "cyan",
   "priority": 15,
-  "description": "限制移动能力，移动动作额外消耗1 AP，持续2回合",
+  "description": "限制移动能力，移动需要中间状态，持续2回合",
   "tags": [
     "movement-penalty",
     "cold",
@@ -66,5 +66,5 @@
     "环境: 冰冻区域"
   ],
   "mvp": true,
-  "notes": "冰冻不阻止所有动作，只增加移动AP成本"
+  "notes": "冰冻不阻止所有动作，只让移动进入过渡态（AP 铁律：非加价）。"
 }

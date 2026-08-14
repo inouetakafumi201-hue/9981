@@ -17,7 +17,7 @@
  * 依据：
  * - docs/L_审查报告/D-061_spec-compiler_L2_功能差集审计.md（完整对比）
  * - docs/L_审查报告/Wave1.2_缺口迁移并行Prompt.md（迁移方案）
- * - .kiro/steering/结构收敛执行计划.md（Wave 1-4 执行波次）
+ * - 波次计划（已归档至 `docs/L_归档/steering_历史/PARALLEL_EXECUTION_LOCK.md`）
  *
  * 联系：若需绕过冻结，请在架构评审会上讨论修订 D-061。
  */

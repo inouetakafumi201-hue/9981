@@ -24,10 +24,13 @@
  *   `--ext` 必须包含 `.tsx`。
  * - **G5 lint 对测试目录真的有效**：ESLint 不忽略 `test/**`，且在测试目录路径下能真实报出 error
  *   （断言的是行为，不是配置字符串）。
- * - **G6 verify 串联三门禁**：`npm run verify` 必须依次包含 typecheck、lint、test。
+ * - **G6 verify 串联三门禁**：`npm run verify` 必须依次包含 typecheck、lint、test，
+ *   且数据可解析守卫 `verify:data` 必须串联进 verify、位列 `verify:docs` 之前。
+ * - **G7 数据 JSON 静态可解析门禁在岗**：`scripts/verify-data-json.mjs` 必须存在、
+ *   被 `verify:data` 与 `verify` 引用，判据确实是严格 `JSON.parse` 且失败即 `exit 1`。
  *
  * 参考：`docs/00_主状态板.md` §一（健康快照与命令覆盖范围）、
- * `.kiro/steering/架构决策原则.md`「契约要机器可校验」「零耦合要有守卫」。
+ * `AGENTS.md` 结尾「项目实践原则」架构决策原则「契约要机器可校验」「零耦合要有守卫」。
  */
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -438,5 +441,33 @@ describe('G6: verify 脚本必须串联三道门禁', () => {
       expect(script, `verify 脚本 "${script}" 未包含 ${stage} 阶段`).toContain(stage);
     }
     expect(script.indexOf('typecheck')).toBeLessThan(script.indexOf('lint'));
+  });
+
+  it('verify:data 作为独立门禁随 verify 串联，且位列 verify:docs 之前', () => {
+    // 数据可解析守卫是白盒迭代的稳定器：把"数据损坏"从运行时炸提前到静态拦。
+    // 它必须先于 verify:docs（文档一致性）；如果有人把它从 verify 里摘掉或移到后面，
+    // 数据损坏风险会被静默放过。
+    const verify = readScript('verify');
+    const jobs = ['verify:data', 'verify:docs'];
+    for (const job of jobs) {
+      expect(verify, `verify 脚本 "${verify}" 未包含 ${job} 阶段`).toContain(`npm run ${job}`);
+    }
+    expect(verify.indexOf('verify:data')).toBeLessThan(verify.indexOf('verify:docs'));
+  });
+});
+
+describe('G7: 数据 JSON 静态可解析门禁在岗', () => {
+  it('verify-data-json.mjs 存在且被 verify:data 引用', () => {
+    const scriptPath = resolve(REPO_ROOT, 'scripts', 'verify-data-json.mjs');
+    expect(existsSync(scriptPath), 'scripts/verify-data-json.mjs 必须存在').toBe(true);
+
+    // verify:data 与 verify 都必须引用它——防止门禁被静默用别的实现替换/绕开。
+    expect(readScript('verify:data')).toContain('verify-data-json.mjs');
+    expect(readScript('verify')).toContain('verify:data');
+
+    // 解析判据确实是把"严格 parse"当作硬门槛，而不是只数文件个数之类的软检查。
+    const source = readFileSync(scriptPath, 'utf8');
+    expect(source).toContain('JSON.parse');
+    expect(source).toMatch(/process\.exit\(1\)/u);
   });
 });

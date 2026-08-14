@@ -127,8 +127,8 @@ describe('L9 schedule.advance Op', () => {
   });
 });
 
-describe('L9 PlaypackLoader: Property 19 (load conflicts)', () => {
-  it('冲突检测：相同 Id 定义在两个 Playpack 时报 E_LOAD_CONFLICT', () => {
+describe('L9 PlaypackLoader: Property 19 (monotonic redefinition — D-073)', () => {
+  it('单调重定义：相同 Id 定义在两个 Playpack 时后装覆盖先装（不再报 E_LOAD_CONFLICT）', () => {
     const existingDef: Def = { id: 'action:attack', kind: 'action' };
     const existing: PlaypackDef = {
       id: 'pp:existing',
@@ -146,11 +146,12 @@ describe('L9 PlaypackLoader: Property 19 (load conflicts)', () => {
     defRegistry.register(existingDef);
     const loader = new PlaypackLoader({ defRegistry, existingPlaypacks: [existing] });
     const result = loader.load(incoming);
-    expect(result.ok).toBe(false);
-    expect(result.diagnostics.some((d) => d.code === 'E_LOAD_CONFLICT')).toBe(true);
+    // D-073：同 key 即重定义（后装覆盖先装），不再拒绝
+    expect(result.ok).toBe(true);
+    expect(result.diagnostics.some((d) => d.code === 'E_LOAD_CONFLICT')).toBe(false);
   });
 
-  it('有 override 映射时不报冲突', () => {
+  it('有 override 映射时同样成功（override 降级为可选重定义辅助）', () => {
     const existingDef: Def = { id: 'action:attack', kind: 'action' };
     const existing: PlaypackDef = {
       id: 'pp:existing',
@@ -187,6 +188,91 @@ describe('L9 PlaypackLoader: Property 19 (load conflicts)', () => {
           };
           const r = loader.load(pp);
           expect(r.ok).toBe(true);
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+describe('Feature: wakeup-engine-layer, Property 3: 单调重定义装载序', () => {
+  it('同 key 后装覆盖先装、异 key append 新增，且不报 E_LOAD_CONFLICT', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 1, max: 3 }),
+        fc.integer({ min: 1, max: 3 }),
+        (sharedCount, uniqueCount) => {
+          const shared: Def[] = Array.from({ length: sharedCount }, (_, i) => ({ id: `action:shared_${i}`, kind: 'action' as const }));
+          const uniqA: Def[] = Array.from({ length: uniqueCount }, (_, i) => ({ id: `action:a_${i}`, kind: 'action' as const }));
+          const uniqB: Def[] = Array.from({ length: uniqueCount }, (_, i) => ({ id: `action:b_${i}`, kind: 'action' as const }));
+          const defRegistry = new DefRegistry();
+          const loader = new PlaypackLoader({ defRegistry });
+
+          const a: PlaypackDef = { id: 'pp:a', kind: 'playpack', version: '1.0', defs: [...shared, ...uniqA] };
+          const loadA = loader.load(a);
+          expect(loadA.ok).toBe(true);
+
+          const b: PlaypackDef = { id: 'pp:b', kind: 'playpack', version: '1.0', defs: [...shared, ...uniqB] };
+          const loadB = loader.load(b);
+          // 同 key 覆盖（重定义）、异 key append 新增，单调重定义下不报冲突
+          expect(loadB.ok).toBe(true);
+          expect(loadB.diagnostics.some((d) => d.code === 'E_LOAD_CONFLICT')).toBe(false);
+          // 全部定义均可解析（覆盖后继任 + 新增都落在注册表上）
+          for (const def of [...shared, ...uniqB]) {
+            expect(defRegistry.resolve(def.id)).not.toBeNull();
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it('同 key 覆盖定义后，注册表解析到后装（单调重定义后继）而非先装', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 1, max: 3 }),
+        fc.integer({ min: 1, max: 3 }),
+        (countA, countB) => {
+          const defRegistry = new DefRegistry();
+          const loader = new PlaypackLoader({ defRegistry });
+
+          const sharedA: Def[] = Array.from({ length: countA }, (_, i) => ({ id: `action:key_${i}`, kind: 'action' as const }));
+          const sharedB: Def[] = Array.from({ length: countB }, (_, i) => ({ id: `action:key_${i}`, kind: 'action' as const }));
+          expect(loader.load({ id: 'pp:a', kind: 'playpack', version: '1.0', defs: sharedA }).ok).toBe(true);
+          expect(loader.load({ id: 'pp:b', kind: 'playpack', version: '1.0', defs: sharedB }).ok).toBe(true);
+
+          // 同 key 交集上，后装 B 覆盖先装 A：解析到的 must 是 B 的 def（可以 B 的 def 与 A 同构，
+          // 但 id/kind 一致即覆盖生效）；先在 A 中不存在、仅在 B 中的异 key 也全部解析成功。
+          for (let i = 0; i < countB; i++) {
+            expect(defRegistry.resolve(`action:key_${i}`)).not.toBeNull();
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it('混合顺序装载大量 playpack：每次失败都回滚到最近成功快照，不积累半改', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 1, max: 6 }), (n) => {
+        const defRegistry = new DefRegistry();
+        const loader = new PlaypackLoader({ defRegistry });
+
+        for (let i = 0; i < n; i++) {
+          const lastOk = defRegistry.fork();
+          // 偶数为合法包、奇数为引用缺失包（需加载失败触发回滚）
+          const ok = i % 2 === 0;
+          const pack: PlaypackDef = ok
+            ? { id: `pp:${i}`, kind: 'playpack', version: '1.0', defs: [{ id: `action:ok_${i}`, kind: 'action' as const }] }
+            : { id: `pp:${i}`, kind: 'playpack', version: '1.0', defs: [{ id: `action:odd_${i}`, kind: 'action' as const }], requires: ['pp:never'] };
+          const result = loader.load(pack);
+          if (ok) {
+            expect(result.ok).toBe(true);
+          } else {
+            expect(result.ok).toBe(false);
+            // 失败包不污染活动注册表（原子性，P10 精神）
+            expect(defRegistry.fork()).toEqual(lastOk);
+          }
         }
       }),
       { numRuns: 100 },

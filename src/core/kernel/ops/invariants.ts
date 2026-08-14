@@ -101,6 +101,25 @@ const checkLocationExclusive: CheckFn = (state) => {
   return diags;
 };
 
+/**
+ * 需求 2.5 / 11.1：载器承载面容量校验。
+ * 对声明了 `capacity` 的载器承载面（`category:'carrier'`），占用数不得超过 capacity。
+ * 无 capacity 字段的承载面跳过（无上限约束）。
+ */
+const checkCarrierCapacity: CheckFn = (state) => {
+  const diags: Diagnostic[] = [];
+  for (const c of Object.values(state.containers)) {
+    if ((c as { category?: string }).category !== 'carrier') continue;
+    const capacity = (c as { capacity?: number }).capacity;
+    if (capacity === undefined) continue;
+    const occupied = c.slots.filter((s) => s?.holds !== undefined).length;
+    if (occupied > capacity) {
+      diags.push(mkDiag('E_INV_CARRIER_CAPACITY', `载器承载面 ${c.id} 占用数 ${occupied} 超过容量上限 ${capacity}`));
+    }
+  }
+  return diags;
+};
+
 /** 需求20.5：无环容纳——一个容器不得直接或间接地容纳自身的宿主。 */
 const checkNoContainmentCycle: CheckFn = (state) => {
   const diags: Diagnostic[] = [];
@@ -293,6 +312,7 @@ export const ALL_INVARIANT_CHECKS: readonly CheckFn[] = [
   checkDecisionTermination,
   checkNumericBounded,
   checkGrantedByCascade,
+  checkCarrierCapacity,
 ];
 
 export class InvariantChecker {

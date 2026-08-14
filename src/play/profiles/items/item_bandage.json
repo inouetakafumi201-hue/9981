@@ -19,18 +19,18 @@
   ],
   "stackable": true,
   "grantedStates": [],
-  "description": "基础的急救绷带，可以快速包扎伤口。零和睡眠协议的标准配置物资。",
+  "description": "基础的急救绷带，可以快速包扎伤口，恢复 2 点血量。零和睡眠协议的标准配置物资。",
   "actions": [
     {
       "name": "使用绷带",
       "apCost": 1,
       "target": "self",
-      "description": "花费1 AP从背包使用",
+      "description": "花费1 AP从背包使用，恢复2点血量",
       "effects": [
         {
           "op": "prop.add",
           "path": "entities.{actor}.props.hp",
-          "delta": 1,
+          "delta": 2,
           "clamp": {
             "min": 0,
             "max": 5

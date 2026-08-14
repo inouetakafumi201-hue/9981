@@ -230,23 +230,13 @@ export function validateVisibleRange(values: readonly number[]): Result<void> {
 }
 
 /* -----------------------------------------------------------------------------
- * DIVERGENCE-02（如实记录，需人工确认）
+ * U-002 结论同步记录（2026-08-13 项目所有者裁决）
  *
- * tasks.md 任务 2.1 要求："参与者为 1 名 → 返回 `E_LOAD_UNRESOLVED_CONTRACT`（reason='U-002'）
- * 且不返回任何分配值"。design.md 的 Property 13 是同一旧结论的属性表述。
+ * 单人投点结论曾经来源冲突：tasks.md 任务 2.1 与旧的 design.md Property 13 要求"参与者为
+ * 1 名 → `E_LOAD_UNRESOLVED_CONTRACT`（reason='U-002'）且不返回分配值"（abort 写法），
+ * 而 requirements.md 5.11（带 D-037 决策号）要求"单人按差值分配算法自然得 2 AP，非特例分支"。
  *
- * 但 requirements.md 5.11（现行文本，带 D-037 决策号）明确规定：
- * "当投点阶段只有 1 名投点参与者时，系统应按 D-037 分配 **2 AP**……单人情形由第 4-8 条算法在
- * 屏蔽 3 AP 档后自然落到 2 AP，**不是特例分支**"；16.8 进一步写明"引用 U-002 不构成拒绝理由"；
- * design.md 9.4 也已改写为裁决记录并要求"`allocateAp` 增加一个档位上限参数……参与者数为 1
- * **不再返回结构化拒绝**"。
- *
- * 本模块按 requirements.md 5.11 / 16.8 与 design.md 9.4 实现（单人得 2 AP）。
- * 需要人工同步的过时文本：tasks.md 任务 2.1 第 2 条、design.md 的 Property 13。
- *
- * 连带影响（已核对，不属本模块修改范围）：既有测试
- * `src/play/action-turn/__tests__/ap-allocation-integration.test.ts` 的用例
- * "blocks the single-participant roll (U-002) and fails activation closed" 断言的是**旧结论**。
- * 该测试针对的是 `src/play/action-turn/playpack.json`（RECON-001 记录的并行实现），不是本模块；
- * 本模块不修改它，但两者对单人局面的结论现在互相矛盾，需人工裁决。
+ * 项目所有者已于 2026-08-13 显式消解：**维持 D-037**（单人 2 AP，算法在屏蔽 3 AP 档后的
+ * 自然结果），**废止 abort 写法与 D-054 的相反陈述**。本模块按该结论实现（单人得 2 AP），
+ * 与 requirements.md 5.11 / 16.8 及 design.md 9.4 一致。T-004 已随本次裁决一并关闭。
  * -------------------------------------------------------------------------- */

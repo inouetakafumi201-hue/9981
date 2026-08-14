@@ -548,6 +548,110 @@ describe('Feature: wakeup-ugc Task 11.1/11.3 real l2 composition root', () => {
     expect(environment.bundle.registryHandles['base-layer'].readSnapshot().activeDefinitionIds).toEqual([]);
   });
 
+  it('reconciliation 要求3：同 key 后装覆盖先装，add 操作不再报 REF_OVERRIDE_NOT_DECLARED（D-073 单调重定义）', () => {
+    const environment = createEnvironment();
+    // 先装「旧」定义
+    const first = packageValue('pkg-first', [damageDefinition('dmg-monotonic', {
+      typeIdentity: Object.freeze({
+        requiredCapabilities: Object.freeze(['deal-damage']),
+        legalRelationships: Object.freeze([]),
+        invariants: Object.freeze([]),
+        substitutionCompatibility: Object.freeze([]),
+      }),
+    })]);
+    activateOnce(environment, requestOf(first));
+
+    // 后装同 key 定义，操作维持默认 add（不声明 overrideIntent）。
+    // 早先端口会对「同名且未声明覆盖」报 REF_OVERRIDE_NOT_DECLARED；单调重定义下同 key 即覆盖，不再拒绝。
+    const second = packageValue('pkg-second', [damageDefinition('dmg-monotonic', {
+      typeIdentity: Object.freeze({
+        requiredCapabilities: Object.freeze(['deal-damage', 'piercing']),
+        legalRelationships: Object.freeze([]),
+        invariants: Object.freeze([]),
+        substitutionCompatibility: Object.freeze([]),
+      }),
+    })]);
+    const report = requestOf(second);
+    const facade = environment.integration.facadeFor('base-layer');
+    const validated = facade.validate(report);
+    expect(validated.status).toBe('validated');
+    // l2 端口把 REF_OVERRIDE_NOT_DECLARED 投影为 catalog 的 E_LOAD_OVERRIDE_INVALID；此处断言
+    // 单调重定义下不会再报「未声明覆盖」，即同 key 后装覆盖先装得到通过。
+    expect(
+      validated.diagnostics.some((diagnostic) => diagnostic.code === 'E_LOAD_OVERRIDE_INVALID'),
+      validated.diagnostics.map((d) => `${d.code}: ${d.reason}`).join('\n'),
+    ).toBe(false);
+    if (validated.validated === null) throw new Error('expected validated report');
+    const result = facade.activate(validated.validated, validated.baseline);
+    expect(result.status).toBe('activated');
+    expect(result.previousSnapshotFingerprint).not.toBe(result.activeSnapshotFingerprint);
+    expect(result.unchanged).toBe(false);
+  });
+
+  it('单调重定义下仍守卫损坏声明：overrideIntent 指向不存在的活动目标 → E_LOAD_OVERRIDE_INVALID', () => {
+    const environment = createEnvironment();
+    const value = packageValue('pkg-orphan', [], {
+      overrideIntent: Object.freeze([Object.freeze({ targetId: 'does-not-exist', reason: 'stale intent' })]),
+    });
+    const request = requestOf(value, { operation: 'replace', expectedTargetId: 'does-not-exist' });
+    const facade = environment.integration.facadeFor('base-layer');
+    const report = facade.validate(request);
+    // 包声明了覆盖意图，但目标不在活动注册表——声明损坏，仍被拒绝。
+    // l2 端口把 REF_OVERRIDE_NOT_DECLARED 投影成 catalog 的 IDENTITY_CONFLICT/override-invalid
+    // （见 diagnostic-projection），对外如实的 error 码是 E_LOAD_OVERRIDE_INVALID。
+    // 这条不变式与 D-073 同 key 覆盖无关：object 不存在则无法声明覆盖，必须报错。
+    expect(report.status).toBe('rejected');
+    expect(
+      report.diagnostics.some((diagnostic) => diagnostic.code === 'E_LOAD_OVERRIDE_INVALID'),
+      report.diagnostics.map((d) => `${d.code}: ${d.reason}`).join('\n'),
+    ).toBe(true);
+  });
+
+  it('单调重定义同 key 覆盖携带 effectiveOverrides，活动依赖不兼容即被拒绝（E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT）', () => {
+    const environment = createEnvironment();
+    // 先装一个 rule：dmg-provider（供依赖者引用）+ 一个依赖者 dmg-consumer，它声明按语义族 damage 引用 dmg-provider。
+    const provider = damageDefinition('dmg-provider', {
+      typeIdentity: Object.freeze({
+        requiredCapabilities: Object.freeze(['deal-damage']),
+        legalRelationships: Object.freeze([]),
+        invariants: Object.freeze([]),
+        substitutionCompatibility: Object.freeze([]),
+      }),
+    });
+    const consumer = damageDefinition('dmg-consumer', {
+      ruleRefs: Object.freeze([Object.freeze({
+        refId: 'dmg-provider',
+        role: 'rule',
+        expected: Object.freeze({ defKind: 'rule', semanticFamily: 'damage', allowAbstract: false }),
+        required: true,
+        jsonPath: '/definitions/0/ruleRefs/0',
+      })]),
+    });
+    activateOnce(environment, requestOf(packageValue('pkg-base', [provider, consumer])));
+
+    // 后装同 key 覆盖 dmg-provider，但不声明 overrideIntent（单调重定义语义），且把语义族改成不兼容的族。
+    // 依赖者 dmg-consumer 仍在活动集、未被重新提交，其 ruleRef 期望 damage —— 覆盖后 provider 不再匹配 → 必须拒绝。
+    const incompatible = damageDefinition('dmg-provider', {
+      semanticFamily: Object.freeze({ familyId: 'damage' }), // 保持族不变，改 kind 使其脱离 rule（更直接）
+      defKind: 'action',
+      typeIdentity: Object.freeze({
+        requiredCapabilities: Object.freeze(['deal-damage']),
+        legalRelationships: Object.freeze([]),
+        invariants: Object.freeze([]),
+        substitutionCompatibility: Object.freeze([]),
+      }),
+    });
+    const value = packageValue('pkg-redef', [incompatible]);
+    const facade = environment.integration.facadeFor('base-layer');
+    const report = facade.validate(requestOf(value));
+    // 同 key 覆盖不再当"未声明覆盖"拒；但覆盖确实发生，且破坏了仍在活动集的依赖者 → E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT
+    expect(report.status).toBe('rejected');
+    expect(
+      report.diagnostics.some((diagnostic) => diagnostic.code === 'E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT'),
+      report.diagnostics.map((d) => `${d.code}: ${d.reason}`).join('\n'),
+    ).toBe(true);
+  });
+
   it('migrates an old Schema through the trusted migration chain, then runs the complete real pipeline', () => {
     const environment = createEnvironment({ migrations: Object.freeze([V0_TO_V1]) });
     const old = { ...packageValue('pkg-old', [damageDefinition('dmg-old')]), schemaVersion: 'l2-declarative/0' };

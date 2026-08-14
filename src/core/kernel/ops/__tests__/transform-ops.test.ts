@@ -87,6 +87,31 @@ describe('entity.setDef / node.merge / node.split：引用完整性（需求18.1
     expect(holder.getState().entities[entityId]?.node).toBe(keepId);
   });
 
+  it('link.create 支持完整方向 token（one-way-down/up）透传，不再只认布尔 directed（reconciliation 方向透传）', () => {
+    const { holder, registry } = setupRegistry();
+    const n1 = registry.invoke<{ def: string }, Ref>('node.create', { def: 'd:room' });
+    const n2 = registry.invoke<{ def: string }, Ref>('node.create', { def: 'd:room' });
+    const n1Id = (n1 as { value: Ref }).value.$;
+    const n2Id = (n2 as { value: Ref }).value.$;
+
+    const down = registry.invoke('link.create', { a: n1Id, b: n2Id, def: 'd:door', direction: 'one-way-down' });
+    expect(down.ok).toBe(true);
+    const downLink = holder.getState().links[(down as { value: Ref }).value.$];
+    expect(downLink?.direction).toBe('one-way-down');
+
+    const up = registry.invoke('link.create', { a: n1Id, b: n2Id, def: 'd:door', direction: 'one-way-up' });
+    expect(up.ok).toBe(true);
+    const upLink = holder.getState().links[(up as { value: Ref }).value.$];
+    expect(upLink?.direction).toBe('one-way-up');
+
+    // 不传 direction 时仍走 back-compat：只设 directed 布尔
+    const legacy = registry.invoke('link.create', { a: n1Id, b: n2Id, def: 'd:door', directed: true });
+    expect(legacy.ok).toBe(true);
+    const legacyLink = holder.getState().links[(legacy as { value: Ref }).value.$];
+    expect(legacyLink?.direction).toBeUndefined();
+    expect(legacyLink?.directed).toBe(true);
+  });
+
   it('node.split 将占位者按 spec 重新分配到新节点', () => {
     const { holder, registry } = setupRegistry();
     const original = registry.invoke<{ def: string }, Ref>('node.create', { def: 'd:room' });

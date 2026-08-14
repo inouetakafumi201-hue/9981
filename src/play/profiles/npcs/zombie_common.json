@@ -16,9 +16,32 @@
         "transitions": [
           {
             "event": "OnNoise",
-            "condition": "soundLevel >= perception.alertThreshold",
+            "condition": "soundLevel > 0",
+            "target": "returning",
+            "kernelEvent": "NPC_Awakened"
+          },
+          {
+            "event": "OnTimeElapsed",
+            "condition": "turnsPassed >= 1",
+            "target": "returning",
+            "kernelEvent": "NPC_WakeUp"
+          }
+        ]
+      },
+      "returning": {
+        "onEnter": ["StaggerToReturnPath", "ReturnToNearestRoute"],
+        "transitions": [
+          {
+            "event": "OnArriveAtRoute",
+            "condition": "onPatrolRoute",
             "target": "chasing",
-            "kernelEvent": "Zombie_Awakened"
+            "kernelEvent": "Zombie_ResumeSearch"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "Zombie_Attacking"
           }
         ]
       },
@@ -55,6 +78,11 @@
     "memory": {
       "lastKnownPosition": null,
       "wakeSource": null
+    },
+    "returnPolicy": {
+      "pathSelection": "nearest",
+      "algorithm": "approximate-nearest-route",
+      "description": "僵尸苏醒后进入返回状态，用近似算法回到最近的行动路线，随后转入追逐。"
     }
   },
   "initialEquipment": ["weapon_claws"],
@@ -76,6 +104,13 @@
       "repeatable": true
     },
     {
+      "id": "return_behavior",
+      "trigger": "State: returning",
+      "action": "MoveToNearestRoute",
+      "apCost": 1,
+      "repeatable": true
+    },
+    {
       "id": "melee_combat",
       "trigger": "State: attacking",
       "action": "MeleeAttack",
@@ -86,18 +121,21 @@
   "kernelEvents": [
     "OnNoise",
     "OnPlayerEnter",
+    "OnTimeElapsed",
     "OnTargetDowned",
     "OnTargetLeft",
-    "Zombie_Awakened",
+    "OnArriveAtRoute",
+    "NPC_Awakened",
+    "NPC_WakeUp",
     "Zombie_Attacking",
     "Zombie_ResumeSearch"
   ],
   "tags": ["ai-significant", "hostile", "zombie"],
-  "description": "普通僵尸，视觉差但听觉敏锐。睡眠中被声音唤醒后持续追逐目标，不受声音干扰。",
+  "description": "普通僵尸，视觉差但听觉敏锐。睡眠中被任何声音惊醒，一回合后自然起床进入返回状态，随后转入追逐。",
   "designNotes": {
     "n004Resolution": "修正07文档hp:1|2|3违反铁律问题。本玩法配置hp=3遵循1-5约束。",
-    "n013Resolution": "僵尸的sleeping状态有明确意义：初始睡眠，被声音唤醒。",
-    "n007Resolution": "简化版FSM：sleeping→chasing→attacking，不实现patrolling/listening（僵尸不巡逻）。",
+    "n013Resolution": "僵尸的sleeping状态有明确意义：初始睡眠，被任何声音惊醒或一回合后自然起床，先进returning再转chase。",
+    "n007Resolution": "简化版FSM：sleeping→returning→chasing→attacking，不实现patrolling/listening（僵尸不巡逻）。",
     "n010Resolution": "所有状态转换通过kernelEvents触发。",
     "noDistractions": "chasing状态noDistractions=true，僵尸锁定目标后不受其他声音影响"
   },
@@ -117,6 +155,31 @@
       "npc.capability.remember",
       "npc.capability.event_driven"
     ]
+  },
+  "behaviorParameters": {
+    "npc.capability.sleep": {
+      "wakePolicyRef": "policy.zombie_wake"
+    },
+    "npc.capability.perceive": {
+      "sensorProfileRef": "policy.zombie_perception",
+      "detectionPolicyRef": "policy.zombie_detection",
+      "signalFilterRef": "policy.zombie_signal_filter"
+    },
+    "npc.capability.chase": {
+      "targetSelectorRef": "policy.zombie_chase_target",
+      "pathPolicyRef": "policy.zombie_chase_path"
+    },
+    "npc.capability.attack": {
+      "attackSelectorRef": "policy.zombie_attack_select",
+      "targetSelectorRef": "policy.zombie_attack_target",
+      "engagementPolicyRef": "policy.zombie_engagement"
+    },
+    "npc.capability.remember": {
+      "memorySlotsRef": "policy.zombie_memory"
+    },
+    "npc.capability.event_driven": {
+      "eventBindingsRef": "policy.zombie_event_bindings"
+    }
   },
   "unresolvedIssues": [
     {

@@ -69,6 +69,7 @@ export const COMPILER_EMITTED_CODES: readonly ErrCode[] = Object.freeze([
   'E_LOAD_ORDER_UNDECLARED',
   'E_LOAD_OUTPUT_WRITE_FAILED',
   'E_LOAD_OVERRIDE_INVALID',
+  'E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT',
   'E_LOAD_PARTIAL_ACTIVATION',
   'E_LOAD_PRESENTATION_FALLBACK',
   'E_LOAD_PROHIBITED_CONSTRUCT',
@@ -289,6 +290,10 @@ export const ZH_CN_CREATOR_BUNDLE: CreatorMessageBundle = Object.freeze({
     E_LOAD_OVERRIDE_INVALID: {
       title: '替换声明无效',
       guidance: '要修改已经生效的内容，必须明确写出你要替换的就是同一个编号。',
+    },
+    E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT: {
+      title: '替换让仍在使用的定义失效',
+      guidance: '你覆盖了一个仍在被其它定义引用的目标，改后的类型不再满足那些引用的期望。请让新版本保持原有类别与语义族，或在同一候选变更里一并更新引用它的定义。',
     },
 
     // ---- Authority and precedence ----

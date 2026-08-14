@@ -184,17 +184,21 @@ describe('武器属性（散射/扫射/连发，2026-08-08 权威变更：替代
       expect(capabilityIds, weapon.sourceId).not.toContain('weapon.capability.target_limit');
       expect(weapon.document['maxTargets'], weapon.sourceId).toBeUndefined();
     }
+    // D-071（2026-08-12 裁决）把「武器属性」落地为 6 个真实战术能力：散射与压制射击取代了
+    // 早期凑数的 scatter_attribute / sweep_attribute 装饰标签。霰弹枪组合 scatter_shot，
+    // 机枪组合 suppressive_fire，二者均不组合 target_limit（命中面而非固定人数）。
     expect((shotgun.document['classComposition'] as Record<string, unknown>)['capabilityIds'])
-      .toContain('weapon.capability.scatter_attribute');
+      .toContain('weapon.capability.scatter_shot');
     expect((machinegun.document['classComposition'] as Record<string, unknown>)['capabilityIds'])
-      .toContain('weapon.capability.sweep_attribute');
+      .toContain('weapon.capability.suppressive_fire');
   });
 
   it('连发且需要固定目标数的武器（突击步枪点射）仍组合 target_limit 并给出数值', () => {
     const rifle = profileNamed('weapons/wp_rifle_assault.json');
     const composition = rifle.document['classComposition'] as Record<string, unknown>;
     expect(composition['capabilityIds']).toContain('weapon.capability.target_limit');
-    expect(composition['capabilityIds']).toContain('weapon.capability.burst_attribute');
+    // D-071：步枪的「点射」由架枪能力 ready_stance 承担固定目标数（maxTargets=2）而非
+    // 旧的 burst_attribute 装饰标签；该能力已从基类层移除。
     expect(rifle.document['maxTargets']).toBe(2);
   });
 
@@ -210,8 +214,8 @@ describe('武器属性（散射/扫射/连发，2026-08-08 权威变更：替代
     const fists = profileNamed('weapons/wp_fists.json');
     const composition = fists.document['classComposition'] as Record<string, unknown>;
     const capabilityIds = composition['capabilityIds'] as string[];
-    expect(capabilityIds).not.toContain('weapon.capability.scatter_attribute');
-    expect(capabilityIds).not.toContain('weapon.capability.sweep_attribute');
+    expect(capabilityIds).not.toContain('weapon.capability.scatter_shot');
+    expect(capabilityIds).not.toContain('weapon.capability.suppressive_fire');
     expect(capabilityIds).not.toContain('weapon.capability.target_limit');
   });
 });

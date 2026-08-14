@@ -89,11 +89,6 @@
   },
   "unresolvedIssues": [],
   "weaponParameters": {
-    "weapon.capability.mount_weapon": {
-      "mountActionId": "action.mount_rifle",
-      "autoTargetScope": "subscene",
-      "breaksOnMove": true
-    },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",
       "ammunitionTypeField": "ammoType",
@@ -116,6 +111,10 @@
     },
     "weapon.capability.target_limit": {
       "maxTargetsField": "maxTargets"
+    },
+    "weapon.capability.ready_stance": {
+      "readyStateId": "status_aiming",
+      "readyActionId": "action.ready_rifle"
     }
   },
   "maxTargets": 2

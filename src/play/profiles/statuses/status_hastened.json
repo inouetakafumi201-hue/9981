@@ -1,10 +1,10 @@
 {
-  "id": "status.class.hastened",
+  "id": "status_hastened",
   "name": "加速",
   "category": "positive",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.hastened",
+    "sourceClass": "status_hastened",
     "capabilityIds": [
       "status.capability.action_efficiency"
     ]
@@ -16,9 +16,8 @@
   "effects": {
     "onAction": {
       "actionType": "move",
-      "apModifier": "-1",
-      "minimum": 0,
-      "description": "移动消耗-1 AP，最低为0"
+      "skipTransition": true,
+      "description": "移动免去中间过渡态，直接以 1 AP 完成（缩短过渡链，不引入负 AP）"
     }
   },
   "breakConditions": [
@@ -35,9 +34,9 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.slowed",
+      "with": "status_slowed",
       "type": "neutralize",
-      "description": "与迟缓互斥，叠加时取较高效果（+1 vs -1 = 抵消）"
+      "description": "与迟缓互斥：加速使移动免去过渡中间态，迟缓使移动需要中间态，取加速生效时免去"
     }
   ],
   "kernelEvents": [
@@ -48,7 +47,7 @@
   "icon": "wind",
   "color": "lightblue",
   "priority": 18,
-  "description": "移动消耗-1 AP，持续2回合",
+  "description": "移动可免去过渡中间态，直接以 1 AP 完成，持续2回合",
   "tags": [
     "movement-bonus",
     "speed",
@@ -58,5 +57,6 @@
     "物品: 加速药水",
     "环境: 加速区域"
   ],
-  "mvp": true
+  "mvp": true,
+  "notes": "AP 铁律：加速只缩短/免去过渡段，不引入负 AP（见宪法·单动作原则）。"
 }

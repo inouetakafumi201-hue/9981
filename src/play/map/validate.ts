@@ -19,6 +19,7 @@ import {
   COORD_MIN,
   EXPR_DISCRIMINANT_KEYS,
   type MapData,
+  type MapEdge,
   type MapNode,
   type SceneScale,
   type Vec2,
@@ -201,8 +202,36 @@ export function validateMapStructure(map: MapData): readonly MapDiagnostic[] {
       degree.set(edge.b, (degree.get(edge.b) ?? 0) + 1);
     }
 
-    // 这里曾经有一条 MAP_WEIGHT_OUT_OF_SCALE，校验作者逐边填的 1-5 通行代价。已删除：
-    // 代价属于门户类型而非单条边（见 MapEdge 的注释与 L2/03 门户系统一节）。作者只选 def。
+    // 方向 token 必须是封闭集合之一（L-07，D-074）：扩展后的 Directionality 不再是布尔，
+    // 非法 token 会静默丢掉方向语义，必须显式拒绝而非猜。
+    if (!DIRECTIONALITY_SET.has(edge.directionality)) {
+      findings.push({
+        code: 'MAP_UNKNOWN_DIRECTIONALITY',
+        severity: 'error',
+        path: `${path}/directionality`,
+        subject: edge.id,
+        message: `连接「${edge.id}」的方向「${edge.directionality}」不是已知类型。`,
+        correction: `方向只能是${[...DIRECTIONALITY_SET].join('、')}之一。改掉这个值。`,
+      });
+    }
+
+    // L-07 数据面增量字段的校验（D-074 与 tasks 8.2）。每个字段按类型/取值域钉死，
+    // 且显式拒绝 Expr 判别键，保持"数据面即数据、不进 Expr 求值"这条边界。
+    if (edge.directionality !== 'bidirectional') {
+      // 单向连接不允许带过渡窗口：窗口是"进出方向上都看得见"的动画，单向语义下无意义。
+      if (edge.transitionWindow !== undefined) {
+        findings.push({
+          code: 'MAP_TRANSITION_WINDOW_ON_UNIDIRECTIONAL',
+          severity: 'warning',
+          path: `${path}/transitionWindow`,
+          subject: edge.id,
+          message: `单向连接「${edge.id}」带了一个过渡窗口。`,
+          correction: '过渡窗口只在双向连接上有意义。删掉它，或把连接改成双向。',
+        });
+      }
+    }
+    findings.push(...validateEdgeDataFields(edge, path));
+    // 曲线自身的校验（点数、坐标范围、首尾吸附），反向用例命中的正是这些。
     findings.push(...validateEdgePath(map, index, nodeById));
   });
 
@@ -331,6 +360,119 @@ function validateEdgePath(
     });
   }
 
+  return findings;
+}
+
+/** 方向式枚举的封闭集合（L-07）。非法 token 必须显式拒绝，不能静默丢语义。 */
+const DIRECTIONALITY_SET: ReadonlySet<string> = new Set([
+  'bidirectional',
+  'unidirectional',
+  'one-way-down',
+  'one-way-up',
+]);
+
+/** 语义锚点的合法取值（L-07）。 */
+const SEMANTIC_ANCHOR_SET: ReadonlySet<string> = new Set(['high', 'low', 'neutral']);
+
+/** 语义锚点的语义名，供报错文案使用。 */
+function anchorName(value: string): string {
+  return value === 'high' ? '高地' : value === 'low' ? '低地' : value === 'neutral' ? '中立' : value;
+}
+
+function isNormalizedPointList(points: unknown): points is readonly Vec2[] {
+  return Array.isArray(points) && points.every((p) => isNormalized(p as Vec2));
+}
+
+/**
+ * 连接数据面增量字段（visualObstruction/physicalObstruction/transitionWindow/semanticAnchor）
+ * 的独立校验（L-07 任务 8.2，design D-074）。每一项都是单独校验码可寻址的结构校验：
+ * 不进 Expr 求值、是纯数据面。报错文案对创作者指明是哪片字段坏了。
+ */
+function validateEdgeDataFields(edge: MapEdge, path: string): readonly MapDiagnostic[] {
+  const findings: MapDiagnostic[] = [];
+
+  if (edge.visualObstruction !== undefined) {
+    findings.push(...validateObstruction(edge.visualObstruction, path, 'visualObstruction', edge, '视觉遮挡'));
+  }
+  if (edge.physicalObstruction !== undefined) {
+    findings.push(...validateObstruction(edge.physicalObstruction, path, 'physicalObstruction', edge, '物理遮挡'));
+  }
+  if (edge.transitionWindow !== undefined) {
+    const window = edge.transitionWindow;
+    if (window.control === undefined || !Array.isArray(window.control) || window.control.length === 0) {
+      findings.push({
+        code: 'MAP_TRANSITION_WINDOW_EMPTY',
+        severity: 'error',
+        path: `${path}/transitionWindow/control`,
+        subject: edge.id,
+        message: `连接「${edge.id}」的过渡窗口没有控制点。`,
+        correction: '过渡窗口至少需要一个控制点，渲染层才能画出进出的动画路径。',
+      });
+    } else if (!isNormalizedPointList(window.control)) {
+      findings.push({
+        code: 'MAP_COORD_OUT_OF_RANGE',
+        severity: 'error',
+        path: `${path}/transitionWindow/control`,
+        subject: edge.id,
+        message: `连接「${edge.id}」的过渡窗口里有的控制点坐标落在 0-1 之外。`,
+        correction: '过渡窗口的控制点坐标是归一化的，两轴都必须在 0 到 1 之间。',
+      });
+    }
+  }
+  if (edge.semanticAnchor !== undefined && !SEMANTIC_ANCHOR_SET.has(edge.semanticAnchor)) {
+    findings.push({
+      code: 'MAP_UNKNOWN_SEMANTIC_ANCHOR',
+      severity: 'error',
+      path: `${path}/semanticAnchor`,
+      subject: edge.id,
+      message: `连接「${edge.id}」的语义锚点「${edge.semanticAnchor}」不认识。`,
+      correction: `语义锚点只能是 ${[...SEMANTIC_ANCHOR_SET].map(anchorName).join('、')} 之一。`,
+    });
+  }
+
+  return findings;
+}
+
+/** 遮挡规格（visualObstruction/physicalObstruction 共用）的校验。 */
+function validateObstruction(
+  spec: { shape?: unknown; height?: unknown; bounds?: unknown },
+  path: string,
+  field: string,
+  edge: MapEdge,
+  label: string,
+): readonly MapDiagnostic[] {
+  const findings: MapDiagnostic[] = [];
+  const shape = spec.shape as string | undefined;
+  if (shape === undefined || !['box', 'circle', 'polygon'].includes(shape)) {
+    findings.push({
+      code: 'MAP_UNKNOWN_OBSTRUCTION_SHAPE',
+      severity: 'error',
+      path: `${path}/${field}/shape`,
+      subject: edge.id,
+      message: `连接「${edge.id}」的${label}形状「${shape ?? '（未填）'}」不认识。`,
+      correction: `${label}形状只能是 box、circle、polygon 之一。`,
+    });
+  }
+  if (spec.height !== undefined && typeof spec.height !== 'number') {
+    findings.push({
+      code: 'MAP_OBSTRUCTION_HEIGHT_TYPE',
+      severity: 'error',
+      path: `${path}/${field}/height`,
+      subject: edge.id,
+      message: `连接「${edge.id}」的${label}高度不是数字。`,
+      correction: '高度作为数值（单位像素或归一格请与渲染层约定）填写。',
+    });
+  }
+  if (spec.bounds !== undefined && !isNormalizedPointList(spec.bounds)) {
+    findings.push({
+      code: 'MAP_COORD_OUT_OF_RANGE',
+      severity: 'error',
+      path: `${path}/${field}/bounds`,
+      subject: edge.id,
+      message: `连接「${edge.id}」的${label}包围盒里有坐标落在 0-1 之外。`,
+      correction: '遮挡包围盒的顶点是归一化的，两轴都必须在 0 到 1 之间。',
+    });
+  }
   return findings;
 }
 

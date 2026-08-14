@@ -16,8 +16,14 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+
+/**
+ * 无 shell 调用 grep：execSync 在 Windows 上走 cmd.exe（非 shell），Bash 重定向
+ * `2>/dev/null` 与 `|| true` 会被 cmd 当成参数、使 grep 以 rc=2 失败。
+ * 这里用 spawnSync(grep, [args]) 不经 shell，grep 无匹配时 rc=1 属正常（吸收后返回空串）。
+ */
 
 describe('D-061: No old import guard', () => {
   describe('TypeScript compilation', () => {
@@ -38,22 +44,18 @@ describe('D-061: No old import guard', () => {
   describe('Production import scan', () => {
     it('L2 does not import from spec-compiler', () => {
       // TODO: 用 grep 扫描 src/l2/**/*.ts 不含 spec-compiler import
-      // 允许的：import * from '../../kernel/ports/...'
-      // 禁止的：import * from '../../kernel/spec-compiler/...'
-      const scanResult = execSync(
-        'grep -r "from [\'\\"].*spec-compiler" src/l2 --include="*.ts" 2>/dev/null || echo ""',
-        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
-      );
-      expect(scanResult.trim(), 'L2 should not import spec-compiler').toBe('');
+      // 允许的：import type * from kernel/ports
+      // 禁止的：import type * from kernel/spec-compiler
+      // 说明：guard 用 spawnSync('grep', [...]) 不经 shell，避免 Windows cmd 把
+      // `2>/dev/null`/`|| true` 当作参数；grep 无匹配时 rc=1，不触发异常。
+      const scan = spawnSync('grep', ['-r', 'from ["]spec-compiler', 'src/l2'], { encoding: 'utf8' });
+      expect(String(scan.stdout ?? '').trim(), 'L2 should not import spec-compiler').toBe('');
     });
 
     it('UGC does not import from spec-compiler', () => {
       // TODO: 用 grep 扫描 src/core/ugc/**/*.ts
-      const scanResult = execSync(
-        'grep -r "from [\'\\"].*spec-compiler" src/core/ugc --include="*.ts" 2>/dev/null || echo ""',
-        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
-      );
-      expect(scanResult.trim(), 'UGC should not import spec-compiler').toBe('');
+      const scan = spawnSync('grep', ['-r', 'from ["]spec-compiler', 'src/core/ugc'], { encoding: 'utf8' });
+      expect(String(scan.stdout ?? '').trim(), 'UGC should not import spec-compiler').toBe('');
     });
 
     it('catalog-activation imports from L2 + ports, not spec-compiler', () => {

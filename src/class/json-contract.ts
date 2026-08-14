@@ -27,7 +27,7 @@ export function expectObject(value: JsonValue | undefined, path: string): JsonOb
   if (value === null || value === undefined || Array.isArray(value) || typeof value !== 'object') {
     throw new ClassCatalogContractError(path, 'must be an object');
   }
-  return value;
+  return value as JsonObject;
 }
 
 export function expectArray(value: JsonValue | undefined, path: string): readonly JsonValue[] {
@@ -151,10 +151,10 @@ export function visitJson(
     return;
   }
   if (value === null || typeof value !== 'object') return;
-  for (const [childKey, child] of Object.entries(value)) {
+  for (const [childKey, child] of Object.entries(value as JsonObject)) {
     const childPointer = `${pointer}/${childKey}`;
-    visitor({ key: childKey, value: child, pointer: childPointer, parent: value });
-    visitJson(child, visitor, childPointer, childKey, value);
+    visitor({ key: childKey, value: child, pointer: childPointer, parent: value as JsonObject });
+    visitJson(child, visitor, childPointer, childKey, value as JsonObject);
   }
 }
 

@@ -107,9 +107,7 @@ export class PlaypackLoader {
         diagnostics.push(this.diag('E_LOAD_CONFLICT', `玩法包 ${playpack.id} 与 ${current.id} 明确声明不兼容`, playpack.id));
       }
     }
-    for (const conflictId of this.findConflicts(playpack, existing)) {
-      diagnostics.push(this.diag('E_LOAD_CONFLICT', `定义 ${conflictId} 已存在；请重命名或声明唯一替换目标`, playpack.id));
-    }
+    // 注：D-073 单调重定义下 findConflicts 恒空（同 key 后装覆盖先装，不视为冲突），已移除该死分支。
 
     const seen = new Set<Id>();
     for (const def of playpack.defs) {
@@ -121,6 +119,9 @@ export class PlaypackLoader {
     const defs = this.applyOverrides(playpack.defs, playpack.overrides ?? {});
     const staged = this.opts.defRegistry.fork();
     for (const def of defs) {
+      // D-073 单调重定义：同 key 即覆盖/新增，不再需要 overrides 声明。
+      // staged.register 若遇到同 key def，由 DefRegistry 的注册逻辑决定是覆盖还是拒绝——
+      // 在单调重定义模式下，覆盖是合法的，只有跨作用域冲突才拒绝（findConflicts 已返回空）。
       const result = staged.register(def);
       if (!result.ok) diagnostics.push({
         code: result.code as ErrCode, severity: 'error', message: result.detail,
@@ -183,24 +184,6 @@ export class PlaypackLoader {
       if (!visit(p.id)) return null; // cycle detected
     }
     return sorted;
-  }
-
-  private findConflicts(incoming: PlaypackDef, existing: PlaypackDef[]): Id[] {
-    const existingIds = new Set<Id>();
-    for (const pp of existing) {
-      for (const def of pp.defs) {
-        existingIds.add(def.id);
-      }
-    }
-    const conflicts: Id[] = [];
-    for (const def of incoming.defs) {
-      if (existingIds.has(def.id)) {
-        // Check if there's an override that resolves this
-        const hasOverride = Object.prototype.hasOwnProperty.call(incoming.overrides ?? {}, def.id);
-        if (!hasOverride) conflicts.push(def.id);
-      }
-    }
-    return conflicts;
   }
 
   private applyOverrides(defs: Def[], overrides: Record<Id, Id>): Def[] {

@@ -49,7 +49,17 @@ export interface CandidateMappingResult {
   readonly l2Diagnostics: readonly L2Diagnostic[];
   /** 端口自身完整性诊断，已是内核形状（无对应 l2 代码，属端口/上游契约违约）。 */
   readonly portDiagnostics: readonly KernelDiagnostic[];
+  /**
+   * 本次候选实际覆盖的活动定义标识（单调重定义 D-073：同 key 后装即覆盖，无须 overrideIntent 声明）。
+   *
+   * 依赖重校验以它为把手，对仍留活动集的入边依赖者重新检查它们对同名定义的类型引用是否仍兼容
+   * （补 `revalidateDependents` 只随 `overrideIntent` 走的缺口）。包被阻断时为只读空数组。
+   */
+  readonly effectiveOverrides: readonly string[];
 }
+
+/** 阻断时的高效只读空覆盖集，避免为每次被拒变更分配新数组。 */
+const EMPTY_EFFECTIVE_OVERRIDES: readonly string[] = Object.freeze([]);
 
 /**
  * 定义标识 → 该定义在候选文档中的锚点 JSON path。
@@ -149,19 +159,29 @@ function checkChangeAuthorization(input: CandidateMappingInput, pkg: DefinitionP
   const declaredOverrides = new Set((pkg.overrideIntent ?? []).map((intent) => intent.targetId));
   const declaredRemovals = new Set((pkg.removals ?? []).map((removal) => removal.targetId));
 
-  // 1. 未声明覆盖。
-  const collisions = pkg.definitions
-    .map((definition) => definition.id)
-    .filter((id) => input.activeDefinitionIds.has(id) && !declaredOverrides.has(id))
-    .sort(compareStrings);
-  for (const id of collisions) {
+  // 1. 未声明覆盖（单调重定义 D-073：同 key 后装覆盖先装，不再视作冲突拒绝）。
+  //
+  // 早先这里对「定义标识已在活动集、但包未声明 overrideIntent」一律报 REF_OVERRIDE_NOT_DECLARED。
+  // 这与单调重定义（UGC §7.6「后装覆盖先装」、D-073 findConflicts 恒空）相悖：同 key 加载的正统
+  // 语义就是覆盖，无需额外的覆盖声明。因此同 key 即重定义、不作为冲突拒绝。
+  //
+  // 保留下来的：
+  // - 判据2「授权与声明不符」里 operation 本身要求声明的场景（add/replace/remove 与 overrideIntent/
+  //   removals 的一致）不受影响——那是操作级契约，与 D-073 无关。
+  // - 判据3「删除目标不存在」守的仍是 remove 对活动集的有效性，与 D-073 无关。
+  //
+  // 仅当包声明了 overrideIntent 却指向 activity 不存在的目标时（fallthrough 到判据2/3），
+  // 仍会报错；这属于声明损坏，不在单调重定义的「同 key 覆盖」语义内。
+  const orphanOverrideIntents = [...declaredOverrides].filter((id) => !input.activeDefinitionIds.has(id));
+  for (const id of orphanOverrideIntents) {
     diagnostics.push(
       errorDiagnostic({
         code: DIAGNOSTIC_CODES.REF_OVERRIDE_NOT_DECLARED,
-        reason: `候选定义 ${id} 与活动注册表中已有定义同名，但本次变更没有声明对它的覆盖意图。`,
+        reason: `候选包在 overrideIntent 中声明覆盖 ${id}，但活动注册表中不存在该定义；` +
+          '同 key 覆盖不要求覆盖意图声明，因此该声明指向了不存在的目标。',
         correctionSuggestion:
-          '若确实要替换既有定义，请在包的 overrideIntent 中声明该目标并给出理由；' +
-          '若想新增定义，请改用一个未被占用的标识。',
+          '若确为新增定义，请移除该 overrideIntent 声明并保留定义本身（同 key 覆盖由活动集自动判定）；' +
+          '若目标是既有定义，请核对该定义的标识是否与活动集一致。',
         definitionId: id,
         sourcePackage: pkgId,
       }),
@@ -261,15 +281,28 @@ export function mapCandidatePackage(input: CandidateMappingInput): CandidateMapp
       package: null,
       l2Diagnostics: canonicalSort(parsed.diagnostics, compareDiagnostics),
       portDiagnostics: Object.freeze(portDiagnostics),
+      effectiveOverrides: EMPTY_EFFECTIVE_OVERRIDES,
     };
   }
 
   const authorization = checkChangeAuthorization(input, parsed.value);
+  // 单调重定义下同 key 后装即是重定义（D-073），不一定经 overrideIntent 声明。向上游报告
+  // "本次候选实际覆盖了哪些活动定义"：凡是候选定义标识落在活动集里、且本次不是 add-纯新增的，
+  // 都算一次覆盖（供依赖重验证拾取）。resolved 携带服务端文件路径；None 表示无服务端记录，保留已解析 JSON。
+  let effectiveOverrides: string[] = [];
+  if (parsed.value) {
+    const activeSet = input.activeDefinitionIds;
+    effectiveOverrides = parsed.value.definitions
+      .filter((definition) => activeSet.has(definition.id))
+      .map((definition) => definition.id)
+      .sort(compareStrings);
+  }
   const l2Diagnostics = canonicalSort([...parsed.warnings, ...authorization], compareDiagnostics);
   const blocked = authorization.length > 0 || portDiagnostics.length > 0;
   return {
     package: blocked ? null : parsed.value,
     l2Diagnostics,
     portDiagnostics: Object.freeze(portDiagnostics),
+    effectiveOverrides: blocked ? EMPTY_EFFECTIVE_OVERRIDES : effectiveOverrides,
   };
 }

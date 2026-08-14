@@ -60,3 +60,23 @@ export function checkMicroSceneCapacity(currentOccupants: number, capacity: numb
   if (capacity === undefined) return true;
   return currentOccupants < capacity;
 }
+
+/**
+ * 在给定宿主节点的子节点里，找出由 microSceneDefId 生成的既有微型场景节点。
+ *
+ * 供 entity.place 在「不新建节点」的前提下量出既有微型场景的容量占用（需求9.6）：宿主节点的子节点中，
+ * node.def 等于 microSceneDefId 者即视为已实例化的微型场景（def 是保证唯一性的稳定键，
+ * 与微场景的 props.creator 溯源标记无关——同一 def 在宿主下只应有一个实例，复用是语义）。调用方在
+ * 分配任何新节点 Id 之前用它完成容量预检，从而避免「失败但回滚的 place 提前烧掉一个 n 计数器」破坏
+ * 幂等快照重放（bombardment-l12 属性 8 实测暴露）。
+ */
+export function findChildMicroScene(
+  nodes: Readonly<Record<string, { def: Id; parent?: Id }>>,
+  hostNodeId: Id,
+  microSceneDefId: Id,
+): Id | null {
+  for (const [id, n] of Object.entries(nodes)) {
+    if (n.parent === hostNodeId && n.def === microSceneDefId) return id as Id;
+  }
+  return null;
+}

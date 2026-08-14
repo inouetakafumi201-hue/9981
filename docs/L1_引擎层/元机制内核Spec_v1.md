@@ -381,13 +381,15 @@ interface Link {
   def: DefId
   a: NodeId
   b: NodeId
-  directed: boolean              // 单向（高窗跳下）
+  direction: 'bidirectional' | 'unidirectional' | 'one-way-down' | 'one-way-up'
   weight: number
   tags: string[]
-  props: Record<string, Value>   // locked、需要检定的条件都放这里
+  props: Record<string, Value>   // 承载视觉遮挡/物理遮挡/过渡窗口/语义锚点等地图数据面增量
   attachments: AttachmentId[]
 }
 ```
+
+> **方向 token（2026-08-13 裁决 D-074，覆盖旧 `directed: boolean`）**：`Link` 用完整方向枚举 `direction` 表达方向，不再压成布尔 `directed`（旧 `directed: boolean` 语义由 `unidirectional` 承载）。单向陷阱显式标注为 `one-way-down`/`one-way-up`。编译链接规格与 `createLinkShape` 须携带此完整 token；方向（`direction`）与通行代价（`weight`）与遮挡（`props`）彼此独立，不互相绑定。
 
 节点与边都能动态增删（`node.create` / `link.destroy`），所以随机地图生成、炸墙开洞、断桥
 都不是特殊机制，是同一个 Op。
@@ -416,7 +418,7 @@ prefab.spawn(defId, params?) -> { nodes: NodeId[], links: LinkId[], entities: En
 interface PrefabDef extends Def {
   kind: 'prefab'
   nodes: { key: string, def: DefId, props?: Record<string, Expr> }[]
-  links: { a: string, b: string, def: DefId, directed?: boolean }[]  // 用 key 互指
+  links: { a: string, b: string, def: DefId, direction?: 'bidirectional' | 'unidirectional' | 'one-way-down' | 'one-way-up', weight?: number, props?: Record<string, Value> }[]  // 用 key 互指
   entities?: { at: string, def: DefId, overrides?: Record<string, Expr> }[]
   items?: { into: string, container: string, def: DefId }[]
   attachTo?: string              // 与外部拓扑的接缝：把 root 连到调用方给的节点
@@ -424,6 +426,7 @@ interface PrefabDef extends Def {
 ```
 
 `prefab.spawn` 做一件事：**按模板批量创建并重映射内部引用**（key → 新生成的 Id）。
+`prefab.spawn` 须把模板声明的 `parent`（情景嵌套）与 `weight`（门户代价）透传到生成的 Node/Link，否则运行期情景是平的、所有连接代价恒为 1，距离模型无依据（对应 `src/play/map` 编译缺口，见 `docs/创作系统/02_地图生产管线.md` 数据契约）。
 这是纯机械操作，不含任何玩法语义 —— 内核不知道生成的是地牢还是房车。
 
 一次实现，覆盖：副本实例化、程序化地图、载具内部（车是 Entity，车内是它 spawn 出的子图）、
@@ -488,10 +491,12 @@ interface SlotSpec {
 | 泛化 | 消灭了什么 |
 |---|---|
 | **一个宿主可有多个具名 Container** | 车厢 vs 后备箱、身上 vs 快捷栏 |
-| **Slot 可容纳 Entity** | 载具座位、抓住敌人、宠物携带笼 |
+| **Slot 可容纳 Entity** | 载具座位、抓住敌人、宠物携带笼、载器（容器承载活体）内部槽 |
 | **Slot 数量可运行时增删** | 拓展背包、解锁装备位、临时仓位 |
 | **`accepts` 是谓词** | 钱袋子只收货币、头盔位只收头盔 |
 | **一切容器都有索引** | 牌堆、弹匣、队列、背包格、装备位、优先级顺序 |
+
+> **载器是容器家族的特化（2026-08-14 项目所有者调和）**：**容器是引擎层唯一通用承载基元**——所有「带物品槽/承载槽」的东西（角色背包、装备位、双手槽、柜子、死亡背包、载具座位/货舱）都通过 `Container`/`Slot` 实现。`Slot.holds: Ref` 本就可指 Item **或** Entity（见上表「Slot 可容纳 Entity」）。**载器不是与容器同级的新基元**，而是对容器「内部承载活体、且内部无场景」这一家族形态的明确命名与约束特化，不改 `Container`/`Slot` 形式。载器承载面的活体进出用容器写通道（`container.enter/exit`）表达。类型签名见 `docs/L1_引擎层/05_底层引擎架构.md`「载器」节与 `.kiro/specs/wakeup-engine-layer/`。
 
 ### 2.3.1 索引是无条件的（第十一轮修正）
 
@@ -1946,12 +1951,15 @@ interface OutcomeDef {           // ★ 第八轮泛化：胜负不是一个布�
 5  跑全部包的 linter，任一失败 → 拒绝装载
 ```
 
-**关键**：冲突在**加载期**暴露，不在运行期崩溃。
-这是"不写代码"承诺的必要条件 —— 创作者叠 MOD 出错时，得到的是一条诊断信息，
-而不是一个需要读引擎源码才能理解的运行时异常。
+**单调重定义（2026-08-13 项目所有者裁决，覆盖此节合并语义）**：玩法包装载收敛为**无名重装载模型**（D-073），核心是「JSON 重新定义即替换或新增，最终声明即最终版」：
 
-运行期的规则变动仍走 `attach.add(world, mod)`（1.3.1 表），
-两者分工明确：**装载期组合 Def 集合，运行期开关生效范围。**
+1. **玩法包无名**，不引入 namespace / 来源归属维度。装载后状态固定即为新版本；不存在「拔出玩法包」——只有回滚到未装载某包之前的状态（剔除=从列表移除该包 + 整体重装载一次）。
+2. **顺序即优先级，后装覆盖先装**。后装载的包同 key 定义覆盖先装载的；同 key 即替换或新增。
+3. **剩 ID 即退役**（不设 DELETE 声明）：某 def 用 replace 出新版、下方引用留空 → 只剩其 ID，不可再被引用（逻辑删除），不伤及老数据、只使引用失效。
+4. **跨作用域冲突一律拒绝**，不设「确认放行」。
+5. **唯一写入通道 + 原子验证不可绕过**：重定义只发生在装载事务的原子 swap 之前；运行期不得直接改写已生效注册表。运行期的规则变动仍走 `attach.add(world, mod)`（见 1.3.1），两者分工明确——**装载期组合 Def 集合（后装覆盖先装），运行期开关生效范围**。
+
+该裁决替代 §9.2 原先「`overrides` 表显式声明才能替换」的声明型冲突解决模型：`overrides` 表降为可选的重定义辅助，同 key 后装覆盖不再要求显式声明。
 
 ---
 

@@ -287,6 +287,7 @@ export const HINT_TEMPLATES: Record<string, string> = {
   E_LOAD_IDENTIFIER_INVALID: '标识格式无效。请使用稳定、非空且符合命名规则的唯一标识。',
   E_LOAD_DUPLICATE_ID: '同一作用域出现重复标识。请重命名其中一个定义。',
   E_LOAD_OVERRIDE_INVALID: '替换声明无效或不唯一。请明确指定现有目标和唯一的新定义。',
+  E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT: '替换让仍在使用它的定义失效。请保持原有类别与语义族，或在同一变更里一并更新引用者。',
   E_LOAD_LAYER_OWNERSHIP: '该字段不属于当前层级。请把规则放回负责它的引擎层、基类层或玩法层。',
   E_LOAD_TERM_NONCANONICAL: '使用了非规范术语。请改用诊断中建议的正式名称。',
   E_LOAD_NUMERIC_OWNERSHIP: '玩法数值出现在错误层级。请将具体约束移到玩法层。',
@@ -313,6 +314,12 @@ export const HINT_TEMPLATES: Record<string, string> = {
   E_LOAD_MIGRATED_SOURCE_REBASED: '文件已自动升级到当前版本，之后报告的行号列号对应升级后的内容，不是你原始文件的位置。请以升级后的内容为准核对。',
   E_MIG_AMBIGUOUS_PATH: '存在多条迁移路径。请指定唯一迁移序列。',
   E_MIG_CYCLE: '迁移依赖形成循环。请移除循环迁移边。',
+
+  // Carrier carrying-surface and map anchor invariants.
+  E_INV_CARRIER_CAPACITY: '载器承载面占用数超过声明的容量上限。请检查 container.enter 校验或调整 capacity。',
+  E_INV_CARRIER_LOCATION_EXCLUSIVE: '活体同时出现在承载面内部槽与 node 上（位置互斥违反）。请检查 container.enter/exit 写通道。',
+  E_LOAD_MAP_ANCHOR_NON_REPLACEABLE: '地图位同 key 撞位，不可替换。请使用不同 ID 或先卸载已装载的地图。',
+  E_LOAD_LLM_MAP_INDEPENDENT: 'LLM 玩法包携带了可独立生效的地图定义。LLM 包不能带可独立激活的地图。',
 };
 
 export function checkHintCompleteness(errCodes: Record<string, readonly string[]>): string[] {

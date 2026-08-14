@@ -280,17 +280,31 @@ describe('Intent resolveOrder', () => {
           const deps2 = makeDeps([counterAction, scheduleWithResolveOrder]);
           const r2 = new OpRegistry(h);
           
-          // 注册 prop.set
+          // 注册 prop.set；表达式值走 ExprEngine/路径求值，使 counter 能真实递增。
           r2.register('prop.set', (args: { path: string; value: unknown }, ctx) => {
-            let val = args.value;            // 如果是表达式，先求值
+            let val = args.value;
             if (typeof val === 'object' && val !== null && 'op' in val) {
-              const expr = val as {op: string; left?: unknown; right?: unknown; path?: string};
-              if (expr.op === 'add' && expr.left && expr.right) {
-                const leftVal = typeof expr.left === 'object' && 'path' in (expr.left as object)
-                  ? (expr.left as {path: string}).path.split('.').reduce((o, k) => (o as Record<string, unknown>)?.[k], ctx.tx.getDraft() as unknown) ?? 0
-                  : expr.left;
-                const rightVal = expr.right;
-                val = (typeof leftVal === 'number' ? leftVal : 0) + (typeof rightVal === 'number' ? rightVal : 0);
+              const expr = val as { op: string; path?: string; args?: unknown[] };
+              if (expr.op === 'get' && expr.path) {
+                val = expr.path.split('.').reduce(
+                  (o, k) => (typeof o === 'object' && o !== null ? (o as Record<string, unknown>)[k] : undefined),
+                  ctx.tx.getDraft() as unknown,
+                ) ?? 0;
+              } else if (expr.op === 'add' && Array.isArray(expr.args)) {
+                val = expr.args.reduce((acc, term) => {
+                  if (typeof term === 'number') return (acc as number) + term;
+                  if (typeof term === 'object' && term !== null && 'op' in term) {
+                    const t = term as { op: string; path?: string };
+                    const resolved = t.op === 'get' && t.path
+                      ? (t.path.split('.').reduce(
+                          (o, k) => (typeof o === 'object' && o !== null ? (o as Record<string, unknown>)[k] : undefined),
+                          ctx.tx.getDraft() as unknown,
+                        ) ?? 0)
+                      : 0;
+                    return (acc as number) + (typeof resolved === 'number' ? resolved : 0);
+                  }
+                  return acc;
+                }, 0);
               }
             }
             ctx.tx.setDraft(setPath(ctx.tx.getDraft(), args.path, val as never));

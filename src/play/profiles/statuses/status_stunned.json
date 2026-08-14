@@ -1,10 +1,10 @@
 {
-  "id": "status.class.stunned",
+  "id": "status_stunned",
   "name": "眩晕",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.stunned",
+    "sourceClass": "status_stunned",
     "capabilityIds": [
       "status.capability.action_eligibility"
     ]
@@ -43,7 +43,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.sleeping",
+      "with": "status_sleeping",
       "type": "counter",
       "description": "眩晕可打断睡眠"
     }

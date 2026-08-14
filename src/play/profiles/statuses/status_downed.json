@@ -1,10 +1,10 @@
 {
-  "id": "status.class.downed",
+  "id": "status_downed",
   "name": "零血倒地",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.downed",
+    "sourceClass": "status_downed",
     "capabilityIds": [
       "status.capability.survival_stage"
     ]
@@ -57,7 +57,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.knocked_down",
+      "with": "status_knocked_down",
       "type": "none",
       "description": "与普通击倒是不同状态，不冲突"
     }

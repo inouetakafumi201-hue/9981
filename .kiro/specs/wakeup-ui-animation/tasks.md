@@ -3,7 +3,7 @@
 > **⚠️ 架构收敛依赖**（2026-08-12）
 > UI/动画实现依赖 Wave 3 完成（文档术语一致性迁移）。
 > 设计文档中的层级标签需先统一后，再据此编写组件。
-> 详见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+> 详见 `docs/L_归档/steering_历史/PARALLEL_EXECUTION_LOCK.md`
 
 
 ## 执行约定

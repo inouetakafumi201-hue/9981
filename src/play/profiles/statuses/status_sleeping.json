@@ -1,10 +1,10 @@
 {
-  "id": "status.class.sleeping",
+  "id": "status_sleeping",
   "name": "睡眠",
   "category": "positive",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.sleeping",
+    "sourceClass": "status_sleeping",
     "capabilityIds": [
       "status.capability.action_eligibility"
     ]

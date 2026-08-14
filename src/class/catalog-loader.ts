@@ -9,11 +9,9 @@
  * 而是由 `class-contract.ts` 的纯函数提供，便于对人造反例单独运行。
  */
 
-import { StrictJsonCodec } from '../core/kernel/spec-compiler/json-codec.js';
-import {
-  DEFAULT_TECHNICAL_QUOTAS,
-  type JsonValue,
-} from '../core/kernel/spec-compiler/types.js';
+import { StrictJsonCodec } from '../core/kernel/codec/index.js';
+import type { JsonValue } from '../core/kernel/spec-compiler/types.js';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../core/kernel/security/index.js';
 import { ClassCatalogContractError, deepFreeze } from './json-contract.js';
 import { type ClassCatalog, parseClassCatalog } from './class-contract.js';
 import type { ItemClassCatalog } from './items/item-types.js';
@@ -35,7 +33,7 @@ export function parseStrictDataJson(
     owningLayer,
     normativeStatus: 'normative',
   }, DEFAULT_TECHNICAL_QUOTAS);
-  return deepFreeze(parsed.value);
+  return deepFreeze(parsed.value) as JsonValue;
 }
 
 /** 使用严格数据解析链读取基类目录。 */

@@ -35,6 +35,7 @@ import type { HookDiagnostic } from '../events/dispatcher.js';
 import type { FlowInterpreter } from '../flow/interpreter.js';
 import { registerPropOps } from '../ops/prop-ops.js';
 import { registerStructuralOps, makeItemMove } from '../ops/structural-ops.js';
+import { registerCarrierOps, makeContainerExit } from '../ops/carrier-ops.js';
 import { registerStackOps } from '../ops/stack-ops.js';
 import { registerRelationOps } from '../ops/relation-ops.js';
 import { registerTransformOps } from '../ops/transform-ops.js';
@@ -149,9 +150,16 @@ export function createFullHarness(seedDefs: Def[] = []): FullHarness {
     exprEngine,
     evalCtxForSlotAccepts: (_containerId, _slotIndex) => ctxForSelf({ $: 'w:0' }),
   });
+  const containerExit = makeContainerExit();
 
   registerPropOps(registry, defRegistry);
   registerStructuralOps(registry, { itemMove, defLookup });
+  registerCarrierOps(registry, {
+    exprEngine,
+    evalCtxForSlotAccepts: (_containerId, _slotIndex) => ctxForSelf({ $: 'w:0' }),
+    evalCtxForCarrierLiving: (_containerId) => ctxForSelf({ $: 'w:0' }),
+    containerExit,
+  });
   registerStackOps(registry, itemMove);
   registerRelationOps(registry);
   registerTransformOps(registry, () => nextId('n'), defLookup);

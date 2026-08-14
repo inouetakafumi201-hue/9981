@@ -347,12 +347,14 @@ export function createL2DefinitionValidationGateway(
       const unknownDiagnostics = unknownMemberDiagnostics(envelope, index, pkg, closedSchema.unknownMembers);
 
       // 5. 全量验证。输入与 registry/definition-registry.ts#activate 完全一致。
+      //    单调重定义（D-073）同 key 覆盖经 effectiveOverrides 折给依赖重验证，确保活动依赖不被破坏。
       const validation = validateFullPackage({
         package: pkg,
         activeNodes: active.nodes,
         activeInbound: active.inbound,
         activeFamilies: active.families,
         activeReferences: activeReferenceMap(active),
+        effectiveOverrides: mapping.effectiveOverrides,
       });
 
       const projected = projectL2Diagnostics(projection, [

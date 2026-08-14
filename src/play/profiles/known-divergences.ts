@@ -102,7 +102,28 @@ export interface UnresolvedParameterBinding {
   readonly blockedBy: string;
 }
 
-export const UNRESOLVED_PARAMETER_BINDINGS: readonly UnresolvedParameterBinding[] = [];
+/** 载具能力参数绑定的结构性未决项（VEHICLE-COMPOSITE-FIELD-BACKING）。 */
+export const VEHICLE_PARAMETER_BINDING_GAP: UnresolvedParameterBinding = {
+  sourceId: 'vehicles/*（5 份载具 profile）',
+  capabilityId: 'vehicle.capability.*（drive/destruction_sequence 等全部载具能力）',
+  parameterKey: 'speed/moveApCost/occupantDisposition/cargoDisposition 等 field-name 槽',
+  issue:
+    '基类层 `src/class/vehicles/index.json` 为各载具能力声明的 `parameters[]` 是「字段名」槽'
+    + '（drive → speed/moveApCost、destruction_sequence → occupantDisposition/cargoDisposition 等），'
+    + '但这些字段名指向的是 profile 上**不存在的顶层键**：实际数据以嵌套块 `cargo`/`moveEffect` 承接，'
+    + '且多个能力要求的 occupantDisposition（载具损毁时乘员去向）、cargoDisposition（货舱去向）在'
+    + '玩法层根本没有对应顶层槽。若硬补齐绑定要么改基类层参数声明（carries 语义），要么在玩法层'
+    + '新增冗余顶层字段——二者都越出本线（玩法层数据契约线）的白名单/职责。',
+  blockedBy:
+    '需由 L2 基类层线裁决载具能力的参数承载面（是把 speed/moveApCost 等改判给 playLayerOwnedFieldNames、'
+    + '还是把 occupantDisposition/cargoDisposition 移出必填），裁决后才能按契约补齐绑定或登记消解。'
+    + '裁决落地前，载具不参与能力参数绑定校验，其玩法参数改由 `auditVehicleParameterBacking` 覆盖：'
+    + '见 `audit.ts` PARAMETER_BINDING_FIELD[vehicles] 空值注释与 VEHICLE_META_FIELDS。',
+};
+
+export const UNRESOLVED_PARAMETER_BINDINGS: readonly UnresolvedParameterBinding[] = [
+  VEHICLE_PARAMETER_BINDING_GAP,
+];
 
 /** 文档与实现之间仍未消解的差异。 */
 export interface DocDivergence {
@@ -150,7 +171,9 @@ export const DOC_DIVERGENCES: readonly DocDivergence[] = [
       + 'action-turn/playpack.json 的 attachment:overloaded 用 remainingRolls=2 每次投点递减。',
     location: 'src/play/profiles/statuses/status_overloaded.json、src/play/action-turn/playpack.json',
     detectable: true,
-    note: '同一机制在玩法层内部有两个不同数值（3 与 2），且都无法直接对应文档的自然语言描述。等待裁决。',
+    note: '同一机制在玩法层内部有两个不同数值（3 与 2），且都无法直接对应文档的自然语言描述。'
+      + '2026-08-13 已裁决：过载语义定为「跳过一次投点、下下回合归队」，status_overloaded 改用 rollsSkipped=1，'
+      + 'playpack 的 remainingRolls=2 投点递减表达同一天数，两侧已对齐。',
   },
   {
     code: 'L3-DIV-02',
@@ -198,15 +221,15 @@ export const DOC_DIVERGENCES_CONTINUED: readonly DocDivergence[] = [
     note:
       '原始分歧是 D-037 整条未实现，补齐需要先定下「唯一领先且优势 ≥2 得 3 AP」的完整判定算法。'
       + '算法由 wakeup-core-mechanics Requirement 5 给出后才落地。'
-      + '单人档位是唯一没有按 01 文档实现的分支：U-002 判定为 abort 阻塞而非默认 2 AP，'
-      + '因 wakeup-core-mechanics 对该点是完全权威，01 文档的旧陈述已被取代而非仍在分歧。'
-      + '需注意 U-002 自身标注「未冻结」，其结论仍可能变化，届时应回到本条而不是另开新编号。',
+      + '单人档位经 U-002 由项目所有者于 2026-08-13 显式消解：维持 D-037，单人按差值分配算法自然得 2 AP，'
+      + '既非特例分支也非 abort 阻塞。01 文档对该陈述的旧解释被取代；若将来结论再变，回到本条更新而非另开新编号。',
     resolution: {
       decisionId: 'D-037 / U-002',
       outcome:
         '档位模型已落地：apParticipantCount 读取投点队列人数，apTier/apMaxTier/apLead 按最高点差距分配 AP——'
         + '2 人局最高者 2AP、差 1 得 1AP、差 ≥2 未分配且不产生 3AP；3+ 人局唯一最高且领先 ≥2 得 3AP、'
-        + '并列最高或领先不足 2 得 2AP、差 1 得 1AP、差 ≥2 未分配。单人局按 U-002 abort，不推断默认 AP。',
+        + '并列最高或领先不足 2 得 2AP、差 1 得 1AP、差 ≥2 未分配。'
+        + '单人局按 U-002（D-037 维持）自然落 2 AP 档；abort 写法已废止，不再注入结构化拒绝或默认推断。',
       recordedAt:
         'src/play/action-turn/playpack.json props.resolutionPolicy.apAllocation 与 .singleParticipant',
     },
@@ -214,24 +237,29 @@ export const DOC_DIVERGENCES_CONTINUED: readonly DocDivergence[] = [
   {
     code: 'L3-DIV-05',
     docSection: '§2.3 逆转 / §3.5 体力流博弈示例 / §十一 术语对照',
-    documented: '规则正文与术语表写常规逆转成本 1 AP；§3.5 的示例文字写「逆转消耗 2AP」。',
-    implemented: '玩法包采用 1 AP。',
+    documented: '旧：规则正文与术语表写常规逆转成本 1 AP；§3.5 示例写「逆转消耗 2AP」。',
+    implemented:
+      '玩法包 `action:reverse` 已改为消耗 SP 1（常规逆转不用 AP），`action:super-reverse` 仍为 SP 2。',
     location: 'src/play/action-turn/playpack.json action:reverse',
     detectable: true,
-    note: '文档内部冲突；玩法包按三处一致的规则正文取值，示例未修订。',
+    note:
+      '2026-08-13 项目所有者裁决：逆转消耗的是 SP（清醒值）而非 AP，代价来源错写。'
+      + '常规逆转 SP 1、超逆转 SP 2；二者与强力骰互斥（同一 windowChoice 槽位）。',
   },
   {
     code: 'L3-DIV-06',
     docSection: '§5.4 弱点攻击与举盾 / §6.2 失衡效果',
     documented: '[失衡] 破除举盾、防御、招架等准备动作状态，且这是盾牌被破解的唯一路径。',
     implemented:
-      'statuses/status_blocking.json 的 breakConditions 与 interactionMatrix 都没有 status_staggered 条目，'
-      + '格挡状态在 profile 层面不会被失衡破除。',
+      'statuses/status_blocking.json 的 breakConditions 与 interactionMatrix 已补 status_staggered 条目，'
+      + '格挡状态在 profile 层面会被失衡破除。',
     location: 'src/play/profiles/statuses/status_blocking.json',
     detectable: true,
     note:
-      '玩法包侧的失衡可以破除以 AttachmentDef 表达的准备态，但格挡 profile 自身缺少这条解除条件。'
-      + '补上会改变防御强度，属玩法平衡取舍，留待裁决。',
+      '玩法包侧的失衡本来就能破除以 AttachmentDef 表达的准备态（rule:staggered-block-preparation 阻止失衡者举盾），'
+      + '格挡 profile 此前缺这条解除条件。经审计确认文档 §5.4/§6.2 明确"失衡会破除举盾"且为盾牌被破解的唯一路径，'
+      + '遂补上 breakConditions 与 interactionMatrix 条目标记——这与已在 status_aiming.json 落地的口径一致，'
+      + '不引入新裁决。',
   },
   {
     code: 'L3-DIV-07',
@@ -277,11 +305,15 @@ export const DOC_DIVERGENCES_PROFILE_LOCAL: readonly DocDivergence[] = [
   {
     code: 'L3-DIV-11',
     docSection: '（profile 自述与自身配置不一致）',
-    documented: 'statuses/status_slowed.json 的 description 写「所有动作消耗 +1 AP」。',
-    implemented: '同文件的 effects.actionModifiers 只覆盖 move 与 attack 两类动作。',
+    documented: 'statuses/status_slowed.json 旧 description 写「所有动作消耗 +1 AP」，effects 却只配置 move/attack 两类。',
+    implemented:
+      '已按 AP 铁律重写：迟缓表达为「离开任何天然场景需一次中间状态」（transition），'
+      + '去除 apModifier/actionModifiers 加价字段；description 改为「需要中间状态」。',
     location: 'src/play/profiles/statuses/status_slowed.json',
     detectable: true,
-    note: '「所有动作」与「两类动作」的差别会改变迟缓的实际强度，需要确认是描述过宽还是配置缺项。',
+    note:
+      '原「所有动作 vs 两类动作」的分歧已在宪法·单动作原则（projects 2026-08-13）下消解：'
+      + '迟缓本就不该以加 AP 表达，改为过渡态是唯一正确形态，描述与实现随之一致。',
   },
 ];
 

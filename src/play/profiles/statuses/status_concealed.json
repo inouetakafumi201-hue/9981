@@ -1,10 +1,10 @@
 {
-  "id": "status.class.concealed",
+  "id": "status_concealed",
   "name": "隐蔽",
   "category": "positive",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.concealed",
+    "sourceClass": "status_concealed",
     "capabilityIds": [
       "status.capability.detection_modulation"
     ]
@@ -36,7 +36,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.concealed",
+      "with": "status_concealed",
       "type": "none",
       "description": "同名不叠加"
     }

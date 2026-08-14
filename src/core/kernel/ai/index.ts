@@ -12,6 +12,7 @@ export * from './read-gateway.js';
 export * from './behavior-validation.js';
 export * from './candidate-planner.js';
 export * from './evaluation.js';
+export * from './design-currency.js';
 export * from './commit-gateway.js';
 export * from './planner-registry.js';
 export * from './simulation.js';

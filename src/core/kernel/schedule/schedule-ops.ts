@@ -2,14 +2,16 @@
  * L9 Schedule Ops: 通用、确定性的相位推进。
  * 相位边界 effect 与 turn 状态在同一个 Op 事务内完成；任何失败都会整体回滚。
  */
+import { err, ok } from '../ops/result.js';
 import type { OpContext, OpImpl, OpRegistry } from '../ops/registry.js';
 import type { Result } from '../ops/result.js';
-import { ok } from '../ops/result.js';
 import type { Id } from '../state/ids.js';
 import type { Value } from '../state/value.js';
 import type { Def } from '../state/def.js';
 import type { Effect } from '../events/effect-types.js';
-import type { ScheduleDef } from './types.js';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
+import type { ScheduleDef, PhaseDef } from './types.js';
+import type { WorldState } from '../state/world-state.js';
 import { checkInstantiable } from '../ops/def-guard.js';
 
 export interface ScheduleAdvanceArgs {
@@ -64,6 +66,70 @@ function fireDueDeferred(ctx: OpContext, deps: ScheduleOpsDeps): Result<void> {
   return ok(undefined);
 }
 
+/**
+ * 检查相位推进条件（需求31.4-31.5, 28.5）：
+ * - 响应相位（reactionRounds > 0）：无 pending Intent 即可推进
+ * - 普通相位：input 齐或 timeLimit 到期
+ *
+ * 返回 true 表示可以推进，false 表示不满足条件。
+ */
+function checkAdvanceConditions(
+  phase: PhaseDef,
+  state: WorldState,
+): boolean {
+  const hasPendingIntents = Object.values(state.world.intents).some(
+    (intent) => intent?.status === 'pending',
+  );
+  const hasOpenDecisions = Object.values(state.world.decisions).some(
+    (decision) => decision?.status === 'open',
+  );
+
+  // 任务 29.2 / 需求28.5：响应相位的推进条件优先于 input 检查，只看 pending Intent。
+  if (phase.reactionRounds !== undefined && phase.reactionRounds > 0) {
+    return !hasPendingIntents;
+  }
+
+  const input = phase.input ?? 'none';
+
+  // timeLimit 到期则无论 input 是否齐都能推进（需求31.5）。非数求值视为未到期。
+  if (phase.timeLimit !== undefined) {
+    const exprEngine = new ExprEngine();
+    const evalCtx = makeDefaultEvalContext({
+      vars: {
+        phaseIndex: state.world.turn.phaseIndex,
+        phaseEnteredAt: state.world.turn.phaseEnteredAt,
+      },
+      // timeLimit 是 Expr，从 state 路径寻址读取；缺跳路时兜底返回 null，视为未到期。
+      resolvePath: (path) => {
+        const parts = path.split('.');
+        let cur: unknown = state;
+        for (const part of parts) {
+          if (cur === null || typeof cur !== 'object') return null;
+          cur = (cur as Record<string, unknown>)[part];
+        }
+        return (cur ?? null) as Value | null;
+      },
+    });
+    try {
+      const limitValue = exprEngine.eval(phase.timeLimit, evalCtx);
+      if (typeof limitValue === 'number' && limitValue <= 0) return true;
+    } catch {
+      // 求值失败视为未到期，回落 input 检查。
+    }
+  }
+
+  switch (input) {
+    case 'none':
+      return true;
+    case 'actor':
+    case 'all':
+      // actor/all 都要求无 open Decision 且无 pending Intent。
+      return !hasOpenDecisions && !hasPendingIntents;
+    default:
+      return true;
+  }
+}
+
 function makeScheduleAdvance(deps: ScheduleOpsDeps): OpImpl<ScheduleAdvanceArgs, void> {
   return (args, ctx) => {
     const draft = ctx.tx.getDraft();
@@ -76,6 +142,14 @@ function makeScheduleAdvance(deps: ScheduleOpsDeps): OpImpl<ScheduleAdvanceArgs,
     if (schedule.phases.length === 0) return ok(undefined);
 
     const currentIndex = Math.min(turn.phaseIndex, schedule.phases.length - 1);
+    const currentPhase = schedule.phases[currentIndex];
+
+    // 需求31.4-31.5：推进前检查相位条件（input 齐或 timeLimit 到期 / 响应相位看 pending Intent）。
+    // 条件不满足时拒绝推进并整体回滚（E_OP_NOT_ACCEPTED）。
+    if (currentPhase && !checkAdvanceConditions(currentPhase, draft)) {
+      return err('E_OP_NOT_ACCEPTED', 'Advance conditions not met');
+    }
+
     const requestedIndex = currentIndex + 1;
     const wraps = requestedIndex >= schedule.phases.length;
     const nextIndex = wraps ? (schedule.loop ? 0 : currentIndex) : requestedIndex;

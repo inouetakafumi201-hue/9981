@@ -1,10 +1,10 @@
 {
-  "id": "status.class.blocking",
+  "id": "status_blocking",
   "name": "格挡",
   "category": "positive",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.blocking",
+    "sourceClass": "status_blocking",
     "capabilityIds": [
       "status.capability.defense_response"
     ]
@@ -32,13 +32,23 @@
       "type": "damage",
       "effect": "auto_cancel",
       "description": "受击后自动取消（无论是否格挡成功）"
+    },
+    {
+      "type": "status",
+      "status": "status_staggered",
+      "description": "进入失衡状态时破除举盾。"
     }
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.blocking",
+      "with": "status_blocking",
       "type": "none",
       "description": "同名不叠加，已有的格挡效果持续"
+    },
+    {
+      "with": "status_staggered",
+      "type": "counter",
+      "description": "失衡会破除举盾准备态。"
     }
   ],
   "kernelEvents": [

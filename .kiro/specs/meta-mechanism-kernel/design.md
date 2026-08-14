@@ -286,6 +286,7 @@ interface InvariantChecker {
          node.create / node.destroy / node.merge / node.split
          link.create / link.destroy
          slot.add / slot.del
+         container.enter / container.exit   // ★ 本次新增（H-ENG-03：载器承载面写通道，见「载器承载面」节）
          prefab.spawn / prefab.despawn
 关系类   relation.set / relation.del
 认知类   agent.bind / agent.unbind

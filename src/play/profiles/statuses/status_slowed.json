@@ -1,10 +1,10 @@
 {
-  "id": "status.class.slowed",
+  "id": "status_slowed",
   "name": "迟缓",
   "category": "negative",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.slowed",
+    "sourceClass": "status_slowed",
     "capabilityIds": [
       "status.capability.action_efficiency"
     ]
@@ -14,18 +14,13 @@
   "stacking": "none",
   "stackBehavior": "extend",
   "effects": {
-    "actionModifiers": [
-      {
-        "actionType": "move",
-        "apModifier": "+1",
-        "description": "移动动作消耗+1 AP"
-      },
-      {
-        "actionType": "attack",
-        "apModifier": "+1",
-        "description": "攻击动作消耗+1 AP（近战和远程均适用）"
-      }
-    ]
+    "onAction": {
+      "transition": true,
+      "actionTypes": [
+        "scene_exit"
+      ],
+      "description": "离开任何天然场景都需一次中间状态：1 AP 进入过渡态，1 AP 完成移动。单段恒为 1 AP，不叠加加价。"
+    }
   },
   "breakConditions": [
     {
@@ -43,14 +38,14 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.heavy",
-      "type": "amplify",
-      "description": "与重装叠加：大场景移动+2 AP（原+1+1）"
+      "with": "status_heavy",
+      "type": "concatenate",
+      "description": "与重装叠加不产生新状态、不加价：离开大场景需多个 1 AP 过渡段（示例：共 3 AP = 三个 1 AP 段），段数由过渡链累加，单段仍是 1 AP"
     },
     {
-      "with": "status.class.hastened",
+      "with": "status_hastened",
       "type": "neutralize",
-      "description": "与加速状态互斥，叠加时取较高效果"
+      "description": "与加速状态互斥，加速仅缩短过渡段（使其不再需要中间态），不引入负 AP"
     }
   ],
   "kernelEvents": [
@@ -61,10 +56,10 @@
   "icon": "clock",
   "color": "gray",
   "priority": 12,
-  "description": "所有动作消耗+1 AP，持续2回合（符合数值小于等于5约束）",
+  "description": "离开任何天然场景都需要一次中间状态（1 AP 进入过渡态，1 AP 完成），持续2回合",
   "tags": [
-    "ap-penalty",
-    "slow",
+    "movement-penalty",
+    "transition",
     "debuff"
   ],
   "source": [
@@ -72,5 +67,5 @@
     "NPC技能: 减速攻击"
   ],
   "mvp": true,
-  "notes": "S-005已解决：迟缓持续时间明确定义为2回合"
+  "notes": "S-005已解决：迟缓持续时间明确定义为2回合。AP 铁律：迟缓表达为「需要过渡中间态」，不是「动作额外+1 AP」，无任何加 AP 设计。"
 }

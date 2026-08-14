@@ -81,7 +81,10 @@ function makePrefabSpawn(deps: PrefabOpsDeps): OpImpl<PrefabSpawnArgs, PrefabHan
     let nextNodes = { ...draft.nodes };
     for (const nodeSpec of prefab.nodes) {
       const id = keyToId.get(nodeSpec.key) as Id;
-      nextNodes[id] = createNodeShape(id, nodeSpec.def);
+      // L-07 透传：parent 经 props 传入，prefab.spawn 传给 createNodeShape
+      const parentStr = nodeSpec.props?.['parent'];
+      const parent = typeof parentStr === 'string' ? (keyToId.get(parentStr) as Id | undefined) ?? parentStr as Id : undefined;
+      nextNodes[id] = createNodeShape(id, nodeSpec.def, { parent });
     }
 
     let remappedLinks: { a: Id; b: Id; def: Id; directed?: boolean }[];
@@ -99,7 +102,14 @@ function makePrefabSpawn(deps: PrefabOpsDeps): OpImpl<PrefabSpawnArgs, PrefabHan
     for (const l of remappedLinks) {
       const linkId = nextId('l');
       linkIds.push(linkId);
-      nextLinks[linkId] = createLinkShape(linkId, l.a, l.b, { def: l.def, directed: l.directed });
+      // L-07 透传：weight 经 PrefabDef.links[].weight 传入（若有）；direction 保持完整 token
+      const linkSpec = prefab.links.find((pl) => pl.a === l.a && pl.b === l.b) ?? { weight: undefined, direction: undefined };
+      nextLinks[linkId] = createLinkShape(linkId, l.a, l.b, {
+        def: l.def,
+        directed: l.directed,
+        weight: (linkSpec as { weight?: number }).weight,
+        direction: (linkSpec as { direction?: string }).direction,
+      });
     }
 
     // 需求8.3：attachTo 接缝——预制结构 root 节点与外部指定节点相连

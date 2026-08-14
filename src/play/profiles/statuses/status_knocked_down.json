@@ -1,10 +1,10 @@
 {
-  "id": "status.class.knocked_down",
+  "id": "status_knocked_down",
   "name": "击倒",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.knocked_down",
+    "sourceClass": "status_knocked_down",
     "capabilityIds": [
       "status.capability.posture"
     ]
@@ -44,7 +44,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.downed",
+      "with": "status_downed",
       "type": "none",
       "description": "与零血倒地（濒死）是不同状态，不冲突"
     }

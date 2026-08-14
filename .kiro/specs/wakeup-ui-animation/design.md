@@ -629,9 +629,9 @@ D-025 与 Requirement 6.3 都禁止用第三方游戏名作为技术方案的规
     "safe-positive-free-discount": "green",
     "relation-gateway-ranged": "purple",
     "melee-aggression-violence": "coral",
-    "social-communication-economy": "cyan",
+    "social-communication-ugc-creative-workshop": "cyan",
     "cooldown-delay": "gray",
-    "neutral-material-base": "gray-white",
+    "neutral-material-dream-sleep-base": "gray-white",
     "gradeHighlights": ["gold", "silver"],
     "authoritativeSource": "D-066"
   },

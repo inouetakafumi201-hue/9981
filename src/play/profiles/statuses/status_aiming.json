@@ -1,10 +1,10 @@
 {
-  "id": "status.class.aiming",
+  "id": "status_aiming",
   "name": "瞄准",
   "category": "positive",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.aiming",
+    "sourceClass": "status_aiming",
     "capabilityIds": [
       "status.capability.preparation"
     ]
@@ -35,7 +35,7 @@
     },
     {
       "type": "status",
-      "status": "status.class.staggered",
+      "status": "status_staggered",
       "description": "进入失衡状态时解除。"
     },
     {
@@ -46,7 +46,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.staggered",
+      "with": "status_staggered",
       "type": "counter",
       "description": "失衡会打断瞄准准备。"
     }

@@ -3,7 +3,7 @@
 > **⚠️ 架构收敛依赖**（2026-08-12）  
 > 任务 9"扩展既有基类目录字段"依赖 Wave 2 完成（14 份目录向统一信封 schema 迁移）。  
 > 迁移期间不可新增专有顶层键，否则会破坏统一形状约束。  
-> 详见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+> 详见 `docs/L_归档/steering_历史/PARALLEL_EXECUTION_LOCK.md`
 
 > ## 本版取代旧版（2026-08-09 按 D-058 重写）
 >

@@ -102,9 +102,8 @@
   ],
   "weaponParameters": {
     "weapon.capability.assault_advance": {
-      "triggerEvent": "OnWeaponFire",
-      "grantedActionId": "action.assault_move",
-      "usesRemaining": 1
+      "advanceActionId": "action.assault_move",
+      "triggerEventId": "OnWeaponFire"
     },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",

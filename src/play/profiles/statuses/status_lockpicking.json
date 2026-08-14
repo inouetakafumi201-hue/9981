@@ -1,10 +1,10 @@
 {
-  "id": "status.class.lockpicking",
+  "id": "status_lockpicking",
   "name": "撬锁中",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.lockpicking",
+    "sourceClass": "status_lockpicking",
     "capabilityIds": [
       "status.capability.interaction_progress"
     ]

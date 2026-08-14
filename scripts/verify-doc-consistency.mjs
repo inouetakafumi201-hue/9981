@@ -56,7 +56,7 @@ console.log('===== 1) 已关闭项不得再被声明为未冻结 =====');
   const match = content.match(/UnresolvedId = .*/);
   const ids = match ? match[0] : '';
   console.log(`  UnresolvedId: ${ids}`);
-  const closed = ['U-002', 'U-004', 'U-005'];
+  const closed = ['U-001', 'U-002', 'U-004', 'U-005'];
   let ok = true;
   for (const id of closed) {
     if (ids.includes(id)) {
@@ -91,7 +91,7 @@ console.log('\n===== 2) U-SPACE 已关闭项不得再要求保持 Unresolved ===
 console.log('\n===== 3) 仍未冻结项必须仍被保护 =====');
 {
   const content = read('.kiro/specs/wakeup-core-mechanics/design.md');
-  const open = ['T-001', 'U-001', 'U-003'];
+  const open = ['T-001', 'U-003'];
   for (const id of open) {
     if (content.includes(`'${id}'`)) {
       console.log(`  ✓ ${id} 仍在 UnresolvedId 中受保护`);

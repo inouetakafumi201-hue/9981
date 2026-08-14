@@ -462,7 +462,7 @@
   },
   "classes": [
     {
-      "id": "status.class.poisoned",
+      "id": "status_poisoned",
       "name": "中毒",
       "category": "negative",
       "type": "numeric",
@@ -474,7 +474,7 @@
       "description": "表示实体正承受持续毒素影响的语义状态。"
     },
     {
-      "id": "status.class.burning",
+      "id": "status_burning",
       "name": "燃烧",
       "category": "negative",
       "type": "numeric",
@@ -486,7 +486,7 @@
       "description": "表示实体正承受持续火焰影响的语义状态。"
     },
     {
-      "id": "status.class.frozen",
+      "id": "status_frozen",
       "name": "冰冻",
       "category": "negative",
       "type": "tag",
@@ -498,7 +498,7 @@
       "description": "表示实体因低温影响而行动受限的语义状态。"
     },
     {
-      "id": "status.class.slowed",
+      "id": "status_slowed",
       "name": "迟缓",
       "category": "negative",
       "type": "numeric",
@@ -510,7 +510,7 @@
       "description": "表示实体的行动效率受到抑制的语义状态。"
     },
     {
-      "id": "status.class.weak",
+      "id": "status_weak",
       "name": "虚弱",
       "category": "negative",
       "type": "numeric",
@@ -522,7 +522,7 @@
       "description": "表示实体的效果输出能力受到削弱的语义状态。"
     },
     {
-      "id": "status.class.heavy",
+      "id": "status_heavy",
       "name": "重装",
       "category": "negative",
       "type": "tag",
@@ -534,7 +534,7 @@
       "description": "表示实体因负重而承受行动负担的语义状态。"
     },
     {
-      "id": "status.class.lockpicking",
+      "id": "status_lockpicking",
       "name": "撬锁中",
       "category": "negative",
       "type": "tag",
@@ -546,7 +546,7 @@
       "description": "表示实体正在进行需要维持的精密交互的语义状态。"
     },
     {
-      "id": "status.class.stunned",
+      "id": "status_stunned",
       "name": "眩晕",
       "category": "negative",
       "type": "tag",
@@ -558,7 +558,7 @@
       "description": "表示实体因控制效果而无法正常行动的语义状态。"
     },
     {
-      "id": "status.class.knocked_down",
+      "id": "status_knocked_down",
       "name": "击倒",
       "category": "negative",
       "type": "tag",
@@ -570,7 +570,7 @@
       "description": "表示实体处于可恢复倒地姿态的语义状态。"
     },
     {
-      "id": "status.class.downed",
+      "id": "status_downed",
       "name": "零血倒地",
       "category": "negative",
       "type": "tag",
@@ -582,7 +582,7 @@
       "description": "表示实体进入危急倒地阶段的语义状态。"
     },
     {
-      "id": "status.class.staggered",
+      "id": "status_staggered",
       "name": "失衡",
       "category": "negative",
       "type": "tag",
@@ -594,7 +594,7 @@
       "description": "表示实体的准备态可被失效的语义状态。"
     },
     {
-      "id": "status.class.overloaded",
+      "id": "status_overloaded",
       "name": "过载",
       "category": "negative",
       "type": "tag",
@@ -606,7 +606,7 @@
       "description": "表示资源越界后进入惩罚状态的语义。"
     },
     {
-      "id": "status.class.blocking",
+      "id": "status_blocking",
       "name": "格挡",
       "category": "positive",
       "type": "tag",
@@ -618,7 +618,7 @@
       "description": "表示实体处于主动防护准备中的语义状态。"
     },
     {
-      "id": "status.class.hastened",
+      "id": "status_hastened",
       "name": "加速",
       "category": "positive",
       "type": "numeric",
@@ -630,7 +630,7 @@
       "description": "表示实体的移动或行动效率获得提升的语义状态。"
     },
     {
-      "id": "status.class.concealed",
+      "id": "status_concealed",
       "name": "隐蔽",
       "category": "positive",
       "type": "tag",
@@ -642,7 +642,7 @@
       "description": "表示实体处于降低可被发现性的语义状态。"
     },
     {
-      "id": "status.class.sleeping",
+      "id": "status_sleeping",
       "name": "睡眠",
       "category": "positive",
       "type": "tag",
@@ -654,7 +654,7 @@
       "description": "表示实体处于休息与低活动阶段的语义状态。"
     },
     {
-      "id": "status.class.radiation",
+      "id": "status_radiation",
       "name": "辐射",
       "category": "environmental",
       "type": "numeric",
@@ -666,7 +666,7 @@
       "description": "表示实体正承受环境辐射暴露的语义状态。"
     },
     {
-      "id": "status.class.traveling",
+      "id": "status_traveling",
       "name": "前往X",
       "category": "environmental",
       "type": "tag",
@@ -678,7 +678,7 @@
       "description": "表示实体处于前往某个目的地过程中的语义状态。"
     },
     {
-      "id": "status.class.aiming",
+      "id": "status_aiming",
       "name": "瞄准",
       "category": "positive",
       "type": "tag",

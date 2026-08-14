@@ -34,8 +34,8 @@
           {
             "event": "OnArriveAtSoundSource",
             "condition": "!playerInSight",
-            "target": "patrolling",
-            "kernelEvent": "NPC_ReturnToPatrol"
+            "target": "returning",
+            "kernelEvent": "NPC_Returning"
           },
           {
             "event": "OnPlayerEnter",
@@ -51,8 +51,8 @@
           {
             "event": "OnArriveAtLastSeen",
             "condition": "!playerInSight",
-            "target": "patrolling",
-            "kernelEvent": "NPC_LostTarget"
+            "target": "returning",
+            "kernelEvent": "NPC_Returning"
           },
           {
             "event": "OnPlayerEnter",
@@ -68,14 +68,37 @@
           {
             "event": "OnTargetDowned",
             "condition": "target.hp <= 0",
-            "target": "patrolling",
-            "kernelEvent": "NPC_ReturnToPatrol"
+            "target": "returning",
+            "kernelEvent": "NPC_Returning"
           },
           {
             "event": "OnPlayerLeft",
             "condition": "!sameMicroScene && distance > 1",
             "target": "chasing",
             "kernelEvent": "NPC_ResumeChase"
+          }
+        ]
+      },
+      "returning": {
+        "onEnter": ["ChooseReturnPath", "ReturnToNearestPatrolLine"],
+        "transitions": [
+          {
+            "event": "OnArriveAtPatrolPath",
+            "condition": "onPatrolRoute",
+            "target": "patrolling",
+            "kernelEvent": "NPC_ResumePatrol"
+          },
+          {
+            "event": "OnNoise",
+            "condition": "perception.hearing >= perception.alertThreshold",
+            "target": "listening",
+            "kernelEvent": "NPC_Alert"
+          },
+          {
+            "event": "OnPlayerEnter",
+            "condition": "perception.vision >= 2 && sameMicroScene",
+            "target": "chasing",
+            "kernelEvent": "NPC_DetectedPlayer"
           }
         ]
       }
@@ -85,6 +108,11 @@
       "currentPatrolIndex": 0,
       "lastSeenPosition": null,
       "lastKnownSoundSource": null
+    },
+    "returnPolicy": {
+      "pathSelection": "nearest",
+      "algorithm": "approximate-nearest-patrol-line",
+      "description": "返回状态用近似算法选择唯一一条路径，回到最近的巡逻线路；因返回可携带与巡逻不同的配置，故以独立状态表达，不与巡逻合并。"
     }
   },
   "initialEquipment": ["weapon_pistol", "item_bulletproof_vest_medium"],
@@ -133,6 +161,13 @@
       "apCost": 1,
       "repeatable": true,
       "priority": 1
+    },
+    {
+      "id": "return_behavior",
+      "trigger": "State: returning",
+      "action": "MoveToNearestPatrolLine",
+      "apCost": 1,
+      "repeatable": true
     }
   ],
   "kernelEvents": [
@@ -144,13 +179,13 @@
     "OnPlayerLeft",
     "NPC_Alert",
     "NPC_DetectedPlayer",
-    "NPC_ReturnToPatrol",
-    "NPC_LostTarget",
+    "NPC_Returning",
+    "NPC_ResumePatrol",
     "NPC_Engaging",
     "NPC_ResumeChase"
   ],
   "tags": ["ai-significant", "hostile", "guard", "elite"],
-  "description": "精英守卫，感知更高、装备更好，会使用远程武器。警觉阈值更低，更快响应声音。",
+  "description": "精英守卫，感知更高、装备更好，会使用远程武器。警觉阈值更低，更快响应声音。使用五状态守卫范式行动。",
   "designNotes": {
     "n001Resolution": "NPC FSM是AI行为状态，与实体的StateComponent完全分离。",
     "n013Resolution": "MVP不实现sleeping状态。",
@@ -170,12 +205,42 @@
       "npc.capability.event_driven"
     ]
   },
+  "behaviorParameters": {
+    "npc.capability.patrol": {
+      "routeRef": "route.guard_elite_patrol",
+      "movementPolicyRef": "policy.guard_elite_patrol_move"
+    },
+    "npc.capability.perceive": {
+      "sensorProfileRef": "policy.guard_elite_perception",
+      "detectionPolicyRef": "policy.guard_elite_detection",
+      "signalFilterRef": "policy.guard_elite_signal_filter"
+    },
+    "npc.capability.investigate": {
+      "stimulusSourceRef": "position.last_sound_source",
+      "searchPolicyRef": "policy.guard_elite_search"
+    },
+    "npc.capability.chase": {
+      "targetSelectorRef": "policy.guard_elite_chase_target",
+      "pathPolicyRef": "policy.guard_elite_chase_path"
+    },
+    "npc.capability.attack": {
+      "attackSelectorRef": "policy.guard_elite_attack_select",
+      "targetSelectorRef": "policy.guard_elite_attack_target",
+      "engagementPolicyRef": "policy.guard_elite_engagement"
+    },
+    "npc.capability.remember": {
+      "memorySlotsRef": "policy.guard_elite_memory"
+    },
+    "npc.capability.event_driven": {
+      "eventBindingsRef": "policy.guard_elite_event_bindings"
+    }
+  },
   "unresolvedIssues": [
     {
       "code": "NPC-GUARD-STATE-NAMING",
-      "status": "unresolved",
-      "issue": "迁移前目录将守卫统一描述为“五状态守卫范式”，当前 profile 的 FSM 实际仅定义 patrolling、listening、chasing、attacking 四个状态。",
-      "decision": "保留现有四状态定义，不擅自补充缺失状态；需后续明确第五状态是否为 sleeping，以及是否属于当前玩法配置。"
+      "status": "resolved",
+      "issue": "迁移前目录将守卫统一描述为“五状态守卫范式”，此前 FSM 仅定义 patrolling、listening、chasing、attacking 四个状态。",
+      "decision": "2026-08-13 项目所有者裁决：第五状态并非 sleeping，而是独立的 returning（返回）。返回用近似算法选唯一路径回最近巡逻线路，因可与巡逻携带不同配置故解耦成独立状态。守卫五状态范式 = 巡逻、听声、追击、战斗、返回。"
     },
     {
       "code": "NPC-EQUIPMENT-DANGLING-PISTOL",

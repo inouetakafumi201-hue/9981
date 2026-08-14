@@ -14,15 +14,15 @@
 
 **禁止触碰**：`src/core/kernel/spec-compiler/`、`src/play/core-mechanics/`
 
-**详细规则** → `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+> 原 `.kiro/steering/`（并行执行锁/执行计划）已于 2026-08-13 归档至 `docs/L_归档/steering_历史/`；当前约束以 `AGENTS.md` 结尾「项目实践原则」与 `docs/00_主状态板.md` 为准。
 
 **🔴 禁止修改的目录**：
 - `src/core/kernel/spec-compiler/`（Wave 1 审计中）
 - `src/play/core-mechanics/`（D-062 冻结，等待 U-002 裁决）
 - `docs/L3_玩法层/01_*.md`、`06_*.md`、`07_*.md`（Wave 3 将迁移）
 
-**详细锁定状态**：见 [`.kiro/steering/PARALLEL_EXECUTION_LOCK.md`](.kiro/steering/PARALLEL_EXECUTION_LOCK.md)  
-**执行计划**：见 [`.kiro/steering/结构收敛执行计划.md`](.kiro/steering/结构收敛执行计划.md)
+**详细锁定状态**：见 `docs/00_主状态板.md`（唯一进度真相源）  
+**执行/行为原则**：见 `AGENTS.md` 结尾「项目实践原则」
 
 **影响**：如果你正在并行工作，**请先查看锁定状态**，避免修改被锁定的文件导致冲突。
 

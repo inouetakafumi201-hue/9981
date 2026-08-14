@@ -1,6 +1,6 @@
 {
   "id": "item_medkit_001",
-  "name": "医疗包",
+  "name": "急救包",
   "category": "consumable",
   "classComposition": {
     "classIds": [
@@ -19,18 +19,19 @@
   ],
   "stackable": true,
   "grantedStates": [],
-  "description": "标准配置的急救医疗包，内含止血剂和消炎药膏。恢复效果优于绷带。",
+  "description": "标准配置的急救包，内含止血剂和消炎药膏。直接使血量回到 4 点。",
   "actions": [
     {
-      "name": "使用医疗包",
+      "name": "使用急救包",
       "apCost": 1,
       "target": "self",
-      "description": "从背包使用，消耗1 AP进行处置",
+      "description": "从背包使用，消耗1 AP，直接使血量回至 4 点",
       "effects": [
         {
-          "op": "prop.add",
+          "op": "prop.set",
           "path": "entities.{actor}.props.hp",
-          "delta": 2,
+          "value": 4,
+          "condition": "entities.{actor}.props.hp < 4",
           "clamp": {
             "min": 0,
             "max": 5
@@ -38,12 +39,12 @@
         }
       ],
       "kernelOps": [
-        "prop.add"
+        "prop.set"
       ]
     }
   ],
   "kernelOps": [
-    "prop.add"
+    "prop.set"
   ],
   "pendingKernelOps": [
     "list.remove"
@@ -60,18 +61,18 @@
   "unresolvedIssues": [
     {
       "code": "ITEM-MEDKIT-AP-COST",
-      "status": "unresolved",
+      "status": "resolved",
       "issue": "来源文档对医疗包的使用成本同时出现 0 AP 与 1 AP 两种写法，本 profile 取 1 AP。",
-      "decision": "保留 1 AP 不改，等待裁决。src/play/action-turn/决策与风险记录.md §5.3 声明该冲突记录在本文件，但此前本文件缺少该记录条目，现补上。"
+      "decision": "2026-08-13 项目所有者裁决：消耗 1 AP 不改；同时裁定本物品更名「急救包」，效果为直接使血量回至 4 点（prop.set 设定 hp=4，非增量）。"
     }
   ],
   "itemParameters": {
     "item.capability.recover": {
       "targetSelector": "self",
       "targetProperty": "hp",
-      "amount": "actions[].effects[].delta",
+      "amount": "actions[].effects[0].value",
       "applicationTiming": "on-use",
-      "operation": "prop.add"
+      "operation": "prop.set"
     }
   }
 }

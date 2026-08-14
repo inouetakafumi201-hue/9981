@@ -6,7 +6,7 @@ import type { OpImpl } from './registry.js';
 import type { OpRegistry } from './registry.js';
 import { ok, err } from './result.js';
 import type { Id } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
+import { nextId, rollbackNextIdCounter } from '../state/ids.js';
 import { setSlotHolds } from '../topology/container.js';
 import type { ItemMoveArgs } from './structural-ops.js';
 
@@ -46,8 +46,11 @@ export function makeStackSplit(itemMove: OpImpl<ItemMoveArgs, void>): OpImpl<Sta
     // 步骤3：放入目标槎位（复用 item.move 的合法槎位选取逻辑）
     const moveResult = itemMove({ itemId: newId, toContainerId: args.toContainerId, atSlot: args.atSlot }, ctx);
     if (!moveResult.ok) {
-      // 无合法槎位 → 整体回滚：原栈数量恢复、新物品不存在（需求17.2-17.3）
+      // 无合法槎位 → 整体回滚：原栈数量恢复、新物品不存在、ID 计数器同时回滚（需求17.2-17.3）
       ctx.tx.rollback();
+      // ID 计数器被 nextId 递增了，需要对称回滚，否则一次失败会永久吞掉一个编号，
+      // 破坏"成功 Op 序列 → 幂等重放"的持久化定见（bombardment-l12 属性 8 实测暴露）。
+      rollbackNextIdCounter('i');
       return moveResult;
     }
 

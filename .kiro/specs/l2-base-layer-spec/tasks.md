@@ -3,7 +3,7 @@
 > **⚠️ 架构收敛依赖**（2026-08-12）  
 > D-1/D-2/D-5 三项任务的落点已确定（D-061 裁决：`src/l2/` 为唯一权威）。  
 > **等待 Wave 1 完成**（spec-compiler 冻结与审计）后才能实施这三项任务。  
-> 详见 `.kiro/steering/PARALLEL_EXECUTION_LOCK.md`
+> 详见 `docs/L_归档/steering_历史/PARALLEL_EXECUTION_LOCK.md`
 
 ## Overview
 

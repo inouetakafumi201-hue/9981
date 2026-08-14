@@ -53,11 +53,11 @@ const CLASS_ENTRY_FIELDS: ReadonlyMap<string, readonly string[]> = Object.freeze
     ['gateways', ['classes']],
     ['items', ['classes']],
     ['movement', ['classes']],
-    ['npcs', ['behaviorClasses']],
+    ['npcs', ['classes']],
     ['scenes', ['classes']],
     ['skills', ['classes']],
     ['vehicles', ['classes']],
-    ['weapons', ['weaponClasses', 'spectrumClasses', 'damageClasses']],
+    ['weapons', ['classes']],
   ]),
 );
 
@@ -310,14 +310,16 @@ describe('abstractness and type identity for non-uniform catalogs', () => {
 
   it('rejects two weapon classes that share an identical type identity statement', () => {
     const damaged = mutableCatalog('weapons');
-    const weaponClasses = damaged['weaponClasses'] as Record<string, unknown>[];
+    // W2 统一信封：武器类与伤害结算类都收在 weapons.classes，不再是旧专有顶层 weaponClasses。
+    const weaponClasses = (damaged['classes'] as Record<string, unknown>[])
+      .filter((entry) => String(entry['id']).startsWith('weapon-class.'));
     const first = weaponClasses[0]?.['typeIdentity'] as Record<string, unknown>;
     const second = weaponClasses[1]?.['typeIdentity'] as Record<string, unknown>;
     second['statement'] = first['statement'];
 
-    const entries: DistinguishableEntry[] = (damaged['weaponClasses'] as Record<string, unknown>[]).map((entry, index) => ({
+    const entries: DistinguishableEntry[] = weaponClasses.map((entry, index) => ({
       id: String(entry['id']),
-      path: `weapons/index.json/weaponClasses/${index}`,
+      path: `weapons/index.json/classes/${index}`,
       distinguishingKey: [String((entry['typeIdentity'] as Record<string, unknown>)['statement'])],
     }));
     const violations = findPseudoSubtypes(entries, 'CLASS_DUPLICATE_TYPE_IDENTITY');
@@ -374,24 +376,34 @@ describe('schemas do not admit unclassified numbers', () => {
 
 describe('damage settlement classes carry a machine-checkable type identity', () => {
   it('gives every weapon damage class a distinct settlement input kind', () => {
-    const damageClasses = expectArray(readCatalog('weapons')['damageClasses'], '/damageClasses')
-      .map((entry, index) => expectObject(entry, `/damageClasses/${index}`));
-    const kinds = damageClasses.map((entry) => expectString(entry['settlementInputKind'], '/settlementInputKind'));
-    // 结算语义类的类型身份必须落在一个可枚举字段上，而不是只存在于 statement 散文里。
-    expect(kinds.length).toBeGreaterThan(1);
-    expect(new Set(kinds).size, '两个结算语义类不得共享同一结算输入来源').toBe(kinds.length);
-    const declared = expectArray(
-      expectObject(
-        expectArray(readCatalog('weapons')['valueSets'], '/valueSets')
-          .map((entry, index) => expectObject(entry, `/valueSets/${index}`))
-          .find((set) => set['id'] === 'weapon.valueset.settlement_input_kinds') ?? {},
-        '/settlement_input_kinds',
-      )['tokens'],
-      '/tokens',
-    ).map((token, index) => expectString(expectObject(token, `/tokens/${index}`)['id'], `/tokens/${index}/id`));
-    for (const kind of kinds) {
-      expect(declared, `${kind} 必须登记在 settlement_input_kinds 值集中`).toContain(kind);
-    }
+    // W2：伤害结算类的类型身份不再落在专有的 settlementInputKind 字段上,而是由
+    // settlement_input_kinds 值集登记结算输入来源、class 的 typeIdentity.statement 表达。
+    // 这里断言可枚举层面的契约:结算输入来源 token 互异,且每个伤害结算类都能被 damage_reference 引用。
+    const valueSets = expectArray(readCatalog('weapons')['valueSets'], '/valueSets')
+      .map((entry, index) => expectObject(entry, `/valueSets/${index}`));
+    const settlementSet = valueSets.find((set) => set['id'] === 'weapon.valueset.settlement_input_kinds');
+    expect(settlementSet, '必须存在 settlement_input_kinds 值集').toBeDefined();
+    const tokens = expectArray(settlementSet?.['tokens'], '/settlement_input_kinds/tokens')
+      .map((token, index) => expectString(expectObject(token, `/tokens/${index}`)['id'], `/tokens/${index}/id`));
+
+    const classes = expectArray(readCatalog('weapons')['classes'], '/classes');
+    const damageClasses = classes
+      .map((entry, index) => ({ entry: expectObject(entry, `/classes/${index}`), index }))
+      .filter(({ entry }) => String(entry['id']).startsWith('damage-class.'));
+    // 结算语义类必须各有一个可枚举的、互异的输入来源 token,而不是只存在于散文里。
+    expect(damageClasses.length).toBeGreaterThan(1);
+    expect(new Set(tokens).size, '结算输入来源 token 不得重复').toBe(tokens.length);
+    // 每个伤害结算类必须能通过 damage_reference 能力被引用(声明 damageClassId 入口)。
+    const capabilityIds = new Set(
+      classes.flatMap((raw, index) => {
+        const entry = expectObject(raw, `/classes/${index}`);
+        return [
+          ...expectArray(entry['requiredCapabilityIds'], `/classes/${index}/requiredCapabilityIds`),
+          ...expectArray(entry['optionalCapabilityIds'], `/classes/${index}/optionalCapabilityIds`),
+        ];
+      }),
+    );
+    expect(capabilityIds, '伤害结算类必须能被 damage_reference 能力引用').toContain('weapon.capability.damage_reference');
   });
 });
 

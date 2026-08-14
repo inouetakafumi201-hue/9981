@@ -806,12 +806,13 @@ describe('G. Schedule / Playpack', () => {
     expect(loader.load(orphan).ok).toBe(false);
   });
 
-  it('G6 同一 Def id 重复装载被拒绝', () => {
+  it('G6 同一 Def id 后装覆盖先装（D-073 单调重定义）', () => {
     const loader = new PlaypackLoader({ defRegistry: new DefRegistry() });
     const first = { id: 'pp:1', kind: 'playpack', version: '1.0', defs: [{ id: 'e:dup', kind: 'entity' }] } as PlaypackDef;
     const second = { id: 'pp:2', kind: 'playpack', version: '1.0', defs: [{ id: 'e:dup', kind: 'entity' }] } as PlaypackDef;
     expect(loader.load(first).ok).toBe(true);
-    expect(loader.load(second).ok).toBe(false);
+    // D-073：同 key 即重定义（后装覆盖先装），不再拒绝
+    expect(loader.load(second).ok).toBe(true);
   });
 });
 

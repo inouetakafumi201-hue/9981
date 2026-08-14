@@ -25,6 +25,7 @@
   "ammoType": "12号",
   "stackable": false,
   "grantedStates": [],
+  "scatterThreshold": 1,
   "actions": [
     {
       "name": "霰弹射击",
@@ -71,9 +72,7 @@
   "unresolvedIssues": [],
   "weaponParameters": {
     "weapon.capability.scatter_shot": {
-      "activationRange": 1,
-      "autoTargetScope": "subscene",
-      "requiresAiming": false
+      "closeRangeThreshold": "scatterThreshold"
     },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",

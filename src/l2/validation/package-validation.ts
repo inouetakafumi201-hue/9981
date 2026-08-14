@@ -33,6 +33,14 @@ export interface PackageValidationInput {
   /** 活动集定义发出的类型化引用（hostId → 引用），供覆盖重验证检查依赖者兼容性。 */
   readonly activeReferences?: ReadonlyMap<string, readonly TypedReference[]>;
   readonly compiled?: CompiledSpecification;
+  /**
+   * 本次候选实际覆盖的活动定义标识（单调重定义 D-073 语义：同 key 后装即覆盖，无须 overrideIntent）。
+   *
+   * `revalidateDependents` 默认只随 `overrideIntent` 走；端口把 D-073 的同 key 覆盖折成
+   * `effectiveOverrides` 交进来后，这些被改的定义才会对仍留活动集的入边依赖者做类型兼容重校验，
+   * 避免"改了定义却让它的活动依赖者静默破坏"。
+   */
+  readonly effectiveOverrides?: readonly string[];
 }
 
 export interface PackageValidationResult {
@@ -77,12 +85,15 @@ export function validateFullPackage(input: PackageValidationInput): PackageValid
   diagnostics.push(...graphResult.diagnostics);
 
   // 3. 依赖重验证（覆盖/删除/父场景删除）。
+  // 单调重定义（D-073）下同 key 后装即覆盖；调用方若通过 effectiveOverrides 告知了这些对等覆盖，
+  // 透传下去让 revalidateDependents 把它们当作覆盖目标处理（覆盖意图把手 + 对等覆盖合一）。
   const revalidation = revalidateDependents({
     package: input.package,
     graph: graphResult.graph,
     activeInbound: input.activeInbound,
     activeFamilies: activeFamilyMap(input.activeNodes),
     ...(input.activeReferences === undefined ? {} : { activeReferences: input.activeReferences }),
+    ...(input.effectiveOverrides === undefined ? {} : { effectiveOverrides: input.effectiveOverrides }),
   });
   diagnostics.push(...revalidation.diagnostics);
 

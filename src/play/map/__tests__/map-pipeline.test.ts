@@ -459,7 +459,7 @@ describe('地图编译：MapData → PrefabDef', () => {
     expect(result.prefab.kind).toBe('prefab');
     expect(result.prefab.nodes.map((n) => n.key)).toEqual(['n_hall', 'n_lab']);
     expect(result.prefab.links).toEqual([
-      { a: 'n_hall', b: 'n_lab', def: 'd:transition/door', directed: false },
+      { a: 'n_hall', b: 'n_lab', def: 'd:transition/door', directed: false, direction: 'bidirectional' },
     ]);
     expect(result.prefab.entities).toEqual([{ at: 'n_lab', def: 'inst_locker_7f3a' }]);
   });

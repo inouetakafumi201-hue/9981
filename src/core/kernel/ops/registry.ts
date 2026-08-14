@@ -10,6 +10,7 @@ import { InvariantChecker } from './invariants.js';
 import type { Result } from './result.js';
 import { err } from './result.js';
 import type { Diagnostic } from '../state/diagnostic.js';
+import { beginIdCounterScope, commitIdCounters, rollbackIdCounters } from '../state/ids.js';
 
 export interface OpContext {
   tx: Transaction;
@@ -125,19 +126,27 @@ export class OpRegistry {
       },
     };
 
+    // 顶层事务：Id 计数器推进与事务提交/回滚对齐。失败或回滚的 Op 不残留任何 Id 计数，
+    // 保证「成功 Op 序列 → 幂等快照重放」在 Id 编号上也逐位一致（bombardment-l12 属性 8）。
+    beginIdCounterScope();
     const result = this.invokeInline<A, T>(name, args, ctx);
-    if (!result.ok) return result;
+    if (!result.ok) {
+      rollbackIdCounters();
+      return result;
+    }
 
     const finalDraft = tx.getFinalDraft();
     const diags = this.invariantChecker.checkAll(finalDraft);
     const fatalDiags = diags.filter((d) => d.severity === 'fatal');
     if (fatalDiags.length > 0) {
+      rollbackIdCounters();
       this.hooks.onFatalDiagnostics?.(fatalDiags);
       // 使用触发失败的第一条不变量诊断的具体 code，而不是笼统的固定码——
       // 这样调用方能区分"哪一条不变量被违反"，符合 5.2 节"每个前置条件失败必须映射到具体 ErrCode"的纪律。
       return err(fatalDiags[0]!.code, `不变量校验失败: ${fatalDiags.map((d) => d.message).join('; ')}`);
     }
 
+    commitIdCounters();
     this.holder.setState(finalDraft);
     return result;
   }

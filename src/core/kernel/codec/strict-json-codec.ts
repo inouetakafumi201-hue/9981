@@ -129,6 +129,11 @@ export class StrictJsonCodec implements StrictJsonCodecPort {
       );
     }
 
+    // 拒绝重复成员。JSON.parse 会静默吞掉重复键中除最后一个以外的全部，导致数据无声
+    // 丢失；旧 spec-compiler 实现以 E_LOAD_DUPLICATE_MEMBER 拒绝，这里必须保持等价。
+    // 探测以 RFC 8259 字符串令牌为单位，使 unicode 转义（\\u0061）的重复同样被识别。
+    assertNoDuplicateObjectMembers(input.sourceText);
+
     // 验证配额与禁止构造
     const parser = new StrictParser(input.sourceText, quotas);
     parser.validate(value);
@@ -157,6 +162,146 @@ export class StrictJsonCodec implements StrictJsonCodecPort {
       value,
       sourceRecord,
     };
+  }
+}
+
+/**
+ * 拒绝重复对象成员。
+ *
+ * `JSON.parse` 会静默吞掉重复键中除最后一个以外的全部，导致数据无声丢失；旧 spec-compiler
+ * 实现以 `E_LOAD_DUPLICATE_MEMBER` 拒绝，这里必须保持等价（见 json-codec-contract 契约）。
+ * 本实现直接对源文本做一次轻量扫描，用对象栈切分**同一对象**内的成员键：只有嵌套在同一个
+ * `{ ... }` 里的同名字符串键才构成重复，不同对象里的同名键（如每个 `sourceRecords` 项都有的
+ * `"sourceFile"`）互不干扰。匹配的是已解码后的键文本，因此 unicode 转义（如 `"\\u0061"`）与
+ * 其字面等价形式同样被识别。
+ */
+function assertNoDuplicateObjectMembers(sourceText: string): void {
+  let index = 0;
+  let line = 1;
+  let column = 1;
+  const advance = (count: number): void => {
+    for (let step = 0; step < count; step += 1) {
+      const char = sourceText[index];
+      index += 1;
+      if (char === '\n') {
+        line += 1;
+        column = 1;
+      } else {
+        column += 1;
+      }
+    }
+  };
+  const position = (): { line: number; column: number } => ({ line, column });
+  const skipWs = (): void => {
+    while (index < sourceText.length && /[ \t\r\n]/u.test(sourceText[index] ?? '')) advance(1);
+  };
+  /** 读取一个完整字符串令牌；遇到非法转义或未闭合时返回 undefined（交由 JSON.parse 报语法错）。 */
+  const readStringToken = (): string | undefined => {
+    advance(1); // 开引号
+    let out = '';
+    for (;;) {
+      if (index >= sourceText.length) return undefined;
+      const char = sourceText[index];
+      if (char === '"') {
+        advance(1);
+        return out;
+      }
+      if (char === '\\') {
+        advance(1);
+        if (index >= sourceText.length) return undefined;
+        const escape = sourceText[index];
+        if (escape === 'u') {
+          advance(1);
+          const hex = sourceText.slice(index, index + 4);
+          if (!/^[0-9a-fA-F]{4}$/u.test(hex)) return undefined;
+          out += String.fromCharCode(Number.parseInt(hex, 16));
+          advance(4);
+          continue;
+        }
+        advance(1);
+        if (escape === 'b') { out += '\b'; continue; }
+        if (escape === 'f') { out += '\f'; continue; }
+        if (escape === 'n') { out += '\n'; continue; }
+        if (escape === 'r') { out += '\r'; continue; }
+        if (escape === 't') { out += '\t'; continue; }
+        out += escape; // \\ 、\"、\/ 及其它合法转义
+        continue;
+      }
+      if ((char ?? '').charCodeAt(0) < 0x20) return undefined;
+      out += char;
+      advance(1);
+    }
+  };
+  const expectNonWs = (char: string): boolean => {
+    skipWs();
+    if (sourceText[index] !== char) return false;
+    advance(1);
+    return true;
+  };
+  // 对象栈：栈顶是"当前正在填充成员键的对象"。遇到 `{` 记一个空的已见键表；
+  // 遇到 `}` 弹栈。字符串若后随冒号，则它是栈顶对象的成员键，参与该对象的重复判定。
+  // 由于我们只关心成员键的归属，不需要区分数组与对象——数组元素不产生成员键，
+  // 嵌套对象自会压栈，键天然只与同栈祖先内的同层键比较。
+  const stack: { seen: Map<string, { line: number; column: number }> }[] = [];
+  while (index < sourceText.length) {
+    const peek = sourceText[index];
+    if (peek === '{') {
+      stack.push({ seen: new Map() });
+      advance(1);
+      continue;
+    }
+    if (peek === '[') {
+      advance(1);
+      continue;
+    }
+    if (peek === '}' || peek === ']') {
+      if (peek === '}' && stack.length > 0) stack.pop();
+      advance(1);
+      continue;
+    }
+    if (peek === ',' || peek === ':') {
+      advance(1);
+      continue;
+    }
+    if (peek === '"') {
+      const keyPos = position();
+      const key = readStringToken();
+      const savedIndex = index;
+      const savedLine = line;
+      const savedColumn = column;
+      if (key === undefined) {
+        // 非法字符串令牌：交由 JSON.parse 报语法错，这里跳过。
+        continue;
+      }
+      if (!expectNonWs(':')) {
+        // 不是对象成员键（是字符串值或数组里的字符串），回滚冒号探测。
+        index = savedIndex;
+        line = savedLine;
+        column = savedColumn;
+        advance(1);
+        continue;
+      }
+      const current = stack.length > 0 ? stack[stack.length - 1] : undefined;
+      if (current === undefined) {
+        // 顶层字符串紧跟冒号不是合法 JSON（顶层必须是值），交由 JSON.parse 报错。
+        continue;
+      }
+      const previous = current.seen.get(key);
+      if (previous !== undefined) {
+        throw new JsonCodecError(
+          'E_LOAD_DUPLICATE_MEMBER',
+          `Duplicate object member ${key}`,
+          previous.line,
+          previous.column,
+          0,
+          sourceText.slice(keyPos.column - 1, keyPos.column + 20),
+        );
+      }
+      current.seen.set(key, keyPos);
+      continue;
+    }
+    // 其它 token 起始字符：跳过（数字、true/false/null、`-` 等）。
+    advance(1);
   }
 }
 

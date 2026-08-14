@@ -30,8 +30,59 @@ import { describe, it, expect } from 'vitest';
 import type { CandidateDefinition, DefinitionPackage } from '../../model/definition.js';
 import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes.js';
 import { buildValidationContext, validatePackage, DEFINITION_RULES } from '../validator.js';
-import { canonicalSort, compareDiagnostics } from '../../model/ordering.js';
 
+const TEST_SOURCE_RECORD = Object.freeze({
+  sourceFile: 'docs/L2_基类层/基类层定义.md',
+  sourceLocation: Object.freeze({ sourceFile: 'docs/L2_基类层/基类层定义.md', section: 'q04-guard' }),
+  precedence: 'finalized-l2-contract',
+  classification: 'Normative_Contract',
+  owningLayer: '基类层',
+  statementFingerprint: 'q04-guard-v1',
+} as const);
+
+/** 构造一个类型化引用（所需字段最小集）。 */
+function typedRef(refId: string): { refId: string; expected: { defKind: string }; jsonPath: string } {
+  return Object.freeze({ refId, expected: Object.freeze({ defKind: 'node' }), jsonPath: '/q04-guard/ref' });
+}
+
+/** 构造最小 base definition（供 Q-04 守卫测试使用）。 */
+function makeBaseDefinition(
+  id: string,
+  defKind: string,
+  patch: Readonly<Record<string, unknown>> = {},
+): CandidateDefinition {
+  return Object.freeze({
+    id,
+    defKind,
+    abstract: false,
+    semanticFamily: Object.freeze({ familyId: 'vehicle' }),
+    typeIdentity: Object.freeze({
+      requiredCapabilities: Object.freeze([]),
+      legalRelationships: Object.freeze([]),
+      invariants: Object.freeze([]),
+      substitutionCompatibility: Object.freeze([]),
+    }),
+    composition: Object.freeze([]),
+    parameterSchema: Object.freeze({ fields: Object.freeze([]), crossFieldConstraints: Object.freeze([]) }),
+    tags: Object.freeze([]),
+    actionRefs: Object.freeze([]),
+    ruleRefs: Object.freeze([]),
+    otherRefs: Object.freeze([typedRef('reference:placeholder')]),
+    sourceRecords: Object.freeze([TEST_SOURCE_RECORD]),
+    ...patch,
+  }) as unknown as CandidateDefinition;
+}
+
+/** 构造最小定义包。 */
+function minimalPackage(packageId: string, definitions: readonly CandidateDefinition[]): DefinitionPackage {
+  return Object.freeze({
+    packageId,
+    schemaVersion: 'l2-declarative/1',
+    dependencies: Object.freeze([]),
+    sourceRecords: Object.freeze([TEST_SOURCE_RECORD]),
+    definitions: Object.freeze([...definitions]),
+  }) as unknown as DefinitionPackage;
+}
 describe('Space-Items Domain Properties (14 mandatory tests)', () => {
   /**
    * P1: 定义包结构一致性。
@@ -291,5 +342,53 @@ describe('Space-Items Domain Properties (14 mandatory tests)', () => {
       ),
       { numRuns: 100 },
     );
+  });
+
+  /**
+   * P15: Q-04 守卫（reconciliation C2）：载具不得推导内部微型场景边界机制。
+   *
+   * 载具声明 `familyContract.interiorMicroSceneBoundary` 必须被 `defError` 以
+   * `SOURCE_PROMOTION_REQUIRES_DECISION`（投影后为 E_LOAD_*) 拒绝。Q-04 未决，
+   * 白盒封顶前不得让这类机制声明漂移进活动集。
+   */
+  it('P15: Q-04 未决 → 载具 interiorMicroSceneBoundary 被拒绝', () => {
+    const definition = makeBaseDefinition('vehicle.q04-guard', 'vehicle', {
+      familyContract: Object.freeze({
+        contractKind: 'vehicle',
+        entityBacked: true,
+        seatRoles: Object.freeze([]),
+        cargoContainers: Object.freeze([]),
+        doors: Object.freeze([]),
+        interiorMicroSceneBoundary: Object.freeze({ region: 'interior' }),
+      }),
+    });
+    const pkg: DefinitionPackage = minimalPackage('pkg-q04-guard', [definition]);
+    const context = buildValidationContext({ package: pkg });
+    const result = validatePackage(context);
+    expect(
+      result.diagnostics.some((d) => d.code === DIAGNOSTIC_CODES.SOURCE_PROMOTION_REQUIRES_DECISION),
+      result.diagnostics.map((d) => `${d.code}: ${d.reason}`).join('\n'),
+    ).toBe(true);
+  });
+
+  /**
+   * P16: 载入合法的 vehicle 合同（不声明 Q-04 机制）不触发 SOURCE_PROMOTION_REQUIRES_DECISION。
+   */
+  it('P16: 合法载具（无 Q-04 机制）不被误报为 promotion-requires-decision', () => {
+    const definition = makeBaseDefinition('vehicle.q04-ok', 'vehicle', {
+      familyContract: Object.freeze({
+        contractKind: 'vehicle',
+        entityBacked: true,
+        seatRoles: Object.freeze([]),
+        cargoContainers: Object.freeze([]),
+        doors: Object.freeze([]),
+      }),
+    });
+    const pkg: DefinitionPackage = minimalPackage('pkg-q04-ok', [definition]);
+    const context = buildValidationContext({ package: pkg });
+    const result = validatePackage(context);
+    expect(
+      result.diagnostics.some((d) => d.code === DIAGNOSTIC_CODES.SOURCE_PROMOTION_REQUIRES_DECISION),
+    ).toBe(false);
   });
 });

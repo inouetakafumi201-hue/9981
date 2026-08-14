@@ -72,9 +72,8 @@
   ],
   "weaponParameters": {
     "weapon.capability.suppressive_fire": {
-      "damageType": "pierce",
-      "damageAmount": 1,
-      "ignoreCoverTypes": ["half", "full"]
+      "pierceDamageAmount": "damage",
+      "pierceDamageTypeId": "DMG_03"
     },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",

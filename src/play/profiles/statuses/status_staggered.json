@@ -1,10 +1,10 @@
 {
-  "id": "status.class.staggered",
+  "id": "status_staggered",
   "name": "失衡",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.staggered",
+    "sourceClass": "status_staggered",
     "capabilityIds": [
       "status.capability.preparation_invalidation"
     ]
@@ -34,7 +34,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.stunned",
+      "with": "status_stunned",
       "type": "none",
       "description": "眩晕优先，失衡不冲突"
     }

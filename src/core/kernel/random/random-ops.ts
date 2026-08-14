@@ -44,7 +44,7 @@ const randomRoll: OpImpl<RandomRollArgs, number> = (args, ctx) => {
     return err('E_OP_INVALID_ARGS', `random.roll: sides must be a positive integer, got ${args.sides}`);
   }
   const streamName = args.stream ?? 'default';
-  const stream = getOrCreateStream(ctx, streamName, args.seed ?? 0);
+  const stream = { ...getOrCreateStream(ctx, streamName, args.seed ?? 0) };
   const { value, next } = lcgNext(stream);
   updateStream(ctx, next);
   const result = Math.floor(value * args.sides) + 1;
@@ -60,7 +60,7 @@ export type RandomPickArgs = { items: Value[]; stream?: string; seed?: number };
 const randomPick: OpImpl<RandomPickArgs, Value> = (args, ctx) => {
   if (args.items.length === 0) return err('E_OP_INVALID_ARGS', 'random.pick: items list is empty');
   const streamName = args.stream ?? 'default';
-  const stream = getOrCreateStream(ctx, streamName, args.seed ?? 0);
+  const stream = { ...getOrCreateStream(ctx, streamName, args.seed ?? 0) };
   const { value, next } = lcgNext(stream);
   updateStream(ctx, next);
   const idx = Math.floor(value * args.items.length);
@@ -75,7 +75,7 @@ export type RandomShuffleArgs = { items: Value[]; stream?: string; seed?: number
 
 const randomShuffle: OpImpl<RandomShuffleArgs, Value[]> = (args, ctx) => {
   const streamName = args.stream ?? 'default';
-  let stream = getOrCreateStream(ctx, streamName, args.seed ?? 0);
+  let stream = { ...getOrCreateStream(ctx, streamName, args.seed ?? 0) };
   const arr = [...args.items];
   for (let i = arr.length - 1; i > 0; i--) {
     const { value, next } = lcgNext(stream);
@@ -100,7 +100,7 @@ const randomWeightedPick: OpImpl<RandomWeightedPickArgs, Value> = (args, ctx) =>
   const totalWeight = args.items.reduce((sum, item) => sum + item.weight, 0);
   if (totalWeight <= 0) return err('E_OP_INVALID_ARGS', 'random.weightedPick: total weight must be > 0');
   const streamName = args.stream ?? 'default';
-  const stream = getOrCreateStream(ctx, streamName, args.seed ?? 0);
+  const stream = { ...getOrCreateStream(ctx, streamName, args.seed ?? 0) };
   const { value, next } = lcgNext(stream);
   updateStream(ctx, next);
   let threshold = value * totalWeight;

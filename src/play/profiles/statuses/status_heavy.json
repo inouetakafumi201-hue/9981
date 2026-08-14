@@ -1,10 +1,10 @@
 {
-  "id": "status.class.heavy",
+  "id": "status_heavy",
   "name": "重装",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.heavy",
+    "sourceClass": "status_heavy",
     "capabilityIds": [
       "status.capability.burden"
     ]
@@ -14,23 +14,13 @@
   "stacking": "none",
   "stackBehavior": "unique",
   "effects": {
-    "actionModifiers": [
-      {
-        "actionType": "move",
-        "sceneType": "macro",
-        "apModifier": "+1",
-        "description": "大场景移动+1 AP"
-      },
-      {
-        "actionType": "move",
-        "transitionType": [
-          "stair",
-          "window"
-        ],
-        "apModifier": "+1",
-        "description": "楼梯或窗户过渡场景+1 AP"
-      }
-    ]
+    "onAction": {
+      "transition": true,
+      "actionTypes": [
+        "scene_exit"
+      ],
+      "description": "携带重物离开大场景或经楼梯/窗户过渡，需一次中间状态（1 AP 进入过渡态，1 AP 完成）。单段恒为 1 AP。"
+    }
   },
   "breakConditions": [
     {
@@ -43,9 +33,9 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.slowed",
-      "type": "amplify",
-      "description": "与迟缓叠加：大场景移动+2 AP"
+      "with": "status_slowed",
+      "type": "concatenate",
+      "description": "与迟缓叠加不产生新状态、不加价：离开大场景需多个 1 AP 过渡段累积，单段仍是 1 AP"
     }
   ],
   "kernelEvents": [
@@ -56,7 +46,7 @@
   "icon": "weight",
   "color": "brown",
   "priority": 5,
-  "description": "携带重型物品导致的移动惩罚，大场景移动+1 AP",
+  "description": "携带重型物品导致的移动过渡惩罚，离开大场景/过渡场景需要中间状态",
   "tags": [
     "movement-penalty",
     "equipment",
@@ -66,5 +56,5 @@
     "装备: 重型物品（带heavy标签）"
   ],
   "mvp": true,
-  "notes": "这是被动状态，来源于装备而非独立施加；只要携带重型物品就一直存在"
+  "notes": "被动状态，来源于装备而非独立施加。AP 铁律：重装表达为「离开场景需中间过渡态」，不是「动作额外+1 AP」（见宪法·单动作原则）。"
 }

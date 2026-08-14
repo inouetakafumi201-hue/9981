@@ -17,6 +17,29 @@ interface AdjEdge {
   link: Link;
 }
 
+/**
+ * 一条链接的方向可达性（reconciliation 要求 1，L-07/D-074 去布尔压缩）。
+ *
+ * 既有 `directed: boolean` 只表达单向/双向，装不下 `one-way-down`/`one-way-up`
+ * 这两个有序方向。扩展后的 `Link.direction?: string` 携带完整四值 token，这里按它建邻接：
+ * - `'one-way-down'`：只走 a→b（从下到上），b→a 禁用；
+ * - `'one-way-up'`：只走 b→a（从上到下），a→b 禁用；
+ * - `'bidirectional'` 或 `direction` 缺省且 `directed !== true`：双向；
+ * - `'unidirectional'`（或 `direction` 缺省且 `directed === true`）：仅 a→b。
+ *
+ * **back-compat**：`direction === undefined` 时回退 `directed` 布尔，确保存量只设
+ * `directed` 的 `Link` 语义不变；绝不因缺 token 报错。
+ */
+function allowsTraversal(link: Link, fromA: boolean): boolean {
+  const dir = link.direction;
+  if (dir === undefined) {
+    return fromA ? true : !link.directed; // 向后兼容：未定向才允许 b→a
+  }
+  if (dir === 'one-way-down') return fromA; // 仅 a→b
+  if (dir === 'one-way-up') return !fromA; // 仅 b→a
+  return true; // bidirectional / unidirectional 之外一律两向；valid 的其余值看作双向兜底
+}
+
 function buildAdjacency(nodes: Record<Id, Node>, links: Record<Id, Link>, metric: 'sum' | 'hops'): Map<Id, AdjEdge[]> {
   const adjacency = new Map<Id, AdjEdge[]>();
   for (const id of Object.keys(nodes)) adjacency.set(id, []);
@@ -25,10 +48,8 @@ function buildAdjacency(nodes: Record<Id, Node>, links: Record<Id, Link>, metric
     const nodeWeightA = nodes[link.a]?.weight ?? 1;
     const costAtoB = metric === 'hops' ? 1 : link.weight * nodeWeightB;
     const costBtoA = metric === 'hops' ? 1 : link.weight * nodeWeightA;
-    adjacency.get(link.a)?.push({ to: link.b, cost: costAtoB, link });
-    if (!link.directed) {
-      adjacency.get(link.b)?.push({ to: link.a, cost: costBtoA, link });
-    }
+    if (allowsTraversal(link, true)) adjacency.get(link.a)?.push({ to: link.b, cost: costAtoB, link });
+    if (allowsTraversal(link, false)) adjacency.get(link.b)?.push({ to: link.a, cost: costBtoA, link });
   }
   return adjacency;
 }

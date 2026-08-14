@@ -1,10 +1,10 @@
 {
-  "id": "status.class.overloaded",
+  "id": "status_overloaded",
   "name": "过载",
   "category": "negative",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.overloaded",
+    "sourceClass": "status_overloaded",
     "capabilityIds": [
       "status.capability.resource_boundary"
     ]
@@ -16,38 +16,30 @@
   "effects": {
     "passive": {
       "blockedActions": [
-        "attack",
-        "move",
-        "use_item",
-        "prepare"
+        "all_action"
       ],
-      "description": "过载期间无法执行任何主动动作"
+      "description": "过载的当次行动阶段无论如何无法行动：选项框与摄像机均不给出。过载者仍留在行动轮中，轮次条泛白但未被踢出；可因他人行动（逆转/弱点/招架/处决）被移动位置。"
     }
   },
   "breakConditions": [
     {
       "type": "turn",
-      "turns": 3,
+      "rollsSkipped": 1,
       "effect": "recover",
-      "description": "3 回合后自动恢复（过载持续 3 回合）"
-    },
-    {
-      "type": "action",
-      "actionId": "wait",
-      "effect": "recover",
-      "description": "等待恢复"
+      "description": "跳过一次投点，在再下一次投点前解除：下回合不参与投点、也不受行动影响，再下回合完全恢复。"
     }
   ],
   "interactionMatrix": [],
   "kernelEvents": [
     "OnTurnStart",
     "OnTurnEnd",
-    "OnActionCheck"
+    "OnActionCheck",
+    "OnInitiativeRoll"
   ],
   "icon": "exclamation-triangle",
   "color": "orange",
   "priority": 99,
-  "description": "体力超过上限（>5）时触发过载，失去本回合行动权，3 回合后恢复",
+  "description": "体力超过上限（>5）时触发过载：当次行动阶段无论如何无法行动（选项框与摄像机不给出），轮次条泛白但未被踢出；跳过一次投点后在下下回合完全恢复、不参与本回合行动。",
   "tags": [
     "stamina",
     "debuff",
@@ -57,5 +49,5 @@
     "系统: 体力超过上限"
   ],
   "mvp": true,
-  "notes": "过载是体力系统的核心惩罚机制，优先级 99（仅次于零血倒地的 100）"
+  "notes": "2026-08-13 过载语义按项目所有者描述定稿：triggered回合直接跳过剩余行动，泛白但留位可变位；下一回合跳过投点；下下回合完全恢复。此为本状态语义，playpack 的 rule:overload-countdown 用 remainingRolls=2 的投点递减表达同一天数（跳过一次投点）。"
 }

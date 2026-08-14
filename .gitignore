@@ -1,1 +1,5 @@
 node_modules
+# 开发期临时产物（素材工作流管线样例/报告，见 scripts/asset-pipeline）
+tmp/
+probe12.mts
+probe13.mts

@@ -14,7 +14,7 @@
  */
 import type { PrefabDef } from '../../core/kernel/topology/prefab.js';
 import type { Expr } from '../../core/kernel/state/expr-types.js';
-import type { MapData, MapEdge, MapNode, MapPlacement } from './types.js';
+import type { MapData, MapEdge, MapNode, MapPlacement, Directionality } from './types.js';
 import { validateMapStructure } from './validate.js';
 import type { MapDiagnostic } from './validate.js';
 
@@ -26,25 +26,30 @@ export type CompileResult =
 /**
  * PrefabDef 内部用 key 而非 Id 标识节点，`buildKeyToIdMap` 在 spawn 时才分配真实 Id。
  * 地图节点 id 直接充当 key：它们在一张地图内已被校验为唯一，正好满足 key 的要求。
+ *
+ * L-07 透传：`parent` 经 props 传入 PrefabDef，`prefab.spawn` 读 props.parent 传给 createNodeShape。
  */
 function nodeSpecOf(node: MapNode): { key: string; def: string; props?: Record<string, Expr> } {
   const props: Record<string, Expr> = { scale: node.scale };
-  // 名称只在有的时候写入。playerFacing 的节点必须有名字，但那条约束属于基类层声明，
-  // 不在这里重复判定——编译器不做校验，校验在 validate.ts。
   if (node.name !== undefined) props['name'] = node.name;
+  if (node.parent !== undefined) props['parent'] = node.parent;
   return { key: node.id, def: node.def, props };
 }
 
 /**
  * 单向连接按 `[起点, 终点]` 排列（`transition.class.scene_link` 的 endpoints 约定）。
  * 双向连接的 a/b 顺序无语义，保持创作者画的顺序，使编译可确定性重放。
+ *
+ * L-07 去布尔压缩：`directionality` 完整 token 经 `direction` 字段传入 PrefabDef.links[]，
+ * 不再压成布尔 `directed`。`directed` 字段保留为兼容旧 spawn 的 fallback。
  */
-function linkSpecOf(edge: MapEdge): { a: string; b: string; def: string; directed?: boolean } {
+function linkSpecOf(edge: MapEdge): { a: string; b: string; def: string; directed?: boolean; direction?: Directionality } {
   return {
     a: edge.a,
     b: edge.b,
     def: edge.def,
-    directed: edge.directionality === 'unidirectional',
+    directed: edge.directionality !== 'bidirectional',
+    direction: edge.directionality,
   };
 }
 

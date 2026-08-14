@@ -30,7 +30,7 @@
       "effects": [
         {
           "op": "attach.add",
-          "def": "status.class.lockpicking",
+          "def": "status_lockpicking",
           "target": "{actor}",
           "grantedBy": "item_lockpick_001",
           "description": "进入撬锁中状态"
@@ -54,7 +54,7 @@
         },
         {
           "op": "attach.del",
-          "def": "status.class.lockpicking",
+          "def": "status_lockpicking",
           "target": "{actor}",
           "description": "移除撬锁中状态"
         }
@@ -64,7 +64,7 @@
         "prop.set"
       ],
       "prerequisite": {
-        "state": "status.class.lockpicking",
+        "state": "status_lockpicking",
         "description": "必须先执行[开始撬锁]"
       }
     }
@@ -95,13 +95,13 @@
     "item.capability.lock_interaction": {
       "lockSelector": "adjacent-locked-container",
       "interactionMode": "progressive-unlock",
-      "prerequisite": "status.class.lockpicking",
+      "prerequisite": "status_lockpicking",
       "completionRule": "two-step-paid-action-sequence",
       "operation": "prop.set"
     },
     "item.capability.status_grant": {
       "targetSelector": "self",
-      "statusSelector": "status.class.lockpicking",
+      "statusSelector": "status_lockpicking",
       "lifecycle": "until-complete",
       "operation": "attach.add"
     }

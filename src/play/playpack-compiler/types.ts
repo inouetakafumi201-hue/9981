@@ -12,8 +12,14 @@
 
 import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
 
-/** 玩法包来源标识。 */
-export type PlaypackSource = 'llm-generated' | 'player-uploaded' | 'official';
+/**
+ * 玩法包来源标识。
+ *
+ * `uploaded`（D-077/D-079）：上传播放包分流两态——态一带 UGC 角标的普通可插拔玩法包、
+ * 态二按地图切成多个口子（仅入口地图、进图装整包）。与既有 `player-uploaded`（历史泛指）等价
+ * 但语义专门化：compiler 不再把它收进源码级分支，纯上传来源由上传两态辨形在编译产物层给出口子。
+ */
+export type PlaypackSource = 'llm-generated' | 'player-uploaded' | 'uploaded' | 'official';
 
 /** 玩法包输入：解析后的 zip 包内容。 */
 export interface PlaypackInput {
@@ -75,6 +81,21 @@ export interface CompiledPlaypack {
 
   /** 复杂度评分（用于定价）。 */
   readonly complexityScore: number;
+
+  /** 高级标签（L-06, D-077）：编译器对产物做可达性静态扫描，凡含引擎层引用即标记。 */
+  readonly advanced?: boolean;
+
+  /** L-06：高级判定的理由。未标高级时为 undefined。 */
+  readonly advancedReason?: string;
+
+  /**
+   * 上传两态辨形（L-07/D-079）：compiler 对 `uploaded` 玩法包在编译产物层标记其装载形态。
+   * - `'ordinary'` = 态一：可插拔的普通玩法包（带 UGC 角标，可自建房/探索匹配）。
+   * - `'entry-by-map'` = 态二：带地图，按地图切多个口子，只能从各自入口进入、进图装整包。
+   * 取自编译产物的地图产物数量：无地图 → ordinary；有地图 → entry-by-map。仅供上传/口子建图
+   * 消费，不改变 Schemma 或校验规则（来源不带特权）。
+   */
+  readonly deliveryForm?: 'ordinary' | 'entry-by-map';
 }
 
 /** 解析后的 profile。 */

@@ -1,10 +1,10 @@
 {
-  "id": "status.class.traveling",
+  "id": "status_traveling",
   "name": "前往X",
   "category": "environmental",
   "type": "tag",
   "classComposition": {
-    "sourceClass": "status.class.traveling",
+    "sourceClass": "status_traveling",
     "capabilityIds": [
       "status.capability.target_binding"
     ]
@@ -38,7 +38,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.heavy",
+      "with": "status_heavy",
       "type": "amplify",
       "description": "与重装叠加：大场景穿越+2 AP"
     }

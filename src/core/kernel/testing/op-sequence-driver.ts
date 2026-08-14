@@ -41,9 +41,31 @@ function danglingId(prefix: string): Id {
   return `${prefix}:dangling-${danglingCounter}`;
 }
 
+// 确定性挂起 Id 解析：用固定种子的 LCG 取代 Math.random，使同一 intent 序列在采集 run 与
+// 重放 run 里解析出完全一致的 `existing` 挂起 Id。此前 resolve/prefabDespawn 用 Math.random
+// 选"已存在 Id"，而采集 run 里失败 Op 也会调用它（比只重放成功 Op 的重放 run 调用更多次），
+// 导致两次 run 的 existing 选 id 逐位分歧——这不是引擎持久化契约的缺陷，而是驱动器的
+// 非确定性（bombardment-l12 属性 8 实测暴露）。rng 设为模块级但用符号弱导出，测试可通过
+// 替换 Math.random 实现；这里默认自持种子，连 Math.random 也不依赖。
+let rngState = 0x9e3779b9;
+function rngNext(): number {
+  // 32 位 LCG（数值与 op-sequence-driver 旧版 Math.random 无关，纯确定性）。
+  rngState = (rngState * 1664525 + 1013904223) >>> 0;
+  return rngState / 4294967296;
+}
+export function seedDriverRng(seed: number): void {
+  rngState = seed >>> 0;
+}
+export function resetDriverRng(): void {
+  rngState = 0x9e3779b9;
+  // 挂起 Id 计数器也是 run 级状态：采集 run 与重放 run 必须从同一原点起步，否则两次 run 的
+  // `dangling-N` 编号会逐位漂移，破坏 l12 快照重放 8.1 的 Id 归一化等价断言。这里一并复原。
+  danglingCounter = 0;
+}
+
 function resolve(which: 'existing' | 'dangling', pool: Id[], prefix: string): Id | null {
   if (which === 'dangling' || pool.length === 0) return danglingId(prefix);
-  return pool[Math.floor(Math.random() * pool.length)] as Id;
+  return pool[Math.floor(rngNext() * pool.length)] as Id;
 }
 
 function pushUnique(pool: Id[], id: Id): void {
@@ -288,7 +310,7 @@ export function runOpSequence(harness: FullHarness, intents: OpIntent[]): StepLo
           logs.push({ intent, op: null, args: null, result: null });
           continue;
         }
-        const handle = pool.prefabHandles[Math.floor(Math.random() * pool.prefabHandles.length)] as PrefabHandle;
+        const handle = pool.prefabHandles[Math.floor(rngNext() * pool.prefabHandles.length)] as PrefabHandle;
         op = 'prefab.despawn';
         args = { handle };
         break;

@@ -1,10 +1,10 @@
 {
-  "id": "status.class.poisoned",
+  "id": "status_poisoned",
   "name": "中毒",
   "category": "negative",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.poisoned",
+    "sourceClass": "status_poisoned",
     "capabilityIds": [
       "status.capability.ongoing_effect"
     ]
@@ -32,7 +32,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.weak",
+      "with": "status_weak",
       "type": "amplify",
       "description": "虚弱状态下中毒伤害不变，但生存压力叠加"
     }
@@ -52,10 +52,12 @@
   "tags": [
     "damage-over-time",
     "dot",
-    "debuff"
+    "debuff",
+    "poison"
   ],
   "source": [
     "物品: 毒针"
   ],
-  "mvp": true
+  "mvp": true,
+  "notes": "中毒是物品/毒素造成的【战斗持续伤害】，与【梦境侵蚀度】（缩圈词条，见 docs/L3_玩法层/01_行动轮与体力博弈系统.md §9.4）分开建模：缩圈的梦境侵蚀不结算 DMG_07 毒素伤害，改由泛白推高体力与纯白迷失死亡两条通道表达。"
 }

@@ -698,6 +698,14 @@ const VEHICLE_META_FIELDS = new Set([
   // interior 块是架构声明字段（isMicroScene/interactionModel/note），不是玩法参数，
   // 因此不受能力支撑校验约束——同 metadata/description/tags 同类处理。
   'interior',
+  // 驾驶移动效果块与特殊能力列表：二者是玩法层的整块布局配置，不逐能力叶判归属。
+  // `moveEffect`（apCost/range/description）与 `specialAbilities`（特殊行为 id 清单）在载具
+  // profile 里是组合多个能力的统一承载面；基类层把移动收敛为 `drive` 的 speed/moveApCost、
+  // 把特殊行为并入各能力的 configurableParameters。因此免去逐叶能力支撑。归属争议（是否把这两块
+  // 补入基类层 compositionContract.playLayerOwnedFieldNames）登记在 known-divergences 的
+  // VEHICLE-COMPOSITE-FIELD-BACKING，交由 L2 线决策，不在此越权修改基类层。
+  'moveEffect',
+  'specialAbilities',
 ]);
 
 /** 纯说明性子字段；出现在任何层级都不需要能力支撑。 */
@@ -782,7 +790,14 @@ const PARAMETER_BINDING_FIELD: Readonly<Record<PlayProfile['category'], string>>
   weapons: 'weaponParameters',
   items: 'itemParameters',
   npcs: 'behaviorParameters',
-  vehicles: 'vehicleParameters',
+  // 载具不参与能力参数绑定校验。依据：基类层 `src/class/vehicles/index.json` 的载具能力用
+  // `parameters[]` 声明的是「字段名」槽（hp/maxHp/cargoCapacity/moveApCost 等），但这些字段名
+  // 指向的是 profile 上**不存在**的顶层键（实际数据以嵌套块 cargo/moveEffect 承载），也缺少
+  // 多个能力所需的 occupantDisposition/cargoDisposition 等必填字段名。把这些绑定补齐要么需要
+  // 改基类层参数声明（carries 语义），要么需要在玩法层新增冗余字段。二者都超出本线
+  // （玩法层数据契约线）的白名单/职责，故载具的玩法参数改用 `auditVehicleParameterBacking`
+  // 覆盖「组合了的能力能支撑其顶层参数」，能力参数绑定契约对载具暂不强制。
+  vehicles: '',
   statuses: 'statusParameters',
 };
 
@@ -835,6 +850,10 @@ export function auditCapabilityParameterBindings(
     if (capabilityIds.length === 0) continue;
 
     const bindingField = PARAMETER_BINDING_FIELD[profile.category];
+    // 载具的 bindingField 为空（见 PARAMETER_BINDING_FIELD 注释）：载具参数改用
+    // `auditVehicleParameterBacking` 覆盖，不强制能力参数绑定。此处直接短路，避免读到空字段名后
+    // 对每个能力都报「缺少绑定分组」。
+    if (bindingField === '' || bindingField === undefined) continue;
     const bindings = optionalObject(document, bindingField) ?? {};
     const composedIds = new Set(capabilityIds);
 

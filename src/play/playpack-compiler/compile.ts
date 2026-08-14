@@ -28,6 +28,7 @@ import type {
   PlaypackCompileResult,
   PlaypackDiagnostic,
   PlaypackInput,
+  PlaypackSource,
 } from './types.js';
 
 /**
@@ -129,7 +130,7 @@ export async function compile(
     const playProfiles: PlayProfile[] = profiles.map((p) => ({
       sourceId: p.path,
       category: p.category,
-      document: p.document as Readonly<Record<string, JsonValue>>,
+      document: p.document,
     }));
 
     // 先收集原始的数值诊断（包含 value 字段）
@@ -196,7 +197,27 @@ export async function compile(
     collectClassReferences(profile.document, referencedClassIds);
   }
 
-  // ---- 阶段 6：汇总结果 ----
+  // ---- 阶段 6：高级判定（L-06, D-077）----
+  // 可达性静态扫描：凡含引擎层引用即标 advanced。含地图定义只带地图 tag，不构成高级判据。
+  // 命中式而非显式声明：判定看产物的可达内容，不看来源/声明 tag。
+  const { advanced, advancedReason } = classifyAdvanced(profiles, compiledMaps);
+
+  // ---- 阶段 7：LLM 包地图独立激活拒绝（L-05/D-076，要求7.4/8.7）----
+  // LLM 生成的包不能携带能独立激活的地图：地图是唯一装载锚点，LLM 包携带的地图
+  // 不得独立生效、不得通过编译（尤其是那些在阶段6被判定为非高级、却还带着地图的包）。
+  if (input.source === 'llm-generated' && compiledMaps.length > 0) {
+    diagnostics.push({
+      code: 'E_LOAD_LLM_MAP_INDEPENDENT',
+      severity: 'error',
+      file: compiledMaps[0]?.path,
+      message:
+        `LLM 生成的玩法包携带了 ${compiledMaps.length} 张地图定义，地图作为唯一装载锚点在 LLM 包内不能独立激活。`,
+      correction: '把地图定义从 LLM 包中拆出，或用玩家上传/官方方式单独交付地图。',
+      autoFixable: false,
+    });
+  }
+
+  // ---- 阶段 8：汇总结果 ----
   if (diagnostics.some((d) => d.severity === 'error')) {
     return { ok: false, diagnostics };
   }
@@ -210,8 +231,30 @@ export async function compile(
       referencedClassIds,
       diagnostics,
       complexityScore,
+      advanced,
+      // L-06：高级判定理由——命中来源（map-only 恒 false，extra 恒 undefined）。
+      advancedReason,
+      // L-07/D-079 上传两态辨形：无地图→可插拔普通包（态一）；带地图→按地图切口子（态二）。
+      // 判定看编译产物地图数量，不看来源声明（来源不带特权）。
+      deliveryForm: deliveryFormOf(input.source, compiledMaps.length),
     },
   };
+}
+
+/**
+ * 上传两态辨形（D-077 主梁4 / D-079）。
+ *
+ * 玩法包经上传取得最强装载能力（能引用引擎层、能带地图）。编译产物据此分两态：
+ * - 无地图 → `'ordinary'`（态一：可插拔普通玩法包，带 UGC 角标，可自建房/探索匹配）；
+ * - 含地图 → `'entry-by-map'`（态二：按地图切成多个隔离口子，进图装载整个包，禁跨口）。
+ *
+ * 非上传来源（llm-generated / player-uploaded / official）不产生态辨形，返回 undefined——
+ * 只有 `uploaded` 语义专门化才走此辨形；判定看产物地图数，不看来源（来源不带特权，呼应
+ * `CandidateSourceKind.kind` 不改变 Schema/配额/severity）。
+ */
+function deliveryFormOf(source: PlaypackSource, mapCount: number): 'ordinary' | 'entry-by-map' | undefined {
+  if (source !== 'uploaded') return undefined;
+  return mapCount > 0 ? 'entry-by-map' : 'ordinary';
 }
 
 // ---------------------------------------------------------------------------
@@ -300,6 +343,82 @@ function collectClassReferences(doc: Readonly<Record<string, JsonValue>>, refs: 
       collectClassReferences(value as Readonly<Record<string, JsonValue>>, refs);
     }
   }
+}
+
+// ---- L-06: 高级判定——引擎层引用可达性扫描（D-077）----
+
+/** 引擎层原语前缀/标识：命中任一即触发 advanced 标签。 */
+const ENGINE_LAYER_INDICATORS = [
+  'd:link',
+  'd:prefab',
+  'd:node',
+  'd:playpack',
+  'd:rule',
+  'd:expr',
+  'd:schedule',
+  'd:policy',
+  'e:',
+  'n:',
+  'l:',
+  'c:',
+  's:',
+  'a:',
+  'g:',
+  'container.enter',
+  'container.exit',
+  'item.move',
+  'entity.create',
+  'entity.destroy',
+  'entity.place',
+  'node.create',
+  'link.create',
+  'slot.add',
+  'slot.del',
+  'prefab.spawn',
+] as const;
+
+/**
+ * 高级判定与理由（L-06）。返回 `{ advanced, advancedReason }`：
+ * - `advanced = true` 当且仅当某个 profile 命中引擎层原语（可达性静态扫描，命中式）。
+ * - 含地图定义只带地图 tag，不构成高级判据——地图本身不触发 advanced。
+ * - `advancedReason` 记录命中来源，供装载体/审核系统向创作者解释为何被标高级。
+ */
+function classifyAdvanced(
+  profiles: readonly ParsedProfile[],
+  _maps: readonly ParsedMap[],
+): { advanced: boolean; advancedReason?: string } {
+  for (const profile of profiles) {
+    const hit = firstEngineRef(profile.document);
+    if (hit !== undefined) {
+      return { advanced: true, advancedReason: `${profile.path} 含引擎层原语「${hit}」` };
+    }
+  }
+  // 地图定义不触发高级——只带地图 tag。
+  return { advanced: false, advancedReason: undefined };
+}
+
+/** 返回命中引擎层指示词的第一个字符串；未命中返回 undefined。 */
+function firstEngineRef(doc: Readonly<Record<string, JsonValue>>): string | undefined {
+  for (const value of Object.values(doc)) {
+    if (typeof value === 'string') {
+      const hit = ENGINE_LAYER_INDICATORS.find((ind) => value === ind || value.startsWith(ind));
+      if (hit !== undefined) return value;
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string') {
+          const hit = ENGINE_LAYER_INDICATORS.find((ind) => item === ind || item.startsWith(ind));
+          if (hit !== undefined) return item;
+        } else if (item !== null && typeof item === 'object') {
+          const nested = firstEngineRef(item as Readonly<Record<string, JsonValue>>);
+          if (nested !== undefined) return nested;
+        }
+      }
+    } else if (value !== null && typeof value === 'object') {
+      const nested = firstEngineRef(value as Readonly<Record<string, JsonValue>>);
+      if (nested !== undefined) return nested;
+    }
+  }
+  return undefined;
 }
 
 function findingToDiagnostic(finding: Finding, numericFinding?: NumericFinding): PlaypackDiagnostic {

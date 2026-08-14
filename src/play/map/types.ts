@@ -22,6 +22,18 @@ export interface Vec2 {
   readonly y: number;
 }
 
+/** 遮挡规格：描述视觉或物理遮挡的形状与范围。 */
+export interface ObstructionSpec {
+  readonly shape: 'box' | 'circle' | 'polygon';
+  readonly bounds?: readonly Vec2[];
+  readonly height?: number;
+}
+
+/** 过渡窗口的样条过渡点（平滑样条的外插补充定位点）。 */
+export interface TransitionWindowPoints {
+  readonly control: readonly Vec2[];
+}
+
 /**
  * 坐标一律归一化而非像素。
  *
@@ -59,7 +71,7 @@ export const ADMITTED_CHILD_SCALES: Readonly<Record<SceneScale, readonly SceneSc
 };
 
 /** 过渡连接的方向性。取自 `scene.valueset.transition_directionalities`。 */
-export type Directionality = 'bidirectional' | 'unidirectional';
+export type Directionality = 'bidirectional' | 'unidirectional' | 'one-way-down' | 'one-way-up';
 
 /**
  * 一个天然场景节点。
@@ -120,6 +132,14 @@ export interface MapEdge {
    * 直接喂给运动核做沿路动画；为空时渲染层退化为直线。
    */
   readonly path: readonly Vec2[];
+  /** 视觉遮挡规格（如墙、高草丛）：影响可见性渲染但不阻止通行。 */
+  readonly visualObstruction?: ObstructionSpec;
+  /** 物理遮挡规格（如路障）：影响通行判定。与门户 def 的 blocking 分离。 */
+  readonly physicalObstruction?: ObstructionSpec;
+  /** 过渡窗口样条过渡点：渲染层用于绘制进/出的动画窗口。 */
+  readonly transitionWindow?: TransitionWindowPoints;
+  /** 语义锚点（高低地）：影响战术语义，不参与代价。 */
+  readonly semanticAnchor?: 'high' | 'low' | 'neutral';
 }
 
 /**

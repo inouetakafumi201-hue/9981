@@ -5,13 +5,13 @@ import type { OpImpl } from './registry.js';
 import type { OpRegistry } from './registry.js';
 import { ok, err } from './result.js';
 import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
+import { nextId, rollbackNextIdCounter } from '../state/ids.js';
 import { createEntityShape, createItemShape } from '../state/entity.js';
 import { createNodeShape, createLinkShape, createContainerShape, createSlotShape } from '../topology/types.js';
 import type { Node } from '../topology/types.js';
 import { linksTouching, cascadeNodeDestroySet } from '../topology/graph.js';
 import { insertSlot, removeSlot, findDefaultSlotIndex, setSlotHolds } from '../topology/container.js';
-import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity } from '../topology/micro-scene.js';
+import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity, findChildMicroScene } from '../topology/micro-scene.js';
 import type { WorldState } from '../state/world-state.js';
 import type { Def, ContainerSpec } from '../state/def.js';
 import type { Expr } from '../state/expr-types.js';
@@ -193,6 +193,8 @@ export interface LinkCreateArgs {
   def: Id;
   directed?: boolean;
   weight?: number;
+  /** 完整方向 token（`bidirectional`/`unidirectional`/`one-way-down`/`one-way-up`）。与 `directed` 并存时优先。 */
+  direction?: string;
 }
 
 export function makeLinkCreate(defLookup: DefLookupFn): OpImpl<LinkCreateArgs, Ref> {
@@ -203,7 +205,12 @@ export function makeLinkCreate(defLookup: DefLookupFn): OpImpl<LinkCreateArgs, R
     if (!(args.a in draft.nodes)) return err('E_REF_MISSING', `Node ${args.a} 不存在`);
     if (!(args.b in draft.nodes)) return err('E_REF_MISSING', `Node ${args.b} 不存在`);
     const id = nextId('l');
-    const link = createLinkShape(id, args.a, args.b, { def: args.def, directed: args.directed, weight: args.weight });
+    const link = createLinkShape(id, args.a, args.b, {
+      def: args.def,
+      directed: args.directed,
+      weight: args.weight,
+      ...(args.direction === undefined ? {} : { direction: args.direction }),
+    });
     ctx.tx.setDraft({ ...draft, links: { ...draft.links, [id]: link } });
     ctx.tx.logOp('link.create', args, () => {});
     return ok({ $: id });
@@ -446,6 +453,19 @@ export function makeEntityPlace(defLookup: DefLookupFn): OpImpl<EntityPlaceArgs,
         if (!guard.ok) return guard;
       }
 
+      // 需求9.6：capacity 仅在 entity.place 发生时校验。容量检查必须在分配新节点 Id
+      // （nextId('n')）之前完成——一次性失败的 place 若先烧掉一个 n 编号，会破坏
+      // 「成功 Op 序列 → 幂等快照重放」的持久化定见（bombardment-l12 属性 8 实测暴露：
+      // 失败的 entity.place 在采集 run 里推进了 n 计数器，重放 run 的后续成功 create 就偏移一位）。
+      // 这里先在宿主节点现有子节点里量出目标微型场景 Id，直接复用同容量判定，不落地任何新节点。
+      const preExistingSceneId = existingMicroSceneId ?? findChildMicroScene(workingDraft.nodes, hostNodeId, microSceneDefId);
+      const preExistingOccupants = preExistingSceneId
+        ? Object.values(workingDraft.entities).filter((e) => e.node === preExistingSceneId).length
+        : 0;
+      if (capacity !== undefined && !checkMicroSceneCapacity(preExistingOccupants, capacity)) {
+        return err('E_OP_SLOT_FULL', `微型场景 ${preExistingSceneId ?? microSceneDefId} 已达到容量上限 ${capacity}`);
+      }
+
       let createdNode: Node | undefined;
       const createNodeFn = (def: Id, opts?: { weight?: number; parent?: Id; props?: Record<string, unknown> }): Node => {
         const newId = nextId('n');
@@ -467,14 +487,6 @@ export function makeEntityPlace(defLookup: DefLookupFn): OpImpl<EntityPlaceArgs,
         workingDraft = { ...workingDraft, nodes: { ...workingDraft.nodes, [createdNode.id]: createdNode } };
       }
       targetNodeId = ensured.id;
-
-      // 需求9.6：capacity 仅在 entity.place 发生时校验
-      if (capacity !== undefined) {
-        const currentOccupants = Object.values(workingDraft.entities).filter((e) => e.node === targetNodeId).length;
-        if (!checkMicroSceneCapacity(currentOccupants, capacity)) {
-          return err('E_OP_SLOT_FULL', `微型场景 ${targetNodeId} 已达到容量上限 ${capacity}`);
-        }
-      }
     } else {
       targetNodeId = args.nodeId as Id;
       if (!(targetNodeId in workingDraft.nodes)) return err('E_REF_MISSING', `Node ${targetNodeId} 不存在`);
@@ -550,7 +562,12 @@ export function makeEntityDemote(itemMoveImpl: OpImpl<ItemMoveArgs, void>): OpIm
     const { [args.entityId]: _removed, ...restEntities } = draft.entities;
     ctx.tx.setDraft({ ...draft, entities: restEntities, items: { ...draft.items, [newId]: item } });
     const moveResult = itemMoveImpl({ itemId: newId, toContainerId: args.toContainerId, atSlot: args.atSlot }, ctx);
-    if (!moveResult.ok) return moveResult;
+    if (!moveResult.ok) {
+      // 降权失败 → 整体回滚：原 entity 恢复、新 item 不存在、ID 计数器同时回滚（与 stack.split 对称）。
+      // 否则一次失败的 demote 会永久吞掉一个 i 编号，破坏「成功 Op 序列 → 幂等快照重放」的持久化定见。
+      rollbackNextIdCounter('i');
+      return moveResult;
+    }
     ctx.tx.logOp('entity.demote', args, () => {});
     return ok({ $: newId });
   };

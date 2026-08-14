@@ -32,10 +32,38 @@ export interface RevalidationInput {
    * 缺省时跳过该检查（调用方未提供活动引用即无法判定，不臆造结论）。
    */
   readonly activeReferences?: ReadonlyMap<string, readonly TypedReference[]>;
+  /**
+   * 单调重定义（D-073）下"实际被本次候选覆盖"的活动定义标识（同 key 后装即覆盖，无须 overrideIntent）。
+   *
+   * 与 `overrideIntent` 做并集视作覆盖目标，从而让"同 key 重定义但未挂 overrideIntent"的覆盖
+   * 也触发对活动入边依赖者的类型兼容重校验。缺省时与覆盖意图声明等价（向后兼容）。
+   */
+  readonly effectiveOverrides?: readonly string[];
 }
 
 export interface RevalidationResult {
   readonly diagnostics: readonly Diagnostic[];
+}
+
+/**
+ * 计算本次候选覆盖目标的并集：显式 `overrideIntent` + 单调重定义的实际覆盖（`effectiveOverrides`）。
+ *
+ * 依赖重验证只关心"被改动的活动定义"，不改动的不需要重查；两者都不会被同一次遍历重复处理。
+ */
+function mergedOverrideIds(
+  pkg: DefinitionPackage,
+  effectiveOverrides: readonly string[] | undefined,
+): Map<string, 'intent' | 'peer'> {
+  const merged = new Map<string, 'intent' | 'peer'>();
+  for (const intent of pkg.overrideIntent ?? []) {
+    merged.set(intent.targetId, 'intent');
+  }
+  for (const id of effectiveOverrides ?? []) {
+    if (!merged.has(id)) {
+      merged.set(id, 'peer');
+    }
+  }
+  return merged;
 }
 
 /**
@@ -45,39 +73,43 @@ export function revalidateDependents(input: RevalidationInput): RevalidationResu
   const diagnostics: Diagnostic[] = [];
   const pkgId = input.package.packageId;
 
-  const overriddenIds = new Set((input.package.overrideIntent ?? []).map((intent) => intent.targetId));
+  const overrides = mergedOverrideIds(input.package, input.effectiveOverrides);
   const removedIds = new Set((input.package.removals ?? []).map((removal) => removal.targetId));
   const candidateIds = new Set(input.package.definitions.map((definition) => definition.id));
 
   // 覆盖：被覆盖定义的入边依赖者必须在合并图中仍能解析该定义（图已在 buildGraph 校验类型匹配，
-  // 此处补充"覆盖目标本身必须存在于候选中"与"被覆盖导致依赖失效"的显式追踪）。
-  for (const intent of input.package.overrideIntent ?? []) {
-    if (!candidateIds.has(intent.targetId)) {
-      diagnostics.push(
-        errorDiagnostic({
-          code: DIAGNOSTIC_CODES.REF_OVERRIDE_TARGET_MISSING,
-          reason: `覆盖意图指向 ${intent.targetId}，但候选包未提供该定义的新版本。`,
-          correctionSuggestion: '覆盖必须在同一候选包内提供被覆盖定义的新版本。',
-          sourcePackage: pkgId,
-        }),
-      );
+  // 此处补充"被覆盖导致依赖失效"的显式追踪）。
+  for (const [targetId, origin] of overrides) {
+    if (!candidateIds.has(targetId)) {
+      // origin === 'peer'（同 key 对等覆盖）时恒在候选中（覆盖定义必然重新提交同 key），
+      // 因此只有显式意图才可能指向候选缺失的定义——沿用 REF_OVERRIDE_TARGET_MISSING。
+      if (origin !== 'peer') {
+        diagnostics.push(
+          errorDiagnostic({
+            code: DIAGNOSTIC_CODES.REF_OVERRIDE_TARGET_MISSING,
+            reason: `覆盖意图指向 ${targetId}，但候选包未提供该定义的新版本。`,
+            correctionSuggestion: '覆盖必须在同一候选包内提供被覆盖定义的新版本。',
+            sourcePackage: pkgId,
+          }),
+        );
+      }
       continue;
     }
 
     // 覆盖后，仍留在活动集的依赖者必须仍能按其声明的期望类型引用新版本。
     // 新版本的节点信息取自合并工作图（候选覆盖活动），因此 graph.nodes 已是覆盖后的形态。
-    const newTarget = input.graph.nodes.get(intent.targetId);
+    const newTarget = input.graph.nodes.get(targetId);
     if (newTarget === undefined || input.activeReferences === undefined) {
       continue;
     }
-    const dependents = [...(input.activeInbound.get(intent.targetId) ?? [])].sort(compareStrings);
+    const dependents = [...(input.activeInbound.get(targetId) ?? [])].sort(compareStrings);
     for (const dependent of dependents) {
       // 依赖者若被删除，或本次已随候选重新提交，则其引用已由建图阶段校验，不重复报告。
       if (removedIds.has(dependent) || candidateIds.has(dependent)) {
         continue;
       }
       for (const reference of input.activeReferences.get(dependent) ?? []) {
-        if (reference.refId !== intent.targetId) {
+        if (reference.refId !== targetId) {
           continue;
         }
         const match = matchesExpected(newTarget, reference.expected);
@@ -92,7 +124,7 @@ export function revalidateDependents(input: RevalidationInput): RevalidationResu
           errorDiagnostic({
             code: DIAGNOSTIC_CODES.REF_OVERRIDE_INVALIDATES_DEPENDENT,
             reason:
-              `覆盖 ${intent.targetId} 会使依赖者 ${dependent} 的引用（角色 ${reference.role}）失效：` +
+              `覆盖 ${targetId} 会使依赖者 ${dependent} 的引用（角色 ${reference.role}）失效：` +
               `该引用期望 ${expectedText}。`,
             correctionSuggestion:
               '保持被覆盖定义与全部入边依赖者的期望类型兼容，或在同一候选变更中一并更新这些依赖者（Requirements 12.6）。',
@@ -115,7 +147,7 @@ export function revalidateDependents(input: RevalidationInput): RevalidationResu
         continue;
       }
       // 依赖者若在候选中被覆盖，则其新版本的出边决定是否仍引用被删目标。
-      if (overriddenIds.has(dependent) || candidateIds.has(dependent)) {
+      if (overrides.has(dependent) || candidateIds.has(dependent)) {
         const stillReferences = (input.graph.outbound.get(dependent) ?? []).includes(removal.targetId);
         if (!stillReferences) {
           continue;

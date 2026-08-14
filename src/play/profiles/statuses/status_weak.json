@@ -1,10 +1,10 @@
 {
-  "id": "status.class.weak",
+  "id": "status_weak",
   "name": "虚弱",
   "category": "negative",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.weak",
+    "sourceClass": "status_weak",
     "capabilityIds": [
       "status.capability.output_modulation"
     ]
@@ -42,12 +42,12 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.poisoned",
+      "with": "status_poisoned",
       "type": "amplify",
       "description": "与中毒叠加：生存压力倍增"
     },
     {
-      "with": "status.class.weak",
+      "with": "status_weak",
       "type": "none",
       "description": "同名不叠加"
     }

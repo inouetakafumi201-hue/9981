@@ -275,6 +275,22 @@ const NUMERIC_RULES: readonly NumericRule[] = [
     source: L0,
   },
   {
+    key: 'dcModifier',
+    ...GAMEPLAY,
+    rationale:
+      '狙击屏息对难度门槛（DC）的修正量（-2）直接改变射击判定成败，是玩家可见的战斗刻度；'
+      + '取值受 1-5 约束。来源：weapons/wp_sniper_m24.json weapon.capability.hold_breath / 顶部 dcModifier。',
+    source: L0,
+  },
+  {
+    key: 'scatterThreshold',
+    ...GAMEPLAY,
+    rationale:
+      '霰弹散射的近距阈值决定何时进入高命中散射形态，是玩家在贴脸与拉开距离间权衡的可见空间刻度。'
+      + '来源：weapons/wp_shotgun_pump.json weapon.capability.scatter_shot / 顶部 scatterThreshold。',
+    source: L0,
+  },
+  {
     key: 'blockedDamage',
     ...GAMEPLAY,
     rationale: '被格挡的伤害量是玩家可见的防御刻度。',
@@ -352,6 +368,12 @@ const NUMERIC_RULES: readonly NumericRule[] = [
     key: 'amount',
     ...GAMEPLAY,
     rationale: '恢复量是玩家可见的资源刻度。',
+    source: L0,
+  },
+  {
+    key: 'rollsSkipped',
+    ...INTERNAL,
+    rationale: '过载跳过的投点次数是判定过载时长的内部结算计数，非玩家直接刻度的取值（2026-08-13 语义定稿）。',
     source: L0,
   },
   {

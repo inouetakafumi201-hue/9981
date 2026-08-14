@@ -23,6 +23,7 @@
   "range": 5,
   "ammoCost": 1,
   "ammoType": "7.62mm",
+  "dcModifier": 2,
   "stackable": false,
   "grantedStates": [],
   "actions": [
@@ -54,7 +55,7 @@
       "effects": [
         {
           "op": "attach.add",
-          "def": "status.class.aiming",
+          "def": "status_aiming",
           "target": "{actor}",
           "durationTurns": 1,
           "description": "进入瞄准准备态"
@@ -95,10 +96,9 @@
   ],
   "weaponParameters": {
     "weapon.capability.hold_breath": {
-      "apCost": 1,
-      "dcReduction": 2,
-      "requiresAiming": true,
-      "persistsWhileAiming": true
+      "holdBreathStateId": "status_aiming",
+      "holdBreathActionId": "action.hold_breath",
+      "dcModifier": "dcModifier"
     },
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",

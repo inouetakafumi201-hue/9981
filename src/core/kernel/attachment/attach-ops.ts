@@ -6,7 +6,7 @@ import type { OpContext, OpImpl, OpRegistry } from '../ops/registry.js';
 import type { Result } from '../ops/result.js';
 import { ok, err } from '../ops/result.js';
 import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
+import { nextId, rollbackNextIdCounter } from '../state/ids.js';
 import type { Value } from '../state/value.js';
 import type { Attachment } from '../state/attachment.js';
 import { cascadeRemovalSet } from '../state/attachment.js';
@@ -142,7 +142,15 @@ function makeAttachAdd(deps: AttachOpsDeps): OpImpl<AttachAddArgs, Ref> {
     });
 
     const lifecycle = runLifecycle(attachmentDef.onAdd, attachment, ctx, deps);
-    if (!lifecycle.ok) return lifecycle;
+    if (!lifecycle.ok) {
+      // onAdd 效果失败会整体回滚（事务回退 draft 与 journal），但 newId 计数已被 nextId('a') 抬高了
+      // （Agent 与 Attachment 共用 `a:` 前缀计数器，见 agent-ops.ts）。不回退会让一次失败的
+      // attach.add 永久吞掉一个 a 编号，破坏「成功 Op 序列 → 幂等快照重放」的持久化定见
+      // （bombardment-l12 属性 8 实测暴露：失败的 attach.add 使采集 run 与重放 run 的 Agent/Attachment
+      // 编号整体错位一位，逐字节重放从此分歧）。
+      rollbackNextIdCounter('a');
+      return lifecycle;
+    }
 
     ctx.tx.logOp('attach.add', args, () => {});
     return ok({ $: newId });

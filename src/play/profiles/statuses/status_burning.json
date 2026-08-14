@@ -1,10 +1,10 @@
 {
-  "id": "status.class.burning",
+  "id": "status_burning",
   "name": "燃烧",
   "category": "negative",
   "type": "numeric",
   "classComposition": {
-    "sourceClass": "status.class.burning",
+    "sourceClass": "status_burning",
     "capabilityIds": [
       "status.capability.ongoing_effect"
     ]
@@ -37,7 +37,7 @@
   ],
   "interactionMatrix": [
     {
-      "with": "status.class.frozen",
+      "with": "status_frozen",
       "type": "neutralize",
       "description": "燃烧解除冰冻"
     }

@@ -13,7 +13,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parseStrictDataJson } from '../../class/catalog-loader.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import type { JsonValue } from '../../core/kernel/ports/index.js';
 import { loadPlayProfiles } from '../profiles/catalog.js';
 import { allDocDivergences, type DocDivergence } from '../profiles/known-divergences.js';
 import { classifyNumericField } from '../types/numeric-classification.js';
@@ -90,14 +90,16 @@ describe('分歧登记表本身的完整性', () => {
   });
 });
 
-describe('L3-DIV-01 过载持续时长在玩法层内部就有两个数值', () => {
-  it('status_overloaded 写 3 回合，玩法包写 2 次投点，两者仍不一致', () => {
+describe('L3-DIV-01 过载持续时长已按 2026-08-13 语义定稿：跳过一次投点，下下回合归队', () => {
+  it('status_overloaded 用 rollsSkipped=1 表达"跳过一次投点"，不再写 3 回合', () => {
     const breakConditions = documentOf('statuses/status_overloaded.json')['breakConditions'];
     expect(Array.isArray(breakConditions)).toBe(true);
     const turnCondition = (breakConditions as readonly JsonValue[])
       .map((entry) => (entry !== null && typeof entry === 'object' && !Array.isArray(entry) ? entry : undefined))
-      .find((entry) => entry?.['type'] === 'turn');
-    expect(turnCondition?.['turns']).toBe(3);
+      .find((entry) => (entry as Record<string, JsonValue> | undefined)?.['turns'] !== undefined
+        || (entry as Record<string, JsonValue> | undefined)?.['rollsSkipped'] !== undefined);
+    // 过载语义：跳过一次投点（rollsSkipped=1），下下回合归队。
+    expect((turnCondition as Record<string, JsonValue> | undefined)?.['rollsSkipped']).toBe(1);
 
     const rule = playpackDef('rule:overload-on-pool-overflow');
     expect(JSON.stringify(rule)).toContain('"remainingRolls":2');
@@ -142,11 +144,15 @@ describe('L3-DIV-04 已由 D-037/U-002 消解：按人数裁剪的档位模型�
     expect(playpackText).toContain('{"op":"gte","args":[{"var":"apLead"},2]}');
   });
 
-  it('单人局按 U-002 abort，不推断默认 AP', () => {
-    expect(playpackText).toContain('"args":[{"var":"apParticipantCount"},1]');
-    expect(playpackText).toContain('U-002');
+  it('单人局按 D-037/U-002 自然落入 2 AP 档，abort 写法已废止', () => {
+    // 差值分配算法用「参与人数 ≤2」走档位裁剪分支：单人局在屏蔽 3 AP 档后、
+    // 因身处最高档自然得 2 AP——这是算法的自然结果，不再是特例分支。
+    expect(playpackText).toContain('"args":[{"var":"apParticipantCount"},2]');
     const policy = (playpack['props'] as Readonly<Record<string, JsonValue>>)['resolutionPolicy'];
-    expect(String((policy as Readonly<Record<string, JsonValue>>)['singleParticipant'])).toContain('abort');
+    const single = String((policy as Readonly<Record<string, JsonValue>>)['singleParticipant']);
+    expect(single).toContain('U-002');
+    expect(single).not.toContain('按 U-002 abort');
+    // 单人按差值算法自然落 2 AP；abort 写法已废止，不再是结构化拒绝。
   });
 
   it('AP 仍然写入 AP 池，投点随机流未被改名', () => {
@@ -155,9 +161,9 @@ describe('L3-DIV-04 已由 D-037/U-002 消解：按人数裁剪的档位模型�
   });
 });
 
-describe('L3-DIV-05 常规逆转成本：规则正文 1 AP 与 §3.5 示例的 2 AP', () => {
-  it('玩法包按规则正文取 1 AP', () => {
-    expect(playpackDef('action:reverse')['cost']).toEqual([{ pool: 'AP', amount: 1 }]);
+describe('L3-DIV-05 逆转消耗 2026-08-13 已裁决：改为 SP 而非 AP', () => {
+  it('常规逆转按项目所有者裁决改为消耗 SP 1（不用 AP）', () => {
+    expect(playpackDef('action:reverse')['cost']).toEqual([{ pool: 'SP', amount: 1 }]);
   });
 
   it('超逆转按文档取 2 SP', () => {
@@ -165,14 +171,14 @@ describe('L3-DIV-05 常规逆转成本：规则正文 1 AP 与 §3.5 示例的 2
   });
 });
 
-describe('L3-DIV-06 失衡破除举盾在格挡 profile 里没有落地', () => {
-  it('status_blocking 的解除条件与交互矩阵都不含 status_staggered', () => {
+describe('L3-DIV-06 失衡破除举盾已在格挡 profile 落地', () => {
+  it('status_blocking 的解除条件与交互矩阵都含 status_staggered', () => {
     const blocking = documentOf('statuses/status_blocking.json');
-    expect(JSON.stringify(blocking['breakConditions'])).not.toContain('status_staggered');
-    expect(JSON.stringify(blocking['interactionMatrix'])).not.toContain('status_staggered');
+    expect(JSON.stringify(blocking['breakConditions'])).toContain('status_staggered');
+    expect(JSON.stringify(blocking['interactionMatrix'])).toContain('status_staggered');
   });
 
-  it('对照：瞄准 profile 已经写了被失衡打断，说明这不是"整套机制都没做"', () => {
+  it('对照：瞄准 profile 同样写入了被失衡打断，说明两处口径一致', () => {
     const aiming = documentOf('statuses/status_aiming.json');
     expect(JSON.stringify(aiming['breakConditions'])).toContain('status_staggered');
   });
@@ -200,49 +206,64 @@ describe('L3-DIV-08 弱点是否必然施加失衡', () => {
   });
 });
 
-describe('L3-DIV-09 医疗包 AP 成本冲突', () => {
-  it('profile 取 1 AP，并在 unresolvedIssues 里留下未裁决记录', () => {
+describe('L3-DIV-09 急救包（原医疗包）AP 成本已裁决', () => {
+  it('急救包取 1 AP，unresolvedIssues 里留下已裁决记录', () => {
     const medkit = documentOf('items/item_medkit.json');
     const actions = medkit['actions'];
     expect(Array.isArray(actions)).toBe(true);
     const first = (actions as readonly JsonValue[])[0];
-    expect(first !== null && typeof first === 'object' && !Array.isArray(first) ? first['apCost'] : undefined)
+    expect(first !== null && typeof first === 'object' && !Array.isArray(first) ? (first as Record<string, JsonValue>)['apCost'] : undefined)
       .toBe(1);
     expect(JSON.stringify(medkit['unresolvedIssues'])).toContain('ITEM-MEDKIT-AP-COST');
   });
+
+  it('急救包按项目所有者裁决：改名急救包并回至 4 点', () => {
+    const medkit = documentOf('items/item_medkit.json');
+    expect(String(medkit['name'])).toBe('急救包');
+    const text = JSON.stringify(medkit['actions']);
+    expect(text).toContain('prop.set');
+    expect(text).toContain('"value":4');
+    expect(text).toContain('4');
+  });
 });
 
-describe('L3-DIV-10 守卫"五状态范式"与实际四状态', () => {
-  it('两个守卫 profile 的 FSM 都只有四个状态，并各自登记了未裁决记录', () => {
+describe('L3-DIV-10 守卫五状态范式：patrolling/listening/chasing/attacking/returning', () => {
+  it('两个守卫 profile 的 FSM 都有五个状态，含独立的 returning', () => {
     for (const sourceId of ['npcs/guard_standard.json', 'npcs/guard_elite.json']) {
       const fsm = documentOf(sourceId)['fsm'];
-      const states = fsm !== null && typeof fsm === 'object' && !Array.isArray(fsm) ? fsm['states'] : undefined;
-      const names = states !== null && states !== undefined && typeof states === 'object' && !Array.isArray(states)
-        ? Object.keys(states).sort()
-        : [];
-      expect(names, sourceId).toEqual(['attacking', 'chasing', 'listening', 'patrolling']);
-      expect(JSON.stringify(documentOf(sourceId)['unresolvedIssues']), sourceId)
-        .toContain('NPC-GUARD-STATE-NAMING');
+      const fsmRecord = fsm !== null && typeof fsm === 'object' && !Array.isArray(fsm) ? fsm as Record<string, JsonValue> : undefined;
+      const states = fsmRecord?.['states'];
+      const stateRecord = states !== null && states !== undefined && typeof states === 'object' && !Array.isArray(states)
+        ? states as Record<string, JsonValue>
+        : undefined;
+      const names = stateRecord !== undefined ? Object.keys(stateRecord).sort() : [];
+      expect(names, sourceId).toEqual(['attacking', 'chasing', 'listening', 'patrolling', 'returning']);
+    }
+  });
+
+  it('守卫五状态范式已由项目所有者消解，登记记录为已裁决并给出依据', () => {
+    for (const sourceId of ['npcs/guard_standard.json', 'npcs/guard_elite.json']) {
+      const issues = documentOf(sourceId)['unresolvedIssues'];
+      expect(JSON.stringify(issues), sourceId).toContain('NPC-GUARD-STATE-NAMING');
     }
   });
 });
 
-describe('L3-DIV-11 迟缓的自述范围宽于其实际配置', () => {
-  it('description 说"所有动作"，actionModifiers 只覆盖 move 与 attack', () => {
+describe('L3-DIV-11 迟缓按 AP 铁律表达为过渡中间态，去除"所有动作+1 AP"加价', () => {
+  it('description 与文档一致表述为"离开任何天然场景需中间状态"，不再说"所有动作"', () => {
     const slowed = documentOf('statuses/status_slowed.json');
-    expect(String(slowed['description'])).toContain('所有动作');
+    expect(String(slowed['description'])).toContain('中间状态');
+    expect(String(slowed['description'])).not.toContain('所有动作');
+    expect(String(slowed['description'])).not.toContain('+1 AP');
+  });
 
-    const effects = slowed['effects'];
-    const modifiers = effects !== null && typeof effects === 'object' && !Array.isArray(effects)
-      ? effects['actionModifiers']
-      : undefined;
-    expect(Array.isArray(modifiers)).toBe(true);
-    const covered = (modifiers as readonly JsonValue[])
-      .map((entry) => (entry !== null && typeof entry === 'object' && !Array.isArray(entry)
-        ? entry['actionType']
-        : undefined))
-      .sort();
-    expect(covered).toEqual(['attack', 'move']);
+  it('迟缓状态不再携带 apModifier 加 AP 修饰，改为过渡态表达', () => {
+    const slowed = documentOf('statuses/status_slowed.json');
+    const text = JSON.stringify(slowed);
+    expect(text).not.toContain('apModifier');
+    expect(text).not.toContain('actionModifiers');
+    expect(text.toLowerCase()).toContain('transition');
+    expect(JSON.stringify(slowed['interactionMatrix'])).toContain('status_heavy');
   });
 });
 
@@ -274,11 +295,11 @@ describe('D-052 NPC 资源配置已按文档补齐', () => {
   it('NPC 体力上限严格低于玩家的 5，才能让玩家在 PVE 里把它压到过载', () => {
     const playerCap = (playpack['pools'] as readonly JsonValue[])
       .map((entry) => (entry !== null && typeof entry === 'object' && !Array.isArray(entry) ? entry : undefined))
-      .find((entry) => entry?.['name'] === 'SP');
-    expect(playerCap?.['max']).toBe(5);
+      .find((entry) => (entry as Record<string, JsonValue> | undefined)?.['name'] === 'SP');
+    expect((playerCap as Record<string, JsonValue> | undefined)?.['max']).toBe(5);
     for (const npc of npcs) {
       const record = npc.document['resources'] as Readonly<Record<string, JsonValue>>;
-      expect(Number(record['staminaMax']), npc.sourceId).toBeLessThan(Number(playerCap?.['max']));
+      expect(Number(record['staminaMax']), npc.sourceId).toBeLessThan(Number((playerCap as Record<string, JsonValue> | undefined)?.['max']));
     }
   });
 });

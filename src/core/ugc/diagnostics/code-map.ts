@@ -91,6 +91,7 @@ export const CODE_MAP = {
     'reference-cycle': 'E_REF_CYCLE',
     'package-cycle': 'E_LOAD_CYCLE_DEP',
     'unresolved-contract': 'E_LOAD_UNRESOLVED_CONTRACT',
+    'invalidates-dependent': 'E_LOAD_OVERRIDE_INVALIDATES_DEPENDENT',
   },
   COMPOSITION_CONFLICT: {
     'inheritance-cycle': 'E_LOAD_INHERITANCE_CYCLE',
