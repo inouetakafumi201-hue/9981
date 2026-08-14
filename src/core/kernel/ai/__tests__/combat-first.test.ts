@@ -393,16 +393,16 @@ describe('阶段1：AI 在真实内核对局里能攻击/拾取/治疗/移动', 
     }
   });
 
-  it('阶段2：满血我方 + 残血敌方 → 趋利选攻击（补刀而非保命疗伤）', () => {
-    // 我方满血(4)、敌方残血(3)，敌方死了对我方是正收益，这刀应该砍下去。
-    const { holder, facade } = makeCombatWorld({ heroVitality: 4, enemyVitality: 3 });
+  it('阶段2：满血我方(5) + 残血敌方(2) → 趋利选攻击（补刀而非保命疗伤）', () => {
+    // 我方满血(5，不在死亡窗口)、敌方残血(2)，敌方死了对我方是正收益，这刀应该砍下去。
+    const { holder, facade } = makeCombatWorld({ heroVitality: 5, enemyVitality: 2 });
     const result = facade.act(rootRequest());
     expect(result.status).toBe('submitted');
     const chosen = result.candidate?.legalAction.action;
-    // 敌方维度已进分数表：残血敌方 (+enemy.vitality 当量) 让攻击分支在我方安全时显著占优。
+    // 敌方维度已进分数表：残血敌方的高当量让攻击分支在我方安全时显著占优。
     expect(chosen).toBe('a:attack');
     // 攻击真实落地。
-    expect(Number(holder.getState().entities[ENEMY]?.props['vitality'])).toBeLessThan(3);
+    expect(Number(holder.getState().entities[ENEMY]?.props['vitality'])).toBeLessThan(2);
   });
 
   it('阶段2：残血我方 + 满血敌方 → 避害选治疗（不鲁莽送死）', () => {
