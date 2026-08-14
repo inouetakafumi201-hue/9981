@@ -49,6 +49,8 @@ export const DESIGN_CURRENCY_PRINCIPLES = {
   deathAnchor: -10,
   /** 存活窗口：值 <= 此值时视为「致死窗口」。 */
   lethalWindow: 4,
+  /** 资源耗尽锚：把关键资源（AP/体力）压零的绝对惩罚，命令 AI 绝不自断后路。 */
+  exhaustionAnchor: -6,
 } as const;
 
 /**
@@ -78,32 +80,35 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     field: 'range',
     unit: 1,
   },
-  // AP（回合预算）：保有 AP 即保有行动机会。
+  // AP（回合预算）：保有 AP 即保有行动机会。真实场在 world.props.pools.ap.<scope>.real，
+  // 经 read-adapter 的资源池投影实体化到实体 props `pool.ap`。压零 = 动作机会清零，绝对值负分。
   {
-    field: 'ap',
+    field: 'pool.ap',
     unit: 2,
-    adjustment: { when: (cur) => cur === 0, value: 0 }, // AP 空 = 动作机会清零，但非绝对
+    adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.exhaustionAnchor },
   },
-  // 体力（清醒值）：强力骰 / 处决恢复的机会。
+  // 体力（清醒值）：强力骰 / 处决恢复的机会。真实场在 world.props.pools.stamina.<scope>.real。
+  // 压零 = 自断强骰/处决机会，绝对值负分（不亚于进入致死窗口）。
   {
-    field: 'stamina',
+    field: 'pool.stamina',
     unit: 1,
+    adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.exhaustionAnchor },
   },
 ];
 
 /** 求某字段在 BeliefSlice 里被观测到的第一个有效值（数值）。 */
 function observedNumber(slice: BeliefSlice, field: string): number | null {
-  // 真实投影：`<id>.<field>`；也兼容裸键。
+  // 真实投影：`<id>.<field>`。field 可能是 `pool.ap`/`pool.stamina` 这类带子段的字段名，
+  // 用「以 field 为后缀」进行匹配（既匹配 `e:ai.pool.ap`，也兼容裸键 `pool.ap`），绝不只是
+  // 取最后一个点分段——否则 `pool.ap` 会误匹配成 `ap`。
   for (const [key, raw] of Object.entries(slice.visibleFacts)) {
-    const base = key.slice(key.lastIndexOf('.') + 1);
-    if (base !== field) continue;
-    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
+    if (key === field || key.endsWith(`.${field}`)) return raw;
   }
   for (const [key, fact] of Object.entries(slice.knownFacts)) {
-    const base = key.slice(key.lastIndexOf('.') + 1);
-    if (base !== field) continue;
     const value = (fact as KnownFact | undefined)?.value;
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+    if (key === field || key.endsWith(`.${field}`)) return value;
   }
   return null;
 }

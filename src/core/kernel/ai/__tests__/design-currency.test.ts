@@ -62,14 +62,14 @@ describe('scoreDesignCurrency', () => {
   it('多维度可加：生命/AP/体力/移动都计入估值', () => {
     const onlyHp = scoreDesignCurrency({ slice: slice({ visibleFacts: hp(5) }) });
     const multi = scoreDesignCurrency({
-      slice: slice({ visibleFacts: { 'e:agent.vitality': 5, 'e:agent.ap': 1, 'e:agent.stamina': 3, 'e:agent.range': 2 } }),
+      slice: slice({ visibleFacts: { 'e:agent.vitality': 5, 'e:agent.pool.ap': 1, 'e:agent.pool.stamina': 3, 'e:agent.range': 2 } }),
     });
     expect(multi).toBeGreaterThan(onlyHp);
   });
 
   it('分数表的费目覆盖生命/伤害/移动/AP/状态等常用维度', () => {
     const fields = DESIGN_CURRENCY_CHARGES.map((entry) => entry.field);
-    for (const field of ['vitality', 'heal', 'range', 'ap', 'stamina']) {
+    for (const field of ['vitality', 'heal', 'range', 'pool.ap', 'pool.stamina']) {
       expect(fields).toContain(field);
     }
   });

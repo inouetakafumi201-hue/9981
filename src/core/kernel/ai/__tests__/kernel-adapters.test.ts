@@ -245,6 +245,60 @@ describe('kernel AI read adapter', () => {
     holder.setState(setPath(holder.getState(), 'world.knowledge.g:npc.facts.lastSeen:e:hidden-scout', 'n:room9' as never) as WorldState);
     expect(readAdapter.isCurrent(authority.value, first.value)).toBe(false);
   });
+
+  it('projects an owner resource pool real value onto the controlled entity', () => {
+    // AP/体力等池在引擎里是 world.props.pools.<pool>.<scope>.real（非实体 props）。受控实体
+    // 应把它主的池代数量投影为 `pool.<name>` 观测字段，供设计货币等估值函数读取。
+    let state = baseState();
+    state = setPath(state, 'world.props.pools.ap.g:npc.real', 2) as WorldState;
+    state = setPath(state, 'world.props.pools.ap.g:npc.available', 2) as WorldState;
+    state = setPath(state, 'world.props.pools.stamina.g:npc.real', 1) as WorldState;
+    state = setPath(state, 'world.props.pools.stamina.g:npc.available', 1) as WorldState;
+    const holder = new WorldStateHolder(state);
+
+    const exprEngine = new ExprEngine();
+    const queryEngine = new QueryEngine();
+    const registry = new OpRegistry(holder);
+    registerPropOps(registry, new DefRegistry());
+    registerIntentOps(registry, {
+      defLookup: () => null,
+      now: () => 1000,
+      runEffects: () => undefined as never,
+    });
+    const actionCatalog = new ActionCatalog({
+      getState: () => holder.getState(),
+      exprEngine,
+      queryEngine,
+      listActionDefs: () => [],
+      ctxForActor: (actor, bindings) => makeDefaultEvalContext({
+        self: actor,
+        vars: bindings,
+        resolvePath: (path) => {
+          const parts = path.split('.');
+          let cursor: unknown = holder.getState();
+          for (const part of parts) {
+            if (cursor === null || typeof cursor !== 'object') return null;
+            cursor = (cursor as Record<string, unknown>)[part];
+          }
+          return (cursor ?? null) as never;
+        },
+      }),
+    });
+    const readAdapter = new KernelAIReadAdapter({ getState: () => holder.getState(), queryEngine, actionCatalog, visibleTo: VISIBLE_TO, exprEngine });
+
+    const authority = readAdapter.readAuthority({ $: 'g:npc' });
+    expect(authority.ok).toBe(true);
+    if (!authority.ok) return;
+    const slice = readAdapter.buildBeliefSlice(authority.value);
+    expect(slice.ok).toBe(true);
+    if (!slice.ok) return;
+
+    // 只投影该 agent 自己范围内的 real，不投影他人池、不投影 available 暂计。
+    expect(slice.value.visibleFacts['e:npc.pool.ap']).toBe(2);
+    expect(slice.value.visibleFacts['e:npc.pool.stamina']).toBe(1);
+    // 未被该 agent 控制的对象不投影池代数量。
+    expect(slice.value.visibleFacts['e:ally.pool.ap']).toBeUndefined();
+  });
 });
 
 describe('kernel canonical submission adapter', () => {

@@ -45,7 +45,38 @@ export function resolveRefDefId(state: WorldState, ref: Ref): string | null {
 /** Returns the declarative `props` of whatever object a Ref points at. */
 export function resolveRefProps(state: WorldState, ref: Ref): Readonly<Record<string, Value>> | null {
   const holder = state.entities[ref.$] ?? state.items[ref.$] ?? state.nodes[ref.$] ?? state.links[ref.$];
-  return holder === undefined ? null : (holder.props ?? {});
+  if (holder === undefined) return null;
+  const props: Record<string, Value> = { ...(holder.props ?? {}) };
+  // 资源池投影：AP/体力等池不在实体 props 上，而在 world.props.pools.<pool>.<scope>.real。
+  // 若该 Ref 是某个 agent 的受控实体，就把它主人的池代数量投影成可观测实体字段（real 为准，
+  // available 是当前回合已结算前的暂计，外部读快照一律以 real 记账）。这样设计货币的
+  // `ap`/`stamina` 费目就能在真实状态字段上被 KernelAIReadAdapter 看到，而不是只活在测试里。
+  if (state.world.agents !== undefined) {
+    for (const [, agent] of Object.entries(state.world.agents)) {
+      const controlsAll = agent.controls ?? [];
+      if (!controlsAll.some((c) => c.$ === ref.$)) continue;
+      const pools = state.world.props?.pools as Record<string, unknown> | undefined;
+      if (!pools) break;
+      for (const [poolName, byScope] of Object.entries(pools)) {
+        // 池结构是 world.props.pools.<pool>.<scope>.real。找到宿主 agent 自己的范围内那个
+        // 数值场再投影成 `pool.<name>` 字段（real 为准；available 是本回合结算前的暂计，
+        // 外部读快照一律以 real 记账）。
+        // byScope 的类型是 { [scope]: Value }；其下再往下取 `.real` 需要的两重类型收缩都要
+        // 通过 unknown 中转（Value 与 { real: Value } 索引签名不重叠，直接断言会被 tsc 拒绝）。
+        const detached = byScope as unknown;
+        const scoped = detached as Record<string, unknown> | undefined;
+        const mine = scoped?.[agent.id];
+        const real = mine !== undefined && typeof mine === 'object' && mine !== null
+          ? (mine as Record<string, unknown>)['real']
+          : undefined;
+        if (typeof real === 'number') {
+          props[`pool.${poolName}`] = real;
+        }
+      }
+      break; // 找到宿主即停止；一个实体通常只被一个 agent 持有
+    }
+  }
+  return Object.freeze(props);
 }
 
 /**
