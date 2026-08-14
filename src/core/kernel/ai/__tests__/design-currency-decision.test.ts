@@ -49,8 +49,6 @@ import type { Expr } from '../../state/expr-types.js';
 import type { Effect } from '../../events/effect-types.js';
 import type { NPCActionRequest } from '../types.js';
 
-const pathOf = (path: string): Expr => ({ path });
-
 /** 玩法层同一专写的 Effect 构造器：`prop.set` 的 args 是已就绪的 `path`/`value`。 */
 function opEffect(op: string, args: Record<string, Expr | number>): Effect {
   return { op, args: args as Record<string, Expr> } as Effect;
@@ -105,6 +103,132 @@ const family: AIBehaviorFamilySchema = {
 };
 
 const currency = new DesignCurrencyGateway();
+
+/** 与 makeWorld 同构：额外铺两个资源池（ap/stamina）供跨字段威胁场景，其余装备完全相同。 */
+function makePooledWorld(startVitality: number, startAp: number, startStamina: number) {
+  let state = baseState(startVitality);
+  state = setPath(state, `world.props.pools.ap.${AGENT}.real`, startAp) as WorldState;
+  state = setPath(state, `world.props.pools.ap.${AGENT}.available`, startAp) as WorldState;
+  state = setPath(state, `world.props.pools.stamina.${AGENT}.real`, startStamina) as WorldState;
+  state = setPath(state, `world.props.pools.stamina.${AGENT}.available`, startStamina) as WorldState;
+
+  const holder = new WorldStateHolder(state);
+  const defRegistry = new DefRegistry();
+  defRegistry.register(recklesslyAttackAction as Def);
+  defRegistry.register(cautiousHoldAction as Def);
+  // 资源动作：分别把 AP 压零、把体力压零——两个候选都保留生命安全，专测资源维度。
+  const burnAp: ActionDef = {
+    id: 'a:dump-ap',
+    kind: 'action',
+    label: 'Dump AP',
+    require: true,
+    cost: [],
+    effects: [
+      opEffect('prop.set', { path: `world.props.pools.ap.${AGENT}.real`, value: 0 }),
+      opEffect('prop.set', { path: `world.props.pools.ap.${AGENT}.available`, value: 0 }),
+    ],
+  };
+  const dumpStamina: ActionDef = {
+    id: 'a:dump-stamina',
+    kind: 'action',
+    label: 'Dump Stamina',
+    require: true,
+    cost: [],
+    effects: [
+      opEffect('prop.set', { path: `world.props.pools.stamina.${AGENT}.real`, value: 0 }),
+      opEffect('prop.set', { path: `world.props.pools.stamina.${AGENT}.available`, value: 0 }),
+    ],
+  };
+  defRegistry.register(burnAp as Def);
+  defRegistry.register(dumpStamina as Def);
+  defRegistry.register(schedule as Def);
+  defRegistry.register({ id: 'd:ai-family', kind: 'policy', abstract: true, mode: 'search' });
+  defRegistry.register({
+    id: BINDING, kind: 'policy', extends: ['d:ai-family'], mode: 'search', policy: POLICY, props: { alertLevel: 2 },
+  });
+
+  const exprEngine = new ExprEngine();
+  const queryEngine = new QueryEngine();
+  const registry = new OpRegistry(holder);
+  registerPropOps(registry, defRegistry);
+  const flowInterpreter = new FlowInterpreter({ opRegistry: registry, exprEngine, queryEngine, defRegistry });
+  registerIntentOps(registry, {
+    defLookup: (id) => defRegistry.resolve(id),
+    now: () => 1,
+    runEffects: (effects, ctx, vars) => flowInterpreter.run(effects, ctx, 1e4, vars).result,
+  });
+  registerScheduleOps(registry, { defLookup: (id) => defRegistry.resolve(id) });
+
+  const actionCatalog = new ActionCatalog({
+    getState: () => holder.getState(),
+    exprEngine,
+    queryEngine,
+    listActionDefs: () => [recklesslyAttackAction, cautiousHoldAction, burnAp, dumpStamina],
+    ctxForActor: (actor, bindings) => makeDefaultEvalContext({
+      self: actor,
+      vars: bindings,
+      resolvePath: (path) => {
+        let cursor: unknown = holder.getState();
+        for (const part of path.split('.')) {
+          if (cursor === null || typeof cursor !== 'object') return null;
+          cursor = (cursor as Record<string, unknown>)[part];
+        }
+        return (cursor ?? null) as never;
+      },
+    }),
+  });
+
+  const readAdapter = new KernelAIReadAdapter({
+    getState: () => holder.getState(), queryEngine, actionCatalog, visibleTo: VISIBLE_TO, exprEngine, defRegistry,
+  });
+  const readGateway = new RestrictedAIReadGateway(readAdapter);
+  const submission = new KernelCanonicalSubmissionAdapter({
+    getState: () => holder.getState(), opRegistry: registry, actionCatalog, defLookup: (id) => defRegistry.resolve(id),
+    isDeferred: () => false,
+  });
+
+  const behaviorGateway = new ValidatedBehaviorGateway((binding) => {
+    return new DefBackedBehaviorValidator({ defRegistry, familyOf: () => family }).resolve(binding);
+  });
+
+  const base = new ScopedCandidatePlanner();
+  const plannerRegistry = new StaticPlannerRegistry([{ policy: { $: POLICY }, category: 'npc-behavior', planner: base }]);
+  const searchPlanner = new SequentialSearchPlanner(base, plannerRegistry);
+
+  const silencer = { silence: () => {}, resume: () => {} };
+  const simulation = new CanonicalSimulationAdapter(
+    new KernelSimulationAdapter({ holder, checkpoints: new InMemoryCheckpointStore(), submission, presentation: silencer }),
+  );
+
+  const order = new SchedulePhaseParticipants({
+    getState: () => holder.getState(),
+    queryEngine,
+    defLookup: (id) => defRegistry.resolve(id),
+    opRegistry: registry,
+    behaviorBindingFor: (agentId) => (agentId === AGENT ? { $: BINDING } : null),
+    exprEngine,
+  });
+
+  const facade = new BoundedAIDecisionFacade({
+    readGateway,
+    behaviorGateway,
+    planners: new StaticPlannerRegistry([{ policy: { $: POLICY }, category: 'npc-behavior', planner: searchPlanner }]),
+    evaluationGateway: currency,
+    evaluationGuard: new FiniteEvaluationGuard(),
+    commitGateway: new CanonicalCandidateCommitGateway(submission),
+    searchSessions: new KernelSearchSessionGateway({
+      getState: () => holder.getState(),
+      readGateway,
+      behaviorGateway,
+      evaluationGateway: currency,
+      evaluationGuard: new FiniteEvaluationGuard(),
+      simulation,
+      nextParticipant: order.resolve,
+    }),
+  });
+
+  return { holder, facade };
+}
 
 function baseState(vitality: number): WorldState {
   let state = createEmptyWorldState('sched:round');
@@ -268,6 +392,16 @@ describe('设计货币驱动的 AI 决策（真实内核链路）', () => {
     };
     // 血量为 1 -> 死亡锚负分。
     expect(Number(gateway.evaluate({ $: AGENT }, slice, { $: POLICY }))).toBe(-10);
+  });
+
+  it('跨字段威胁：四选中既不把血自送死亡窗口，也不把 AP/体力任一关键资源压零', () => {
+    const { facade } = makePooledWorld(3, 2, 2);
+    const result = facade.act(rootRequest());
+    expect(result.status).toBe('submitted');
+    const action = result.candidate?.legalAction.action;
+    // reckless 把血压到 1(死亡锚 -10)、dump-ap/dump-stamina 把关键资源压零(-6)，
+    // 唯一保留所有维度的是 cautious：血回到 5，资源不动。绝不趋利避害地选牺牲项。
+    expect(action).toBe('a:cautious');
   });
 });
 
