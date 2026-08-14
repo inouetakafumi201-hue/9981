@@ -473,7 +473,10 @@ const CAPABILITY_ENTRY_KEYS: readonly string[] = Object.freeze([
   'kernelOps',
   'mutuallyExclusiveWith',
   'writeChannelContract',
+  'compositionKind',
 ]);
+export const COMPOSITION_KIND_KEYS = Object.freeze(['static', 'transient', 'modified-explicit', 'modified-capability'] as const);
+export type CompositionKindKey = (typeof COMPOSITION_KIND_KEYS)[number];
 
 /** 类条目上引用结构边界的字段名。 */
 const STRUCTURAL_BOUND_REFERENCE_KEYS: readonly string[] = Object.freeze([
@@ -520,6 +523,8 @@ export interface ClassCatalogCapability {
   readonly parameters: readonly ClassCatalogParameter[];
   readonly kernelOps: readonly string[];
   readonly mutuallyExclusiveWith: readonly string[];
+  /** ECS compositionKind 四形（`static`/`transient`/`modified-explicit`/`modified-capability`）；缺省为 undefined（既有目录不声明）。 */
+  readonly compositionKind?: CompositionKindKey;
 }
 
 export interface ClassCatalogClassEntry {
@@ -615,6 +620,7 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
     expectString(contract['description'], `${path}/writeChannelContract/description`);
   }
   const exclusives = object['mutuallyExclusiveWith'];
+  const compositionKind = object['compositionKind'];
   return Object.freeze({
     id: expectString(object['id'], `${path}/id`),
     name: expectString(object['name'], `${path}/name`),
@@ -624,6 +630,9 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
     mutuallyExclusiveWith: exclusives === undefined
       ? Object.freeze([])
       : expectUniqueStringArray(exclusives, `${path}/mutuallyExclusiveWith`),
+    compositionKind: compositionKind === undefined
+      ? undefined
+      : expectEnum(compositionKind, `${path}/compositionKind`, COMPOSITION_KIND_KEYS),
   });
 }
 

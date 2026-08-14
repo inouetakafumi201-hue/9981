@@ -190,6 +190,7 @@ export function auditClassLayerReferences(
     }
 
     auditCapabilityScope(profile, family, classIds, capabilityIds, capabilityField, findings);
+    auditKernelOpsAlignment(profile, family, capabilityIds, capabilityField, findings);
 
     if (profile.category === 'weapons') {
       auditWeaponComposition(profile, composition, contract, index, findings);
@@ -197,6 +198,53 @@ export function auditClassLayerReferences(
     if (profile.category === 'statuses') continue;
   }
   return sortFindings(findings);
+}
+
+/**
+ * ECS System 接线对齐（PT-12）：对每个组合的基类层能力，校验它声明的 `kernelOps`
+ * 引用的参数是否落在该能力的 `parameters` 槽位（同一通路，闭合 CaS 缝隙）。
+ *
+ * 目的：基类层目录说"这个能力由哪些 Op 读写"，玩法层组合它时这些 Op 读写的字段名
+ * 必须能映射到该能力声明的可配置参数。字段名既不能写到能力未声明的槽位（漏网），
+ * 也不能引用了不存在的参数。它是把 ECS 的"原子 System 接线"承诺延伸到玩法层组合路径上，
+ * 与既有 `auditVehicleParameterBacking` 的能力参数支撑校验互补。
+ */
+function auditKernelOpsAlignment(
+  profile: PlayProfile,
+  family: ClassFamily,
+  capabilityIds: readonly string[],
+  capabilityField: string,
+  findings: Finding[],
+): void {
+  for (const [position, capabilityId] of capabilityIds.entries()) {
+    const capability = family.capabilities.get(capabilityId);
+    if (capability === undefined) continue;
+    const { kernelOps, parameterNames, parameters } = capability;
+    // 基类层可选：允许能力不声明 kernelOps（未限定接线），此时没有字段名可对齐。
+    if (kernelOps.size === 0) continue;
+    // valueShape 可能把参数声明为"字段名引用"，而 kernelOps 操作数才是真正会被 System 读写的字段。
+    // 本校验对齐 ECS 语义：`kernelOps` 引用的字段名应落回该能力 `parameters` 声明的槽位。
+    const declared = new Set([...parameterNames, ...parameters.map((p) => p.key)]);
+    for (const scopeField of kernelOps) {
+      // `scopeField` 形态：`prop.set(hp)` 这类携带字段名的接线、或裸 `prop.set`。
+      const openParen = scopeField.indexOf('(');
+      const opName = openParen === -1 ? scopeField : scopeField.slice(0, openParen);
+      // 只有当接线带字段引用时才有可对齐的槽位；裸 `prop.set` 无法推导字段名，跳过（不误报）。
+      if (!scopeField.includes('(') || !scopeField.endsWith(')')) continue;
+      const fieldHint = scopeField.slice(openParen + 1, -1);
+      // 字段名归属对齐是宽松前缀匹配：`prop.<field>`、`<field>.<nested>`、`<nested>.<field>` 都视为同一槽位。
+      const fieldMatches = [...declared].some((declaredField) =>
+        fieldHint === declaredField
+        || fieldHint === `prop.${declaredField}`
+        || fieldHint.startsWith(`${declaredField}.`)
+        || fieldHint.endsWith(`.${declaredField}`));
+      if (fieldMatches) continue;
+      findings.push(finding('PLAY-REF-KERNELOPS-FIELD-GAP', profile.sourceId,
+        `/classComposition/${capabilityField}/${position}/kernelOps`,
+        `能力 ${capabilityId} 的 ECS 接线 ${opName} 引用字段 ${fieldHint}，但该能力未在 parameters 声明这个槽位（CaS 缝隙）。`
+        + `在基类层能力 parameters 补声明，或在玩法层对应字段改名对齐。`));
+    }
+  }
 }
 
 /** 契约声明的字段既可能是单个 id，也可能是 id 数组；两种形态都归一成数组。 */

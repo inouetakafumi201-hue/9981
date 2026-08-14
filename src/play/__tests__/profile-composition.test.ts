@@ -10,6 +10,9 @@ import {
   loadClassLayerIndex,
   loadPlayProfiles,
   playInstanceIds,
+  type ClassEntry,
+  type ClassFamily,
+  type ClassLayerIndex,
   type PlayProfile,
 } from '../profiles/catalog.js';
 import {
@@ -162,6 +165,43 @@ describe('组合关系：基类层引用', () => {
     });
     const codes = auditClassLayerReferences([broken], classIndex).map((item) => item.code);
     expect(codes).toContain('PLAY-REF-CAPABILITY-REQUIRED');
+  });
+
+  it('ECS 接线：现有组合的每个能力 kernelOps 引用槽位都能映射到其 parameters，无 CaS 缝隙', () => {
+    const divergent = auditClassLayerReferences(profiles, classIndex)
+      .filter((item) => item.code === 'PLAY-REF-KERNELOPS-FIELD-GAP');
+    expect(describeFindings(divergent)).toEqual([]);
+  });
+
+  it('ECS 接线：kernelOps 引用未声明的字段会被报出 CaS 缝隙', () => {
+    // 带字段引用的接线形态 `prop.set(<field>)` 引用未在 parameters 声明的槽位时应触发 CaS 缝隙。
+    // 真实目录目前无括号形态（全裸 kernelOps），故用 mock 能力构造带字段引线的反例来证伪该护栏。
+    const vehicleFamily = classIndex.vehicles;
+    // mock 一条带字段引线 kernelOps、且字段未在槽位里声明的能力，形状对齐 ClassEntry/ParameterSpec。
+    const mockCapability: ClassEntry = {
+      id: 'vehicle.capability.mock_ghost',
+      requiredCapabilityIds: new Set(),
+      optionalCapabilityIds: new Set(),
+      parameterNames: new Set(['knownSlot']),
+      parameters: [{ key: 'knownSlot', required: false, valueShape: undefined }],
+      kernelOps: new Set(['prop.set(ghostField)']),
+    };
+    const corruptedFamily: ClassFamily = {
+      ...vehicleFamily,
+      capabilities: new Map(vehicleFamily.capabilities).set(mockCapability.id, mockCapability),
+    };
+    const corruptedIndex: ClassLayerIndex = { ...classIndex, vehicles: corruptedFamily };
+    const kit = profileNamed('vehicles/ebike.json');
+    const composed: PlayProfile = {
+      ...kit,
+      document: structuredClone(kit.document) as PlayProfile['document'],
+    };
+    const composition = (composed.document as Record<string, unknown>)['classComposition'] as Record<string, unknown>;
+    composition['capabilityIds'] = ['vehicle.capability.mock_ghost'];
+    const gap = auditClassLayerReferences([composed], corruptedIndex).filter(
+      (item) => item.code === 'PLAY-REF-KERNELOPS-FIELD-GAP');
+    expect(gap.length).toBe(1);
+    expect(gap[0]!.reason).toContain('ghostField');
   });
 });
 

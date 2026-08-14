@@ -261,6 +261,7 @@
         "parameters": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/parameterShape" } },
         "kernelOps": { "$ref": "#/definitions/identifierList" },
         "mutuallyExclusiveWith": { "$ref": "#/definitions/identifierList" },
+        "compositionKind": { "type": "string", "enum": ["static", "transient", "modified-explicit", "modified-capability"] },
         "writeChannelContract": {
           "type": "object",
           "additionalProperties": false,
