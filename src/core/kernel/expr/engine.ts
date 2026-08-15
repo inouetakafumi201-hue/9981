@@ -45,6 +45,15 @@ export type ExprOpImpl = (args: Value[], ctx: EvalContext) => Value | null;
 
 const RANDOM_OP_NAMES = new Set(['roll', 'pick', 'shuffle', 'weightedPick']);
 
+interface ObjectWithKeys { readonly [K: string]: unknown }
+function isExprLeafObject(v: unknown): v is object {
+  if (v === null || typeof v !== 'object') return false;
+  if (isRef(v)) return false; // Ref 是不可拆分的原子值，按值保留
+  // 形如 {var}/{op}/{path}/{q}/{call}（可含任意附加键）的对象视为 Expr 节点，需递归求值
+  const keys = Object.keys(v as ObjectWithKeys);
+  return keys.some((k) => k === 'var' || k === 'op' || k === 'path' || k === 'q' || k === 'call');
+}
+
 function num(v: Value | null): number | null {
   return typeof v === 'number' && isFiniteNumber(v) ? v : null;
 }
@@ -515,10 +524,19 @@ export class ExprEngine {
         budget: { depth: ctx.budget.depth + 1, maxDepth: ctx.budget.maxDepth },
       });
     }
-    // 普通对象形态的字面量 Value（映射）
+    // 普通对象形态的字面量 Value（映射）。叶子若是 Expr 结构（含 var/op/path/q/call 键的对象、数组嵌套），
+    // 递归求值而非原样拷贝——保证 `{ emit: { data: { target: {var:'t'}, delta: {var:'dmg'} } } }` 这类
+    // 运行动态派生的 payload 能真正把运行时值写进规则（需求15）：Event payload 是「求值后的数据」，
+    // 而不是带着 Expr 结构的半成品。若不展开，规则里 `get(payload, 'damagePath')` 会拿到一个没求值的
+    // Expr 节点，随后把 [object Object] 当路径写进 prop.add，直接违反需求1.7（结构区不可直写）。
+    const nextCtx = { ...ctx, budget: { depth: ctx.budget.depth + 1, maxDepth: ctx.budget.maxDepth } };
+    // 注意 maxDepth 守卫：深度将尽时（nextDepth > maxDepth）不再用 isExprLeafObject 展开嵌套表达式
+    // 子树，回退为原样拷贝映射，避免栈溢出。这让带深嵌套的 emit payload 在预算允许内展开、预算逼近
+    // 时不崩溃（query/path 最坏是返回 null）。
+    const canExpand = nextCtx.budget.depth <= nextCtx.budget.maxDepth;
     const result: Record<string, Value> = {};
     for (const [k, v] of Object.entries(obj)) {
-      result[k] = (v as Value) ?? null;
+      result[k] = canExpand && isExprLeafObject(v) ? (this.evalInner(v as Expr, nextCtx) ?? null) : (v as Value);
     }
     return result;
   }

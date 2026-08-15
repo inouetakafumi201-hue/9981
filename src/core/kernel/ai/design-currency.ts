@@ -85,10 +85,14 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
   // 生命越高反而越要避开（打不死还白送反击机会），故这是单位当量表里方向相反的一行：
   // 目标生命越低、单位贡献越高，直到归零时的终止奖励。
   {
-    field: 'enemy.vitality',
+    field: 'e:enemy.vitality',
+    // 敌方维度是"进攻"向：这个值的走向和自身 vitality 相反。自身 vitality 越高越好，敌方
+    // vitality 越低越好。分值必须反映这个方向——值越接近 0 贡献越高，直到归零（击杀）给终止
+    // 奖励。用正 unit + 低血量端稀缺：值越低当量越高，击杀由下方 adjustment 给对称奖励。
     unit: 5,
+    // 敌方零血 = 击杀，是一次确定性终结，给对称的天花板奖励（正面，镜像自身死亡锚）。
     adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.deathAnchor * -1 },
-    // 目标血越少，击杀那刀的价值越接近满当量（补刀/终场动力）。
+    // 敌方血越少，击杀那刀价值越接近满当量（补刀/终场动力）。
     scarcity: { floor: 1, ceiling: 5, coefficient: 0.5 },
   },
   // AP（回合预算）：保有 AP 即保有行动机会。真实场在 world.props.pools.ap.<scope>.real，
@@ -114,6 +118,10 @@ function observedNumber(slice: BeliefSlice, field: string): number | null {
   // 取最后一个点分段——否则 `pool.ap` 会误匹配成 `ap`。
   for (const [key, raw] of Object.entries(slice.visibleFacts)) {
     if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
+    // 完整字段名本身也要匹配：真实投影键就是 `<id>.<field>`，对不含点前缀、天然形如 `e:enemy.vitality`
+    // 的字段，`key === field` 且 `endsWith('.'+field)` 均真；但对 `<id>.<field>` 型键，`field` 本身就带点，
+    // `endsWith` 的递归（`key` 也以 `.${field}` 结尾）会命中同一条且值相同，没有语义差。这里用「键恰好是
+    // field 或以 .field 结尾」统一覆盖两种投影（裸键与点路径扩展）。
     if (key === field || key.endsWith(`.${field}`)) return raw;
   }
   for (const [key, fact] of Object.entries(slice.knownFacts)) {
@@ -150,7 +158,9 @@ export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
     if (entry.scarcity !== undefined) {
       const scarcity = entry.scarcity;
       const ratio = Math.max(0, Math.min(1, (value - scarcity.floor) / (scarcity.ceiling - scarcity.floor)));
-      // 值越低越接近 0，稀缺系数使当量上调（这里简化为线性，随打磨调整）。
+      // 稀缺系数使当量向"值所在端"上调（值越低越接近 floor，上调越多）。自身维度 vitality 等
+      // 低值该保；敌方维度 enemy.vitality 低值该杀——两者都想要"值越低、当量越高"，所以统一
+      // 加正稀缺即可（敌方维度本来就是正 unit）。
       charge += (1 - ratio) * scarcity.coefficient * entry.unit;
     }
     v += charge;

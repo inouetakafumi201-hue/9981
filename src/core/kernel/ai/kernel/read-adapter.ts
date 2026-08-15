@@ -147,6 +147,10 @@ export class KernelAIReadAdapter implements AIReadAdapter {
     const visibleIds = new Set(visibleRefs.map((ref) => ref.$));
 
     const visibleFacts: Record<string, Value> = {};
+    // 设计货币的事实键契约是 `<id>.<字段>`，键名按「实体的具体 id」区分，互不掺和：
+    // 自己是 `e:hero.vitality`，死敌是 `e:enemy.vitality`，绝不会因为都叫 vitality 而撞车。
+    // 所以主控实体与他者实体可以一视同仁地全部投影进 visibleFacts——每个参与者（含递归里
+    // 换边后的敌方）都会把自己的实体写成自己那份键，评分器据此既能读到自己生命也能读到对方。
     for (const ref of visibleRefs) {
       const props = resolveRefProps(state, ref);
       if (props === null) continue;
