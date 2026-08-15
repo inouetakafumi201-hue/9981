@@ -1,0 +1,12 @@
+{
+  // 开发板(独立地图编辑器)隔离门禁：只编译开发板自身 + 它显式只读消费的 src/play/map 契约，
+  // 不把游戏运行时(其余 src/**)拖进来。证明"开发板可独立 build、与游戏解耦"。
+  // 由 `npm run typecheck:devboard` 运行；不替代 tsconfig.json 的全域 typecheck。
+  "extends": "./tsconfig.json",
+  "compileOnSave": true,
+  "include": [
+    "src/devboard",
+    "src/play/map",
+    "src/devboard/scripts"
+  ]
+}

@@ -10,7 +10,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": false,
@@ -22,7 +22,8 @@
     "sourceMap": false,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "types": ["vitest/globals", "node"]
+    "jsx": "react-jsx",
+    "types": ["vitest/globals", "node", "react"]
   },
   "include": ["src", "test"]
 }

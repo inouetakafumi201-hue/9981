@@ -9,3 +9,10 @@ probe13.mts
 
 # sprite-forge 出图密钥（本地 .env：gpt-image-2 / gemini 中转站 key，勿提交）
 .agents/skills/sprite-forge/tools/.env
+
+# 开发板/资产构建产物（Vite outDir；构建期生成，非仓库内容）
+dist/
+
+# 运行期产物（asset-pipeline 自测的 run/ 目录等）
+run/
+

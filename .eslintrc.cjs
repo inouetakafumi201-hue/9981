@@ -74,6 +74,16 @@ module.exports = {
   overrides: [
     ...overrides,
     {
+      // 开发板是 React + JSX 应用，`JSX.Element`、`document` 等是合法全局。
+      // 这些是 .tsx 专属的（纯脚本层用不到，缺省 env 已够；加 browser 只为 devboard）。
+      files: ['src/devboard/**/*.tsx'],
+      env: { browser: true },
+      rules: {
+        // React.createElement / JSX.IntrinsicElements 走 types 声明，归 TS 管，不由 no-undef 管。
+        'no-undef': 'off',
+      },
+    },
+    {
       // 渲染层禁止 import kernel/ops、kernel/state 的可写接口（design.md 3.15节，需求40.5）。
       // src/ui 是 wakeup-ui-animation 交付的表现资源层（投影消费 / 交互意图 / 演出编排），
       // 与 src/scene、src/components 同属表现侧，因此受同一条边界约束
@@ -105,6 +115,7 @@ module.exports = {
       // 创作工具的产物是玩法层数据，但玩法层运行期不得反向依赖工具——否则发布出去的
       // 玩法包会拖着一整套编辑器 UI，且"没有编辑器也能跑"这条就不再成立。
       // 两者共用的纯计算（如 map/curve.ts 的折线简化）放在 src/play 下，由编辑器 import。
+      // 同时禁止反向 import 开发板（devboard）：开发板是独立可交付编辑器，游戏运行不得拖上它。
       files: ['src/play/**/*.ts', 'src/play/**/*.tsx'],
       rules: {
         'no-restricted-imports': [
@@ -116,6 +127,38 @@ module.exports = {
                 message:
                   '玩法层禁止 import 编辑器：编辑器产出玩法层数据，玩法层运行期不得反向依赖它。'
                   + '两者共用的纯计算请放在 src/play/map/ 下。',
+              },
+              {
+                group: ['**/devboard/**', '**/devboard'],
+                message:
+                  '玩法层禁止反向 import 开发板：开发板是可交付的独立编辑器应用，'
+                  + '运行游戏不得拖上整套编辑器（守"没有编辑器也能跑"纪律）。',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      // 其他渲染层（scene/components/ui）禁止反向 import 开发板，理由同 play 层。
+      files: [
+        'src/scene/**/*.ts',
+        'src/scene/**/*.tsx',
+        'src/components/**/*.ts',
+        'src/components/**/*.tsx',
+        'src/ui/**/*.ts',
+        'src/ui/**/*.tsx',
+      ],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                group: ['**/devboard/**', '**/devboard'],
+                message:
+                  '渲染层禁止反向 import 开发板：开发板是可交付的独立编辑器应用，'
+                  + '运行游戏不得拖上整套编辑器。',
               },
             ],
           },
