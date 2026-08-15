@@ -3,3 +3,9 @@ node_modules
 tmp/
 probe12.mts
 probe13.mts
+
+# mutation-run.mjs 每次运行重建的运行产物（运行期输出，非仓库内容）
+.mutation-report.json
+
+# sprite-forge 出图密钥（本地 .env：gpt-image-2 / gemini 中转站 key，勿提交）
+.agents/skills/sprite-forge/tools/.env

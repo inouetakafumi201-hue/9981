@@ -363,7 +363,7 @@ UGC 的实现目标是接入编排，不是创建第二套定义系统：所有�
     - Small-grained acceptance: 多位置相同错误均保留；所有启用诊断可定位、可行动且属于封闭代码集。
     - **Requirements:** 14.1–14.13. **Design:** Diagnostics; P14.
 
-  - [~] 11.3 已添加 `src/core/ugc/__tests__/integration/full-pipeline.integration.test.ts`，真实基类层端口场景 12/13 通过（场景 11 valid play candidate 因玩法包契约未冻结保持失败关闭）。**剩余阻塞：l2 尚未冻结规范玩法包验证契约**，当前 `DefinitionValidationGateway` 仍复用基类定义包校验，不能把基类包写入 play registry 冒充 valid play candidate。待 l2 交付冻结契约后补齐场景 11。详见 `docs/L_审查报告/UGC薄适配器最终验收报告.md`。
+  - [~] 11.3 已添加 `src/core/ugc/__tests__/integration/full-pipeline.integration.test.ts`，真实基类层端口场景 12/13 通过（场景 11 valid play candidate 因玩法包契约未冻结保持失败关闭）。**剩余阻塞：l2 尚未冻结规范玩法包验证契约**，当前 `DefinitionValidationGateway` 仍复用基类定义包校验，不能把基类包写入 play registry 冒充 valid play candidate。待 l2 交付冻结契约后补齐场景 11。详见 `docs/L_归档/L_审查报告/UGC薄适配器最终验收报告.md`。
     - 覆盖 valid base candidate、valid play candidate、unknown field、duplicate ID、typed cross-domain reference、override/remove、old Schema migration、presentation fallback、warning-only activation 和 canonical snapshot。
     - 每个 rejected case 断言 registry/graph/snapshot 指纹不变；每个 success 断言完整变化一次可见。
     - Small-grained acceptance: requirements 1–16 每组至少一个真实端口场景，且报告包含 candidate/baseline/snapshot identity。

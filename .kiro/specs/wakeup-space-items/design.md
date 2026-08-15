@@ -1402,7 +1402,7 @@ For any transition or gateway composition, 过渡必须声明允许的端点类�
 
 | 编号 | 内容 | 性质 | 影响面 |
 |---|---|---|---|
-| **R-01** | `requirements.md` 要求 13 与本次任务指令要求 `U-SPACE-001`~`007` 全部保持未决，但 `docs/访谈决策记录.md` 的未冻结项关闭状态总表把 `U-SPACE-002` 记为"结构已冻结（D-040 + D-038）"、`U-SPACE-005` 记为"部分冻结（D-038）"、`U-SPACE-007` 记为"已关闭（D-042）"，`docs/审查状态综合报告.md` 亦把 T-002 记为已由 D-040 收敛。按 requirements.md 自身的适用顺序，已确认访谈决策优先级高于基类层契约，因此该冲突方向不利于"七项全未决"。本设计按指令执行，未自行裁决。 | 上游来源实质冲突 | 要求 13 全部条款、P11、`model/unresolved.ts` |
+| **R-01** | `requirements.md` 要求 13 与本次任务指令要求 `U-SPACE-001`~`007` 全部保持未决，但 `docs/访谈决策记录.md` 的未冻结项关闭状态总表把 `U-SPACE-002` 记为"结构已冻结（D-040 + D-038）"、`U-SPACE-005` 记为"部分冻结（D-038）"、`U-SPACE-007` 记为"已关闭（D-042）"，`docs/L_归档/审查状态综合报告_历史.md` 亦把 T-002 记为已由 D-040 收敛。按 requirements.md 自身的适用顺序，已确认访谈决策优先级高于基类层契约，因此该冲突方向不利于"七项全未决"。本设计按指令执行，未自行裁决。 | 上游来源实质冲突 | 要求 13 全部条款、P11、`model/unresolved.ts` |
 | **R-02** | **（已由 R-14 裁决取代，保留裁决轨迹）** 大/中/小连接数 5/4/3 的权威来源，本设计初稿定位为 `docs/L0_规范宪法.md` 第五条（上限 5）+ `docs/L2_基类层/03_空间系统.md`「场景节点分类」与「拓扑 Linter 度数检查」（5/4/3）。`requirements.md` 要求 4.2 声明来源为 S-01 与 S-02，但 S-02（`l2-base-layer-spec/requirements.md` 要求 7.2）只说"权威连接数上限作为 Structural_Bound"，未给出 4 与 3。本设计以 03 号文档补齐该来源。 | 来源补充 | 要求 4.2、P3、`model/structural-bounds.ts` |
 | **R-03** | 领域诊断类别到 `ErrCode` 的映射（尤其 `OP_BYPASS_FORBIDDEN` → `E_LOAD_LAYER_OWNERSHIP`、`STRUCTURAL_BOUND_VIOLATION` 与 `MICRO_SCENE_CREATOR_MISUSE` → `E_LOAD_CROSS_FIELD_CONSTRAINT`、`creator-declared-mutable` → `E_LOAD_SCHEMA_CONTRACT`）是在"不得新增 `ERR_CODES` 成员"约束下由本设计选定的最接近语义，非上游指定。 | 映射选择 | Diagnostics 全表、P12 |
 | **R-04** | 死亡容器"只出不进"固定为 `before:item.move` 的 veto 机制 + 灌注完成后再加标记。依据是已登记 Op 集合中没有任何 Op 能在容器创建后修改 `Slot.accepts`（结构区字段）。这与 `wakeup-core-mechanics/design.md` 的同一判断一致，但两处都是自主判断。 | 机制推导 | 要求 7.6、`ItemDomainContract.deathContainerCapability` |

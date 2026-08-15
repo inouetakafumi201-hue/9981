@@ -345,7 +345,7 @@ Requirement 2.8 要求：在 D-002 所述 Hook 接线缺口"完成并通过引�
 | 结构性 Op 已标记 | 28 处 `{ structural: true }`（entity/item/node/link/slot/prefab/stack/attach/decision/intent/transform 类） |
 | 属性类 Op 未标记结构性 | `prop.*` / `list.*` / `tag.*` / `relation.*` / `agent.*` / `decision.open` / `intent.submit` / `random.*` / `schedule.advance` 均未标 `structural` |
 | 无生产组合根 | 不存在 `src/core/kernel/index.ts`；`wireHooksIntoRegistry` 目前只被测试与模糊测试用例使用 |
-| 文档侧状态不一致 | `docs/AI完备性与文档对齐分析.md` 称 D-002 已完成；`docs/审查状态综合报告.md` 的剩余待决表未列 D-002，也未记录"引擎层验收通过"的验收记录 |
+| 文档侧状态不一致 | `docs/AI完备性与文档对齐分析.md` 称 D-002 已完成；`docs/L_归档/审查状态综合报告_历史.md` 的剩余待决表未列 D-002，也未记录"引擎层验收通过"的验收记录 |
 
 **门禁裁决（本设计的立场）**
 
@@ -2125,7 +2125,7 @@ T-003 是"把 D-030（车辆位置优先于门索引）的结论同步回来源�
 见 2.8 节的事实表。当前状态是：**引擎层接线实现与测试存在，但缺少生产组合根，且缺少"引擎层验收通过"的可定位记录。** 因此：
 
 - 依赖 `play.*` 事件管道与结构性 Op `before:` 否决的全部集成，按 Requirement 2.8 **仍处于阻塞状态**，本设计不宣称端到端可用。
-- 文档侧存在不一致：`docs/AI完备性与文档对齐分析.md` 称 D-002 已完成，`docs/审查状态综合报告.md` 的剩余待决表未列 D-002 也未给出验收记录。这两处需要人工对齐后才能关闭门禁。
+- 文档侧存在不一致：`docs/AI完备性与文档对齐分析.md` 称 D-002 已完成，`docs/L_归档/审查状态综合报告_历史.md` 的剩余待决表未列 D-002 也未给出验收记录。这两处需要人工对齐后才能关闭门禁。
 
 ### 11.4 本设计尚未覆盖、需后续拓展的部分
 

@@ -231,9 +231,9 @@ const KNOWN_VIOLATIONS: ReadonlyMap<string, { readonly count: number; readonly o
 
 /** 已修好的历史违规被移出本表（棘轮只登记"本轮无权改动的既有违规"，目标状态是空表）。 */
 const KNOWN_VIOLATIONS_RETIRED: readonly string[] = [
-  'docs/审查状态综合报告.md',
-  'docs/12_根基完备性审查_v2.md',
-  'docs/AI完备性与文档对齐分析.md',
+  'docs/L_归档/审查状态综合报告_历史.md',
+  'docs/L_归档/12_根基完备性审查_v2_历史.md',
+  'docs/L_归档/AI完备性与文档对齐分析_历史.md',
   'docs/L1_引擎层/05_底层引擎架构.md',
   'docs/工程治理/02_技术栈与开发流程.md',
   'docs/L_审查报告/PT-09_UI投影完成报告.md',

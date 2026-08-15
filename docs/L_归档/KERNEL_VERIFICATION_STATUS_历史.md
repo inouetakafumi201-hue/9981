@@ -120,7 +120,7 @@ L3、L5、L6、L13 — 需先确认是否存在应有的一致性约束而未校
   待证变异体**同一代码块**内。"没发现分歧"可能是等价，也可能是没走到。
 
 L12 重建时又撞见四种，一并记在这里（详见
-[kernel-l12-test/REPORT.md](kernel-l12-test/REPORT.md) 第六节）：
+[kernel-l12-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l12-test/REPORT.md) 第六节）：
 
 - **自指判据**：测试 `import` 产品自己的常量表再拿它断言产品的输出，
   改常量时两侧一起变，差异恒不可见。破法：字面量钉死取值 **且** 断言两两互不相同。
@@ -137,7 +137,7 @@ L12 重建时又撞见四种，一并记在这里（详见
   L12 的 M82 三条菱形用例方向写反，全是恒真断言，靠这一步才发现。
 
 L8 重建时又撞见两种，一并记在这里（详见
-[kernel-l8-test/REPORT.md](kernel-l8-test/REPORT.md) 第六节）：
+[kernel-l8-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l8-test/REPORT.md) 第六节）：
 
 - **观测面缺失可触发状态 → 假等价**：差分模糊器跑的全是**合法状态**，
   而合法状态下不变量检查器的每条子句都返回空，于是"删掉一条报违规的子句"
@@ -158,7 +158,7 @@ M92 的用例初版写成 `expect(a.rel.in).not.toBe(b.rel.in)`，
 说明它不是偶发失误，而是默认会犯的错。
 
 L11 重建时又撞见两种，一并记在这里（详见
-[kernel-l11-test/REPORT.md](kernel-l11-test/REPORT.md) 第六节）：
+[kernel-l11-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l11-test/REPORT.md) 第六节）：
 
 - **判据复用造成"合法即损坏"**：把调用方的**展示预算**（`chainOf` 的 `maxDepth`）
   当成了**数据完整性**边界，于是 100 条合法 emit 被报成 36 条数据损坏（BUG L11#1）。
@@ -186,19 +186,19 @@ L8 是哨兵自检 11/14 漏三个，L11 是**3000 条合法序列命中子句 0
 ## 四、进度
 
 - [x] **L4** — 143 项测试、变异 100.00%（65/65）、等价 5/5、发现并修复 BUG L4#1。
-      见 [kernel-l4-test/REPORT.md](kernel-l4-test/REPORT.md)
+      见 [kernel-l4-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l4-test/REPORT.md)
 - [x] **L7** — 已完成（前序会话）
 - [x] **L12** — 120 项测试、变异 100.00%（85/85）、等价 6/6（哨兵自检 17/17）、
       发现并修复 **9 个缺陷**（BUG L12#1 ~ #9）。
-      见 [kernel-l12-test/REPORT.md](kernel-l12-test/REPORT.md)
+      见 [kernel-l12-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l12-test/REPORT.md)
 - [x] **L8** — 74 项测试、变异 100.00%（90/90）、等价 6/6（哨兵自检 14/14）、
       发现并修复 **13 个缺陷**（BUG L8#1 ~ #13，含 1 处测试自身缺陷）。
       原报告"220,006 次 10/10 PASS"实测有三种 op 全程为死代码（0/2000 生效）。
-      见 [kernel-l8-test/REPORT.md](kernel-l8-test/REPORT.md)
+      见 [kernel-l8-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l8-test/REPORT.md)
 - [x] **L11** — 64 项测试、变异 100.00%（115/115 计分，116 个变异体 0 无效）、
       等价 1/1（M28，哨兵自检 2/2，两阶段判定）、发现并修复 **12 个缺陷**（BUG L11#1 ~ #12），
       另钉住 4 处易被顺手改掉的设计选择。
       原报告"420,006 次 12/12 PASS"实测：3000 条合法序列命中检查器子句 **0 条**，
       随机串撞注册码 5000 次 **0 命中**，两条属性的实际输入空间为 **29**。
-      见 [kernel-l11-test/REPORT.md](kernel-l11-test/REPORT.md)
+      见 [kernel-l11-test/REPORT.md](docs/L_归档/开发期杂项_2026-08/kernel测试工程/kernel-l11-test/REPORT.md)
 - [ ] L1L2、L3、L5、L6、L9、L10、L13 — 待逐层普查与重建
