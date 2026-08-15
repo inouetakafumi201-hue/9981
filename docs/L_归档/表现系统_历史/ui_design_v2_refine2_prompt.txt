@@ -1,0 +1,63 @@
+MODIFY THIS UI DESIGN IMAGE WITH MINIMAL CHANGES (Round 2 Refinement):
+
+## Changes Required (第二轮精修)
+
+### 1. Dice comparison bars on the RIGHT side of the central dice area (骰子右侧的投点对比条)
+
+**Current state**: Only 3 bars visible
+**Required change**: Increase to **7 horizontal bars** (one for each player 1-7)
+
+**Bar design**:
+- Each bar is a **BRIGHT COLORED horizontal bar** (NOT dark outline boxes)
+- Bar **length** = dice roll value (投点数值), no upper limit - bars can extend very long
+- Bar **color** = AP gained from the roll (4 colors):
+  * 0 AP = Gray (#808080)
+  * 1 AP = Green (#4CAF50)
+  * 2 AP = Orange (#FF9800)
+  * 3 AP = Red (#F44336)
+- Bars are arranged vertically (stacked), one for each player
+- Bars should be **solid, bright, glowing** - NOT dark with light border
+- The bars extend HORIZONTALLY to the right, length proportional to roll value
+
+**Example visualization**:
+```
+Player 1: [████████████] (long green bar = rolled high, got 1 AP)
+Player 2: [██████] (medium orange bar = rolled medium, got 2 AP)
+Player 3: [███] (short red bar = rolled low, got 3 AP)
+Player 4: [████████] (green bar)
+Player 5: [█] (gray bar = rolled 0, got 0 AP)
+Player 6: [██████████] (orange bar)
+Player 7: [█████] (red bar)
+```
+
+### 2. Action card icons on the RIGHT side of each action card (动作卡片右侧图标)
+
+**Current state**: 3×3 grid icons showing attack range (small squares)
+**Required change**: Replace with **tag/label icons** 
+
+For each action card (Slash, Cleave, Guard, Focus, Quick Step):
+- Remove the 3×3 grid range indicators
+- Replace with **tag word icons** showing action properties
+- Examples of tag icons: "Melee" icon, "Attack" icon, "Self" icon, "Defense" icon
+- Icons should be small, simple, iconic symbols (NOT text, but visual symbols representing the tag concepts)
+- Placed where the grid icons currently are (right side of each card)
+
+## What to Keep EXACTLY the Same
+
+- Overall layout and positioning
+- Bottom action card layout (5 cards in a row)
+- Left-side turn order panel (semi-transparent, already correct)
+- Central dice area positioning
+- Character positions on map
+- ROLL SETTINGS panel (bottom-left)
+- All text, fonts, sizes
+- Color scheme and visual style
+- Card backgrounds and borders
+
+## Important Notes
+
+- This is an **IMAGE REFINEMENT task**, not a complete redesign
+- Only modify the two specific areas mentioned above
+- Maintain the same art style, color palette, and visual language
+- The dice comparison bars must be BRIGHT and COLORED, not dark outlines
+- The 7 bars should be clearly visible and distinguishable by color (gray/green/orange/red)

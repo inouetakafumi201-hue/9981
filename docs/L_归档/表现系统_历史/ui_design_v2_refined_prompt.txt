@@ -1,0 +1,34 @@
+MODIFY THIS UI DESIGN IMAGE WITH MINIMAL CHANGES:
+
+## Changes Required (局部精修)
+
+1. **Left-side turn order panel (轮次栏) background transparency**:
+   - Current: Solid black background (#000000)
+   - Change to: Semi-transparent dark overlay (rgba(10, 15, 25, 0.85))
+   - Effect: The player list (1-7) should FLOAT over the map, not create a separate black region
+   - Keep all text, icons, HP/SP bars, borders exactly the same
+   - Only change the background to semi-transparent
+
+2. **Remove status icons above character heads**:
+   - Remove the ✖️ (red cross) icons above some characters
+   - Remove the ◆ (diamond) icons above some characters
+   - Keep the character sprites unchanged
+   - Keep the circular platforms under characters unchanged
+
+3. **Keep everything else EXACTLY the same**:
+   - DO NOT change layout
+   - DO NOT change the bottom-left "ROLL SETTINGS" panel
+   - DO NOT change the bottom action cards (Slash/Cleave/Guard/Focus/Quick Step)
+   - DO NOT change the center dice display
+   - DO NOT change character positions or sprites
+   - DO NOT change the map background
+   - DO NOT change the top status bar ("Turn 5 | Player Action Phase | Player A's Turn")
+
+## Visual Style (保持不变)
+- Pixel art characters (high saturation, ~32×32)
+- Sketch-style map background (low saturation)
+- Clear visual hierarchy with layered transparency
+- Color semantics: Red=HP, Blue=SP, Orange=AP, Purple=Reversal
+- Isometric view (front cabinet projection, Among Us style)
+
+IMPORTANT: This is an IMAGE REFINEMENT task, not a complete redesign. Make ONLY the two specific changes listed above. Keep 98% of the original image unchanged.

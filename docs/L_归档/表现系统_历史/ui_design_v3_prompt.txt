@@ -1,0 +1,70 @@
+Generate a 1920x1080 pixel turn-based roguelite game interface concept design with the following specifications:
+
+VISUAL STYLE:
+- Pixel art UI components (high saturation, 32x32 or 64x64 pixels) for interactive elements
+- Sketch-style background (low saturation, clean) for map
+- Front-facing cabinet/cavalier oblique projection (Among Us style) for characters
+- Clear visual hierarchy with layered pixel foreground + sketch background
+
+COLOR SEMANTICS (strict):
+- Red = HP/damage/danger
+- Blue = stamina/lucidity (SP)
+- Orange = action points (AP)
+- Green = safe/positive/free
+- Purple = constraints/ranged
+- Coral = melee/combat
+- Yellow = sensory/alert
+- Cyan = social/UGC
+- Gray-white = interactable with state constraints
+- Pure white = dream boundary/overload
+
+LAYOUT (1920x1080):
+
+LEFT SIDE - Turn Order Bar (vertical, 60-70% screen height):
+- 8-player capacity design
+- Each turn = independent frame with shape
+- Active player = glossy reflective shine highlight (NOT simple outline)
+- Player's own frame ~1 dice width LARGER than others, much more prominent
+- Each frame shows: rank number + avatar + name + HP bar (red, 5 blocks) + SP bar (blue, 5 blocks)
+- Inactive players grayed out/desaturated
+
+FLOATING DICE SYSTEM (2026-08-15 core revision):
+- Dice icon appears ONLY next to current actor's turn frame (floating, not fixed to bar)
+- Left side of dice = player number square (1/2/3/4/5), NOT weapon icon
+- Horizontal bars extend from turn frames showing dice results
+- 3-phase growth animation: 1) gray extend 2) power dice effect + fast grow with +1/+2 icon 3) unified color fill from left + red tint for boosted portion
+- Grid-marked bars, no upper limit frame
+- Dice on top layer (covers bars)
+
+CENTER - Map Main View:
+- Sketch background (low saturation)
+- Node regions with light fill
+- Pixel chess pieces (characters) in foreground, high saturation
+- Small portal icons (gray-white/white glow = unconditional, purple = conditional)
+- Clean default (no connection lines unless movement mode activated)
+
+RIGHT BOTTOM - Action Panel:
+- Diamond-shaped AP cost indicators at card bottom (◆ orange for AP, 💧 blue for stamina)
+- "Too sexy" design detail that breaks the "no AP display" principle
+- Examples: [Move ◆1] [Attack ◆1] [Shield 💧1] [Lockpick ◆2]
+- Grayed flat options for insufficient AP, no highlight
+
+TOP - Dice Roll Panel (shifts up when bars extend):
+- 4-tier push sliders (0/1/2/3, index 0/1/2/2) for Power Dice and Reversal
+- Tier 3 and 4 close spacing ("extreme tier" visual hint)
+- "Aesthetics over logic" - kept 4 tiers for expandability
+- Different tier visual effects (charging feel, glow, color intensity, particles)
+- Power Dice (orange/blue 💧) + Reversal (purple ▲) as separate sliders
+
+INTERACTION:
+- Edge glow interaction (no traditional buttons)
+- Glow color matches semantic color system
+- Non-clickable = flat without highlight (gray can still be clickable with highlight)
+
+DETAILS:
+- Chinese UI text with pixel font style
+- Icons 32x32 or 64x64, clearly distinguishable
+- 1080p resolution, all elements clear
+- Cohesive visual hierarchy showing turn-based combat scene
+
+Technical keywords: front-facing cabinet/cavalier oblique projection, pixel art high saturation 32x32 64x64, sketch-style background low saturation, glossy reflective shine, edge glow interaction, diamond AP indicator, 4-tier push slider close spacing tier 3-4, floating dice next to actor, 3-phase bar growth gray-boost-fill-tint, grid-marked bars no limit frame, 8-player capacity turn frames player ~1 dice width larger, 1920x1080 turn-based roguelite cohesive hierarchy
