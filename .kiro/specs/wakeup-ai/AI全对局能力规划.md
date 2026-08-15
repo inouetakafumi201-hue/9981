@@ -3,6 +3,8 @@
 > **性质**：规划 / 阶段性完备判据文档，不是 requirements/design/tasks 三件套，也不改写既有 `requirements.md` / `design.md` / `tasks.md`。
 >
 > **附：跨线改动致歉与归属（2026-08-15，基类层×玩法层接线线）**：并行期间我在接管工作树时，曾把本 AI 线的两处未提交改动（`src/core/kernel/ai/__tests__/combat-first.test.ts` 的 `require: {op:'gt'}` + enemyAgent 多参与者测试、以及 `src/core/kernel/expr/engine.ts` 的 `isExprLeafObject` 动态 payload 递归求值）误当成自己的改动带进分支做了验证。现已确认这些属本 AI 并行线工作树（非本线产物）：对 `combat-first` 我已在基线复核后还原到 committed HEAD（阶段2 红测—`expected a:attack got a:move`——在干净 master 上同样失败，本非本线引入），`engine.ts` 亦还原。两处原始改动均在 `git stash`（`ai-crossline-investigation-wip`）归回，由 AI 线收敛时使用，未丢失。本线不接管也不越权落到 `src/core/kernel/**` 的 AI 交付物。
+>
+> **附 2：本次（2026-08-15，commit dc5908a）交接复核**：基类层×玩法层接线线收尾时复查了全量 vitest。除 `combat-first` 阶段2 红测（已归上一条）外，AI 线工作树里还有一个**未跟踪探针** `src/core/kernel/ai/__tests__/probe-payload.test.ts`（含两个 `it`：`intent.submit→intent.resolve applies damage`、`emit data eval + rule prop.add`），它在无 `ctx.emit` 的探针驱动下报 `expected 4 to be less than 4` / `ctx.emit is not a function`，与 `src/core/kernel/expr/engine.ts` 的 `isExprLeafObject` 动态 payload 改动同源（需该改动的 `emit` 求值支撑）。该探针未跟踪、非本线，本线**未改动**其内容，原样保留在工作树，由 AI 线收敛时一并处理。本线在干净写权内仅落地 CaS 关闭（T-CaS-01/02），不做任何 AI 引擎改动。
 > **目的**：回应「你没跑通——你只让 AI 避害了。攻击呢？敌人呢？自主拾取武器呢？背包治疗呢？预判呢？」——把 AI「会玩」的常识机制全清单写出来，分层×阶段规划，并给出每一阶段的完备判据，保证阶段性完备、不出现趋利避害的常识漏洞。
 > **关键结论（先摆明）**：设计货币（`DesignCurrencyGateway`）只是 AI「会玩」三层里的**评估一环**，不是 AI 本体。让它成为 MVP，必须补齐三层的另外两层：**玩法层合法动作真实化**（攻击/拾取/治疗/移动能真正 targeting 敌人与物品）、**顺序多参与者搜索真预判**（already 有 `SequentialSearchPlanner`，但测试里只有自保单实体，没有攻击对局）。本文把它拆成 4 个可独立验收的阶段，阶段内全部完成后才有资格谈"阶段性完备"。
 
