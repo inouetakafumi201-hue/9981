@@ -461,8 +461,12 @@ export function loadCoreMechanics(opts: CoreMechanicsLoadOptions): CoreMechanics
   const blocked = collectBlockedCapabilities(config);
 
   // Step 1-2：玩法层 Linter + 配置校验（先于注册表改动，保证原子拒绝时注册表不变）。
+  // 只 lint 具体 Def，不把 playpack 根当 Def 扫：`writesTurnOrder`/`collectOpNames` 会递归遍历
+  // playpack 的 `defs` 数组——playpack 根自身不含 effects/turnOrder，把根一并扫会把 `defs` 里
+  // 合法写 turnOrder 的结算规则误判指向 playpack 根（kind==='playpack' 非 settle），报
+  // E_LOAD_LAYER_OWNERSHIP。叶子 def 已各自携带归属扩展并会被逐条校验。
   const opNames = new Set(runtime.registry.listOpNames());
-  const lintTargets: Def[] = [CoreMechanicsPlaypack as unknown as Def, ...CoreMechanicsPlaypack.defs];
+  const lintTargets: Def[] = [...CoreMechanicsPlaypack.defs];
   diagnostics.push(...coreMechanicsLinter(lintTargets, config, opNames));
   if (hasBlocking(diagnostics)) {
     return { ok: false, diagnostics, projection: null, blocked };
