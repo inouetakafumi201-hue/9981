@@ -474,6 +474,7 @@ const CAPABILITY_ENTRY_KEYS: readonly string[] = Object.freeze([
   'mutuallyExclusiveWith',
   'writeChannelContract',
   'compositionKind',
+  'familyId',
 ]);
 export const COMPOSITION_KIND_KEYS = Object.freeze(['static', 'transient', 'modified-explicit', 'modified-capability'] as const);
 export type CompositionKindKey = (typeof COMPOSITION_KIND_KEYS)[number];
@@ -525,6 +526,8 @@ export interface ClassCatalogCapability {
   readonly mutuallyExclusiveWith: readonly string[];
   /** ECS compositionKind 四形（`static`/`transient`/`modified-explicit`/`modified-capability`）；缺省为 undefined（既有目录不声明）。 */
   readonly compositionKind?: CompositionKindKey;
+  /** ECS 组件契约的族 id（`component.*` 单一源 familyId）；缺省为 undefined（既有目录不声明）。与 ComponentContract 对齐见 CaS-01 交接。 */
+  readonly familyId?: string;
 }
 
 export interface ClassCatalogClassEntry {
@@ -621,6 +624,7 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
   }
   const exclusives = object['mutuallyExclusiveWith'];
   const compositionKind = object['compositionKind'];
+  const familyId = object['familyId'];
   return Object.freeze({
     id: expectString(object['id'], `${path}/id`),
     name: expectString(object['name'], `${path}/name`),
@@ -633,6 +637,8 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
     compositionKind: compositionKind === undefined
       ? undefined
       : expectEnum(compositionKind, `${path}/compositionKind`, COMPOSITION_KIND_KEYS),
+    // 可选：ECS 组件契约族 id。既有目录不声明则缺省 undefined，校验为空操作（向后兼容，CaS-01）。
+    familyId: familyId === undefined ? undefined : expectString(familyId, `${path}/familyId`),
   });
 }
 

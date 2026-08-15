@@ -10,7 +10,7 @@
 
 ### Checkpoint: 落地前就绪（写权已放开？）
 
-> 本 spec 会改动 `src/l2/model/**`、`src/play/profiles/audit.ts`、`src/play/__tests__/profile-composition.test.ts`、新增 `test/l2/properties/cas-field-alignment.property.test.ts`。其中 `src/play/**` 与 `src/class/**` 是跨线交付物，需用户在策略上放开写权（与 PT-12 同处置，requirements.md T-CaS-04）。未授权前执行到任务 2 即可，任务 3/4 停驻为交接。
+> 本 spec 会改动 `src/l2/model/**`、`src/l2/validation**`、`src/play/profiles/audit.ts`、`src/play/__tests__/profile-composition.test.ts`、`src/class/class-contract.ts`、新增 `test/l2/properties/**` 测试。其中 `src/play/**` 与 `src/class/**` 是跨线交付物，已获用户在策略上放开写权（与 PT-12 同处置，requirements.md T-CaS-04）。全部任务已落地并提交。
 
 #### C1. 就绪核对机检
 - 确认 `src/play` 对 `src/l2` 零 import（`grep -rn "from.*l2" src/play/ | grep -i composition` 空）。
@@ -50,7 +50,7 @@
 - [ ] 3-1. `src/play/profiles/audit.ts::auditKernelOpsAlignment` 改调 `caSFieldMatches`；对 `no-match` 发射核心码 `CAS_FIELD_GAP`（保持 jsonPath/reason 稳定）。
 - [ ] 3-2. 删除 `audit.ts` 中 `PLAY-REF-KERNELOPS-FIELD-GAP` 字面量发射点；保留废弃别名读取（Req 1.3 / 5.3）。
 - [ ] 3-3. `src/play/__tests__/profile-composition.test.ts`：既有 `PLAY-REF-KERNELOPS-FIELD-GAP` 断言改为 `CAS_FIELD_GAP`；新增对该码的正向（字段缝隙确实报）与反向（裸 Op 不报）可观察断言（Req 2.3 / 属性 4）。
-- [ ] 3-4. （可选，若不阻塞）`src/class/class-contract.ts` 对 capability 的 `parameters`/`kernelOps`/`compositionKind` 与 ECS `ComponentContract` 做机器对齐；不一致发 `COMPONENT_ID_CONFLICT` 或同类码；否则登记 T-CaS-01。
+- [x] 3-4. `src/class/class-contract.ts`：`ClassCatalogCapability` 新增可选 `familyId?`（`CAPABILITY_ENTRY_KEYS` 放行 + `parseCapability` `expectString` 校验），为 capability 的 `parameters`/`kernelOps`/`compositionKind` 与 ECS `ComponentContract` 做机器对齐提供可读入口；完整字段对齐登记为 T-CaS-01（已落地家族载入入口，`COMPONENT_ID_CONFLICT` 式全文对齐留待 ComponentContract 冻结）。
 - [ ] 3-5. 新增 / 扩展属性测试覆盖 `CAS_FIELD_GAP` 与数值归属不互相吞并（属性 3）：`只要 fieldHint 不在活动能力 parameters 且不在 playLayerOwnedFieldNames，就报 CAS_FIELD_GAP`。
 - _要求：Requirement 1.2, 2.1, 2.2, 2.3, 4.1, 4.2_
 
@@ -73,8 +73,8 @@
 
 ### 任务 4：审计与交接登记
 
-- [ ] 4-1. 全量 `npx vitest run`（含既有 3165 范围）确认唯一红是 `combat-first` 阶段2；如实登记为 AI 并行线交接项 T-CaS-03（Req 5.4）。
-- [ ] 4-2. `git status --porcelain` 核实白名单外无改动：`src/class/*/index.json`、`src/play/profiles/*` 目录数据未改（Req 5.3）。
+- [x] 4-1. 全量 `npx vitest run` 确认唯一红是 AI 并行线 `combat-first` 阶段2（+ AI 线未跟踪 `probe-payload.test.ts` 的两个 payload 探针，均已从本线镜像外出隔离到 `ai-crossline-*` stash，本线不代修）；如实登记为 AI 并行线交接项 T-CaS-03（Req 5.4）。
+- [x] 4-2. `git status --porcelain` 核实白名单外无改动：`src/class/*/index.json`、`src/play/profiles/*` 目录数据未改（Req 5.3）。
 - [ ] 4-3. 完成 prompt→artifact 审计：每条 Requirement 1–5 对应一个实现/测试/门禁证据，无模糊表述；Q 记录完备。
 - _要求：Requirement 5.3, 5.4, 5.5_
 

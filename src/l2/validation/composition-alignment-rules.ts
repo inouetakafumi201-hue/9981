@@ -21,9 +21,23 @@
 import type { CandidateDefinition } from '../model/definition.js';
 import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
 import { COMPOSITION_KINDS } from '../model/composition-registry.js';
+import { caSFieldMatches } from '../model/cas-field-alignment.js';
 import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
 import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
 import { defError } from './helpers.js';
+
+/** 收集 parameters 声明的槽位名（parameters[*].name；与组件契约 parameters 的 key 同源，宽容前缀存进 caSFieldMatches）。 */
+function parametersArrayNames(parameters: unknown): readonly string[] {
+  if (!Array.isArray(parameters)) return [];
+  const names: string[] = [];
+  for (const field of parameters) {
+    const raw = field as Record<string, unknown> | null;
+    if (raw === null || typeof raw !== 'object') continue;
+    const name = raw['name'];
+    if (typeof name === 'string' && name.trim().length > 0) names.push(name.trim());
+  }
+  return names;
+}
 
 function isComponentId(id: unknown): id is string {
   return typeof id === 'string' && id.startsWith('component.');
@@ -95,6 +109,12 @@ export const validateCompositionAlignment: DefinitionRule = (
       }),
     );
   } else if (kernelOpsIsStringArray) {
+    // kernelOps 引用字段名 ↔ parameters[*].name 是否落在同一通路（CaS 缝隙闭合）。
+    // 单一权威判定收敛于 src/l2/model/cas-field-alignment.ts::caSFieldMatches（wakeup-cas-gap-closure
+    // Req 1.1/3.2）：本路径（spec-compiler）与 src/play/profiles/audit 组合路径共用同一实现。
+    const declaredSlots = new Set(
+      parametersArrayNames(parameters),
+    );
     for (let opIndex = 0; opIndex < kernelOps.length; opIndex += 1) {
       const opName = kernelOps[opIndex] as string;
       if (!isWellFormedOpName(opName)) {
@@ -103,6 +123,16 @@ export const validateCompositionAlignment: DefinitionRule = (
             code: DIAGNOSTIC_CODES.SYSTEM_BINDING_MISSING_KERNELOPS,
             reason: `kernelOps op '${opName}' does not match the "namespace.operation" naming convention.`,
             correctionSuggestion: 'Use a well-formed op name, e.g. "item.move".',
+            jsonPath: joinJsonPath(defPath, 'kernelOps', opIndex),
+          }),
+        );
+      }
+      if (caSFieldMatches(opName, declaredSlots) === 'no-match') {
+        collector.add(
+          defError(context, definition, {
+            code: DIAGNOSTIC_CODES.CAS_FIELD_GAP,
+            reason: `kernelOps op '${opName}' references a field not declared in parameters (CaS 缝隙).`,
+            correctionSuggestion: 'Declare the referenced field in parameters, or align the kernelOps field name.',
             jsonPath: joinJsonPath(defPath, 'kernelOps', opIndex),
           }),
         );

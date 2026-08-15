@@ -455,4 +455,24 @@ describe('uniform catalog structural contract', () => {
         .toThrowError(/must satisfy all three criteria/);
     }
   });
+
+  it('round-trips an optional capability familyId into the catalog (CaS-01 对齐入口)', () => {
+    // 单一来源族 id（`component.*` 的 familyId）在能力条目上声明后应被解析进 catalog.capabilities，
+    // 说明 ECS ComponentContract ↔ 基类能力契约的族字段可由机器读取并对齐。
+    const withFamilyId = mutateCatalog('skills', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 'skill';
+    });
+    const catalog = parseClassCatalog(withFamilyId as JsonValue, 'skills/index.json');
+    expect(catalog.capabilities[0]?.familyId).toBe('skill');
+  });
+
+  it('rejects a capability familyId that is not a string (CaS-01 校验入口)', () => {
+    const damaged = mutateCatalog('skills', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 7;
+    });
+    expect(() => parseClassCatalog(damaged as JsonValue, 'skills/index.json'))
+      .toThrowError(ClassCatalogContractError);
+  });
 });

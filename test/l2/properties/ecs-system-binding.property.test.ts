@@ -56,7 +56,8 @@ describe('Property 5: System 接线闭合', () => {
               { name: 'fieldA', dataType: 'string', required: false, classification: 'Gameplay_Value', playerVisible: true },
               { name: 'fieldB', dataType: 'string', required: false, classification: 'Gameplay_Value', playerVisible: true },
             ]),
-            kernelOps: Object.freeze(['item.move', 'stack.merge']),
+            // 带字段引线的接线（`item.move(fieldA)` / `stack.merge(fieldB)`）引用已声明槽位 → 不触发 CAS_FIELD_GAP。
+            kernelOps: Object.freeze(['item.move(fieldA)', 'stack.merge(fieldB)']),
             compositionKind: 'static',
             familyId: seed.fam,
           } as Parameters<typeof baseDefinition>[0];
@@ -71,6 +72,38 @@ describe('Property 5: System 接线闭合', () => {
               (d.code.startsWith('SYSTEM_BINDING_') || d.code.startsWith('COMPOSITION_KIND_')),
           );
           expect(ecsErrors).toHaveLength(0);
+          // 字段引用全落在声明槽位 → 也不触发 CAS_FIELD_GAP（wakeup-cas-gap-closure Req 3.2：同轨判定无缝隙）。
+          expect(hasCode(result.diagnostics, DIAGNOSTIC_CODES.CAS_FIELD_GAP)).toBe(false);
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it('kernelOps 引用未声明字段 → 触发 CAS_FIELD_GAP（CaS 缝隙闭合，l2/validation 路径）', () => {
+    fc.assert(
+      fc.property(
+        fc.tuple(arbId, fc.constantFrom('movement', 'damage', 'status')).map(([id, fam]) => ({ id, fam })),
+        (seed) => {
+          const raw = {
+            id: `component.${seed.fam}.${seed.id}`,
+            defKind: 'rule',
+            semanticFamily: { familyId: seed.fam },
+            familyContract: undefined,
+            parameters: Object.freeze([
+              { name: 'fieldA', dataType: 'string', required: false, classification: 'Gameplay_Value', playerVisible: true },
+            ]),
+            // `ghostField` 未在 parameters 声明 → no-match → CAS_FIELD_GAP。
+            kernelOps: Object.freeze(['item.move(ghostField)']),
+            compositionKind: 'static',
+            familyId: seed.fam,
+          } as Parameters<typeof baseDefinition>[0];
+          const def = baseDefinition(raw);
+          const result = validateStructure(
+            singleDefinitionPackage(`pkg-${seed.id}`, def),
+          );
+          // 字段引用 ghostField 未声明 → 必须触发 CAS_FIELD_GAP（生财与非生财同源判定）。
+          expect(hasCode(result.diagnostics, DIAGNOSTIC_CODES.CAS_FIELD_GAP)).toBe(true);
         },
       ),
       { numRuns: 100 },
