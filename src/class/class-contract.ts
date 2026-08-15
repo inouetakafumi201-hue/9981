@@ -13,6 +13,12 @@
  */
 
 import type { JsonValue } from '../core/kernel/spec-compiler/types.js';
+import { compileFamilyComponentShapeIndex } from '../l2/model/family-component-shapes.js';
+import {
+  alignCapabilityToComponentContract,
+  type AlignmentComponent,
+  type CapabilityAlignmentInput,
+} from '../l2/model/component-alignment.js';
 import {
   ClassCatalogContractError,
   assertAllowedKeys,
@@ -475,6 +481,7 @@ const CAPABILITY_ENTRY_KEYS: readonly string[] = Object.freeze([
   'writeChannelContract',
   'compositionKind',
   'familyId',
+  'componentId',
 ]);
 export const COMPOSITION_KIND_KEYS = Object.freeze(['static', 'transient', 'modified-explicit', 'modified-capability'] as const);
 export type CompositionKindKey = (typeof COMPOSITION_KIND_KEYS)[number];
@@ -528,6 +535,8 @@ export interface ClassCatalogCapability {
   readonly compositionKind?: CompositionKindKey;
   /** ECS 组件契约的族 id（`component.*` 单一源 familyId）；缺省为 undefined（既有目录不声明）。与 ComponentContract 对齐见 CaS-01 交接。 */
   readonly familyId?: string;
+  /** 可选：显式指认的 ECS 组件 id（`component.*`）。仅当 familyId 存在时用于精确对齐。 */
+  readonly componentId?: string;
 }
 
 export interface ClassCatalogClassEntry {
@@ -625,6 +634,7 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
   const exclusives = object['mutuallyExclusiveWith'];
   const compositionKind = object['compositionKind'];
   const familyId = object['familyId'];
+  const componentId = object['componentId'];
   return Object.freeze({
     id: expectString(object['id'], `${path}/id`),
     name: expectString(object['name'], `${path}/name`),
@@ -639,7 +649,71 @@ function parseCapability(value: JsonValue, path: string): ClassCatalogCapability
       : expectEnum(compositionKind, `${path}/compositionKind`, COMPOSITION_KIND_KEYS),
     // 可选：ECS 组件契约族 id。既有目录不声明则缺省 undefined，校验为空操作（向后兼容，CaS-01）。
     familyId: familyId === undefined ? undefined : expectString(familyId, `${path}/familyId`),
+    // 可选：显式指认的 ECS 组件 id（`component.*`）。仅当 familyId 存在时用于精确对齐。
+    componentId: componentId === undefined ? undefined : expectString(componentId, `${path}/componentId`),
   });
+}
+
+/** ECS `FamilyShape` 中 `auditCapabilityEcsAlignment` 实际读取的最小形态（与 family-component-shapes 的 FamilyShape 兼容）。 */
+interface FamilyShapeLike {
+  readonly familyId: string;
+  readonly components: readonly {
+    readonly id: string;
+    readonly compositionKind: string;
+    readonly parameters: readonly { readonly name: string }[];
+    readonly kernelOps: readonly string[];
+  }[];
+}
+
+/**
+ * 对解析出的全部能力做「声明 ↔ ECS 组件契约单一源」逐能力对齐（T-CaS-01）。
+ *
+ * 委托共享判定器 `alignCapabilityToComponentContract`（src/l2/model/component-alignment.ts），
+ * class-contract 与 play-audit 两侧消费同一对齐函数，不各自内联一套规则。仅在能力同时声明了
+ * `familyId` 且该族在单一源可解析时做完整对齐；未声明 familyId（既有目录空隙）或 ECS 族未登记
+ * → 空操作，向后兼容。返回的违规清单以 ECS_ALIGN_* 诊断码可被 `parseClassCatalog` 在解析期
+ * 转成 `ClassCatalogContractError`。
+ */
+export function auditCapabilityEcsAlignment(
+  capabilities: readonly ClassCatalogCapability[],
+  familyShapeIndex: ReadonlyMap<string, FamilyShapeLike>,
+): readonly ContractViolation[] {
+  const violations: ContractViolation[] = [];
+  const resolve = (familyId: string): AlignmentFamilyShape | null => {
+    const family = familyShapeIndex.get(familyId);
+    if (family === undefined) return null;
+    return {
+      familyId: family.familyId,
+      components: family.components as readonly AlignmentComponent[],
+    };
+  };
+  for (const capability of capabilities) {
+    const input: CapabilityAlignmentInput = {
+      capabilityId: capability.id,
+      familyId: capability.familyId,
+      componentId: capability.componentId,
+      compositionKind: capability.compositionKind,
+      declaredParameterSlots: new Set(capability.parameters.map((parameter) => parameter.key)),
+      declaredKernelOps: new Set(capability.kernelOps),
+    };
+    const result = alignCapabilityToComponentContract(input, resolve);
+    if (result.ok) continue;
+    for (const issue of result.issues) {
+      violations.push({
+        code: issue.code,
+        path: `/capabilities/${capability.id}`,
+        reason: issue.reason,
+        correction: issue.correction,
+      });
+    }
+  }
+  return sortViolations(violations);
+}
+
+/** `alignCapabilityToComponentContract` 解析器所需的最小族形状；与 `FamilyShapeLike` 结构兼容。 */
+interface AlignmentFamilyShape {
+  readonly familyId: string;
+  readonly components: readonly AlignmentComponent[];
 }
 
 function parseClassEntry(value: JsonValue, path: string): ClassCatalogClassEntry {
@@ -842,6 +916,12 @@ export function parseClassCatalog(parsed: JsonValue, sourceId: string): ClassCat
     .map((entry, index) => parseClassEntry(entry, `/classes/${index}`));
   const capabilities = expectNonEmptyArray(root['capabilities'], '/capabilities')
     .map((entry, index) => parseCapability(entry, `/capabilities/${index}`));
+  // T-CaS-01：能力声明与 ECS 组件契约单一源逐能力交叉对齐。真实目录能力未声明
+  // familyId/componentId → 空操作；声明但偏离单一源即抛 ECS_ALIGN_*（见解析期断点）。
+  const ecsAlignment = auditCapabilityEcsAlignment(capabilities, compileFamilyComponentShapeIndex());
+  if (ecsAlignment.length > 0) {
+    throw new ClassCatalogContractError('/capabilities', formatViolations(ecsAlignment).join(' | '));
+  }
   const valueSets = expectArray(root['valueSets'], '/valueSets')
     .map((entry, index) => parseValueSet(entry, `/valueSets/${index}`));
   const structuralBounds = expectArray(root['structuralBounds'], '/structuralBounds')

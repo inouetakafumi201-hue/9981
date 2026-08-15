@@ -459,12 +459,14 @@ describe('uniform catalog structural contract', () => {
   it('round-trips an optional capability familyId into the catalog (CaS-01 对齐入口)', () => {
     // 单一来源族 id（`component.*` 的 familyId）在能力条目上声明后应被解析进 catalog.capabilities，
     // 说明 ECS ComponentContract ↔ 基类能力契约的族字段可由机器读取并对齐。
-    const withFamilyId = mutateCatalog('skills', (root) => {
+    // 用 attachments 族能力：`attachment.capability.host_binding`（params=hostType，kernelOps=attach.add）
+    // 恰好是 ECS `component.attachment.host` 形状的子集 → 声明 familyId=attachment 可通过对齐（不误报）。
+    const withFamilyId = mutateCatalog('attachments', (root) => {
       const capabilities = root['capabilities'] as Record<string, unknown>[];
-      (capabilities[0] as Record<string, unknown>)['familyId'] = 'skill';
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 'attachment';
     });
-    const catalog = parseClassCatalog(withFamilyId as JsonValue, 'skills/index.json');
-    expect(catalog.capabilities[0]?.familyId).toBe('skill');
+    const catalog = parseClassCatalog(withFamilyId as JsonValue, 'attachments/index.json');
+    expect(catalog.capabilities[0]?.familyId).toBe('attachment');
   });
 
   it('rejects a capability familyId that is not a string (CaS-01 校验入口)', () => {
@@ -474,5 +476,48 @@ describe('uniform catalog structural contract', () => {
     });
     expect(() => parseClassCatalog(damaged as JsonValue, 'skills/index.json'))
       .toThrowError(ClassCatalogContractError);
+  });
+
+  it('rejects a capability whose compositionKind deviates from the ECS single source (T-CaS-01 反例)', () => {
+    // attachment 族 ECS 组件 `component.attachment.host` 单一源是 modified-explicit；能力声明 `static` → parseClassCatalog 抛 ECS_ALIGN。
+    const damaged = mutateCatalog('attachments', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 'attachment';
+      (capabilities[0] as Record<string, unknown>)['compositionKind'] = 'static';
+    });
+    expect(() => parseClassCatalog(damaged as JsonValue, 'attachments/index.json'))
+      .toThrowError(/ECS_ALIGN_COMPOSITION_KIND_MISMATCH/);
+  });
+
+  it('rejects a capability whose kernelOps exceed the ECS single source (T-CaS-01 反例)', () => {
+    // attachment 能力声明一条 ECS 组件 `component.attachment.host` 未登记的 Op（prop.nonexistent） → ECS_ALIGN_KERNELOPS_NOT_IN_SOURCE。
+    const damaged = mutateCatalog('attachments', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      const first = capabilities[0] as Record<string, unknown>;
+      first['familyId'] = 'attachment';
+      first['kernelOps'] = [...(first['kernelOps'] as string[]), 'prop.nonexistent'];
+    });
+    expect(() => parseClassCatalog(damaged as JsonValue, 'attachments/index.json'))
+      .toThrowError(/ECS_ALIGN_KERNELOPS_NOT_IN_SOURCE/);
+  });
+
+  it('rejects a componentId that points to a different family (T-CaS-01 反例)', () => {
+    // 能力声明 familyId=attachment 但 componentId 指到别的族的组件 → ECS_ALIGN_COMPONENT_NOT_FOUND。
+    const damaged = mutateCatalog('attachments', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 'attachment';
+      (capabilities[0] as Record<string, unknown>)['componentId'] = 'component.status.hostState';
+    });
+    expect(() => parseClassCatalog(damaged as JsonValue, 'attachments/index.json'))
+      .toThrowError(/ECS_ALIGN_COMPONENT_NOT_FOUND/);
+  });
+
+  it('accepts a capability that matches the ECS single source exactly (T-CaS-01 正例)', () => {
+    // attachment.capability.host_binding 声明 familyId=attachment（hostType/attach.add ⊆ ECS shape）→ 通过对齐。
+    const withExactMatch = mutateCatalog('attachments', (root) => {
+      const capabilities = root['capabilities'] as Record<string, unknown>[];
+      (capabilities[0] as Record<string, unknown>)['familyId'] = 'attachment';
+    });
+    expect(() => parseClassCatalog(withExactMatch as JsonValue, 'attachments/index.json')).not.toThrow();
   });
 });

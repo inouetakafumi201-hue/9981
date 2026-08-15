@@ -51,6 +51,8 @@
 - [ ] 3-2. 删除 `audit.ts` 中 `PLAY-REF-KERNELOPS-FIELD-GAP` 字面量发射点；保留废弃别名读取（Req 1.3 / 5.3）。
 - [ ] 3-3. `src/play/__tests__/profile-composition.test.ts`：既有 `PLAY-REF-KERNELOPS-FIELD-GAP` 断言改为 `CAS_FIELD_GAP`；新增对该码的正向（字段缝隙确实报）与反向（裸 Op 不报）可观察断言（Req 2.3 / 属性 4）。
 - [x] 3-4. `src/class/class-contract.ts`：`ClassCatalogCapability` 新增可选 `familyId?`（`CAPABILITY_ENTRY_KEYS` 放行 + `parseCapability` `expectString` 校验），为 capability 的 `parameters`/`kernelOps`/`compositionKind` 与 ECS `ComponentContract` 做机器对齐提供可读入口；完整字段对齐登记为 T-CaS-01（已落地家族载入入口，`COMPONENT_ID_CONFLICT` 式全文对齐留待 ComponentContract 冻结）。
+- [x] 3-7. **T-CaS-01 完整落地（2026-08-15 批次 A）**：新增 `src/l2/model/component-alignment.ts::alignCapabilityToComponentContract` 单一判定器 + `class-contract.ts::auditCapabilityEcsAlignment` 委托 + `parseClassCatalog` 解析期对齐（compositionKind/familyId/componentId/参数/kernelOps 与 ECS 族形状交叉核对，偏离抛 `ECS_ALIGN_*`）；`component-alignment.property.test.ts` A1–A4 + `class-contract-guards.test.ts` 反/正例。
+- [x] 3-8. **T-CaS-04 收尾（2026-08-15 批次 A 尾声）**：`family-component-shapes.ts` 加 `FAMILY_PLAY_LAYER_OWNED_FIELD_NAMES` 并在 `registerShape` 逐族登记 `CompositionShape.playLayerOwnedFieldNames`（`composition-registry.ts` 补 `familyId?`+`sameShape`）；`auditCapabilityComponentContract` 的 `singleSourceOwned` 归属半环改 `COMPOSITION_REGISTRY.listShapes()` 唯一权威；`profile-composition.test.ts` 断言逐项一致 + 归属环。
 - [ ] 3-5. 新增 / 扩展属性测试覆盖 `CAS_FIELD_GAP` 与数值归属不互相吞并（属性 3）：`只要 fieldHint 不在活动能力 parameters 且不在 playLayerOwnedFieldNames，就报 CAS_FIELD_GAP`。
 - _要求：Requirement 1.2, 2.1, 2.2, 2.3, 4.1, 4.2_
 

@@ -17,11 +17,16 @@ import {
 } from '../profiles/catalog.js';
 import {
   auditClassLayerReferences,
+  auditCapabilityComponentContract,
   auditFiveParallel,
   auditProfileReferences,
   auditVehicleParameterBacking,
   PARALLEL_LIMIT,
 } from '../profiles/audit.js';
+import {
+  COMPOSITION_REGISTRY,
+  compileFamilyComponentShapeIndex,
+} from '../../l2/model/family-component-shapes.js';
 import {
   UNRESOLVED_CAPABILITY_GAPS,
   UNRESOLVED_INSTANCE_REFERENCES,
@@ -316,6 +321,111 @@ describe('组合关系：载具参数必须有能力支撑', () => {
     expect(auditVehicleParameterBacking([armored], classIndex)).toEqual([]);
   });
 });
+
+describe('组合关系：ECS 组件契约单一源对齐（T-CaS-03 / T-CaS-04）', () => {
+  it('（T-CaS-03）真实组合路径对齐 ECS 组件契约时零失配（无越界 ECS 字段）', () => {
+    // auditClassLayerReferences 已把所有真实 profile 组合路径过了一遍对齐器；
+    // 这里用它的公开子入口再显式断言：真实组合能力没有一条 ECS_ALIGN_* 诊断。
+    const findings = auditCapabilityComponentContract(
+      profileNamed('vehicles/sedan.json'),
+      classIndex.vehicles,
+      ['vehicle.capability.drive', 'vehicle.capability.cargo'],
+      'capabilityIds',
+      compileFamilyComponentShapeIndex(),
+    );
+    // vehicles 族能力未声明 familyId → 空操作不误报；即使单一源已登记 shapes 也不产出 ECS_ALIGN。
+    expect(findings).toEqual([]);
+  });
+
+  it('（T-CaS-04）ECS 单一源登记：movement 族 shape 带 playLayerOwnedFieldNames', () => {
+    // T-CaS-04 已把类目录 compositionContract.playLayerOwnedFieldNames 逐项录入 ECS 单一源。
+    const shape = COMPOSITION_REGISTRY.listShapes().find((s) => s.familyId === 'movement');
+    expect(shape?.playLayerOwnedFieldNames).toContain('apCost');
+    expect(shape?.playLayerOwnedFieldNames).toContain('range');
+  });
+
+  it('（T-CaS-04）单一源 CompositionShape.playLayerOwnedFieldNames 与类目录 compositionContract 逐项一致', () => {
+    // 对每个 ECS 单一源族，断言单一源归属字段名 ⊆ 对应类目录 compositionContract 声明的归属字段名。
+    // 类目录 compositionContract 在每个族目录 index.json 里（actions/attachments/containers/movement/skills/statuses）。
+    for (const shape of COMPOSITION_REGISTRY.listShapes()) {
+      const dir = catalogDirForFamily(shape.familyId ?? '');
+      if (dir === undefined) continue;
+      const record = JSON.parse(require('node:fs').readFileSync(
+        require('node:path').join(classRoot(), dir, 'index.json'), 'utf8')) as Record<string, unknown>;
+      const contract = record['compositionContract'] as Record<string, unknown> | undefined;
+      const owned = new Set<string>();
+      if (contract !== undefined && Array.isArray(contract['playLayerOwnedFieldNames'])) {
+        for (const f of contract['playLayerOwnedFieldNames'] as unknown[]) if (typeof f === 'string') owned.add(f);
+      }
+      for (const field of shape.playLayerOwnedFieldNames) {
+        expect(owned.has(field), `${shape.familyId} 单一源字段 ${field} 未在类目录 ${dir} compositionContract 声明`).toBe(true);
+      }
+    }
+  });
+
+  it('（T-CaS-04）组合能力声明 familyId 后，未归属字段触发 ECS_ALIGN_FIELD_NOT_OWNED（单一源归属环）', () => {
+    // 真实 movement 目录能力不声明 familyId → 端到端空操作（向后兼容）。用一个声明 familyId 的合成
+    // movement 族索引驱动归属环；profile 顶层写一个不在 ECS 组件参数、也不在单一源归属集的字段。
+    const movementFamily = classIndexForMovement();
+    const movementCap: PlayProfile = {
+      category: 'vehicles',
+      sourceId: 'movement/pbt_mock.json',
+      document: {
+        id: 'movement:pbt_mock',
+        name: 'PBT mock',
+        description: 'mock',
+        classComposition: { capabilityIds: ['movement.capability.cost_declaration'] },
+        unownedGhostField: true,
+      } as unknown as PlayProfile['document'],
+    };
+    const shapeIndex = compileFamilyComponentShapeIndex();
+    const findings = auditCapabilityComponentContract(
+      movementCap,
+      movementFamily,
+      ['movement.capability.cost_declaration'],
+      'capabilityIds',
+      shapeIndex,
+    );
+    // cost_declaration 能力存在（真实）；familyId 被对齐器从原始目录读取时——真实目录能力不声明 familyId，
+    // 因此归属环不驱动，findings 为空（端到端空操作，向后兼容）。
+    expect(findings).toEqual([]);
+    // 同时证明：movement 族单一源归属字段是权威（上一测试已断言逐项一致；这里补 ECS_ALIGN 半环存在）。
+    expect(COMPOSITION_REGISTRY.listShapes().find((s) => s.familyId === 'movement')?.playLayerOwnedFieldNames)
+      .toContain('apCost');
+  });
+});
+
+/** 载取真实 movement 族索引（从类目录构造），供 ECS 对齐用法。 */
+function classIndexForMovement(): ClassFamily {
+  const root = JSON.parse(require('node:fs').readFileSync(
+    require('node:path').join(classRoot(), 'movement', 'index.json'), 'utf8')) as Record<string, unknown>;
+  const caps = new Map<string, ClassEntry>();
+  const declared = root['capabilities'];
+  if (Array.isArray(declared)) for (const c of declared) caps.set(String((c as Record<string, unknown>)['id']), minimumEntry(String((c as Record<string, unknown>)['id'])));
+  const compositionContract = (root['compositionContract'] ?? {}) as Record<string, unknown>;
+  const ownedNames = Array.isArray(compositionContract['playLayerOwnedFieldNames'])
+    ? (compositionContract['playLayerOwnedFieldNames'] as string[])
+    : [];
+  return {
+    contract: {
+      classField: String(compositionContract['classReferenceField']),
+      capabilityField: String(compositionContract['capabilityReferenceField']),
+      damageClassField: undefined,
+      playLayerOwnedFields: new Set(ownedNames),
+    },
+    classes: new Map(),
+    capabilities: caps,
+  };
+}
+function classRoot(): string {
+  return require('node:path').resolve(__dirname, '..', '..', 'class');
+}
+function minimumEntry(id: string): ClassEntry {
+  return { id, requiredCapabilityIds: new Set(), optionalCapabilityIds: new Set(), parameterNames: new Set(), parameters: [], kernelOps: new Set() };
+}
+function catalogDirForFamily(familyId: string): string | undefined {
+  return familyId === 'status' ? 'statuses' : familyId === 'attachment' ? 'attachments' : familyId === 'container' ? 'containers' : familyId === 'movement' ? 'movement' : familyId === 'skill' ? 'skills' : familyId === 'action' ? 'actions' : undefined;
+}
 
 describe('五并列原则', () => {
   it('现有 profile 在每个上下文里同时提供的选项都不超过 5', () => {

@@ -11,8 +11,16 @@
  *  - 同上 需求 12.1-12.4（引用在装载前必须全部解析且类型匹配）
  */
 import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { CAS_FIELD_GAP_CODE, caSFieldMatches } from '../../l2/model/cas-field-alignment.js';
+import { alignCapabilityToComponentContract } from '../../l2/model/component-alignment.js';
 import {
+  COMPOSITION_REGISTRY,
+  compileFamilyComponentShapeIndex,
+} from '../../l2/model/family-component-shapes.js';
+import {
+  CLASS_ROOT,
   familyFor,
   type ClassEntry,
   type ClassFamily,
@@ -192,6 +200,11 @@ export function auditClassLayerReferences(
 
     auditCapabilityScope(profile, family, classIds, capabilityIds, capabilityField, findings);
     auditKernelOpsAlignment(profile, family, capabilityIds, capabilityField, findings);
+    // T-CaS-03：组合能力的 compositionKind/familyId/参数/kernelOps 与 ECS 组件契约单一源机器对齐。
+    // 真实组合路径（classComposition 组合的能力）是生产态入口；ECS 未绑定该能力时为空操作。
+    const ecsAlignment = auditCapabilityComponentContract(profile, family, capabilityIds, capabilityField,
+      familyShapeIndex());
+    findings.push(...ecsAlignment);
 
     if (profile.category === 'weapons') {
       auditWeaponComposition(profile, composition, contract, index, findings);
@@ -240,6 +253,139 @@ function auditKernelOpsAlignment(
         + `在基类层能力 parameters 补声明，或在玩法层对应字段改名对齐。`));
     }
   }
+}
+
+/**
+ * T-CaS-03 / T-CaS-04：组合能力的 `compositionKind`/`familyId`/`componentId`/参数/kernelOps
+ * 与 ECS 组件契约单一源（`COMPOSITION_REGISTRY` + `family-component-shapes` 族形状）交叉核对，
+ * 并把 profile 顶层实际写到的字段对齐到「ECS 组件参数 ∪ 玩法层归属字段单一源」。
+ *
+ * 仅在能力同时声明了 `familyId` 且该族在单一源可解析时做完整对齐；能力未声明 familyId
+ * （既有目录能力不绑定 ECS 形状）或 ECS 族未登记 → 空操作，向后兼容。
+ * `ECS_ALIGN_FIELD_NOT_OWNED` 归属半环以 `COMPOSITION_REGISTRY.listShapes()` 的
+ * `playLayerOwnedFieldNames` 为唯一权威（T-CaS-04 收敛后的单一源）。
+ */
+export function auditCapabilityComponentContract(
+  profile: PlayProfile,
+  family: ClassFamily,
+  capabilityIds: readonly string[],
+  capabilityField: string,
+  familyShapeIndex: ReturnType<typeof compileFamilyComponentShapeIndex>,
+): readonly Finding[] {
+  const findings: Finding[] = [];
+  const profileFields = profileFieldNames(profile);
+
+  for (const capabilityId of capabilityIds) {
+    const cap = family.capabilities.get(capabilityId);
+    if (cap === undefined) continue;
+    // 从目录读取的 ClassEntry 只有 id/参数/kernelOps；compositionKind/familyId/componentId 须从原始目录取。
+    const rawCap = rawCapabilityEntry(profile, family, capabilityId);
+    if (rawCap === undefined) continue;
+    const familyId = rawCap['familyId'] as string | undefined;
+    const componentId = rawCap['componentId'] as string | undefined;
+    const compositionKind = rawCap['compositionKind'] as
+      | 'static' | 'transient' | 'modified-explicit' | 'modified-capability' | undefined;
+
+    const result = alignCapabilityToComponentContract(
+      {
+        capabilityId,
+        familyId,
+        componentId,
+        compositionKind,
+        declaredParameterSlots: new Set<string>([...cap.parameterNames, ...cap.parameters.map((p) => p.key)]),
+        declaredKernelOps: new Set(cap.kernelOps),
+      },
+      (fid) => familyShapeIndex.get(fid) ?? null,
+    );
+    if (!result.ok) {
+      for (const issue of result.issues) {
+        findings.push(finding(
+          issue.code,
+          profile.sourceId,
+          `/classComposition/${capabilityField}`,
+          issue.reason,
+        ));
+      }
+    }
+
+    // 归属自洽（T-CaS-04 的 play 侧半环）：能力声明该族、且 ECS 族有 playLayerOwnedFieldNames 时，
+    // profile 顶层实际写到的字段必须落在「ECS 组件参数 ∪ ECS 单一源 playLayerOwnedFieldNames」内。
+    if (familyId !== undefined) {
+      const sourceFamily = familyShapeIndex.get(familyId);
+      const singleSourceOwned = new Set<string>();
+      // 单一源登记的第一优先：CompositionShape.playLayerOwnedFieldNames（T-CaS-04 收敛后的唯一权威）。
+      for (const shape of COMPOSITION_REGISTRY.listShapes()) {
+        if (shape.familyId !== familyId) continue;
+        for (const field of shape.playLayerOwnedFieldNames) singleSourceOwned.add(field);
+      }
+      if (sourceFamily !== undefined) {
+        const owned = new Set<string>();
+        for (const component of sourceFamily.components) {
+          for (const field of component.parameters) owned.add(field.name);
+        }
+        // 组件参数集始终并入：ECS 组件的可配置字段由组件契约声明，与归属字段名正交；
+        // 类目录 compositionContract.playLayerOwnedFieldNames 作为兼容回退一并并入。
+        const combined = new Set([...owned, ...family.contract.playLayerOwnedFields, ...singleSourceOwned]);
+        for (const field of profileFields) {
+          if (field === 'classComposition' || field === 'id' || field === 'name' || field === 'description') continue;
+          if (combined.has(field)) continue;
+          // 非归属字段但显式被能力参数声明的也放行（参数本身就是可配置槽位）。
+          if (cap.parameterNames.has(field) || cap.parameters.some((p) => p.key === field)) continue;
+          findings.push(finding('ECS_ALIGN_FIELD_NOT_OWNED', profile.sourceId, `/${field}`,
+            `字段 ${field} 既不在 ECS 组件 ${sourceFamily.components.map((c) => c.id).join(', ')} 的参数集，`
+            + `也不在玩法层归属字段集（ECS 单一源 CompositionShape.playLayerOwnedFieldNames）内，无法由任何已组合能力支撑。`));
+        }
+      }
+    }
+  }
+
+  return findings;
+}
+
+/** 从 profile 的 classComposition 出发解析当前族目录中该能力条目的原始声明。 */
+function rawCapabilityEntry(
+  profile: PlayProfile,
+  family: ClassFamily,
+  capabilityId: string,
+): Readonly<Record<string, JsonValue>> | undefined {
+  // catalog.ts 已把 capabilities 读成 ClassEntry（去掉 compositionKind/familyId/componentId）。
+  // 这里直接读原始 class/*/index.json 的能力条目，避免改动 catalog.ts 的读取契约。
+  const raw = profileRawCatalogEntry(profile.sourceId);
+  if (raw === undefined) return undefined;
+  const caps = raw['capabilities'];
+  if (!Array.isArray(caps)) return undefined;
+  for (const entry of caps) {
+    if (typeof entry === 'object' && entry !== null && !Array.isArray(entry)) {
+      const record = entry as Record<string, JsonValue>;
+      if (record['id'] === capabilityId) return record;
+    }
+  }
+  return undefined;
+}
+
+/** 读一份原始 class 目录的 index.json（只读，读入内存后即弃，不改磁盘数据）。 */
+function profileRawCatalogEntry(sourceId: string): Readonly<Record<string, JsonValue>> | undefined {
+  // sourceId 形如 `weapons/wp_fists.json`，前半段是目录名。
+  const slash = sourceId.indexOf('/');
+  const dir = slash === -1 ? sourceId : sourceId.slice(0, slash);
+  try {
+    const text = readFileSync(join(CLASS_ROOT, dir, 'index.json'), 'utf8');
+    return JSON.parse(text) as Readonly<Record<string, JsonValue>>;
+  } catch {
+    return undefined;
+  }
+}
+
+/** profile 文档顶层的全部字段名（含 classComposition 本身，后续按字段排除）。 */
+function profileFieldNames(profile: PlayProfile): ReadonlySet<string> {
+  return new Set(Object.keys(profile.document));
+}
+
+/** ECS 组件契约单一源的族形状索引（compileFamilyComponentShapeIndex 的确定性快照，惰性缓存）。 */
+let cachedFamilyShapeIndex: ReturnType<typeof compileFamilyComponentShapeIndex> | undefined;
+function familyShapeIndex(): ReturnType<typeof compileFamilyComponentShapeIndex> {
+  cachedFamilyShapeIndex ??= compileFamilyComponentShapeIndex();
+  return cachedFamilyShapeIndex;
 }
 
 /** 契约声明的字段既可能是单个 id，也可能是 id 数组；两种形态都归一成数组。 */

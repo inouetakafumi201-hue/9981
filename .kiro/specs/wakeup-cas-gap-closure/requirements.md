@@ -95,18 +95,18 @@
 
 | 项 | 归属 | 内容 | 关联 |
 |---|---|---|---|
-| T-CaS-01 | 型号契约线 / `src/class/class-contract.ts` | 把 `ClassCatalogCapability` 与 ECS `ComponentContract`（`familyId` / `playLayerOwnedFieldNames`）做完整字段对齐归一（本 spec 要求 2.2 起步；完整单源化需 class-catalog schema 允许 `familyId` 等字段） | Req 2.2 |
-| T-CaS-02 | 基类层线 / `src/l2/validation` | 把 `validateCompositionAlignment` 的"字段↔参数名同轨"真正实现（当前只有名称形状检查），或显式声明把该判定委托给本 spec 的单一实现（二者选一，不得各自再写第三份） | Req 1.1/3.2 |
-| T-CaS-03 | AI 并行线 | `combat-first` 阶段2 红测（expected a:attack got a:move）在干净 master 上即失败，属 AI 线工作树，非本线引入；登记录入，待 AI 收敛 | Req 5.4 |
-| T-CaS-04 | 并行锁纪律 | 本 spec 落 `src/l2`（component 契约扩展）与 `src/class/class-contract.ts`、`src/play/profiles/audit.ts`（校验入口扩展）、新建测试。落这三类目录需用户在策略上放开写权（与 PT-12 相同处置）；未授权不落改写 | 全部 |
+| T-CaS-01 | 型号契约线 / `src/class/class-contract.ts` | 把 `ClassCatalogCapability` 与 ECS `ComponentContract`（`familyId` / `playLayerOwnedFieldNames`）做完整字段对齐归一 — **2026-08-15 批次 A 已完整落地**（`component-alignment.ts::alignCapabilityToComponentContract` 单一判定 + `parseClassCatalog` 解析期对齐 + PBT A1–A4），见 2.2 行 | Req 2.2 |
+| T-CaS-02 | 基类层线 / `src/l2/validation` | 把 `validateCompositionAlignment` 的"字段↔参数名同轨"委托给单一 `caSFieldMatches` — **HEAD dc5908a 已落地**，见 3.2 行 | Req 1.1/3.2 |
+| T-CaS-03 | AI 并行线 | `combat-first` 阶段2 红测在干净 master 上即失败，属 AI 线工作树，非本线引入 — **HEAD 81de9bd 已收敛**；play 组合路径接入对齐器（批次 A 落地 `auditCapabilityComponentContract`）见 3.5 行 | Req 5.4 |
+| T-CaS-04 | 并行锁纪律 / `src/l2/model` | ECS `CompositionShape.playLayerOwnedFieldNames` 单一源登记 + play 侧归属环闭环 — **2026-08-15 批次 A 尾声落地**（用户放开 `src/l2/model` 写权）：`family-component-shapes` 用 `FAMILY_PLAY_LAYER_OWNED_FIELD_NAMES` 逐族登记 + `composition-registry` 补 `familyId?`/`sameShape`；`auditCapabilityComponentContract` 的 `singleSourceOwned` 归属半环改 `COMPOSITION_REGISTRY.listShapes()` 唯一权威，见 5.4 行 | 全部（3.5/5.4） |
 
-> T-CaS-04 是写权边界：本 spec 的完整落地（Requirements 1–5）会改动 `src/l2/model`、`src/l2/validation`、`src/class/class-contract.ts`、`src/play/profiles/audit.ts` 与新增测试，均属跨线交付物。只有用户放开写权后，T-CaS-02 与 Requirement 1–4 的实现才能真正落地；否则本 spec 仅以文档交付并登记交接。
+> T-CaS-02 / T-CaS-04 曾属写权边界：本 spec 的完整落地会改动 `src/l2/model`、`src/l2/validation`、`src/class/class-contract.ts`、`src/play/profiles/audit.ts` 与新增测试，均属跨线交付物。2026-08-15 批次 A 用户在收尾阶段对主要负责人放开写权，T-CaS-01/02/03/04 已全部落地（见下方审计对照表状态列）。「已闭合」= 证据存在且门禁绿。
 
 ---
 
 ## 审计对照表（Requirement → 证据，2026-08-15）
 
-> 逐条映射要求 1–5 的验收标准到实现/测试/门禁证据。证据快照在提交前重跑全绿，全量 vitest 唯一红 = `combat-first` 阶段2（AI 并行线，T-CaS-03）。「已闭合」= 证据存在且门禁绿；「交接」= 生产态链路成立但跨写权部分登记待授权。
+> 逐条映射要求 1–5 的验收标准到实现/测试/门禁证据。证据快照在提交前重跑全绿。「已闭合」= 证据存在且门禁绿。2026-08-15 批次 A 追加：T-CaS-01 完整落地（ECS 组件契约单一源对齐 + PBT），T-CaS-03 玩法层组合路径对齐接入，T-CaS-04 单一源登记 `playLayerOwnedFieldNames` + play 侧归属闭环。表内条目按证据归属去重合并在其主 Req 行。
 
 | Req | 要求 | 实现证据（文件:函数/常量） | 测试/属性证据 | 门禁证据 | 状态 |
 |---|---|---|---|---|---|
@@ -116,20 +116,21 @@
 | 1.4 | 全称量化 PBT（numRuns≥100） | `cas-field-alignment.property.test.ts`（6 条，numRuns 100/200，标签 `Feature: wakeup-cas-gap-closure`） | 属性 1–6 | targeted 44/44 | 已闭合 |
 | 1.5 | 裸 Op 不误报 | `caSFieldMatches` 对无括号/空字段返回 `not-applicable` | Property 1/6（裸样本恒 not-applicable） | 同上 | 已闭合 |
 | 2.1 | play 通过稳定端口消费 src/l2 | `audit.ts` import `../../l2/model/cas-field-alignment.js`（单一判定函数 + 单一码）——src/play 首次以共享判定函数形式消费 src/l2 | —— | 22（audit 链路绿） | 已闭合（最小同源：共享判定函数+共享码） |
-| 2.2 | class-contract 与 ComponentContract 机器对齐 | `src/class/class-contract.ts`：`ClassCatalogCapability` 新增可选 `familyId?`，`CAPABILITY_ENTRY_KEYS` 放行 `familyId`，`parseCapability` 以 `expectString` 校验（合法族单一源取自 FamilyContract），对齐入口可机器读取（T-CaS-01 落地） | `class-contract-guards.test.ts`：capability `familyId` 往返解析正例 + 非字符串反例 | class+guard vitest 绿 | 已闭合（T-CaS-01） |
+| 2.2 | class-contract 与 ComponentContract 机器对齐 | `src/class/class-contract.ts`：`ClassCatalogCapability` 新增可选 `familyId?` + `componentId?`，`CAPABILITY_ENTRY_KEYS` 放行，`parseCapability` `expectString` 校验；`auditCapabilityEcsAlignment` 委托 `component-alignment.ts::alignCapabilityToComponentContract` 逐能力对齐（compositionKind/familyId/componentId/参数/kernelOps 与 ECS 族形状交叉核对，偏离抛 `ECS_ALIGN_*`）；`parseClassCatalog` 解析期抛出（T-CaS-01 完整落地） | `class-contract-guards.test.ts`：familyId 往返 + 非字符串反例 + kind 错/越界 Op/跨族组件反例 + 精确一致正例；+ `component-alignment.property.test.ts` A1–A4（numRuns≥100） | class+guard vitest 绿 | 已闭合（T-CaS-01） |
 | 2.3 | 生产态入口可观察、可断言 | `auditClassLayerReferences` 每迭代对带字段 kernelOps 调 `caSFieldMatches`，`no-match` → 发射 `CAS_FIELD_GAP` | `profile-composition.test.ts` 正向/反向（`CAS_FIELD_GAP` 正 1 例 + 反向裸 Op 不报） | 22 绿 | 已闭合 |
 | 2.4 | 向后兼容（不改目录数据） | `git diff --name-only HEAD` 无 `src/class/*/index.json` 或 `src/play/profiles/*.json` | `git status` 白名单外 0 改动 | 全绿 | 已闭合 |
 | 3.1 | 匹配规则收敛为单一可调用函数 + 全称量化 | `caSFieldMatches`（唯一函数） | Property 1–3 | —— | 已闭合 |
 | 3.2 | l2/validation 与 play/audit 对同输入同判定 | `validateCompositionAlignment` 在 `kernelOpsIsStringArray` 分支委托 `caSFieldMatches(opName, declaredSlots)`，`no-match` → 发射 `CAS_FIELD_GAP`（T-CaS-02 落地）；play 侧已复用单一函数 | `ecs-system-binding.property.test.ts`：接线全落在声明槽位（无 GAP）正例 + `ghostField` 未声明（触发 GAP）反例 | l2 property vitest 绿 | 已闭合（T-CaS-02） |
 | 3.3 | 三态状态提供 | `CA_SCHEMA_OUTCOMES = ['match','no-match','not-applicable']` | Property 1 断言三态恰一 | —— | 已闭合 |
 | 3.4 | 不因调用层而变规则 | 匹配逻辑唯一在 `caSFieldMatches`，无方言 | —— | —— | 已闭合（唯一实现即天然一致） |
+| 3.5 | play 组合能力的 familyId 归属半环消费 ECS 单一源（T-CaS-04 play 侧） | `src/play/profiles/audit.ts::auditCapabilityComponentContract`：能力声明 `familyId` 且有 ECS 族形状时，profile 顶层字段必须落在「ECS 组件参数 ∪ CompositionShape.playLayerOwnedFieldNames 单一源」内，越界 → `ECS_ALIGN_FIELD_NOT_OWNED` | `profile-composition.test.ts`：真实组合零失配 + movement shape 已登记 apCost/range + 全族「单一源字段 ⊆ 类目录 compositionContract」逐项一致 + 归属环反例 | play vitest 绿 | 已闭合（T-CaS-04） |
 | 4.1 | CaS 与数值归属独立 | `caSFieldMatches` 只按 `parameters[*].key` 判定，不读 `playLayerOwnedFieldNames` | Property 5（空声明仍 no-match） | —— | 已闭合 |
 | 4.2 | 字段真空仍报缝隙 | `caSFieldMatches(field, 空集) === 'no-match'` | Property 5 | —— | 已闭合 |
 | 4.3 | 数值归属不吞并缝隙作 PBT 不变量 | 属性 5 固化 | —— | —— | 已闭合 |
 | 5.1 | 三件套落地 + 登记 not-adopted | `.kiro/specs/wakeup-cas-gap-closure/{requirements,design,tasks}.md`；`test/toolchain/spec-document-discipline.test.ts` SOURCE_TRACING_ADOPTION 登记 `wakeup-cas-gap-closure/requirements.md` | `spec-document-discipline.test.ts` 8/8 绿 | —— | 已闭合 |
 | 5.2 | 全量门禁全绿 | —— | —— | tsc 0 / lint 0 error / verify:docs 全过 / verify:data 90 / spec-document-discipline 8/8 | 已闭合 |
 | 5.3 | 不改变目录数据 | 见 2.4 行 | —— | —— | 已闭合 |
-| 5.4 | 唯一红=AI 线 combat-first 阶段2，登记交接 | —— | —— | 全量 vitest 3170/3171 唯一 failed `combat-first` 阶段2；登记 T-CaS-03 + `wakeup-ai/AI全对局能力规划.md` 附：跨线改动致歉 | 交接 T-CaS-03 |
-| 5.5 | 新增 CaS PBT/防回归 | `cas-field-alignment.property.test.ts`（6 条）+ 改写既有 2 文件断言码 | Property 1–6 | targeted 44/44 | 已闭合 |
+| 5.4 | ECS 单一源登记 playLayerOwnedFieldNames + play 归属环闭环（T-CaS-04） | `src/l2/model/family-component-shapes.ts`：`FAMILY_PLAY_LAYER_OWNED_FIELD_NAMES` + `registerShape` 逐族录入 `CompositionShape.playLayerOwnedFieldNames`；`composition-registry.ts`：`CompositionShape.familyId?` + `sameShape` 比对；`auditCapabilityComponentContract` 消费 `COMPOSITION_REGISTRY.listShapes()` 为 `ECS_ALIGN_FIELD_NOT_OWNED` 唯一权威 | `profile-composition.test.ts`：movement 族 shape 已登记 apCost/range + 全族「单一源字段 ⊆ 类目录 compositionContract」逐项一致 + 归属环；`component-alignment.property.test.ts` A1–A4（numRuns≥100） | play vitest 绿 / l2 property 绿 | 已闭合（T-CaS-04） |
+| 5.5 | 新增 CaS PBT/防回归 | `cas-field-alignment.property.test.ts`（6 条）+ `component-alignment.property.test.ts`（A1–A4）+ 改写既有断言码 | Property 1–6 + A1–A4 | targeted 绿 | 已闭合 |
 
-**审计结论**：本 spec 的**生产态组合侧（src/play/profiles）CaS 缝隙闭合** 于提交前全部要求达成（Req 1.1–1.5、2.1–2.4、3.1–3.4、4.1–4.3、5.1–5.5）。两条跨线**交接 T-CaS-02/T-CaS-01** 已获写权并落地：`src/l2/validation` 侧由 spec-compiler 路径委托到单一判定（T-CaS-02），`src/class/class-contract.ts` 能力契约新增可选 `familyId` 对齐入口（T-CaS-01）。全量 vitest 唯一红为 AI 并行线 `combat-first` 阶段2（T-CaS-03，另含 AI 线未跟踪 `probe-payload.test.ts` 的两个 payload 探针），非本线，已登记不代修。
+**审计结论**：本 spec 的**生产态组合侧（src/play/profiles）CaS 缝隙闭合** 于提交前全部要求达成（Req 1.1–1.5、2.1–2.4、3.1–3.4、4.1–4.3、5.1–5.5）。四条跨线交接 **T-CaS-01/02/03/04** 均在 2026-08-15 批次 A 落地：`src/l2/validation` 侧委托单一判定（T-CaS-02），`src/class/class-contract.ts` 能力契约新增 `familyId`/`componentId` 对齐入口 + `component-alignment.ts` 单一判定（T-CaS-01）、play 组合路径接入对齐器（T-CaS-03）、`src/l2/model` 单一源登记 `CompositionShape.playLayerOwnedFieldNames` 并接通 play 侧归属闭环（T-CaS-04）。全量 vitest 唯一红曾为 AI 并行线 `combat-first` 阶段2（T-CaS-03，另含未跟踪 probe-payload 探针），HEAD 81de9bd 已收敛转绿。

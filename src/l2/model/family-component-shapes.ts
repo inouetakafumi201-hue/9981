@@ -218,11 +218,33 @@ const FAMILY_SHAPES: readonly FamilyShape[] = Object.freeze([
 export const COMPOSITION_REGISTRY: CompositionRegistry = new CompositionRegistry();
 const shapeRegistry = new CompositionShapeRegistry();
 
+// 各语义族在类目录 `compositionContract.playLayerOwnedFieldNames` 中声明的玩法层归属字段名
+// （T-CaS-04 单一源登记；与 src/class/{action,attachment,container,movement,skill,status}/index.json 逐项一致）。
+const FAMILY_PLAY_LAYER_OWNED_FIELD_NAMES: Readonly<Record<SemanticFamilyId, readonly string[]>> = {
+  action: ['apCost', 'target', 'effects', 'kernelOp', 'kernelOps'],
+  attachment: ['duration', 'durationUnit', 'stacking', 'stackBehavior', 'priority'],
+  container: ['capacity', 'accessibleApCost', 'unlockConditions', 'volume'],
+  movement: ['cost', 'speed', 'range', 'terrainModifier', 'collisionEffect', 'apCost'],
+  skill: ['cost', 'cooldownTurns', 'duration', 'amount'],
+  status: ['duration', 'durationUnit', 'stacking', 'stackBehavior', 'priority', 'effects', 'breakConditions', 'interactionMatrix', 'icon', 'color'],
+  shield: [],
+  damage: [],
+};
+
 for (const familyShape of FAMILY_SHAPES) {
   for (const component of familyShape.components) {
     COMPOSITION_REGISTRY.registerComponent(component);
   }
   shapeRegistry.register(familyShape);
+  // T-CaS-04：族级归属字段名登记进 CompositionShape 单一源（按族一次）。
+  COMPOSITION_REGISTRY.registerShape({
+    id: `compositionShape.${familyShape.familyId}`,
+    classIds: familyShape.components.map((component) => component.id),
+    capabilityIds: familyShape.components.map((component) => component.id),
+    compositionKind: familyShape.components[0]?.compositionKind ?? 'static',
+    playLayerOwnedFieldNames: Object.freeze([...FAMILY_PLAY_LAYER_OWNED_FIELD_NAMES[familyShape.familyId] ?? []]),
+    familyId: familyShape.familyId,
+  });
 }
 
 /** 全部 8 族组件形状，集中导出供下游消费。 */
@@ -231,4 +253,14 @@ export const ALL_FAMILY_SHAPES: readonly FamilyShape[] = Object.freeze([...FAMIL
 /** 解析某族组件形状，`familyId` 未登记时返回 null。 */
 export function resolveFamilyComponentShape(familyId: SemanticFamilyId): FamilyShape | null {
   return shapeRegistry.resolveFamilyShape(familyId);
+}
+
+/**
+ * 族形状索引（familyId → FamilyShape）的确定性快照。
+ *
+ * 供 class-contract 的 ECS 对齐校验器一次性取全（T-CaS-01）：避免对每条能力重复做
+ * O(n) 线性查找，同时保持输出语义与 `resolveFamilyComponentShape` 完全一致。
+ */
+export function compileFamilyComponentShapeIndex(): ReadonlyMap<SemanticFamilyId, FamilyShape> {
+  return new Map(FAMILY_SHAPES.map((shape) => [shape.familyId, shape]));
 }

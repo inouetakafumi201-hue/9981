@@ -103,6 +103,8 @@ export interface CompositionShape {
   readonly compositionKind: CompositionKind;
   /** 玩法层归属字段名（值由 L3 填）。 */
   readonly playLayerOwnedFieldNames: readonly string[];
+  /** 该组合形状所有者的族 id（`CompositionRegistry` 登记的唯一键解析为族级形状，缺省视为族形状）。 */
+  readonly familyId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -284,7 +286,8 @@ function sameShape(left: CompositionShape, right: CompositionShape): boolean {
     arraysEqual(left.classIds, right.classIds) &&
     arraysEqual(left.capabilityIds, right.capabilityIds) &&
     left.compositionKind === right.compositionKind &&
-    arraysEqual(left.playLayerOwnedFieldNames, right.playLayerOwnedFieldNames)
+    arraysEqual(left.playLayerOwnedFieldNames, right.playLayerOwnedFieldNames) &&
+    (left.familyId ?? '') === (right.familyId ?? '')
   );
 }
 
