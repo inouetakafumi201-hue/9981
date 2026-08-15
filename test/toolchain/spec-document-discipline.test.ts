@@ -459,6 +459,14 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
     state: 'not-adopted',
     note: '10 条要求，0 采纳。保持 not-adopted 的原因：本 spec 用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer，不能改 fully-adopted（改 fully 会让守卫要求每节恰一个来源 footer而立即撞红）。2026-08-14 基类层 ECS 收敛专项（收束专项）PT-11 已完成实施且门禁全绿（tsc0/vitest3125/lint0err/verify:docs/verify:data/spec-document-discipline 8 绿）；产出=composition-registry.ts（component.* 集中登记）+ family-component-shapes.ts（8 族组件形状）+ composition-alignment-rules.ts（COMPOSITION_KIND_*/SYSTEM_BINDING_*）+ 10 属性测试（test/l2/properties/ecs-*）。基类层↔玩法层对接未闭合，登记为交接项 H-ECS-06/07。结构规则规范：组件契约单一源、家族目录收敛为组件形状、原子 System 接线、vehicle 降级为组合型组件族；接受标准体 + 要求子句回溯，无逐条来源追踪 footer',
   }],
+  ['.kiro/specs/wakeup-base-layer-bombardment/requirements.md', {
+    state: 'not-adopted',
+    note: '属性/验收计数，0 采纳。2026-08-15 基类层收官属性+压力轰炸专项 Spec（测试/验收规格，非逐条来源追踪风格）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer。产出=src/class/__tests__/base-layer-bombardment-*.test.ts（6 文件）+ harness + composition-alignment-rules.ts 接线注。执行报告登记于本 spec 目录 execution-report.md。kernelOps↔OpRegistry.listOpNames 机械闭环升格；npcs/weapons 族特有待裁决未注册 Op 名登记为 KNOWN_FAMILY_PENDING_OPS',
+  }],
+  ['.kiro/specs/wakeup-cas-gap-closure/requirements.md', {
+    state: 'not-adopted',
+    note: '5 条要求。2026-08-15 CaS 缝隙闭合专项：把「组件字段名↔System 参数名同碰」的机器闭合从两条并列、规则不同、无单一依赖的实现收敛为单一权威判定函数 caSFieldMatches（src/l2/model/cas-field-alignment.ts）+ 单一诊断码 CAS_FIELD_GAP（入 src/l2/model/diagnostic-codes.ts）+ 生产态组合路径（src/play/profiles/audit.ts）可观察入口。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer。涉及 src/play/**、src/class/** 的跨线交付物写权放开后落地，未授权则登记 T-CaS-04 交接；combat-first 阶段2 红测归 AI 并行线 T-CaS-03',
+  }],
 ]);
 
 /** 逐条要求的标题行：中文「要求 N」与英文「Requirement N」两种标题式在本仓库并存。 */

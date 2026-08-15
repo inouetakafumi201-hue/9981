@@ -11,6 +11,7 @@
  *  - 同上 需求 12.1-12.4（引用在装载前必须全部解析且类型匹配）
  */
 import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import { CAS_FIELD_GAP_CODE, caSFieldMatches } from '../../l2/model/cas-field-alignment.js';
 import {
   familyFor,
   type ClassEntry,
@@ -229,17 +230,11 @@ function auditKernelOpsAlignment(
       // `scopeField` 形态：`prop.set(hp)` 这类携带字段名的接线、或裸 `prop.set`。
       const openParen = scopeField.indexOf('(');
       const opName = openParen === -1 ? scopeField : scopeField.slice(0, openParen);
-      // 只有当接线带字段引用时才有可对齐的槽位；裸 `prop.set` 无法推导字段名，跳过（不误报）。
-      if (!scopeField.includes('(') || !scopeField.endsWith(')')) continue;
+      // 单一权威判定（wakeup-cas-gap-closure Req 1.1/1.2/1.5）：字段↔参数名同轨、裸 Op 不适用。
+      // 由 `src/l2/model/cas-field-alignment.ts::caSFieldMatches` 收敛，禁止再在各处内联一套。
+      if (caSFieldMatches(scopeField, declared) !== 'no-match') continue;
       const fieldHint = scopeField.slice(openParen + 1, -1);
-      // 字段名归属对齐是宽松前缀匹配：`prop.<field>`、`<field>.<nested>`、`<nested>.<field>` 都视为同一槽位。
-      const fieldMatches = [...declared].some((declaredField) =>
-        fieldHint === declaredField
-        || fieldHint === `prop.${declaredField}`
-        || fieldHint.startsWith(`${declaredField}.`)
-        || fieldHint.endsWith(`.${declaredField}`));
-      if (fieldMatches) continue;
-      findings.push(finding('PLAY-REF-KERNELOPS-FIELD-GAP', profile.sourceId,
+      findings.push(finding(CAS_FIELD_GAP_CODE, profile.sourceId,
         `/classComposition/${capabilityField}/${position}/kernelOps`,
         `能力 ${capabilityId} 的 ECS 接线 ${opName} 引用字段 ${fieldHint}，但该能力未在 parameters 声明这个槽位（CaS 缝隙）。`
         + `在基类层能力 parameters 补声明，或在玩法层对应字段改名对齐。`));

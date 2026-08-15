@@ -261,6 +261,7 @@ export const L2_DIAGNOSTIC_SELECTORS = {
   [DIAGNOSTIC_CODES.COMPOSITION_KIND_INVALID]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
   [DIAGNOSTIC_CODES.COMPONENT_ID_CONFLICT]: { category: 'IDENTITY_CONFLICT', condition: 'duplicate-id' },
   [DIAGNOSTIC_CODES.MISSING_CAPABILITY_FOR_COMPOSE]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
+  [DIAGNOSTIC_CODES.CAS_FIELD_GAP]: { category: 'COMPOSITION_CONFLICT', condition: 'composition-conflict' },
 } as const satisfies Readonly<Record<DiagnosticCode, DiagnosticSelector>>;
 
 /** 投影时无法识别 l2 代码或严重级别不可表达时使用的失败关闭选择器。 */

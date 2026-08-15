@@ -233,6 +233,9 @@ export const DIAGNOSTIC_CODES = {
   COMPOSITION_KIND_INVALID: 'COMPOSITION_KIND_INVALID',
   COMPONENT_ID_CONFLICT: 'COMPONENT_ID_CONFLICT',
   MISSING_CAPABILITY_FOR_COMPOSE: 'missing-capability-for-compose',
+
+  // ── CaS 缝隙闭合：组件字段名 ↔ System 参数名（wakeup-cas-gap-closure Req 1.3） ──
+  CAS_FIELD_GAP: 'CAS_FIELD_GAP',
 } as const;
 
 export type DiagnosticCode = (typeof DIAGNOSTIC_CODES)[keyof typeof DIAGNOSTIC_CODES];

@@ -108,7 +108,7 @@ describe('Property Bx: play↔class 数值归属不越层(任意组合与任意 
           >;
           composition['capabilityIds'] = [mock.id];
           const gap = auditClassLayerReferences([profile], withGapFamily)
-            .filter((item) => item.code === 'PLAY-REF-KERNELOPS-FIELD-GAP')
+            .filter((item) => item.code === 'CAS_FIELD_GAP')
             .map((item) => item.reason);
           const argName = raw.kernelOp.slice(raw.kernelOp.indexOf('(') + 1, -1);
           if (argName === raw.knownSlot) {

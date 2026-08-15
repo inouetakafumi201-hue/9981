@@ -169,7 +169,7 @@ describe('组合关系：基类层引用', () => {
 
   it('ECS 接线：现有组合的每个能力 kernelOps 引用槽位都能映射到其 parameters，无 CaS 缝隙', () => {
     const divergent = auditClassLayerReferences(profiles, classIndex)
-      .filter((item) => item.code === 'PLAY-REF-KERNELOPS-FIELD-GAP');
+      .filter((item) => item.code === 'CAS_FIELD_GAP');
     expect(describeFindings(divergent)).toEqual([]);
   });
 
@@ -199,7 +199,7 @@ describe('组合关系：基类层引用', () => {
     const composition = (composed.document as Record<string, unknown>)['classComposition'] as Record<string, unknown>;
     composition['capabilityIds'] = ['vehicle.capability.mock_ghost'];
     const gap = auditClassLayerReferences([composed], corruptedIndex).filter(
-      (item) => item.code === 'PLAY-REF-KERNELOPS-FIELD-GAP');
+      (item) => item.code === 'CAS_FIELD_GAP');
     expect(gap.length).toBe(1);
     expect(gap[0]!.reason).toContain('ghostField');
   });
