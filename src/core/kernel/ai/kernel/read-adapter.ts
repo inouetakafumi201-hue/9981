@@ -22,6 +22,14 @@ import type { AIReadAdapter, AIReadVersions, ReadAuthority } from '../read-gatew
 import type { AIResult, BeliefSlice, KnownFact } from '../types.js';
 import { fingerprint, resolveRefDefId, resolveRefProps, resolveRefValuePath, resolveStatePath } from './state-read.js';
 
+/** 倒地（零血未终结）的 tag：规则 effect 把 `tag:downed` 写进实体 tags，感知投影据此补 `defeated` 事实。 */
+const TAG_DOWNED = 'tag:downed';
+
+/** 取一个 Ref 指向的状态持有对象（Entity/Item/Node/Link），供读 tags 判断倒地威胁。 */
+function holderFor(state: WorldState, ref: Ref): { tags?: unknown[] } | null {
+  return (state.entities?.[ref.$] ?? state.items?.[ref.$] ?? state.nodes?.[ref.$] ?? state.links?.[ref.$] ?? null) as { tags?: unknown[] } | null;
+}
+
 /** Minimal legal-action source; the real ActionCatalog satisfies it structurally. */
 export interface LegalActionSource {
   queryActions(actor: Ref, mode: QueryMode): LegalAction[];
@@ -156,6 +164,12 @@ export class KernelAIReadAdapter implements AIReadAdapter {
       if (props === null) continue;
       for (const [name, value] of Object.entries(props)) {
         visibleFacts[`${ref.$}.${name}`] = value;
+      }
+      // 倒地威胁投影（M9）：若该实体带着 `tag:downed`（零血被打倒、尚未被令其长眠移除），
+      // 就在事实键补一个 `<id>.defeated`=1 标记。设计货币据此把「一具悬着的倒地尸体」当成本
+      // 未终结的威胁计罚（得分表 defeated 分支），直到它被令其长眠（entity.destroy）移出战场。
+      if (Array.isArray(holderFor(state, ref)?.tags) && (holderFor(state, ref) as { tags?: unknown[] }).tags!.includes(TAG_DOWNED)) {
+        visibleFacts[`${ref.$}.defeated`] = 1;
       }
     }
 

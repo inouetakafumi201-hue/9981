@@ -41,6 +41,13 @@ export interface DesignCurrencyEntry {
   };
   /** 稀缺性（可选）：值越低权重按此系数上调，建模「少越珍贵」。 */
   readonly scarcity?: { readonly floor: number; readonly ceiling: number; readonly coefficient: number };
+  /**
+   * 可选：倒地威胁费目结果。费目值为某实体（如敌方）当前「是否已倒地但未被终结」的标记
+   * （`<id>.downedZero` / `<id>.defeated` 型事实）。当它被观测到且命中时，把该费目当量换成
+   * 绝对悬着惩罚（死亡锚），命令 AI 优先「令其长眠」把这具倒地的尸体移出战场，而不是继续打
+   * 尸体（M9 终结语义）。`continue` 式消费在 `scoreDesignCurrency` 里实现。
+   */
+  readonly defeated?: { readonly when: (mark: number) => boolean };
 }
 
 /** 死亡锚（占位目标：血 1→0 为 -10），其余原则可继续增补。 */
@@ -75,6 +82,12 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     field: 'heal',
     unit: 3,
   },
+  // 武器攻击力（E）：攻击力越高，把目标打进击杀窗口越划算——竞技武器价值真实进入分数表
+  // （阶段4a/m8「更强者更优」）的定价落点。武器是 item（`i:sword.E`），不是实体。
+  {
+    field: 'E',
+    unit: 2,
+  },
   // 移动（可移动的节点距离），探索/资源可达为价值。
   {
     field: 'range',
@@ -94,6 +107,9 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.deathAnchor * -1 },
     // 敌方血越少，击杀那刀价值越接近满当量（补刀/终场动力）。
     scarcity: { floor: 1, ceiling: 5, coefficient: 0.5 },
+    // M9：敌方带倒地威胁事实（`e:enemy.downedZero`=1）而未终结时，击杀奖励不发放、换悬着
+    // 惩罚，直到被「令其长眠」清除。这样 AI 面对「倒地敌人」唯一正确收敛是去终结它。
+    defeated: { when: (mark) => mark === 1 },
   },
   // AP（回合预算）：保有 AP 即保有行动机会。真实场在 world.props.pools.ap.<scope>.real，
   // 经 read-adapter 的资源池投影实体化到实体 props `pool.ap`。压零 = 动作机会清零，绝对值负分。
@@ -101,6 +117,17 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     field: 'pool.ap',
     unit: 2,
     adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.exhaustionAnchor },
+  },
+  // 武器等级（E）：把「持有/靠近更强武器」记正分——越强的武器对进攻的促进越大，越到高档
+  // 边际越贵（M8「更强者更优」/阶段4「拾取→更强→进攻」的估值落点，AI全对局能力规划 4.1/4.3）。
+  // 字段匹配：read-adapter 把物品 Def 元数据投影成 `<id>.E`（如 `i:sword.E`），observedNumber
+  // 按「键以 `.字段` 结尾」后缀匹配，裸「E」即可命中任意 `<id>.E`。武器族是唯一携带 E 级的事实，
+  // 活体/资源池无 E 字段，不会误收；攻击动作本身不改数值、不因武器变伤害量（避免给同一动作拍两个
+  // 行为），强武器的加成只体现在「装备该武器比空手/弱武器更优」的估值面。
+  {
+    field: 'E',
+    unit: 1,
+    scarcity: { floor: 1, ceiling: 5, coefficient: 0.4 },
   },
   // 体力（清醒值）：强力骰 / 处决恢复的机会。真实场在 world.props.pools.stamina.<scope>.real。
   // 压零 = 自断强骰/处决机会，绝对值负分（不亚于进入致死窗口）。
@@ -148,6 +175,18 @@ export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
     const value = observedNumber(context.slice, entry.field);
     if (value === null) continue; // 未知不打分
 
+    // 倒地威胁优先：一旦命中（该实体已倒地但未被终结），直接给绝对悬着惩罚并跳过此费目的
+    // 常规当量/击杀奖励——「一具悬着的尸体」不该给进攻收益，只有被令其长眠（清除事实键）
+    // 之后才释放击杀奖励。这是 M9 终结语义在分值面的落点：继续打尸体 vs 终结它，后者是唯一
+    // 能移除这个绝对惩罚的分支，理性 AI 会选它。
+    if (entry.defeated !== undefined) {
+      const mark = observedNumber(context.slice, defeatedFieldOf(entry.field));
+      if (mark !== null && entry.defeated.when(mark)) {
+        v += DESIGN_CURRENCY_PRINCIPLES.deathAnchor;
+        continue;
+      }
+    }
+
     // 分水岭修正优先：一旦触发，直接给绝对修正并跳过该费目的常规当量（避免被边缘收益倒挂）。
     if (entry.adjustment !== undefined && entry.adjustment.when(value)) {
       v += entry.adjustment.value;
@@ -166,6 +205,16 @@ export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
     v += charge;
   }
   return v;
+}
+
+/**
+ * 由费目标的「值字段」推导同名「倒地威胁事实键」：`e:enemy.vitality` → `e:enemy.downedZero`。
+ * 倒地标记由 read-adapter 在感知投影里补 tag 时写入（`<id>.downedZero`，见 kernel/read-adapter）。
+ */
+function defeatedFieldOf(field: string): string {
+  const dot = field.lastIndexOf('.');
+  const prefix = dot === -1 ? '' : field.slice(0, dot + 1);
+  return `${prefix}defeated`;
 }
 
 /**

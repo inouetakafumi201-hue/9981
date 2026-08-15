@@ -467,6 +467,10 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
     state: 'not-adopted',
     note: '5 条要求。2026-08-15 CaS 缝隙闭合专项：把「组件字段名↔System 参数名同碰」的机器闭合从两条并列、规则不同、无单一依赖的实现收敛为单一权威判定函数 caSFieldMatches（src/l2/model/cas-field-alignment.ts）+ 单一诊断码 CAS_FIELD_GAP（入 src/l2/model/diagnostic-codes.ts）+ 生产态组合路径（src/play/profiles/audit.ts）可观察入口。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer。涉及 src/play/**、src/class/** 的跨线交付物写权放开后落地，未授权则登记 T-CaS-04 交接；combat-first 阶段2 红测归 AI 并行线 T-CaS-03',
   }],
+  ['.kiro/specs/wakeup-map-editor-devboard/requirements.md', {
+    state: 'not-adopted',
+    note: '地图编辑器开发板专项 requirements（并行产出，未采纳）。2026-08-15 开发板 web 应用 spec：Vite+React+TS 从零搭建的独立 web 应用（src/devboard/）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体，非逐条「来源追踪」footer。此条为本会话维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检）；其业务实现与 src/devboard/** 均属外部并行线交付物，不在本 AI 线审计范围',
+  }],
 ]);
 
 /** 逐条要求的标题行：中文「要求 N」与英文「Requirement N」两种标题式在本仓库并存。 */
