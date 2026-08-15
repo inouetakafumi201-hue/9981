@@ -39,6 +39,7 @@ export function serializeMapPublish(bundle: ExportBundle): string {
     id: bundle.map.id,
     name: bundle.map.name,
     backdrop: bundle.map.backdrop,
+    floors: bundle.map.floors,
     layers: bundle.layers.map((l) => ({
       id: l.id,
       ...(l.name !== undefined ? { name: l.name } : {}),
