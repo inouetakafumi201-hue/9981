@@ -17,7 +17,7 @@ import type { OpRegistry } from '../../core/kernel/ops/registry.js';
 import type { DefRegistry } from '../../core/kernel/state/def.js';
 import type { Def } from '../../core/kernel/state/def.js';
 import type { RuleProvider } from '../../core/kernel/events/rule-provider.js';
-import type { PlaypackLoader } from '../../core/kernel/schedule/playpack.js';
+import type { PlaypackDef, PlaypackLoader, OutcomeDef } from '../../core/kernel/schedule/playpack.js';
 import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
 import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
 import type { ErrCode } from '../../core/kernel/state/error-codes.js';
@@ -28,6 +28,8 @@ import type { AttachmentDef } from '../../core/kernel/attachment/types.js';
 import type { RuleDef } from '../../core/kernel/events/types.js';
 import type { LegalAction } from '../../core/kernel/actions/types.js';
 import { createProjection } from './projection.js';
+import { createTerminalQuery, consumePlayerQueue as consumePlayerQueueOp } from './match-lifecycle.js';
+import type { TerminalQuery } from './match-lifecycle.js';
 import type {
   BlockedCapability,
   BlockedCapabilityConfig,
@@ -52,7 +54,6 @@ import {
   PATH_NPC_ENABLED,
   PATH_ROLL_POLICY_READY,
   PATH_TURN_ORDER,
-  PHASE_SETTLE,
   POOL_AP,
 } from './defs/ids.js';
 import { FORBIDDEN_STACK_STRATEGY } from './defs/attachments.js';
@@ -162,6 +163,13 @@ export interface CoreMechanicsRuntime {
 export interface CoreMechanicsLoadOptions {
   readonly runtime: CoreMechanicsRuntime;
   readonly config: CoreMechanicsConfig;
+  /**
+   * 要装载的玩法包（D-081 / L0 第十四条：装载权限不分级）。缺省时为官方
+   * `CoreMechanicsPlaypack`——官方 TS 包只保留"默认装载的第一个包"地位，不再拥有源码特权；
+   * 传入任意 `PlaypackDef`（官方 TS 构造或 UGC JSON 反序列化）都经同一装载契约进入注册表，
+   * 装载后 Def 快照地位等价。
+   */
+  readonly playpack?: PlaypackDef;
 }
 
 export interface CoreMechanicsLoadResult {
@@ -170,6 +178,8 @@ export interface CoreMechanicsLoadResult {
   /** 装载成功后可用的只读投影；失败时为 null（不返回半可用对象）。 */
   readonly projection: unknown | null;
   readonly blocked: readonly BlockedCapability[];
+  /** 装载期声明的结局种类（CEME C-1：playpack.outcomes 非空守恒集）。 */
+  readonly outcomes: readonly OutcomeDef[];
 }
 
 // ---------------------------------------------------------------------------
@@ -279,14 +289,16 @@ function writesTurnOrder(node: unknown): boolean {
 /**
  * 玩法层 Linter：把 design.md 2.6 与 3.x 的装载期校验逐条落地。全部复用既有 ERR_CODES，不新增码。
  *
- * @param defs   玩法包的全部定义（含 Playpack 自身）
- * @param config 玩法层配置
- * @param opNames 引擎层当前已注册的 Op 名全集（用于 Op 合法性校验）
+ * @param defs       玩法包的全部定义（含 Playpack 自身）
+ * @param config     玩法层配置
+ * @param opNames    引擎层当前已注册的 Op 名全集（用于 Op 合法性校验）
+ * @param playpackId 被装载玩法包的 id（只作配置诊断的归属锚点；诊断内容与包无关）
  */
 export function coreMechanicsLinter(
   defs: readonly Def[],
   config: CoreMechanicsConfig,
   opNames: ReadonlySet<string>,
+  playpackId: string,
 ): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
@@ -360,7 +372,7 @@ export function coreMechanicsLinter(
   }
 
   diagnostics.push(...lintParallelism(defs, config));
-  diagnostics.push(...lintConfig(config));
+  diagnostics.push(...lintConfig(config, playpackId));
   return diagnostics;
 }
 
@@ -391,11 +403,11 @@ function lintParallelism(defs: readonly Def[], config: CoreMechanicsConfig): Dia
 }
 
 /** 配置级校验：未冻结引用、恢复来源完整性、状态生命周期约束（design.md 3.13、3.15）。 */
-function lintConfig(config: CoreMechanicsConfig): Diagnostic[] {
+function lintConfig(config: CoreMechanicsConfig, playpackId: string): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
   // 未冻结项引用（U-001 / T-001 / T-002 数值 / U-003）。
-  diagnostics.push(...validateConfigUnresolvedRefs(config, CoreMechanicsPlaypack.id));
+  diagnostics.push(...validateConfigUnresolvedRefs(config, playpackId));
 
   // 恢复来源：七项字段齐备（Requirement 15.6），且同 (triggerPoint, resource, targetEligibilityRef) 不重复。
   const recoveryKeys = new Set<string>();
@@ -451,12 +463,19 @@ function hasBlocking(diagnostics: readonly Diagnostic[]): boolean {
 /**
  * 装载核心机制玩法包。
  *
+ * 玩法包来源（D-081 / L0 第十四条）：`opts.playpack` 未传时默认官方 `CoreMechanicsPlaypack`——
+ * 官方包只是"默认装载的第一个玩法包"，不再持有源码特权。注入包的 def 集合、id 与规则集合
+ * 决定本装载的一切派生：lint 目标、`PlaypackLoader.load` 输入、配置校验锚点、常驻规则挂载
+ * 与 `CoreMechanicsFacade` 的附着动作集。默认路径（不传 playpack）的派生输入与改造前
+ * 逐字节一致，行为不变。
+ *
  * 顺序：玩法层 Linter + 配置校验（先于任何注册表改动）→ 若阻塞则原子拒绝（注册表状态不变）→
  * PlaypackLoader.load（引擎层 Linter + 注册 defs）→ 规则挂进 RuleProvider → 写装载期世界配置 →
  * 构造只读投影。任一诊断为 error/fatal → ok:false、projection:null（不返回半可用对象）。
  */
 export function loadCoreMechanics(opts: CoreMechanicsLoadOptions): CoreMechanicsLoadResult {
   const { runtime, config } = opts;
+  const playpack = opts.playpack ?? CoreMechanicsPlaypack;
   const diagnostics: Diagnostic[] = [];
   const blocked = collectBlockedCapabilities(config);
 
@@ -466,22 +485,32 @@ export function loadCoreMechanics(opts: CoreMechanicsLoadOptions): CoreMechanics
   // 合法写 turnOrder 的结算规则误判指向 playpack 根（kind==='playpack' 非 settle），报
   // E_LOAD_LAYER_OWNERSHIP。叶子 def 已各自携带归属扩展并会被逐条校验。
   const opNames = new Set(runtime.registry.listOpNames());
-  const lintTargets: Def[] = [...CoreMechanicsPlaypack.defs];
-  diagnostics.push(...coreMechanicsLinter(lintTargets, config, opNames));
+  const lintTargets: Def[] = [...playpack.defs];
+  diagnostics.push(...coreMechanicsLinter(lintTargets, config, opNames, playpack.id));
   if (hasBlocking(diagnostics)) {
-    return { ok: false, diagnostics, projection: null, blocked };
+    return { ok: false, diagnostics, projection: null, blocked, outcomes: playpack.outcomes ?? [] };
   }
 
   // Step 3：引擎层装载（PlaypackLoader 内部 fork 一个候选注册表，失败不影响活动注册表）。
-  const loadResult = runtime.playpackLoader.load(CoreMechanicsPlaypack);
+  const loadResult = runtime.playpackLoader.load(playpack);
   diagnostics.push(...loadResult.diagnostics);
   if (!loadResult.ok) {
-    return { ok: false, diagnostics, projection: null, blocked };
+    return { ok: false, diagnostics, projection: null, blocked, outcomes: playpack.outcomes ?? [] };
   }
 
-  // Step 4：常驻规则挂进同一 Hook 管道。
-  for (const rule of CORE_MECHANICS_RULES) {
-    runtime.ruleProvider.add(rule as RuleDef);
+  // Step 4：常驻规则挂进同一 Hook 管道。规则集合同样随注入包派生：官方包经
+  // CORE_MECHANICS_RULES 提供，注入包从自己的 `rules` 引用解析（与 PlaypackActivator 同语义，
+  // 见 playpack-runtime.ts 的 mountPermanentRules）。注入包未声明 rules 时不挂任何规则。
+  const mountedRuleIds = playpack === CoreMechanicsPlaypack
+    ? CORE_MECHANICS_RULES.map((rule) => rule.id)
+    : playpack.rules ?? [];
+  for (const ruleId of mountedRuleIds) {
+    const definition = runtime.defRegistry.resolve(ruleId);
+    if (definition === null || definition.kind !== 'rule') {
+      diagnostics.push(lintDiag('E_LOAD_UNDEFINED_REF', `注入包 ${playpack.id} 的常驻规则 ${ruleId} 不存在或不是 RuleDef`, ruleId, { reason: 'undefined_ref' }));
+      return { ok: false, diagnostics, projection: null, blocked, outcomes: playpack.outcomes ?? [] };
+    }
+    runtime.ruleProvider.add(definition as RuleDef);
   }
 
   // Step 5：写装载期世界配置（合法 Op 调用，不直接改 WorldState）。
@@ -497,14 +526,14 @@ export function loadCoreMechanics(opts: CoreMechanicsLoadOptions): CoreMechanics
     const result = runtime.registry.invoke<{ path: string; value: Value }, void>('prop.set', write);
     if (!result.ok) {
       diagnostics.push(lintDiag('E_LOAD_ACTIVATION_FAILED', `写装载期世界配置失败：${write.path} → ${result.detail}`, undefined, { reason: 'invariant_violated' }));
-      return { ok: false, diagnostics, projection: null, blocked };
+      return { ok: false, diagnostics, projection: null, blocked, outcomes: playpack.outcomes ?? [] };
     }
   }
 
   const projection = runtime.queryActions
     ? createProjection({ getState: () => runtime.holder.getState(), queryActions: runtime.queryActions })
     : null;
-  return { ok: true, diagnostics, projection, blocked };
+  return { ok: true, diagnostics, projection, blocked, outcomes: playpack.outcomes ?? [] };
 }
 
 // ---------------------------------------------------------------------------
@@ -530,11 +559,22 @@ export interface SubmitAck {
  * 内部只做参数整形 + `OpRegistry.invoke`，不做来源相关分支，不抛玩法层异常。
  */
 export class CoreMechanicsFacade {
+  private readonly registry: OpRegistry;
   private readonly attachedActionIds: ReadonlySet<string>;
 
-  constructor(private readonly registry: OpRegistry) {
+  /**
+   * @param registry 引擎层 Op 注册表（与 `loadCoreMechanics` 的 runtime.registry 同一实例）。
+   * @param playpack 该 Facade 服务的目标玩法包；缺省为官方 `CoreMechanicsPlaypack`
+   *   （与 `loadCoreMechanics` 的默认包一致）。附着动作全集随注入包派生——默认路径的派生输入
+   *   与改造前逐字节一致，行为不变。
+   */
+  constructor(
+    registry: OpRegistry,
+    playpack: PlaypackDef = CoreMechanicsPlaypack,
+  ) {
+    this.registry = registry;
     this.attachedActionIds = new Set(
-      CoreMechanicsPlaypack.defs
+      playpack.defs
         .filter((def): def is ActionDef => def.kind === 'action' && playExtensionOf(def)?.costClass === 'attached')
         .map((def) => def.id),
     );
@@ -566,4 +606,15 @@ export class CoreMechanicsFacade {
   advancePhase(): Result<void> {
     return this.registry.invoke<Record<string, never>, void>('schedule.advance', {});
   }
+
+  consumePlayerQueue(): Result<void> {
+    return consumePlayerQueueOp(this.registry);
+  }
+
+  /** 装载后的终局/回合只读查询（round / matchEnded 均为 Internal_Metric，投影禁止展示）。 */
+  terminal(): TerminalQuery {
+    // 只读当前已提交的顶层状态（holder 是顶层事务的唯一状态源，registry 内部持有它）。
+    return createTerminalQuery(() => this.registry['holder'].getState());
+  }
 }
+

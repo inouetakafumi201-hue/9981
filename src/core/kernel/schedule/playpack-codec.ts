@@ -22,7 +22,18 @@ const EFFECT_KEYS = ['op', 'let', 'if', 'forEach', 'while', 'emit', 'after', 'at
 const EXPR_KEYS = ['path', 'var', 'op', 'q', 'call'] as const;
 const COMMON_DEF_FIELDS = new Set([
   'id', 'kind', 'extends', 'abstract', 'tags', 'props', 'containers',
-  'slots', 'actions', 'rules', 'clamp', 'schema',
+  'slots', 'actions', 'rules', 'clamp', 'schema', 'play',
+]);
+
+/**
+ * `PlayDefExtension`（src/play/core-mechanics/ownership.ts）的字段全集。本 codec 只做**结构**校验：
+ * `numericOwnership` 每条登记的值语义（kind/min/max/int/note/rationale/sourceId 是否自洽）、
+ * `sourceTrace` 的可解析性、`unresolvedGuards` 的编号是否登记，一律留给玩法层 Linter
+ * （src/play/core-mechanics/load.ts），这里不重复实现任何值语义判断。
+ */
+const PLAY_EXTENSION_FIELDS = new Set([
+  'numericOwnership', 'costClass', 'parentActions', 'triggerPoint', 'requireRef',
+  'onFailure', 'sourceTrace', 'unresolvedGuards', 'presentation',
 ]);
 const PLAYPACK_FIELDS = new Set([
   ...COMMON_DEF_FIELDS, 'version', 'schedule', 'pools', 'conflicts',
@@ -236,6 +247,57 @@ class Validator {
 
     if (value['schema'] !== undefined && !isRecord(value['schema'])) {
       this.problem('E_LOAD_FIELD_TYPE', this.child(path, 'schema'), 'schema must be an object');
+    }
+
+    if (value['play'] !== undefined) this.playExtension(value['play'], this.child(path, 'play'));
+  }
+
+  /**
+   * `PlayDefExtension` 的宽松结构校验（见文件顶部 `PLAY_EXTENSION_FIELDS` 的说明）。
+   *
+   * 只确认"放行字段的形状能安全地交给玩法层 Linter"，不做任何值语义判断：`numericOwnership`
+   * 每条登记的 kind 是否合法、`sourceTrace` 是否可解析、`unresolvedGuards` 编号是否已登记，
+   * 都是玩法层 `validateNumericOwnership` / `validateProvenance` / `validateUnresolvedGuards`
+   * 的职责。这里报出的全部是 `E_LOAD_FIELD_TYPE` / `E_LOAD_CROSS_FIELD_CONSTRAINT` 结构诊断。
+   */
+  private playExtension(value: unknown, path: string): void {
+    if (!this.record(value, path, 'play extension')) return;
+    this.knownFields(value, PLAY_EXTENSION_FIELDS, path);
+
+    const ownership = this.optionalRecord(value, 'numericOwnership', path);
+    if (ownership) {
+      for (const [key, entry] of Object.entries(ownership)) {
+        if (!this.record(entry, this.child(this.child(path, 'numericOwnership'), key), 'numericOwnership entry')) return;
+        this.knownFields(entry, new Set(['kind', 'min', 'max', 'int', 'note', 'rationale', 'sourceId']), this.child(this.child(path, 'numericOwnership'), key));
+      }
+    }
+
+    // sourceTrace 必填（PlayDefExtension 的必填字段；缺失时玩法层 validateProvenance 报
+    // E_LOAD_NORMATIVE_WITHOUT_PROVENANCE）。这里只校验"存在且是 string 数组"。
+    if (value['sourceTrace'] === undefined) {
+      this.missing(path, 'sourceTrace');
+    } else {
+      this.requiredStringArray(value, 'sourceTrace', path);
+    }
+
+    this.optionalEnum(value, 'costClass', path, ['paid', 'attached']);
+    this.optionalEnum(value, 'triggerPoint', path, ['beforeParentEffects', 'afterParentEffects']);
+    this.optionalEnum(value, 'onFailure', path, ['rejectWholeAction', 'skipAttachedOnly']);
+    this.optionalString(value, 'requireRef', path);
+
+    // parentActions / unresolvedGuards 在 PlayDefExtension 里是数组形态，玩法层 Linter 也按数组读
+    // （lintParallelism 逐项计数、validateUnresolvedGuards 调 forEach）。因此这里**不**放行裸字符串：
+    // 裸字符串会通过本校验却在玩法层 Linter 上以字符为单位迭代或直接崩溃，等于制造"能解码、不能装载"
+    // 的假装载等价。JSON 包必须与官方 TS 包一样写数组。
+    this.optionalStringArray(value, 'parentActions', path);
+    this.optionalStringArray(value, 'unresolvedGuards', path);
+
+    const presentation = this.optionalRecord(value, 'presentation', path);
+    if (presentation) {
+      const presentationPath = this.child(path, 'presentation');
+      this.knownFields(presentation, new Set(['labelKey', 'iconKey']), presentationPath);
+      this.optionalString(presentation, 'labelKey', presentationPath);
+      this.optionalString(presentation, 'iconKey', presentationPath);
     }
   }
 

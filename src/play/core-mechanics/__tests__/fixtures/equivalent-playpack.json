@@ -1,0 +1,2380 @@
+{
+  "id": "playpack:play.equivalent",
+  "kind": "playpack",
+  "version": "1.0.0",
+  "schedule": "schedule:equivalent",
+  "rules": [
+    "rule:equivalent.damage.default-apply",
+    "rule:equivalent.stamina.default-grant",
+    "rule:equivalent.overload.apply"
+  ],
+  "pools": [
+    {
+      "name": "ap",
+      "per": "actor",
+      "min": 0,
+      "max": 3,
+      "reset": "turn"
+    },
+    {
+      "name": "stamina",
+      "per": "actor",
+      "min": 0,
+      "max": 5,
+      "reset": "never"
+    }
+  ],
+  "outcomes": [
+    {
+      "name": "last-standing",
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "args": [
+              { "path": "world.props.play.spawnComplete" },
+              true
+            ]
+          },
+          {
+            "op": "eq",
+            "args": [
+              {
+                "op": "len",
+                "args": [
+                  {
+                    "q": {
+                      "from": "entities",
+                      "where": {
+                        "op": "and",
+                        "args": [
+                          {
+                            "op": "includes",
+                            "args": [
+                              { "path": "self.tags" },
+                              "play:roll-participant"
+                            ]
+                          },
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "isNull",
+                                "args": [
+                                  { "path": "self.props.vitality" }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "op": "not",
+                            "args": [
+                              {
+                                "op": "includes",
+                                "args": [
+                                  { "path": "self.tags" },
+                                  "play:permanent-exit"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              1
+            ]
+          },
+          {
+            "op": "gt",
+            "args": [
+              {
+                "op": "len",
+                "args": [
+                  {
+                    "q": {
+                      "from": "entities",
+                      "where": {
+                        "op": "or",
+                        "args": [
+                          {
+                            "op": "includes",
+                            "args": [
+                              { "path": "self.tags" },
+                              "play:permanent-exit"
+                            ]
+                          },
+                          {
+                            "op": "includes",
+                            "args": [
+                              { "path": "self.tags" },
+                              "play:downed-zero"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              0
+            ]
+          }
+        ]
+      },
+      "scope": "game",
+      "rank": 2,
+      "ends": true
+    },
+    {
+      "name": "round-checkpoint",
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "not",
+            "args": [
+              {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.round" }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "gt",
+            "args": [
+              { "path": "world.props.play.round" },
+              0
+            ]
+          },
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.matchEnded" }
+                ]
+              },
+              {
+                "op": "eq",
+                "args": [
+                  { "path": "world.props.play.matchEnded" },
+                  false
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "scope": "game",
+      "rank": 1,
+      "ends": false
+    }
+  ],
+  "defs": [
+    {
+      "id": "schedule:equivalent",
+      "kind": "schedule",
+      "loop": true,
+      "order": "fixed",
+      "roundEnd": [
+        { "emit": "play.round.increment" }
+      ],
+      "phases": [
+        {
+          "id": "phase:equivalent.roll",
+          "name": "投点阶段",
+          "phaseKind": "submit",
+          "input": "all",
+          "onEnter": [
+            {
+              "if": {
+                "op": "eq",
+                "args": [
+                  { "path": "world.props.play.rollPolicyReady" },
+                  true
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "U-001 未冻结：基础投点等级生成策略与强力骰修正后边界策略均未审批，标准随机投点与强力骰结算阻塞。本次阶段推进在任何命名随机流被推进、任何体力被扣减之前中止。"
+                }
+              ]
+            },
+            {
+              "forEach": {
+                "q": {
+                  "from": "entities",
+                  "where": {
+                    "op": "includes",
+                    "args": [
+                      { "path": "self.tags" },
+                      "play:overloaded"
+                    ]
+                  }
+                }
+              },
+              "as": "overloadedActor",
+              "do": [
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": "world.props.play.request.overload.target",
+                    "value": { "var": "overloadedActor" }
+                  }
+                },
+                {
+                  "emit": "play.overload.tick",
+                  "data": { "path": "world.props.play.request.overload" }
+                },
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": "world.props.play.request.overload"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.commitmentsCollected",
+                "value": false
+              }
+            },
+            {
+              "emit": "play.roll.request"
+            }
+          ],
+          "onExit": [
+            {
+              "if": {
+                "op": "or",
+                "args": [
+                  {
+                    "op": "eq",
+                    "args": [
+                      { "path": "world.props.play.commitmentsRequired" },
+                      false
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      { "path": "world.props.play.commitmentsCollected" },
+                      true
+                    ]
+                  }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "投点阶段仍有未收集的强力骰承诺：推进被拒绝，阶段索引不变（Requirement 7.10）。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phase:equivalent.settle",
+          "name": "结算阶段",
+          "phaseKind": "resolve",
+          "input": "none",
+          "onEnter": [
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.settle"
+              }
+            },
+            {
+              "emit": "play.phase.settle",
+              "data": { "path": "world.props.play.request.settle" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.settle.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "结算被 before 阶段规则否决：整个结算事务回滚，最终等级、AP 分配、退还与顺序四项均不生效。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.settle"
+              }
+            }
+          ]
+        },
+        {
+          "id": "phase:equivalent.player-action",
+          "name": "玩家行动阶段",
+          "phaseKind": "normal",
+          "input": "actor",
+          "onExit": [
+            {
+              "if": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          { "path": "world.props.play.playerQueue" }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "len",
+                        "args": [
+                          { "path": "world.props.play.playerQueue" }
+                        ]
+                      },
+                      0
+                    ]
+                  }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "玩家行动阶段仍有未完成的行动者（执行队列非空）：推进被拒绝，阶段索引不变。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phase:equivalent.npc-action",
+          "name": "NPC 行动阶段",
+          "phaseKind": "normal",
+          "input": "none",
+          "onExit": [
+            {
+              "if": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          { "path": "world.props.play.npcQueue" }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      {
+                        "op": "len",
+                        "args": [
+                          { "path": "world.props.play.npcQueue" }
+                        ]
+                      },
+                      0
+                    ]
+                  }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "NPC 行动阶段仍有未完成的 NPC（队列非空）：推进被拒绝，阶段索引不变。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phase:equivalent.cleanup",
+          "name": "清理阶段",
+          "phaseKind": "normal",
+          "input": "none",
+          "onEnter": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.pendingExpiry",
+                "value": 0
+              }
+            },
+            {
+              "forEach": {
+                "q": {
+                  "from": "entities",
+                  "where": {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          { "path": "self.props.vitality" }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "as": "recoveryActor",
+              "do": [
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": "world.props.play.request.stamina.target",
+                    "value": { "var": "recoveryActor" }
+                  }
+                },
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": "world.props.play.request.stamina.amount",
+                    "value": 1
+                  }
+                },
+                {
+                  "emit": "play.stamina.grant",
+                  "data": { "path": "world.props.play.request.stamina" }
+                },
+                {
+                  "if": {
+                    "op": "isNull",
+                    "args": [
+                      { "path": "world.props.play.request.stamina.veto" }
+                    ]
+                  },
+                  "then": [],
+                  "else": [
+                    {
+                      "abort": "自然体力恢复被 before 阶段规则否决：整个清理阶段回滚。"
+                    }
+                  ]
+                },
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": "world.props.play.request.stamina"
+                  }
+                }
+              ]
+            },
+            {
+              "forEach": {
+                "q": {
+                  "from": "attachments",
+                  "where": {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          { "path": "self.props.remainingTurns" }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "as": "tickAttachment",
+              "do": [
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": "world.props.play.request.tick.attachment",
+                    "value": { "var": "tickAttachment" }
+                  }
+                },
+                {
+                  "emit": "play.status.tick",
+                  "data": { "path": "world.props.play.request.tick" }
+                },
+                {
+                  "if": {
+                    "op": "isNull",
+                    "args": [
+                      { "path": "world.props.play.request.tick.veto" }
+                    ]
+                  },
+                  "then": [],
+                  "else": [
+                    {
+                      "abort": "状态到期推进被 before 阶段规则否决：整个清理阶段回滚。"
+                    }
+                  ]
+                },
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": "world.props.play.request.tick"
+                  }
+                }
+              ]
+            }
+          ],
+          "onExit": [
+            {
+              "if": {
+                "op": "or",
+                "args": [
+                  {
+                    "op": "isNull",
+                    "args": [
+                      { "path": "world.props.play.pendingExpiry" }
+                    ]
+                  },
+                  {
+                    "op": "eq",
+                    "args": [
+                      { "path": "world.props.play.pendingExpiry" },
+                      0
+                    ]
+                  }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "清理阶段仍有未完成的到期结算：推进被拒绝，阶段索引不变。"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "phases.2.onExit.0.if.args.1.args.1": {
+            "kind": "structural",
+            "rationale": "执行队列空值判据（len === 0 的右操作数）：结构性判据，不是玩家可见刻度。"
+          },
+          "phases.3.onExit.0.if.args.1.args.1": {
+            "kind": "structural",
+            "rationale": "执行队列空值判据（len === 0 的右操作数）：结构性判据，不是玩家可见刻度。"
+          },
+          "phases.4.onEnter.0.args.value": {
+            "kind": "structural",
+            "rationale": "到期结算计数的空值初始化：0 表示没有条目，是结构性判据。"
+          },
+          "phases.4.onEnter.1.do.1.args.value": {
+            "kind": "gameplay",
+            "min": 1,
+            "max": 5,
+            "int": true
+          },
+          "phases.4.onExit.0.if.args.1.args.1": {
+            "kind": "structural",
+            "rationale": "到期结算计数空值判据（eq 0 的右操作数）。"
+          }
+        },
+        "sourceTrace": ["Req 7.1", "Req 7.9", "Req 7.10", "Req 6.2", "Req 13.4", "D-008", "S5 完整回合流程"]
+      }
+    },
+    {
+      "id": "attachment:play.downed-zero",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "onAdd": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.add",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:downed-zero"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "onRemove": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.del",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:downed-zero"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {},
+        "sourceTrace": ["Req 11.3", "S5 生命值与倒地系统", "S0 四·4.2"]
+      }
+    },
+    {
+      "id": "attachment:play.sleeping",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "onAdd": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.add",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:sleeping"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "onRemove": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.del",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:sleeping"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {},
+        "sourceTrace": ["Req 6.11", "Req 15.4", "S5 体力恢复途径"]
+      }
+    },
+    {
+      "id": "attachment:play.overloaded",
+      "kind": "attachment",
+      "stackStrategy": "unique",
+      "onAdd": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.add",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:overloaded"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.del",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:roll-participant"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "onRemove": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.del",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:overloaded"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.collection",
+            "value": "entities"
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.scratch.ref.id",
+            "value": {
+              "op": "get",
+              "args": [
+                { "var": "target" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "op": "tag.add",
+          "args": {
+            "ref": { "path": "world.props.play.scratch.ref" },
+            "tag": "play:roll-participant"
+          }
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.scratch.ref"
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {},
+        "sourceTrace": ["Req 6.16", "Req 6.18", "Req 6.20", "Req 28.1", "D-055", "S3 C-7"]
+      }
+    },
+    {
+      "id": "action:play.attack",
+      "kind": "action",
+      "label": "攻击",
+      "group": "play.paid",
+      "tags": ["ugc"],
+      "targets": [
+        {
+          "name": "target",
+          "query": { "from": "entities" }
+        }
+      ],
+      "require": {
+        "op": "and",
+        "args": [
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "isNull",
+                            "args": [
+                              {
+                                "op": "refGet",
+                                "args": [
+                                  { "var": "self" },
+                                  "def"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "includes",
+                            "args": [
+                              {
+                                "op": "refGet",
+                                "args": [
+                                  { "var": "self" },
+                                  "tags"
+                                ]
+                              },
+                              "play:downed-zero"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "and",
+                    "args": [
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "isNull",
+                            "args": [
+                              {
+                                "op": "refGet",
+                                "args": [
+                                  { "var": "self" },
+                                  "def"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "op": "not",
+                        "args": [
+                          {
+                            "op": "includes",
+                            "args": [
+                              {
+                                "op": "refGet",
+                                "args": [
+                                  { "var": "self" },
+                                  "tags"
+                                ]
+                              },
+                              "play:permanent-exit"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "target" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "target" },
+                              "props.vitality"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+        ]
+      },
+      "cost": [
+        { "pool": "ap", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "beforeParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "op": "not",
+            "args": [
+              {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.damageAmountRef" }
+                ]
+              }
+            ]
+          },
+          "then": [],
+          "else": [
+            {
+              "abort": "T-001 未冻结：枪械基础伤害表未裁决，本玩法包不得给出任何默认伤害数值，攻击在任何写入之前被拒绝。"
+            }
+          ]
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.request.damage.source",
+            "value": { "var": "self" }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.request.damage.target",
+            "value": { "var": "target" }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.request.damage.amount",
+            "value": { "path": "world.props.play.damageAmountRef" }
+          }
+        },
+        {
+          "emit": "play.damage.request",
+          "data": { "path": "world.props.play.request.damage" }
+        },
+        {
+          "if": {
+            "op": "isNull",
+            "args": [
+              { "path": "world.props.play.request.damage.veto" }
+            ]
+          },
+          "then": [],
+          "else": [
+            {
+              "abort": "伤害被 before 阶段规则否决（目标资格或免疫）：整个动作事务回滚。"
+            }
+          ]
+        },
+        {
+          "op": "prop.del",
+          "args": {
+            "path": "world.props.play.request.damage"
+          }
+        },
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "afterParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "cost.0.amount": {
+            "kind": "constitutional",
+            "sourceId": "S8 一个动作永远 1 AP / Req 4.2"
+          }
+        },
+        "costClass": "paid",
+        "sourceTrace": ["Req 4.7", "Req 11.2", "Req 11.3", "T-001"]
+      }
+    },
+    {
+      "id": "action:play.move",
+      "kind": "action",
+      "label": "移动到相邻位置",
+      "group": "play.paid",
+      "tags": ["ugc"],
+      "targets": [
+        {
+          "name": "node",
+          "query": { "from": "nodes" }
+        }
+      ],
+      "require": {
+        "op": "and",
+        "args": [
+          {
+            "op": "and",
+            "args": [
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "includes",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "tags"
+                            ]
+                          },
+                          "play:downed-zero"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "includes",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "tags"
+                            ]
+                          },
+                          "play:permanent-exit"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "and",
+            "args": [
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "isNull",
+                    "args": [
+                      {
+                        "op": "refGet",
+                        "args": [
+                          { "var": "node" },
+                          "def"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "includes",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "tags"
+                            ]
+                          },
+                          "play:knocked-down"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "ap", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "beforeParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        },
+        {
+          "op": "entity.place",
+          "args": {
+            "entityId": {
+              "op": "get",
+              "args": [
+                { "var": "self" },
+                "$"
+              ]
+            },
+            "nodeId": {
+              "op": "get",
+              "args": [
+                { "var": "node" },
+                "$"
+              ]
+            }
+          }
+        },
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "afterParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "cost.0.amount": {
+            "kind": "constitutional",
+            "sourceId": "S8 一个动作永远 1 AP / Req 4.2"
+          }
+        },
+        "costClass": "paid",
+        "sourceTrace": ["Req 4.7", "Req 11.5", "S5 行动点系统"]
+      }
+    },
+    {
+      "id": "action:play.sleep-down",
+      "kind": "action",
+      "label": "睡下",
+      "group": "play.paid",
+      "tags": ["ugc"],
+      "require": {
+        "op": "and",
+        "args": [
+          {
+            "op": "and",
+            "args": [
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "includes",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "tags"
+                            ]
+                          },
+                          "play:downed-zero"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "isNull",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "def"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "not",
+                    "args": [
+                      {
+                        "op": "includes",
+                        "args": [
+                          {
+                            "op": "refGet",
+                            "args": [
+                              { "var": "self" },
+                              "tags"
+                            ]
+                          },
+                          "play:permanent-exit"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "and",
+            "args": [
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "isNull",
+                    "args": [
+                      {
+                        "op": "refGet",
+                        "args": [
+                          { "var": "self" },
+                          "def"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "not",
+                "args": [
+                  {
+                    "op": "includes",
+                    "args": [
+                      {
+                        "op": "refGet",
+                        "args": [
+                          { "var": "self" },
+                          "tags"
+                        ]
+                      },
+                      "play:sleeping"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "cost": [
+        { "pool": "ap", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "beforeParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        },
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:play.sleeping",
+            "target": { "var": "self" }
+          }
+        },
+        {
+          "forEach": { "var": "attached" },
+          "as": "attachedEntry",
+          "do": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actionId",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "actionId"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.phase",
+                "value": "afterParentEffects"
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.actor",
+                "value": { "var": "self" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.item",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "item"
+                  ]
+                }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": "world.props.play.request.attach.target",
+                "value": {
+                  "op": "get",
+                  "args": [
+                    { "var": "attachedEntry" },
+                    "target"
+                  ]
+                }
+              }
+            },
+            {
+              "emit": "play.attach.invoke",
+              "data": { "path": "world.props.play.request.attach" }
+            },
+            {
+              "if": {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.request.attach.veto" }
+                ]
+              },
+              "then": [],
+              "else": [
+                {
+                  "abort": "附着动作前置条件不满足且其失败行为为 rejectWholeAction：父付费动作连同附着效果整体回滚。"
+                }
+              ]
+            },
+            {
+              "op": "prop.del",
+              "args": {
+                "path": "world.props.play.request.attach"
+              }
+            }
+          ]
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "cost.0.amount": {
+            "kind": "constitutional",
+            "sourceId": "S8 一个动作永远 1 AP / Req 4.2"
+          }
+        },
+        "costClass": "paid",
+        "sourceTrace": ["Req 6.11", "Req 15.4"]
+      }
+    },
+    {
+      "id": "rule:equivalent.damage.default-apply",
+      "kind": "rule",
+      "on": "play.damage.request",
+      "phase": "default",
+      "priority": 100,
+      "when": {
+        "op": "isNull",
+        "args": [
+          { "path": "world.props.play.request.damage.veto" }
+        ]
+      },
+      "effects": [
+        {
+          "let": "current",
+          "be": {
+            "op": "refGet",
+            "args": [
+              { "path": "world.props.play.request.damage.target" },
+              "props.vitality"
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "not",
+            "args": [
+              {
+                "op": "isNull",
+                "args": [
+                  { "var": "current" }
+                ]
+              }
+            ]
+          },
+          "then": [
+            {
+              "let": "remaining",
+              "be": {
+                "op": "sub",
+                "args": [
+                  { "var": "current" },
+                  { "path": "world.props.play.request.damage.amount" }
+                ]
+              }
+            },
+            {
+              "if": {
+                "op": "gte",
+                "args": [
+                  { "var": "remaining" },
+                  1
+                ]
+              },
+              "then": [
+                {
+                  "op": "prop.set",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "entities.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "path": "world.props.play.request.damage.target" },
+                            "$"
+                          ]
+                        },
+                        ".props.vitality"
+                      ]
+                    },
+                    "value": { "var": "remaining" }
+                  }
+                }
+              ],
+              "else": [
+                {
+                  "op": "prop.del",
+                  "args": {
+                    "path": {
+                      "op": "concat",
+                      "args": [
+                        "entities.",
+                        {
+                          "op": "get",
+                          "args": [
+                            { "path": "world.props.play.request.damage.target" },
+                            "$"
+                          ]
+                        },
+                        ".props.vitality"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "op": "attach.add",
+                  "args": {
+                    "def": "attachment:play.downed-zero",
+                    "target": { "path": "world.props.play.request.damage.target" }
+                  }
+                },
+                {
+                  "emit": "play.downed.entered",
+                  "data": { "path": "world.props.play.request.damage" }
+                }
+              ]
+            }
+          ],
+          "else": []
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "priority": {
+            "kind": "internal",
+            "note": "规则结算次序编号，不呈现给玩家，也不参与玩法刻度比较。"
+          },
+          "effects.1.then.1.if.args.1": {
+            "kind": "structural",
+            "rationale": "存活/致死边界阈值 1：剩余生命 ≥ 1 即存活，结构性判据，不是玩家可配置的平衡数值。"
+          }
+        },
+        "sourceTrace": ["Req 11.3", "Req 3.3", "Req 3.5"]
+      }
+    },
+    {
+      "id": "rule:equivalent.stamina.default-grant",
+      "kind": "rule",
+      "on": "play.stamina.grant",
+      "phase": "default",
+      "priority": 100,
+      "when": {
+        "op": "isNull",
+        "args": [
+          { "path": "world.props.play.request.stamina.veto" }
+        ]
+      },
+      "effects": [
+        {
+          "let": "sid",
+          "be": {
+            "op": "get",
+            "args": [
+              { "path": "world.props.play.request.stamina.target" },
+              "$"
+            ]
+          }
+        },
+        {
+          "if": {
+            "op": "eq",
+            "args": [
+              { "path": "world.props.play.request.stamina.toMax" },
+              true
+            ]
+          },
+          "then": [
+            {
+              "op": "prop.set",
+              "args": {
+                "path": {
+                  "op": "concat",
+                  "args": [
+                    "world.props.pools.stamina.",
+                    { "var": "sid" },
+                    ".available"
+                  ]
+                },
+                "value": 5
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": {
+                  "op": "concat",
+                  "args": [
+                    "world.props.pools.stamina.",
+                    { "var": "sid" },
+                    ".real"
+                  ]
+                },
+                "value": 5
+              }
+            }
+          ],
+          "else": [
+            {
+              "let": "curr",
+              "be": {
+                "op": "coalesce",
+                "args": [
+                  {
+                    "op": "refGet",
+                    "args": [
+                      { "$": "w:0" },
+                      {
+                        "op": "concat",
+                        "args": [
+                          "props.pools.stamina.",
+                          { "var": "sid" },
+                          ".real"
+                        ]
+                      }
+                    ]
+                  },
+                  0
+                ]
+              }
+            },
+            {
+              "let": "next",
+              "be": {
+                "op": "min",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      { "var": "curr" },
+                      { "path": "world.props.play.request.stamina.amount" }
+                    ]
+                  },
+                  5
+                ]
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": {
+                  "op": "concat",
+                  "args": [
+                    "world.props.pools.stamina.",
+                    { "var": "sid" },
+                    ".available"
+                  ]
+                },
+                "value": { "var": "next" }
+              }
+            },
+            {
+              "op": "prop.set",
+              "args": {
+                "path": {
+                  "op": "concat",
+                  "args": [
+                    "world.props.pools.stamina.",
+                    { "var": "sid" },
+                    ".real"
+                  ]
+                },
+                "value": { "var": "next" }
+              }
+            }
+          ]
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "priority": {
+            "kind": "internal",
+            "note": "规则结算次序编号，不呈现给玩家，也不参与玩法刻度比较。"
+          },
+          "effects.1.then.0.args.value": {
+            "kind": "constitutional",
+            "sourceId": "S0 四·4.2 / D-007：体力刻度上限 5。"
+          },
+          "effects.1.then.1.args.value": {
+            "kind": "constitutional",
+            "sourceId": "S0 四·4.2 / D-007：体力刻度上限 5。"
+          },
+          "effects.1.else.0.be.args.1": {
+            "kind": "internal",
+            "note": "体力字段缺失兜底 0：Internal_Metric。"
+          },
+          "effects.1.else.1.be.args.1": {
+            "kind": "constitutional",
+            "sourceId": "S0 四·4.2 / D-007：体力刻度上限 5。"
+          }
+        },
+        "sourceTrace": ["Req 6.2", "Req 6.14", "Req 15.8", "D-007"]
+      }
+    },
+    {
+      "id": "rule:equivalent.overload.apply",
+      "kind": "rule",
+      "on": "play.overload.apply",
+      "phase": "default",
+      "priority": 100,
+      "when": {
+        "op": "not",
+        "args": [
+          {
+            "op": "isNull",
+            "args": [
+              {
+                "op": "get",
+                "args": [
+                  { "var": "payload" },
+                  "target"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "effects": [
+        {
+          "op": "attach.add",
+          "args": {
+            "def": "attachment:play.overloaded",
+            "target": {
+              "op": "get",
+              "args": [
+                { "var": "payload" },
+                "target"
+              ]
+            }
+          }
+        },
+        {
+          "op": "prop.set",
+          "args": {
+            "path": {
+              "op": "concat",
+              "args": [
+                "entities.",
+                {
+                  "op": "get",
+                  "args": [
+                    {
+                      "op": "get",
+                      "args": [
+                        { "var": "payload" },
+                        "target"
+                      ]
+                    },
+                    "$"
+                  ]
+                },
+                ".props.overloadRejoinPending"
+              ]
+            },
+            "value": 2
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "priority": {
+            "kind": "internal",
+            "note": "规则结算次序编号，不呈现给玩家，也不参与玩法刻度比较。"
+          },
+          "effects.1.args.value": {
+            "kind": "internal",
+            "note": "过载归队计数初值：Internal_Metric，投影禁止展示。"
+          }
+        },
+        "sourceTrace": ["Req 28.1", "Req 6.16", "Req 6.18", "D-055", "S3 C-7"]
+      }
+    }
+  ],
+  "play": {
+    "numericOwnership": {
+      "pools.0.min": {
+        "kind": "structural",
+        "rationale": "资源下限 0：资源可被耗尽到 0，是结构性护栏，不是玩家在 1-5 上选择的数值。"
+      },
+      "pools.0.max": {
+        "kind": "constitutional",
+        "sourceId": "S0 四·4.2 / D-007：AP 分配上限 3、体力上限 5 落在 1-5 内。"
+      },
+      "pools.1.min": {
+        "kind": "structural",
+        "rationale": "资源下限 0：资源可被耗尽到 0，是结构性护栏，不是玩家在 1-5 上选择的数值。"
+      },
+      "pools.1.max": {
+        "kind": "constitutional",
+        "sourceId": "S0 四·4.2 / D-007：AP 分配上限 3、体力上限 5 落在 1-5 内。"
+      },
+      "outcomes.0.rank": {
+        "kind": "internal",
+        "note": "结局优先级：Internal_Metric，不作为玩家可见 1-5 刻度。"
+      },
+      "outcomes.1.rank": {
+        "kind": "internal",
+        "note": "结局优先级：Internal_Metric，不作为玩家可见 1-5 刻度。"
+      },
+      "outcomes.0.when.args.1.args.1": {
+        "kind": "structural",
+        "rationale": "结局判据阈值（存活人数比较的右操作数），不是玩家可见平衡值。"
+      },
+      "outcomes.0.when.args.2.args.1": {
+        "kind": "structural",
+        "rationale": "结局判据阈值（已淘汰计数比较的右操作数），不是玩家可见平衡值。"
+      },
+      "outcomes.1.when.args.1.args.1": {
+        "kind": "structural",
+        "rationale": "结局判据阈值（回合计数比较的右操作数），不是玩家可见平衡值。"
+      }
+    },
+    "sourceTrace": ["Req 4.1", "Req 6.1", "Req 7.1", "Req 20.2", "S0 四·4.2", "D-007", "D-037"]
+  }
+}
