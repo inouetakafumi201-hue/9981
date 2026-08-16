@@ -281,7 +281,12 @@ describe('M10 状态机端到端靶（AI 消费：BoundedAIDecisionFacade 在真
     // 这条是 AI 侧对玩法层交付靶的交叉印证：直接走组合根的 CoreMechanicsFacade（玩法层交付的
     // 装载后状态机驱动器），验证 M10 状态转换在真实装载链路上成立，为 AI 提交提供确定性基线。
     const { CoreMechanicsFacade } = { CoreMechanicsFacade: loadCoreMechanicsFacade } as {
-      CoreMechanicsFacade: new (registry: unknown) => { submit: (r: { actorRef: Ref; actionId: string; bindings: Record<string, unknown> }) => { ok: boolean; value?: { intentId: string }; detail?: string }; resolve: (id: string) => unknown; advancePhase: () => { ok: boolean; detail?: string } };
+      CoreMechanicsFacade: new (registry: unknown) => {
+        submit: (r: { actorRef: Ref; actionId: string; bindings: Record<string, unknown> }) => { ok: boolean; value?: { intentId: string }; detail?: string };
+        resolve: (id: string) => unknown;
+        advancePhase: () => { ok: boolean; detail?: string };
+        consumePlayerQueue: () => { ok: boolean; detail?: string };
+      };
     };
     const loadRoot = createLoadedCoreMechanics();
     const { holder } = seedLoadedWorld(loadRoot, 4);
@@ -297,8 +302,7 @@ describe('M10 状态机端到端靶（AI 消费：BoundedAIDecisionFacade 在真
         const r = facade.advancePhase();
         if (!r.ok) throw new Error(`advance 失败：${r.detail ?? '未知'}`);
       }
-      const s = holder.getState();
-      holder.setState(setPath(s, 'world.props.play.playerQueue', [] as never) as WorldState); // 见玩法层 e2e PLAYER_QUEUE_GAP
+      facade.consumePlayerQueue();
     }
     const sleepDown = facade.submit({ actorRef: HERO_REF, actionId: 'action:play.sleep-down', bindings: {} });
     expect(sleepDown.ok).toBe(true);
@@ -340,7 +344,7 @@ describe('M10 状态机端到端靶（AI 消费：BoundedAIDecisionFacade 在真
     // 同链路，但这里额外断言「AI 决策门面（BoundedAIDecisionFacade）在同一条 Op 链上可决断」。
     const { CoreMechanicsFacade: FacadeCtor } = {
       CoreMechanicsFacade: loadCoreMechanicsFacade,
-    } as { CoreMechanicsFacade: new (registry: unknown) => { advancePhase: () => { ok: boolean; detail?: string } } };
+    } as { CoreMechanicsFacade: new (registry: unknown) => { advancePhase: () => { ok: boolean; detail?: string }; consumePlayerQueue: () => { ok: boolean; detail?: string } } };
     const loadRoot = createLoadedCoreMechanics();
     const { holder } = seedLoadedWorld(loadRoot, 3);
     const facade = new FacadeCtor(loadRoot.harness.registry);
@@ -348,10 +352,10 @@ describe('M10 状态机端到端靶（AI 消费：BoundedAIDecisionFacade 在真
     let guard = 0;
     let phaseNow = holder.getState().world.turn.phaseIndex;
     const PHASE_NAMES = ['roll', 'settle', 'playerAction', 'npcAction', 'cleanup'] as const;
-    // 每到 playerAction 清空执行队列（见玩法层 e2e PLAYER_QUEUE_GAP），否则无法从 playerAction 离开。
+    // 每到 playerAction 都通过 production drain 入口清空执行队列，否则无法从 playerAction 离开。
     while (guard++ < 14) {
       if (phaseNow === 2) {
-        holder.setState(setPath(holder.getState(), 'world.props.play.playerQueue', [] as never) as WorldState);
+        facade.consumePlayerQueue();
       }
       phases.push(PHASE_NAMES[phaseNow] ?? `phase${phaseNow}`);
       const before = holder.getState().world.turn.phaseIndex;

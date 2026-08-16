@@ -51,9 +51,26 @@ export const PATH_ROLL_POLICY_READY = `${PATH_PLAY_ROOT}.rollPolicyReady`;
 /** NPC 预算是否启用（`npcBudget === null` 时为 false，NPC 行动阶段无参与者）。 */
 export const PATH_NPC_ENABLED = `${PATH_PLAY_ROOT}.npcEnabled`;
 
+/** 一局终局判定字段（Internal_Metric；false→true 单调，投影禁止展示）。 */
+export const PATH_MATCH_ENDED = `${PATH_PLAY_ROOT}.matchEnded`;
+/** 一局回合/round 计数（Internal_Metric；cleanup→roll 回绕 +1，投影禁止展示）。 */
+export const PATH_ROUND = `${PATH_PLAY_ROOT}.round`;
+/** 终结详情（Internal_Metric：{ outcome, scope, rank }，投影禁止展示）。 */
+export const PATH_MATCH_END_DETAIL = `${PATH_PLAY_ROOT}.matchEnd`;
+/** 出生装配完成标记（Internal_Metric）。 */
+export const PATH_SPAWN_COMPLETE = `${PATH_PLAY_ROOT}.spawnComplete`;
+/** 装载期待出生玩家实体 Id 清单（Internal_Metric，供出生装配消费）。 */
+export const PATH_SPAWN_CANDIDATES = `${PATH_PLAY_ROOT}.spawnCandidates`;
+/** 默认出生起始体力（Gameplay_Value 1-5，D-007 上限内）。 */
+export const SPAWN_STAMINA_INITIAL = 5;
+/** 默认出生起始投点等级（Gameplay_Value 1-5）。 */
+export const SPAWN_ROLL_TIER_INITIAL = 3;
+
 /** 活体属性字段名（落在 `entities.<id>.props.*` 自由区）。 */
 export const PROP_VITALITY = 'vitality';
 export const PROP_ROLL_TIER = 'rollTier';
+/** 过载归队计数（Internal_Metric，投影禁止展示；>0 表示仍需跳过投点）。 */
+export const PROP_OVERLOAD_REJOIN = 'overloadRejoinPending';
 /** 附着上的回合型状态剩余（Gameplay_Value 1-5，永不写 0）。 */
 export const PROP_REMAINING_TURNS = 'remainingTurns';
 
@@ -100,6 +117,16 @@ export const EVENT_DOWNED_ENTERED = 'play.downed.entered';
 export const EVENT_PRECISE_INTERRUPTED = 'play.precise.interrupted';
 export const EVENT_ETERNAL_SLEEP_REQUEST = 'play.eternalSleep.request';
 export const EVENT_DEATH_SETTLED = 'play.death.settled';
+/** 结局达成后置事件：outcome.reach 记录事实后由玩法层发出，供终局/胜负规则消费。 */
+export const EVENT_OUTCOME_REACHED = 'play.outcome.reached';
+/** 出生装配请求事件（装载期 / domain-entry 发出）。 */
+export const EVENT_SPAWN_REQUEST = 'play.spawn.request';
+/** 过载施加请求事件（体力超上限触发，非清理自然恢复）。 */
+export const EVENT_OVERLOAD_APPLY = 'play.overload.apply';
+/** 过载归队计数推进事件（投点阶段开始时发出）。 */
+export const EVENT_OVERLOAD_TICK = 'play.overload.tick';
+/** 回合回绕计数事件（ScheduleDef.roundEnd 发出）。 */
+export const EVENT_ROUND_INCREMENT = 'play.round.increment';
 
 // ---------------------------------------------------------------------------
 // Def 标识符
@@ -118,6 +145,10 @@ export const ATT_TRANSIT = 'attachment:play.transit';
 export const ATT_BOOST_COMMITMENT = 'attachment:play.boost-commitment';
 export const ATT_PERMANENT_EXIT = 'attachment:play.permanent-exit';
 export const ATT_SLEEPING = 'attachment:play.sleeping';
+/** 过载状态 AttachmentDef（D-055 / Requirement 6.16-6.22；CEME C-7 收束到 core-mechanics）。 */
+export const ATT_OVERLOADED = 'attachment:play.overloaded';
+/** 过载状态标记（供 require 快速判定）。 */
+export const TAG_OVERLOADED = 'play:overloaded';
 /** 死亡背包容器实体的 EntityDef（独立新建，不复用死者原背包实体，Requirement 12.7）。 */
 export const ENTITY_DEATH_BAG = 'entity:play.death-bag';
 
@@ -197,6 +228,18 @@ export const RULE_GATEWAY_DEFAULT = 'rule:play.gateway.default-dispatch';
 export const RULE_GATEWAY_AFTER = 'rule:play.gateway.after-presentation';
 export const RULE_DEATH_BAG_NO_DEPOSIT = 'rule:play.death-bag.no-deposit';
 export const RULE_ETERNAL_SLEEP_DEFAULT = 'rule:play.eternal-sleep.default-settle';
+/** 终局判定：消费 play.outcome.reached，ends:true 时写 matchEnded（CEME C-1/C-3/C-5）。 */
+export const RULE_OUTCOME_TERMINAL = 'rule:play.outcome.terminal';
+/** 回合回绕计数：cleanup 阶段 onExit 后由玩法层在 roundEnd 等效路径推进（CEME C-3）。 */
+export const RULE_ROUND_INCREMENT = 'rule:play.round.increment';
+/** 出生装配：给待出生玩家打 roll-participant + 起始体力/rollTier（CEME C-2/C-4）。 */
+export const RULE_SPAWN_DEFAULT = 'rule:play.spawn.default';
+/** 过载施加：体力超上限时施加过载附件并写归队计数（CEME C-7）。 */
+export const RULE_OVERLOAD_APPLY = 'rule:play.overload.apply';
+/** 过载拦截：过载期间主动动作一律结构化拒绝（Requirement 6.20）。 */
+export const RULE_OVERLOAD_BLOCK_INTENT = 'rule:play.overload.block-intent';
+/** 过载归队：跳过一次投点后在下下回合归队（Requirement 6.18）。 */
+export const RULE_OVERLOAD_TICK = 'rule:play.overload.tick';
 
 /**
  * 附着动作在装载期派生的 `RuleDef` Id（design.md 3.6 第 3 条）。
@@ -267,6 +310,8 @@ export const PATH_REQ_GATEWAY = `${PATH_REQUEST_ROOT}.gateway`;
 export const PATH_REQ_ATTACH = `${PATH_REQUEST_ROOT}.attach`;
 export const PATH_REQ_ETERNAL_SLEEP = `${PATH_REQUEST_ROOT}.eternalSleep`;
 export const PATH_REQ_SETTLE = `${PATH_REQUEST_ROOT}.settle`;
+/** 过载施加/归队请求记录。 */
+export const PATH_REQ_OVERLOAD = `${PATH_REQUEST_ROOT}.overload`;
 
 /**
  * 请求记录的统一否决字段名。

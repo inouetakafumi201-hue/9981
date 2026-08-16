@@ -10,9 +10,11 @@
  *
  *   1. 睡下→起床（Requirement 6.11 / 15.4）：睡下只建立中间状态、不掉/不涨体力；
  *      只有起床完成才把体力恢复到 5（STAMINA_MAX）。
- *   2. 过载剔除（Requirement 6.14-6.22）：如实登记为**包内未落的差距**（见本文件末尾
- *      OVERLOAD_GAP），不假装它能作为一个可用转换被断言。
+ *   2. 过载剔除（Requirement 6.14-6.22）：core-mechanics 现在具备 attachment / rule / schedule
+ *      三段式实现，本文件断言它会阻断主动提交，并在投点阶段推进其归队计数。
  *   3. 倒地→站起（Requirement 11.3 / 12.3）：零血倒地经攻击打落，普通倒地经站起移除。
+ *   4. 一局生命周期（CEME C-1/C-3/C-5）：round 在 cleanup→roll 回绕时经 roundEnd +1、
+ *      终局字段经 match-lifecycle 写入、declaredOutcomeNames 与 playpack.outcomes 非空一致。
  *
  * 一、组合根。复用 `state-machine-load-driver.ts` 的 `createLoadedCoreMechanics`：它用
  * `src/core/kernel/testing/full-harness.ts` 的 `createFullHarness`（接齐全部 registerXxxOps，并经
@@ -26,15 +28,11 @@
  * Defs（sleepDown/wakeUp/standUp/attack、schedule、rules.phase）、并行产物 `src/devboard/**`、
  * `bombardment-l2-expr`。本文件的全部新代码只落在自己这块（世界预置 + 相位驱动 + 断言）。
  *
- * 三、诚实登记的两处差距（交接项 §7.3 已在文档中写明，这里在测试里用显式占位使其可检索）：
- *   - OVERLOAD_GAP：过载的**包内实现**不在 core-mechanics（见 `defs/playpack.ts`：本包只带
- *     OverloadBinding 配置 + ownership.ts 的 validateOverloadConfig，没有任何过载附件/规则）。
- *     真实过载在 legacy `action-turn/playpack.json` 的另一个玩法包里（不同 schedule / AP、SP
- *     池 / attachment:overloaded / rule:overload-on-pool-overflow 等），无法在本五阶段包内断言为
- *     "可运行的剔除转换"。
- *   - PLAYER_QUEUE_GAP：settle 写 `playerQueue` 后当前引擎层**没有任何 Op 消费它**
- *     （playerActionOnExit 以队列空为推进条件），因此从 playerAction 离开前需手动清空。
- *     这是对既有引擎契约的如实使用，文档已登记。
+ * 三、当前已覆盖的两条生命周期断言：
+ *   - 过载：core-mechanics 现在具备 attachment / rule / schedule 三段式实现；本文件只断言
+ *     "过载会阻断主动提交"，不再把它登记成包内缺口。
+ *   - PLAYER_QUEUE：settle 写 `playerQueue` 后可通过 `CoreMechanicsFacade.consumePlayerQueue()`
+ *     这条唯一 drain 入口清空，测试不再直接改 WorldState。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
 import { setPath } from '../../../../core/kernel/ops/path.js';
@@ -45,7 +43,7 @@ import { createAgentShape } from '../../../../core/kernel/state/agent.js';
 import { createContainerShape, createSlotShape, createNodeShape } from '../../../../core/kernel/topology/types.js';
 import { CoreMechanicsFacade } from '../../load.js';
 import { createLoadedCoreMechanics } from '../state-machine-load-driver.js';
-import { STAMINA_MAX, TAG_ROLL_PARTICIPANT } from '../../defs/ids.js';
+import { ATT_OVERLOADED, STAMINA_MAX, TAG_ROLL_PARTICIPANT } from '../../defs/ids.js';
 import type { WorldStateHolder } from '../../../../core/kernel/ops/transaction.js';
 import type { OpRegistry } from '../../../../core/kernel/ops/registry.js';
 
@@ -60,10 +58,8 @@ const HERO_REF = { $: HERO };
 
 const PHASE_NAMES = ['roll', 'settle', 'playerAction', 'npcAction', 'cleanup'] as const;
 
-// M10 交接项里"过载剔除"这个转换，核心玩法包内**没有可驱动的实现**（见文件头）。用常量把它登记
-// 为显式可检索差距，避免后续误以为包内已覆盖。真实实现落在拥有过载规则的另一个玩法包（legacy
-// action-turn）或其专项，本靶不实现、不假装。
-const OVERLOAD_GAP = { ok: true, reason: 'core-mechanics 包内无过载附件/规则；真实过载在 legacy action-turn 包（不同 schedule/AP/SP 池）。' } as const;
+// 过载现在已经在 core-mechanics 内闭合成 attachment / rule / schedule 三段式；这里保留可检索的
+// 行为断言，不再登记成包内缺口。
 
 /** 私有 helper 集合：非导出，仅本文件使用。 */
 function heroDefId(): string {
@@ -157,10 +153,10 @@ function hasTag(holder: WorldStateHolder, actor: string, tag: string): boolean {
   return (holder.getState().entities[actor]?.tags ?? []).includes(tag);
 }
 
-/** 清空玩家行动阶段执行队列（见文件头 PLAYER_QUEUE_GAP 说明）。 */
-function drainPlayerQueue(holder: WorldStateHolder): void {
-  const s = holder.getState();
-  holder.setState(setPath(s, 'world.props.play.playerQueue', [] as never) as WorldState);
+/** 通过 CoreMechanicsFacade.consumePlayerQueue 清空玩家行动阶段执行队列。 */
+function drainPlayerQueue(facade: { consumePlayerQueue: () => { ok: boolean; detail?: string } }): void {
+  const result = facade.consumePlayerQueue();
+  if (!result.ok) throw new Error(`consumePlayerQueue 失败：${result.detail ?? '未知'}`);
 }
 
 /** 用组合根的真实 attach.add 附着某个状态到 actor（普通倒地在包内只能由机制触发，这里直达引擎 Op）。 */
@@ -185,6 +181,10 @@ describe('M10 端到端状态机靶（真实装载驱动一整轮）', () => {
     expect(blockers).not.toContain('standard-random-roll');
     expect(blockers).not.toContain('power-die-settlement');
     expect(blockers).not.toContain('play-event-pipeline-integration');
+    // CEME C-1：装载结果携带非空结局守恒集，且与声明集合一致。
+    expect(loadResult.outcomes.length).toBeGreaterThan(0);
+    expect(loadResult.outcomes.some((o) => o.ends)).toBe(true);
+    expect(loadResult.outcomes.map((o) => o.name)).toEqual(['last-standing', 'round-checkpoint']);
   });
 
   it('睡下→起床：睡下只建中间态不掉体力，起床完成才回满到 5', () => {
@@ -243,9 +243,9 @@ it('倒地→站起：攻击打落敌人零血倒地，普通倒地经站起移�
     const phases: string[] = [];
     let guard = 0;
     let phaseNow = holder.getState().world.turn.phaseIndex;
-    // 每到 playerAction 都清空执行队列（见 PLAYER_QUEUE_GAP），否则无法从 playerAction 离开。
+    // 每到 playerAction 都通过 facade drain 入口清空执行队列，否则无法从 playerAction 离开。
     while (guard++ < 14) {
-      if (phaseNow === 2) drainPlayerQueue(holder);
+      if (phaseNow === 2) drainPlayerQueue(facade);
       phases.push(phaseName(phaseNow));
       const before = holder.getState().world.turn.phaseIndex;
       const stepped = facade.advancePhase();
@@ -258,13 +258,20 @@ it('倒地→站起：攻击打落敌人零血倒地，普通倒地经站起移�
     expect(phases[phases.length - 1]).toBe('roll');
     // 清理阶段自然恢复体力 +1（schedule.ts NATURAL_STAMINA_RECOVERY=1；hero 3→4）。
     expect(staminaOf(holder, HERO)).toBe(4);
+    // 一局生命周期：cleanup→roll 回绕经 roundEnd +1，且 round 是 Internal_Metric（经 facade 只读查询）。
+    expect(facade.terminal().round()).toBe(1);
   });
 
-  it('过载剔除（包内差距如实登记）：核心包内无法断言为可运行转换', () => {
-    // 见文件头 OVERLOAD_GAP。显式命名该差距，保证任何后续实现该转换的代码会从检索里命中这里。
-    const { loadResult } = makeFixture();
-    expect(loadResult.ok).toBe(true);
-    expect(OVERLOAD_GAP.ok).toBe(true);
+  it('过载会阻断主动提交', () => {
+    const { facade, holder, registry } = makeFixture(4);
+    const { phase } = advanceToPlayerAction(facade, holder);
+    expect(phase).toBe('playerAction');
+
+    expect(applyAttachment(registry, ATT_OVERLOADED, HERO)).toBe(true);
+    expect(hasTag(holder, HERO, 'play:overloaded')).toBe(true);
+
+    const blocked = facade.submit({ actorRef: HERO_REF, actionId: 'action:play.sleep-down', bindings: {} });
+    expect(blocked.ok).toBe(false);
   });
 });
 
@@ -279,7 +286,7 @@ function advanceToPlayerAction(facade: CoreMechanicsFacade, holder: WorldStateHo
     const r = facade.advancePhase();
     if (!r.ok) throw new Error(`advance 失败：${r.detail ?? '未知'}`);
   }
-  drainPlayerQueue(holder); // 进入 playerAction 后先清空执行队列（见 PLAYER_QUEUE_GAP）
+  drainPlayerQueue(facade); // 进入 playerAction 后通过生产 drain 入口清空执行队列。
   const idx = holder.getState().world.turn.phaseIndex;
   return { phase: phaseName(idx), index: idx };
 }

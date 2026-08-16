@@ -2,7 +2,7 @@
  * CoreMechanicsPlaypack 组装（tasks.md 任务 4.1 / design.md 2.5、3.2、5.1）。
  *
  * PlaypackDef 汇总本 Spec 的全部声明式定义（附着/规则/状态/动作/网关/阶段），声明两个资源池
- * （AP、体力），指向五阶段 ScheduleDef，outcomes 留空（胜负条件不在本 Spec 范围）。
+ * （AP、体力），指向五阶段 ScheduleDef，outcomes 由 CORE_OUTCOMES 非空守恒集填充（CEME C-1）。
  *
  * 附着动作的派生执行规则（CORE_ATTACHED_INVOKE_RULES）在装载期与附着动作一并注册进玩法包，
  * 挂在 play.attach.invoke 事件上（design.md 3.6 的"装载期例外"派生，同一份 effects 只声明一次）。
@@ -16,6 +16,7 @@ import type { Def } from '../../../core/kernel/state/def.js';
 import {
   buildNumericOwnership,
   constitutionalConstant,
+  internalMetric,
   playExt,
   structuralBound,
 } from '../ownership.js';
@@ -26,6 +27,8 @@ import { CORE_DAMAGE_RULES } from './rules.damage.js';
 import { CORE_STATUS_RULES, CORE_STATUS_EXPRS } from './rules.status.js';
 import { CORE_GATEWAY_RULES } from './rules.gateway.js';
 import { CORE_PHASE_RULES } from './rules.phase.js';
+import { CORE_MATCH_RULES } from './rules.match.js';
+import { CORE_OUTCOMES } from './outcomes.js';
 import { coreSchedule } from './schedule.js';
 import {
   DEATH_BAG_CONTAINER_NAME,
@@ -55,8 +58,7 @@ export const deathBagEntityDef: Def = {
  * - AP：per actor，reset:'turn'（每回合清零后由结算阶段重新分配）。分配上限 3（落在 1-5 内）。
  * - 体力：per actor，reset:'never'（跨回合保留，清理阶段自然恢复）。min 0（可耗尽）、max 5（D-007）。
  *
- * 起始体力不在本 Spec 范围（出生规则属下游，Requirement 18）：不声明 initial，默认为 0，由下游/
- * 出生流程设定实际起点。
+ * 起始体力由装载期出生装配（CEME C-4 / assembleMatchStart）经合法 Op 写入，不在此推断默认值。
  */
 const AP_POOL: PoolDef = { name: POOL_AP, per: 'actor', min: 0, max: 3, reset: 'turn' };
 const STAMINA_POOL: PoolDef = { name: POOL_STAMINA, per: 'actor', min: 0, max: STAMINA_MAX, reset: 'never' };
@@ -68,7 +70,7 @@ const playpackBody = {
   version: '1.0.0',
   schedule: SCHEDULE_ID,
   pools: [AP_POOL, STAMINA_POOL],
-  outcomes: [],
+  outcomes: [...CORE_OUTCOMES],
   defs: [
     deathBagEntityDef,
     coreSchedule,
@@ -82,6 +84,7 @@ const playpackBody = {
     ...CORE_STATUS_EXPRS,
     ...CORE_GATEWAY_RULES,
     ...CORE_PHASE_RULES,
+    ...CORE_MATCH_RULES,
   ],
 };
 
@@ -101,10 +104,12 @@ export const CoreMechanicsPlaypack: PlaypackDef = {
       [
         { pathSuffix: 'min', whenValue: (value) => value === 0, ownership: structuralBound('资源下限 0：资源可被耗尽到 0，是结构性护栏，不是玩家在 1-5 上选择的数值。') },
         { pathSuffix: 'max', ownership: constitutionalConstant('S0 四·4.2 / D-007：资源刻度上限（AP 分配上限 3、体力上限 5）落在 1-5 内。') },
+        { pathSuffix: 'rank', ownership: internalMetric('结局优先级：Internal_Metric，不作为玩家可见 1-5 刻度。') },
+        { pathSuffix: 'args.1', whenValue: (value) => value === 0 || value === 1, ownership: structuralBound('结局判据阈值（人数/回合/已淘汰计数的比较右操作数），不是玩家可见平衡值。') },
       ],
       `${PLAYPACK_ID} 的数值归属`,
     ),
-    sourceTrace: ['Req 4.1', 'Req 6.1', 'Req 7.1', 'S0 四·4.2', 'D-007', 'D-037'],
+    sourceTrace: ['Req 4.1', 'Req 6.1', 'Req 7.1', 'Req 20.2', 'S0 四·4.2', 'D-007', 'D-037'],
   }),
 };
 
@@ -118,4 +123,5 @@ export const CORE_MECHANICS_RULES = [
   ...CORE_STATUS_RULES,
   ...CORE_GATEWAY_RULES,
   ...CORE_PHASE_RULES,
+  ...CORE_MATCH_RULES,
 ];

@@ -30,6 +30,7 @@ import {
   ATT_CONCEALED,
   ATT_DOWNED_ZERO,
   ATT_KNOCKED_DOWN,
+  ATT_OVERLOADED,
   ATT_PERMANENT_EXIT,
   ATT_PRECISE_INTERACTION,
   ATT_SLEEPING,
@@ -39,6 +40,7 @@ import {
   TAG_CONCEALED,
   TAG_DOWNED_ZERO,
   TAG_KNOCKED_DOWN,
+  TAG_OVERLOADED,
   TAG_PERMANENT_EXIT,
   TAG_PRECISE_IN_PROGRESS,
   TAG_ROLL_PARTICIPANT,
@@ -206,6 +208,22 @@ export const sleepingAttachment: AttachmentDef = {
   }),
 };
 
+/**
+ * 过载（D-055 / Requirement 6.16-6.22）。CEME C-7 把权威从 legacy action-turn 收束到本包。
+ * 条件持续：由过载规则显式移除，清理自然恢复不得触发本状态。
+ */
+export const overloadedAttachment: AttachmentDef = {
+  id: ATT_OVERLOADED,
+  kind: 'attachment',
+  stackStrategy: 'unique',
+  // 过载期间退出投点参与者谓词，避免结算再把过载者写进 playerQueue；归队时恢复资格。
+  onAdd: [...addTag(TAG_OVERLOADED), ...delTag(TAG_ROLL_PARTICIPANT)],
+  onRemove: [...delTag(TAG_OVERLOADED), ...addTag(TAG_ROLL_PARTICIPANT)],
+  play: playExt({
+    sourceTrace: ['Req 6.16', 'Req 6.18', 'Req 6.20', 'Req 28.1', 'D-055', 'S3 C-7'],
+  }),
+};
+
 /** 本模块声明的全部 `AttachmentDef`，按 Id 稳定排序（装载顺序不影响结果，但顺序稳定便于比对）。 */
 export const CORE_ATTACHMENT_DEFS: readonly AttachmentDef[] = [
   blockingAttachment,
@@ -213,6 +231,7 @@ export const CORE_ATTACHMENT_DEFS: readonly AttachmentDef[] = [
   concealedAttachment,
   downedZeroAttachment,
   knockedDownAttachment,
+  overloadedAttachment,
   permanentExitAttachment,
   preciseInteractionAttachment,
   sleepingAttachment,

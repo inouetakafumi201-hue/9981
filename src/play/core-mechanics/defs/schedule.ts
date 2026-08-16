@@ -23,6 +23,7 @@ import {
   eq,
   forEachEffect,
   guardEffect,
+  includesOf,
   isNull,
   lenOf,
   notNull,
@@ -34,8 +35,10 @@ import {
   vetoGuard,
 } from './expr.js';
 import {
+  EVENT_OVERLOAD_TICK,
   EVENT_PHASE_SETTLE,
   EVENT_ROLL_REQUEST,
+  EVENT_ROUND_INCREMENT,
   EVENT_STAMINA_GRANT,
   EVENT_STATUS_TICK,
   PATH_COMMITMENTS_DONE,
@@ -43,6 +46,7 @@ import {
   PATH_NPC_QUEUE,
   PATH_PENDING_EXPIRY,
   PATH_PLAYER_QUEUE,
+  PATH_REQ_OVERLOAD,
   PATH_REQ_SETTLE,
   PATH_REQ_STAMINA,
   PATH_REQ_TICK,
@@ -56,8 +60,10 @@ import {
   PHASE_SETTLE,
   PROP_REMAINING_TURNS,
   PROP_VITALITY,
+  REQ_FIELD_TARGET,
   REQ_FIELD_VETO,
   SCHEDULE_ID,
+  TAG_OVERLOADED,
 } from './ids.js';
 
 /** 五阶段名（design.md 3.5 的 `CorePhaseName`）。 */
@@ -124,6 +130,16 @@ const rollOnEnter: readonly Effect[] = [
     eq(pathOf(PATH_ROLL_POLICY_READY), true),
     'U-001 未冻结：基础投点等级生成策略与强力骰修正后边界策略均未审批，标准随机投点与强力骰结算阻塞。'
     + '本次阶段推进在任何命名随机流被推进、任何体力被扣减之前中止。',
+  ),
+  // 投点开始时推进过载归队计数：仍带过载标记的实体先 tick，再进入本轮投点。
+  forEachEffect(
+    { q: { from: 'entities', where: includesOf(pathOf('self.tags'), TAG_OVERLOADED) } },
+    'overloadedActor',
+    [
+      setRequestField(PATH_REQ_OVERLOAD, REQ_FIELD_TARGET, varOf('overloadedActor')),
+      emitEffect(EVENT_OVERLOAD_TICK, pathOf(PATH_REQ_OVERLOAD)),
+      clearRequest(PATH_REQ_OVERLOAD),
+    ],
   ),
   opEffect('prop.set', { path: PATH_COMMITMENTS_DONE, value: false }),
   // 只发出请求事件，不在此给出任何分布：分布属于 U-001（见 ids.ts 的 EVENT_ROLL_REQUEST 说明）。
@@ -293,6 +309,8 @@ const scheduleBody = {
   kind: 'schedule' as const,
   phases,
   loop: true,
+  /** cleanup→roll 回绕时先发 round.increment，再回到投点阶段。 */
+  roundEnd: [emitEffect(EVENT_ROUND_INCREMENT)],
   /** 固定顺序：玩家行动顺序由结算阶段写入 `turnOrder`，不交给引擎层的 initiative 排序。 */
   order: 'fixed' as const,
 };
