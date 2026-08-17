@@ -471,6 +471,22 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
     state: 'not-adopted',
     note: '地图编辑器开发板专项 requirements（并行产出，未采纳）。2026-08-15 开发板 web 应用 spec：Vite+React+TS 从零搭建的独立 web 应用（src/devboard/）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体，非逐条「来源追踪」footer。此条为本会话维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检）；其业务实现与 src/devboard/** 均属外部并行线交付物，不在本 AI 线审计范围',
   }],
+  ['.kiro/specs/wakeup-map-editor-graffiti/requirements.md', {
+    state: 'not-adopted',
+    note: '开发板编辑器「涂鸦式交互」专项 requirements（2026-08-16 从 wakeup-map-editor-devboard 全面调研后重写的子集 spec，取代 devboard 的编辑内核章）。R1~R16：拉边拖拽描线/样条塑形/框选/全局输入过渡窗口/遮挡框/校验反馈/视觉零新增，全逐字落实 §八+§九（docs/创作系统/01_创作工具与产权.md）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体 + 要求子句回溯，非逐条「来源追踪」footer。实现全部落 src/devboard/**（Vite+React+TS），不碰 src/play/map/** 契约；为此条维护 T2 门禁健壮性登记',
+  }],
+  ['.kiro/specs/wakeup-core-mechanics-exhaustive/requirements.md', {
+    state: 'fully-adopted',
+    note: '12/12（Requirement 20~31），采用 `### Requirement N` 标题式，每节恰一个「来源追踪：」footer。专项 CEME 玩法层彻查：结局种类/参与者资格/round 终局/出生规则/胜负结算/AI 接入/OVERLOAD_GAP 归属 + 额外扫描与交接项。编号从 20 起紧接 wakeup-core-mechanics 的 1~19，不重复已定义内容',
+  }],
+  ['.kiro/specs/wakeup-ai-tuning/requirements.md', {
+    state: 'not-adopted',
+    note: 'AI 调参器专项（2026-08-16 并行产出）：设计货币估值的调参/黄金场景/快照断言（src/core/kernel/ai/tuning/**）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体 + 要求子句回溯，非逐条「来源追踪」footer。此条为维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检）；其实现与 src/core/kernel/ai/tuning/** 均属并行线交付物，不在专项 B 审计范围',
+  }],
+  ['.kiro/specs/wakeup-loading-runtime/requirements.md', {
+    state: 'fully-adopted',
+    note: '12/12（Requirement 32~41），采用 `### Requirement N` 标题式，每节恰一个「来源追踪：」footer。专项 B 整合层装载运行期：生产组合根 createLoadedMatch、门禁面、对局外壳 MatchShell、生产加载驱动 driveMatch、演员面、UI 宿主 7 端口、LoadedMatch 门面、事件出口单次语义、门禁对齐与收账。编号从 32 起紧接 CEME 的 20~31；整合专项 A（CEME）/专项 D（注册表桥）承载面与已落地 loading-runtime 实现，收账含 OVERLOAD_GAP 归属（随 CEME Requirement 28 收束）、legacy ui-adapter 处置、04 规划文档归档 L_归档、主状态板入账',
+  }],
 ]);
 
 /** 逐条要求的标题行：中文「要求 N」与英文「Requirement N」两种标题式在本仓库并存。 */

@@ -1,0 +1,25 @@
+{
+  "id": "item.magazine",
+  "name": "弹匣",
+  "category": "ammo",
+  "classComposition": {
+    "classIds": [
+      "item.class.consumable"
+    ],
+    "capabilityIds": []
+  },
+  "volume": 1,
+  "tags": [
+    "consumable",
+    "magazine",
+    "generic"
+  ],
+  "stackable": false,
+  "description": "一个装满的弹匣。手持同谱型的枪时使用，一次性装满弹匣，本体消耗。",
+  "mvp": true,
+  "source": "play.magazine",
+  "itemParameters": {
+    "magazineFamily": "generic",
+    "magazineCapacityFill": "full"
+  }
+}

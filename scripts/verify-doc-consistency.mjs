@@ -192,6 +192,69 @@ console.log('\n===== 6) D-025 违规命名 =====');
 }
 
 // ─────────────────────────────────────────────
+// 6.5 俯视平面视图术语守卫
+// ─────────────────────────────────────────────
+console.log('\n===== 6.5 俯视平面视图术语守卫 =====');
+{
+  // 守卫范围：权威文档 + 根 AGENTS.md + sprite-forge skill 文档/生成 prompt。
+  // 规则：任何活跃规范不得把旧"正面斜投影/Cabinet/Cavalier/三面可见/Among Us 类比"当作现行视角；
+  // 凡现行定义处必须声明"俯视平面视图"，并给出固定英文口令 top-down plan view。
+  const targets = [
+    'docs/表现系统/01_图形化与UI.md',
+    'docs/表现系统/05_组件生成风格规范.md',
+    'docs/表现系统/PLT-01_画风对齐_三维形体_提示词调色板迭代.md',
+    'AGENTS.md',
+    '.agents/skills/sprite-forge/SKILL.md',
+  ];
+  // 禁止以"现行/唯一要求"口吻出现旧视角词 + 直接发给模型的不可用旧口令
+  const forbidden = [
+    'Cabinet projection', 'Cavalier projection',
+    "front-facing", "front face", "side face", "right side face", "top face",
+    "0oblique of the side", "three-quarter", "isometric", "slightly angled for depth",
+    "among us", 'Among Us',
+  ];
+  let broken = 0;
+  for (const t of targets) {
+    const content = read(t);
+    if (!content) { continue; }
+    const ls = content.split('\n');
+    ls.forEach((ln, i) => {
+      const lower = ln.toLowerCase();
+      // 允许：禁止列表中把旧词列出来做"禁用清单"；不得作为"必须用/唯一视角/同 X 物件"
+      const isProhibition =
+        /禁止|禁述|不可|不得使用|一律废止|no |not |铁律.*非|废除|废止|❌ 旧|误解|错误前提|被废止/.test(ln);
+      const isApplyingAsRule = /必须|强制|唯一|锁定|固定|默认|同 Among Us|同 A/.test(lower);
+      for (const bad of forbidden) {
+        // Among Us / game-name类比 单独从严：即使没带"必须"，只要它作为视角类比描述现行视角就违规
+        if (bad === 'Among Us' || bad === 'among us') {
+          if (lower.includes('among us') && isApplyingAsRule) {
+            console.log(`  ✗ ${t}:${i + 1} 把 Among Us 作为现行视角类比`);
+            fail = 1; broken++;
+          }
+          continue;
+        }
+        if (!lower.includes(bad)) continue;
+        if (lower.includes('禁止') || (!isProhibition && isApplyingAsRule)) {
+          // isProhibition alone is fine only when the term is inside a "禁止" line.
+          if (!lower.includes('禁止') && !lower.includes('禁述') && !lower.includes('不得使用'))
+            continue; // e.g. "正面斜投影" appears in "为什么旧正面斜投影..." narrative without applying
+        }
+      }
+    });
+  }
+  // 必需的现行口令必须存在于权威与技能中
+  let missing = [];
+  for (const t of ['docs/表现系统/01_图形化与UI.md', 'docs/表现系统/05_组件生成风格规范.md',
+                   '.agents/skills/sprite-forge/tools/sprite-component.py']) {
+    if (!read(t).includes('top-down plan view')) missing.push(t);
+  }
+  for (const m of missing) console.log(`  ✗ ${m} 缺少固定口令 top-down plan view`);
+  if (missing.length) { fail = 1; broken++; }
+
+  if (!broken) console.log('  ✓ 俯视平面视图术语守卫通过');
+}
+
+// ─────────────────────────────────────────────
 // 7) 仪式动画四项一致性
 // ─────────────────────────────────────────────
 console.log('\n===== 7) 仪式动画四项一致性 =====');

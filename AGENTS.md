@@ -390,3 +390,24 @@ After context compaction, re-confirm your current position in multi-step tasks b
 - 数值铁律：所有玩家可见数值严格限制在 1-5；内部数值（回合号、实体数）例外。
 - 并行作战纪律：不跨 Spec 改交付物；发现职责重复先判结构问题还是接口问题；发现文档矛盾登记+提请裁决，不默认否决已批准机制（D-060）。
 
+## 素材工具链使用纪律（迭代者必读）
+
+**需要任何可见美术素材时，先查素材管线再动手，禁止手工造贴图/占位图。**
+
+1. **静态组件（武器/物品/设备/环境交互件）** → `sprite-forge` skill 的**组件管线**：
+   `python .agents/skills/sprite-forge/tools/sprite-component.py --type <类型> --desc <描述> --states <状态> --out run/assets/<名>`
+   - 类型：`weapon-melee` / `weapon-ranged` / `weapon-firearm` / `item-consumable` / `item-tool` / `item-equipment` / `device` / `environment`
+   - 单帧不传 `--states`；多帧（如箱子 closed,open,broken）逗号分隔
+   - **语境铁律**：默认 `map` = 地图实体，强制**俯视平面视图**（top-down plan view：平面轮廓 + 可读剪影 + 落地阴影，无前脸/侧脸/顶面/斜投影纵深，非 isometric）；
+     只有背包/UI 图标才传 `--context ui`
+   - 风格锁定在脚本内（硬边 64×64 + 左上光源 + 语义色 + 品红底），
+     **调用方只传参数，取够格的成品帧 + manifest.json 挂载，不用盯贴图**；
+     脚本按实际检测到的品红分隔带切格并经成品质量闸门（尺寸+非品红内容占比）校验，
+     任一帧退化即整体失败并保留 `raw.png`/`sheet.png`，此时需重生成而非手动挂载
+   - 权威规范：`docs/表现系统/05_组件生成风格规范.md`
+2. **角色/NPC/动画帧** → `sprite-forge` 角色管线（母版系统 + proper-pixel-art 后处理，
+   见 `docs/表现系统/PLT-01` 与 SKILL.md）。
+3. **地图数据（MapData）** → `asset-pipeline` skill（生成→校验→编译→引擎 spawn）。
+4. **精灵图后处理（去毛边/网格对齐/像素化）** → `sprite-pixelate.py`（proper-pixel-art）。
+5. 生成后统一走 `run/assets/`，`manifest.json` 是挂载时读的登记；能复用先复用，不重复生成。
+

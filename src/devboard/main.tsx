@@ -2,6 +2,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { EditorApp } from './app/EditorApp.js';
+import './app/index.css';
 
 const container = document.getElementById('root');
 if (container) {

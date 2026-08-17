@@ -20,11 +20,20 @@
  * visibleFacts；pools（AP/体力）不在实体 props 上，而在 world.props.pools，
  * 需要通过 knownFacts 由感知/知识写入（本版以字段启发式兼容）。
  * 分数表对「确实观测到」的值计分；未观测一律不加减（未知不是零）。
+ *
+ * ## 可调费目运行时（tuning 专项）
+ *
+ * 费目表已迁为可序列化 `DesignCurrencyConfig`（`tuning/config-design-currency.ts`）；
+ * `scoreDesignCurrency` 用默认费目表求值（与既有硬编码语义逐行一致，回归红线），分数构成
+ * 由 `tuning/runtime.ts` 的同一运行时产生。`DesignCurrencyGateway` 可注入调参后的配置——
+ * 调参器改完 JSON 后注入新配置，真实决策立即按新表打分。
  */
 
-import type { BeliefSlice, EvaluationGateway, KnownFact } from './types.js';
+import type { BeliefSlice, EvaluationGateway } from './types.js';
 import type { AIDecisionFacadeDependencies } from './facade.js';
 import { FiniteEvaluationGuard } from './evaluation.js';
+import { defaultDesignCurrencyConfig, type DesignCurrencyConfig } from './tuning/config-design-currency.js';
+import { scoreDesignCurrencyBreakdown } from './tuning/runtime.js';
 
 /** 一次「透过信念切片」的评分，只消费当前可见/已知的事实字段。 */
 export interface DesignCurrencyEntry {
@@ -43,9 +52,8 @@ export interface DesignCurrencyEntry {
   readonly scarcity?: { readonly floor: number; readonly ceiling: number; readonly coefficient: number };
   /**
    * 可选：倒地威胁费目结果。费目值为某实体（如敌方）当前「是否已倒地但未被终结」的标记
-   * （`<id>.downedZero` / `<id>.defeated` 型事实）。当它被观测到且命中时，把该费目当量换成
-   * 绝对悬着惩罚（死亡锚），命令 AI 优先「令其长眠」把这具倒地的尸体移出战场，而不是继续打
-   * 尸体（M9 终结语义）。`continue` 式消费在 `scoreDesignCurrency` 里实现。
+   * （`<id>.defeated` 型事实）。当它被观测到且命中时，把该费目当量换成绝对悬着惩罚（死亡锚），
+   * 命令 AI 优先「令其长眠」把这具倒地的尸体移出战场，而不是继续打尸体（M9 终结语义）。
    */
   readonly defeated?: { readonly when: (mark: number) => boolean };
 }
@@ -83,7 +91,7 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     unit: 3,
   },
   // 武器攻击力（E）：攻击力越高，把目标打进击杀窗口越划算——竞技武器价值真实进入分数表
-  // （阶段4a/m8「更强者更优」）的定价落点。武器是 item（`i:sword.E`），不是实体。
+  // （阶段4a/m8「更强者更优」的定价落点）。武器是 item（`i:sword.E`），不是实体。
   {
     field: 'E',
     unit: 2,
@@ -107,7 +115,7 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
     adjustment: { when: (cur) => cur <= 0, value: DESIGN_CURRENCY_PRINCIPLES.deathAnchor * -1 },
     // 敌方血越少，击杀那刀价值越接近满当量（补刀/终场动力）。
     scarcity: { floor: 1, ceiling: 5, coefficient: 0.5 },
-    // M9：敌方带倒地威胁事实（`e:enemy.downedZero`=1）而未终结时，击杀奖励不发放、换悬着
+    // M9：敌方带倒地威胁事实（`e:enemy.defeated`=1）而未终结时，击杀奖励不发放、换悬着
     // 惩罚，直到被「令其长眠」清除。这样 AI 面对「倒地敌人」唯一正确收敛是去终结它。
     defeated: { when: (mark) => mark === 1 },
   },
@@ -138,94 +146,61 @@ export const DESIGN_CURRENCY_CHARGES: readonly DesignCurrencyEntry[] = [
   },
 ];
 
-/** 求某字段在 BeliefSlice 里被观测到的第一个有效值（数值）。 */
-function observedNumber(slice: BeliefSlice, field: string): number | null {
-  // 真实投影：`<id>.<field>`。field 可能是 `pool.ap`/`pool.stamina` 这类带子段的字段名，
-  // 用「以 field 为后缀」进行匹配（既匹配 `e:ai.pool.ap`，也兼容裸键 `pool.ap`），绝不只是
-  // 取最后一个点分段——否则 `pool.ap` 会误匹配成 `ap`。
-  for (const [key, raw] of Object.entries(slice.visibleFacts)) {
-    if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
-    // 完整字段名本身也要匹配：真实投影键就是 `<id>.<field>`，对不含点前缀、天然形如 `e:enemy.vitality`
-    // 的字段，`key === field` 且 `endsWith('.'+field)` 均真；但对 `<id>.<field>` 型键，`field` 本身就带点，
-    // `endsWith` 的递归（`key` 也以 `.${field}` 结尾）会命中同一条且值相同，没有语义差。这里用「键恰好是
-    // field 或以 .field 结尾」统一覆盖两种投影（裸键与点路径扩展）。
-    if (key === field || key.endsWith(`.${field}`)) return raw;
-  }
-  for (const [key, fact] of Object.entries(slice.knownFacts)) {
-    const value = (fact as KnownFact | undefined)?.value;
-    if (typeof value !== 'number' || !Number.isFinite(value)) continue;
-    if (key === field || key.endsWith(`.${field}`)) return value;
-  }
-  return null;
-}
-
 /**
- * 计算当前信念切片的设计货币估值。
- *
- * 规则：
- *  - 逐费目求当量，未观测到该字段的费目不加减；
- *  - 分水岭修正（死亡锚/资源耗尽锚）覆盖单位当量；
- *  - 稀缺系数对低值上调（亚线性）；
- *  - 敌方维度是「进攻」向：目标越残血当量越接近满值；自身维度是「防守」向。两者同入
- *    一张分数表、互不覆盖，AI 才能既会在满血时压敌人、又会在残血时保自己（阶段 2）。
+ * 计算当前信念切片的设计货币估值（默认费目配置，回归红线语义）。
  */
 export function scoreDesignCurrency(context: { slice: BeliefSlice }): number {
-  let v = 0;
-  for (const entry of DESIGN_CURRENCY_CHARGES) {
-    const value = observedNumber(context.slice, entry.field);
-    if (value === null) continue; // 未知不打分
+  return scoreDesignCurrencyBreakdown(defaultDesignCurrencyConfig(), context.slice).total;
+}
 
-    // 倒地威胁优先：一旦命中（该实体已倒地但未被终结），直接给绝对悬着惩罚并跳过此费目的
-    // 常规当量/击杀奖励——「一具悬着的尸体」不该给进攻收益，只有被令其长眠（清除事实键）
-    // 之后才释放击杀奖励。这是 M9 终结语义在分值面的落点：继续打尸体 vs 终结它，后者是唯一
-    // 能移除这个绝对惩罚的分支，理性 AI 会选它。
-    if (entry.defeated !== undefined) {
-      const mark = observedNumber(context.slice, defeatedFieldOf(entry.field));
-      if (mark !== null && entry.defeated.when(mark)) {
-        v += DESIGN_CURRENCY_PRINCIPLES.deathAnchor;
-        continue;
-      }
-    }
+/** 分水岭修正的来源键。 */
+export type PivotSource = 'lethalWindow' | 'exhaustionAnchor' | 'defeated';
 
-    // 分水岭修正优先：一旦触发，直接给绝对修正并跳过该费目的常规当量（避免被边缘收益倒挂）。
-    if (entry.adjustment !== undefined && entry.adjustment.when(value)) {
-      v += entry.adjustment.value;
-      continue;
-    }
-
-    let charge = entry.unit;
-    if (entry.scarcity !== undefined) {
-      const scarcity = entry.scarcity;
-      const ratio = Math.max(0, Math.min(1, (value - scarcity.floor) / (scarcity.ceiling - scarcity.floor)));
-      // 稀缺系数使当量向"值所在端"上调（值越低越接近 floor，上调越多）。自身维度 vitality 等
-      // 低值该保；敌方维度 enemy.vitality 低值该杀——两者都想要"值越低、当量越高"，所以统一
-      // 加正稀缺即可（敌方维度本来就是正 unit）。
-      charge += (1 - ratio) * scarcity.coefficient * entry.unit;
-    }
-    v += charge;
-  }
-  return v;
+/** 分数构成（ScoreBreakdown）：items 的 contribution 之和恒等于 total。 */
+export interface ScoreContribution {
+  readonly feeItem: string;
+  readonly contribution: number;
+  readonly currentValue: number;
+  readonly triggeredPivot?: PivotSource;
+  readonly scarcityMultiplier?: number;
+}
+export interface ScoreBreakdownInstance {
+  readonly total: number;
+  readonly items: readonly ScoreContribution[];
 }
 
 /**
- * 由费目标的「值字段」推导同名「倒地威胁事实键」：`e:enemy.vitality` → `e:enemy.downedZero`。
- * 倒地标记由 read-adapter 在感知投影里补 tag 时写入（`<id>.downedZero`，见 kernel/read-adapter）。
+ * 计算「分数构成」——每条费目贡献明细（含触发标记），供决策证据链与归因使用。
+ *
+ * 分值与 `scoreDesignCurrency` 完全一致（默认配置），回归红线由既有
+ * design-currency*.test.ts 保证。
  */
-function defeatedFieldOf(field: string): string {
-  const dot = field.lastIndexOf('.');
-  const prefix = dot === -1 ? '' : field.slice(0, dot + 1);
-  return `${prefix}defeated`;
+export function scoreBreakdown(context: { slice: BeliefSlice }): ScoreBreakdownInstance {
+  return scoreDesignCurrencyBreakdown(defaultDesignCurrencyConfig(), context.slice) as unknown as ScoreBreakdownInstance;
 }
 
 /**
  * 把设计货币接入 `EvaluationGateway` 的默认装配。
  *
  * 它把每个候选后继的信念切片换算成设计估值，走通 evaluate → guard → 剪枝。
- * 这是 AI 在生产决策链路消费设计货币的默认实现。
+ * 这是 AI 在生产决策链路消费设计货币的默认实现。可注入 `DesignCurrencyConfig`：
+ * 不传时用默认费目表（既有硬编码语义，回归红线）；`ParameterTuner` 调参后把新配置
+ * 注入这里，真实决策即按新表打分（调参真正生效的断点）。
  */
 export class DesignCurrencyGateway implements EvaluationGateway {
+  private readonly config: DesignCurrencyConfig;
+
+  constructor(config: DesignCurrencyConfig = defaultDesignCurrencyConfig()) {
+    this.config = config;
+  }
+
   evaluate(_actor: BeliefSlice['agent'], slice: BeliefSlice, _policy: unknown): unknown {
-    return scoreDesignCurrency({ slice });
+    return scoreDesignCurrencyBreakdown(this.config, slice).total;
+  }
+
+  /** 计算分数构成（供决策证据链与归因，与 evaluate 同值）。 */
+  breakdown(slice: BeliefSlice): ScoreBreakdownInstance {
+    return scoreDesignCurrencyBreakdown(this.config, slice) as unknown as ScoreBreakdownInstance;
   }
 
   neutralFallback(_policy: unknown): number {

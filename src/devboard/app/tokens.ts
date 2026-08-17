@@ -1,27 +1,12 @@
 import type { CSSProperties } from 'react';
+import { colors } from '../../design/tokens.js';
 
-export const colors = {
-  ink: '#0d1824',
-  muted: '#627383',
-  panel: '#f8fbfd',
-  border: '#cfdae2',
-  canvas: '#e7eff3',
-  cyan: '#027f92',
-  blue: '#3182ce',
-  yellow: '#d69e2e',
-  red: '#d74343',
-  green: '#208860',
-} as const;
+/**
+ * devboard 呈现层令牌：直接把 `src/design/tokens.ts`（表现层唯一美学真相源）映射成 CSS 变量，
+ * 供编辑器使用。与 tailwind 的 `--color-*` 语义同源，保证编辑器 UI 与游戏 HUD 用同一色板。
+ */
+export const cssVars: CSSProperties = Object.fromEntries(
+  Object.entries(colors).map(([name, value]) => [`--${name}`, value]),
+) as CSSProperties;
 
-export const cssVars: CSSProperties = {
-  '--ink': colors.ink,
-  '--muted': colors.muted,
-  '--panel': colors.panel,
-  '--border': colors.border,
-  '--canvas': colors.canvas,
-  '--cyan': colors.cyan,
-  '--blue': colors.blue,
-  '--yellow': colors.yellow,
-  '--red': colors.red,
-  '--green': colors.green,
-} as CSSProperties;
+export { colors };

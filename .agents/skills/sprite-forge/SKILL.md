@@ -98,3 +98,131 @@ python .agents/skills/sprite-forge/tools/selftest-sprite-pipeline.py
 `asset-pipeline` 管**地图数据契约**（MapData 生成→校验→编译→引擎 spawn，主梁 D-077）。
 `sprite-forge` 管**可见美术位图**（像素组件/精灵/动画）。二者是开发期素材工具链的两
 条独立链路，互不依赖；sprite 产出是位图文件，不写入任何游戏数据契约。
+
+## 组件生成管线（外包化：AI 只传参数，直接拿成品）
+
+**定位**：与角色管线不同，本管线专门生成**统一美学的静态组件**——武器、物品、设备、
+环境交互件。风格完全锁定在脚本内部（视角/光影/像素/语义色/背景），调用方不需要关心
+怎么做贴图，只需要说「要一个什么类型的什么组件、有几个状态」，拿回来就是品红底、
+纯化背景、按固定比例切好、已像素化的成品帧。
+
+> **真实流程（2026-08-16 起）**：出图后不是「直接拿成品」。脚本会先**检测实际品红分隔带**
+> 推导真实网格行/列（不受提示词期望约束），再经过**成品质量闸门**——任一帧过小或
+> 非品红内容占比过低（疑似纯色块）就会整体失败，并在输出目录保留 `raw.png` / `sheet.png`
+> 供重跑或人工排查，**绝不把损坏切格写进 manifest**。切图的布局由检测结果确认，模型未遵守
+> 提示词布局时按检测到的分隔带切，而不是静默产出 1×1 单色块。
+
+**何时用**：迭代者在做玩法/场景时需要任何静态组件（钥匙、药包、武器、箱子、设备、
+门、环境件……）时，直接调本管线，**不消耗 AI 心智去盯贴图**。帧数由调用方决定：
+单帧（钥匙）或多帧（箱子 = closed/open/broken）都支持，脚本自动排网格并切格。
+
+**用法**：
+```bash
+# 单帧组件（钥匙）
+python tools/sprite-component.py --type item-tool --desc "old brass door key" --out run/assets/key
+
+# 多帧组件（箱子三态）
+python tools/sprite-component.py --type environment --desc "wooden supply crate" \
+    --states closed,open,broken --out run/assets/crate
+
+# 指定后端（默认 gpt-image-2；可选 gemini）
+python tools/sprite-component.py --type weapon-firearm --desc "revolver" \
+    --provider gemini --out run/assets/revolver
+
+# 只打印提示词不调用 API（校对用）
+PRINT_PROMPT_ONLY=1 python tools/sprite-component.py --type item-consumable --desc "bandage" --out /tmp/x
+```
+
+**类型**（决定语义色与材质倾向，见 `docs/表现系统/01` §五条视觉定律 1）：
+`weapon-melee`（珊瑚=近战）/ `weapon-ranged`（紫=远程）/ `weapon-firearm`（枪灰+橙=AP 消耗）/
+`item-consumable`（绿=正面或橙=消耗）/ `item-tool`（橙=进行中或黄=感官）/
+`item-equipment`（蓝=科技）/ `device`（灰白=可交互受制状态+蓝科技）/ `environment`（低饱和灰棕=背景素描）
+
+**语境（`--context`，统一俯视平面视图）**：
+- `map`（**默认**）= 地图实体，**强制俯视平面视图**（top-down plan view：平面轮廓 + 可读剪影 +
+  落地阴影；无前脸/侧脸/顶面/斜投影纵深，非 45° 侧身、非 isometric、非纯侧影）——凡是会显示在地图上的组件必须用它
+- `ui` = 背包/界面图标，**同样俯视平面视图**，只更强调剪影对比与人眼识别（仍无立面、不倾斜、不是斜投影）
+
+**风格锁定**（全部硬编码在脚本里，不随机发挥）：
+- 俯视平面视图（top-down plan view）——map 与 ui 统一，全项目唯一视角
+- 硬边色块、64×64 像素、无抗锯齿/渐变/抖动
+- 光影 = 俯视平面下的平面明暗分区 + 统一方向落影（光源左上），没有逐面明暗（无立面）
+- 品红底 #FF00FF，纯化背景（近品红→纯品红）
+- 后处理 = proper-pixel-art 网格重建 + 最近邻放进 64×64 画布（保留纵横比）
+
+**切格与质量闸门**：
+- 布局以脚本检测到的实际品红分隔带为准；检测格数与状态数一致时直接按真实行列切格
+- 若检测格数与状态数不一致才退回安全等分，并由质量闸门拒绝空帧/纯色块
+- 每帧经过尺寸 + 非品红内容占比双重校验，任一不合格即整体失败并保留 `raw.png`/`sheet.png`
+- 切出的帧用原生分辨率喂 proper-pixel-art（`-s 1` 不放大），不做 1024 预放大
+
+**产物结构**（输出目录内）：
+```
+raw.png         后端原始网格 sheet
+raw.json        提示词留档（含状态表）
+sheet.png       背景纯化后的整 sheet（品红底）
+frames/         N 个 64×64 成品帧，按状态命名（single.png / closed.png ...）
+contact.png     各帧拼版总览
+manifest.json   组件登记（类型/状态/路径/提示词摘要）
+```
+
+**依赖**：`httpx` / `Pillow` / `proper-pixel-art` / `numpy`（与角色管线共享）
+
+**工具位置**：`tools/sprite-component.py`
+
+**组件切格回归自测**（不发 API，仅验证切格/质量闸门逻辑）：
+```bash
+python .agents/skills/sprite-forge/tools/selftest-component-grid.py
+```
+覆盖横排 / 竖排 / 检测失败回退三种网格，断言帧数、无反向裁剪、无非品红内容，并验证
+质量闸门拒绝纯色块与帧数不匹配输入。
+
+## 后处理管线：AI 伪像素 → 真正像素艺术
+
+**标准流程**（推荐）：使用 `sprite-pixelate.py` + proper-pixel-art 进行真正的像素网格检测和重建。
+
+### 方案 A：proper-pixel-art（推荐，2026-08-16 定案）
+
+**问题**：AI 生成的图虽然看起来像像素艺术，但实际上：
+- 边缘有抗锯齿渐变色（参差不齐的锯齿，有浅紫、中紫等过渡色块）
+- 内部有亚像素级的颜色变化（看似单色的区域其实有几十个相似但不同的颜色）
+- 没有对齐到整数像素网格
+
+**解决方案**：
+```bash
+# 批量处理（覆盖原文件，输出 128×128）
+python tools/sprite-pixelate.py batch *.png --size 128 --inplace
+
+# 如果细节丢失太多，提高输出尺寸
+python tools/sprite-pixelate.py batch *.png --size 256 --inplace
+```
+
+**工作原理**：
+1. **proper-pixel-art 网格检测**：用计算机视觉（Canny 边缘检测 + Hough 变换）检测 AI 生成图中的"伪像素网格"
+2. **色彩量化**：合并相似颜色到 32 个主色（MEDIANCUT 算法）
+3. **网格对齐重建**：重建为真正对齐的像素艺术（每个色块内部是纯色或保留阴影，但无抗锯齿杂色）
+4. **最近邻放大**：放大到目标尺寸（128×128 或更大），保持像素风格
+
+**效果**：
+- ✅ 边缘整齐对齐，无抗锯齿杂色
+- ✅ 消除参差不齐的锯齿
+- ✅ 保留内部细节（阴影、褶皱）
+- ⚠️  眼睛等最灵动的细节可能轻微失真（需要手动用画笔修正）
+
+**依赖**：
+```bash
+pip install proper-pixel-art
+```
+
+**工具位置**：`tools/sprite-pixelate.py`
+
+### 方案 B：简单像素化（备选，保留）
+
+如果不安装 proper-pixel-art，`generate2dsprite.py process` 会自动执行简单的 **`pixelate_postprocess()`**：
+
+1. **Alpha 二值化**：半透明像素（alpha < 128）→ 全透明；不透明像素（alpha >= 128）→ 完全不透明（255）。消除抗锯齿毛边。
+2. **强制像素网格对齐**：最近邻下采样 + 上采样（默认 grid_size=2，即 1024×1024 → 512×512 → 1024×1024），强制所有像素对齐到 2×2 网格。
+
+**不做**：色彩量化（保留所有颜色供 UGC 调色板使用）、形态学清理（保留 AI 生成的形状细节）、轮廓描边（不改变原始形状）。
+
+**局限**：无法处理抗锯齿渐变色和亚像素级颜色变化，边缘仍然有杂色。

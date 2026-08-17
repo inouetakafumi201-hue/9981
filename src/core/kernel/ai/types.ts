@@ -320,6 +320,8 @@ export interface AIDecisionResult {
   readonly status: 'recommended' | 'submitted' | 'no-action' | 'rejected';
   readonly candidate?: AICandidate;
   readonly diagnostics: readonly AIDiagnostic[];
+  /** 可选：本次决策的完整审计记录（DecisionTrace），由成功路径回填；既有消费方不受影响。 */
+  readonly trace?: import('./tuning/trace.js').DecisionTrace;
 }
 
 /** The only formal public decision entry point. */

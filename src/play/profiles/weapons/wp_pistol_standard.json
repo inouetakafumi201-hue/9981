@@ -86,7 +86,8 @@
     "weapon.capability.ammunition_binding": {
       "ammunitionClassId": "item.class.ammunition",
       "ammunitionTypeField": "ammoType",
-      "ammunitionCostField": "ammoCost"
+      "ammunitionCostField": "ammoCost",
+      "magazineCapacity": 3
     },
     "weapon.capability.damage_reference": {
       "damageClassId": "damage-class.firearm",

@@ -16,7 +16,6 @@ import {
   sampleMap,
   setNodeFloor,
   updateEdge,
-  updateNode,
 } from './editor-state.js';
 import { validateMapStructure } from '../ports/map-contracts.js';
 import { distance } from '../ports/map-contracts.js';
@@ -46,6 +45,8 @@ function normalize(input: any): any {
   const nodes = (input.nodes ?? []).filter((node: any) => {
     if (seen.has(node.id)) return false;
     seen.add(node.id);
+    // 过滤掉 fc.double 可能产出的非有限坐标（NaN/±Infinity），它们不配"合法地图"前提。
+    if (!Number.isFinite(node.at?.x) || !Number.isFinite(node.at?.y)) return false;
     return true;
   }) as any[];
   const floors = Array.from(new Set<number>([...(input.floors ?? [0]), ...nodes.map((n) => n.floor)])).sort((a, b) => a - b);
@@ -61,11 +62,6 @@ function normalize(input: any): any {
     return true;
   });
   return { schemaVersion: '1.0', id: 'm', name: 'map', backdrop: { image: '', pixelWidth: 1, pixelHeight: 1, tileRows: 1, tileCols: 1 }, floors, nodes, edges, placements: (input.placements ?? []) as any[] };
-}
-const edgeListOf = (input: any): any[] => (input.edges ?? []);
-
-function edgesToSet(edges: any[]): Set<string> {
-  return new Set(edges.map((e) => `${e.a}\u0001${e.b}`));
 }
 
 /** 全量合法地图生成器：先从空白开始跑一组随机操作，保证地图确实合法稳定。 */

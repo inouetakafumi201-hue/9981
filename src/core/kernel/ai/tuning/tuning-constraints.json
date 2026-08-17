@@ -1,0 +1,15 @@
+{
+  "principles": {
+    "deathAnchor": "DEATH_ANCHOR",
+    "exhaustionAnchor": "EXHAUSTION_ANCHOR",
+    "lethalWindow": "LETHAL_WINDOW"
+  },
+  "playerVisibleMax": ["vitality.max", "stamina.max", "ap.max"],
+  "rules": [
+    "不得修改任何 playerVisible=true 的费目",
+    "不得修改核心语义锚 deathAnchor / exhaustionAnchor / lethalWindow",
+    "agent 只能在现有费目内调 unit / scarcity.coefficient，不发明新费目、新动作、新规则",
+    "任何改动必须受 tunableRange 与 step 约束",
+    "改动必须经全量 golden 回归验证，否则回滚"
+  ]
+}

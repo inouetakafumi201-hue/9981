@@ -57,6 +57,7 @@ import type { ActionDef } from '../core/kernel/actions/types.js';
 import type { ScheduleDef } from '../core/kernel/schedule/types.js';
 
 import { DesignCurrencyGateway } from '../core/kernel/ai/design-currency.js';
+import type { DesignCurrencyConfig } from '../core/kernel/ai/tuning/config-design-currency.js';
 import { ValidatedBehaviorGateway } from '../core/kernel/ai/behavior-validation.js';
 import { ScopedCandidatePlanner } from '../core/kernel/ai/candidate-planner.js';
 import { CanonicalCandidateCommitGateway } from '../core/kernel/ai/commit-gateway.js';
@@ -139,6 +140,8 @@ export interface PlayAiRuntimeOptions {
   readonly seedDefs?: readonly Def[];
   /** 可选：备选 schedule/actor 查询的可见性谓词（默认全部可见）。 */
   readonly visibleTo?: import('../core/kernel/state/expr-types.js').Expr;
+  /** 可选：设计货币费目配置。不传用默认表（既有语义，回归红线）；调参后注入新配置即让真实决策生效。 */
+  readonly designCurrencyConfig?: DesignCurrencyConfig;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,7 +175,7 @@ function nextNpcNumber(): number {
  * 全部接进同一个 holder，并登记 AI 策略与其行为族 schema。
  */
 export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntime {
-  const { scheduleId, npcBudget, seedDefs = [], visibleTo = DEFAULT_VISIBLE_TO } = options;
+  const { scheduleId, npcBudget, seedDefs = [], visibleTo = DEFAULT_VISIBLE_TO, designCurrencyConfig } = options;
   const holder = new WorldStateHolder(createEmptyWorldState(scheduleId));
   const defRegistry = new DefRegistry();
   for (const def of seedDefs) defRegistry.register(def);
@@ -352,18 +355,21 @@ export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntim
     },
     exprEngine,
   });
+  // 单一配置网关实例（前后台决策共享同一费目表）；注入 config 后调参即影响真实决策。
+  const currencyGateway = new DesignCurrencyGateway(designCurrencyConfig);
   const facadeDeps = {
     readGateway,
     behaviorGateway,
     planners: facadePlanners,
-    evaluationGateway: new DesignCurrencyGateway(),
+    evaluationGateway: currencyGateway,
     evaluationGuard: new FiniteEvaluationGuard(),
     commitGateway: new CanonicalCandidateCommitGateway(submission),
+    worldState: () => holder.getState(),
     searchSessions: new KernelSearchSessionGateway({
       getState: () => holder.getState(),
       readGateway,
       behaviorGateway,
-      evaluationGateway: new DesignCurrencyGateway(),
+      evaluationGateway: currencyGateway,
       evaluationGuard: new FiniteEvaluationGuard(),
       simulation,
       nextParticipant: participants.resolve,

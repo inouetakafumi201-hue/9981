@@ -246,7 +246,7 @@ def build_prompt(target: str, mode: str, prompt: str, role: str | None = None, s
 
     if target == "creature":
         if mode == "single":
-            result = f"Single pixel art creature sprite, centered, facing right. {prompt}. {ART_STYLE}"
+            result = f"Single pixel art creature sprite, centered, top-down plan view outline. {prompt}. {ART_STYLE}"
         elif mode == "evolution":
             descs = build_evolution_descs(prompt, rng)
             result = (
@@ -282,28 +282,31 @@ def build_prompt(target: str, mode: str, prompt: str, role: str | None = None, s
                 "Top-right quadrant: same pose, mouth open, one limb lifted. "
                 "Bottom-left quadrant: lunging right, attacking fiercely. "
                 "Bottom-right quadrant: leaning back, eyes closed, taking damage. "
-                f"SAME character, SAME size, facing RIGHT. {ART_STYLE} {GRID_RULES}"
+                f"SAME character, SAME size, same top-down plan facing. {ART_STYLE} {GRID_RULES}"
             )
         else:
             result = (
                 f"A 2x2 pixel art sprite sheet of a walk cycle of the same {prompt}. "
-                "Top-left quadrant: walking right, right front leg forward. "
-                "Top-right quadrant: walking right, legs under body, mid-stride. "
-                "Bottom-left quadrant: walking right, left front leg forward. "
-                "Bottom-right quadrant: walking right, legs extended, passing pose. "
-                f"SAME character, SAME size, facing RIGHT. Only leg positions change. {ART_STYLE} {GRID_RULES}"
+                "Top-left quadrant: walking, right front leg forward. "
+                "Top-right quadrant: walking, legs under body, mid-stride. "
+                "Bottom-left quadrant: walking, left front leg forward. "
+                "Bottom-right quadrant: walking, legs extended, passing pose. "
+                f"SAME character, SAME size, same top-down plan facing. Only leg positions change. {ART_STYLE} {GRID_RULES}"
             )
     elif target == "player":
         if mode == "player":
             result = (
                 "Single hero sprite for a top-down RPG. "
                 f"CHARACTER: {prompt}. Young adventurer protagonist, distinct heroic silhouette, strongly themed costume. "
-                "Front-facing (toward camera), idle standing pose, centered in canvas with lots of magenta margin around. "
+                "Top-down plan view: flat top-down outline and readable silhouette, ground shadow, "
+                "NO front face, NO side face, NO top face, NO oblique depth, no three-quarter. "
+                "Centered in canvas with lots of magenta margin around. "
                 f"{CHAR_STYLE}"
             )
         elif mode == "player_walk":
             result = (
-                "A 2x2 pixel art sprite sheet of a top-down RPG hero walk cycle, ALL FRAMES FACING DOWN (toward camera). "
+                "A 2x2 pixel art sprite sheet of a top-down RPG hero walk cycle, all frames in top-down plan view with "
+                "direction shown in the plan plane (steps read as top-down leg motion; no side profiles, no three-quarter). "
                 f"CHARACTER: {prompt}. "
                 "Top-left: neutral standing, both feet together. "
                 "Top-right: LEFT foot stepping forward, right foot planted. "
@@ -314,26 +317,28 @@ def build_prompt(target: str, mode: str, prompt: str, role: str | None = None, s
             )
         elif mode == "player_sheet":
             result = (
-                "A 4x4 pixel art sprite sheet, full 4-direction walk cycle for a top-down RPG hero. "
+                "A 4x4 pixel art sprite sheet, full 4-direction walk cycle for a top-down RPG hero in top-down plan view. "
                 f"CHARACTER: {prompt}. Young adventurer protagonist. "
-                "SHEET LAYOUT (rows = facing direction, columns = walk frames): "
-                "Row 1 (top): facing DOWN (toward camera, face fully visible). "
-                "Row 2: facing LEFT (left profile or side view). "
-                "Row 3: facing RIGHT (right profile or side view, mirror of row 2). "
-                "Row 4 (bottom): facing UP (away from camera, back of head visible). "
+                "SHEET LAYOUT (rows = facing direction in the plan plane, columns = walk frames): "
+                "Row 1 (top): facing DOWN. "
+                "Row 2: facing LEFT. "
+                "Row 3: facing RIGHT. "
+                "Row 4 (bottom): facing UP. "
+                "All rows share the SAME top-down plan view (flat top-down outline, no side profiles, no three-quarter, "
+                "no isometric): only the in-plane facing direction changes via head/gear/shadow orientation. "
                 "COLUMN 1: neutral pose, both feet together. "
                 "COLUMN 2: LEFT foot stepping forward. "
                 "COLUMN 3: neutral pose again, both feet together. "
                 "COLUMN 4: RIGHT foot stepping forward. "
                 "IDENTICAL SIZE in every cell: same character height head-to-foot, same width shoulder-to-shoulder, "
-                "same on-screen pixel scale. No zooming, no cropping differently, only pose and direction change. "
+                "same on-screen pixel scale. No zooming, no cropping differently, only pose and in-plane facing change. "
                 "SAME character identity, SAME costume, SAME palette in all 16 cells. "
                 "The head and torso orientation must clearly communicate which direction the character is facing in each row. "
                 f"{CHAR_STYLE} {GRID_RULES_4X4}"
             )
         else:
             result = (
-                "A 2x2 pixel art sprite sheet of a top-down RPG hero in 4 action states, all facing DOWN (toward camera). "
+                "A 2x2 pixel art sprite sheet of a top-down RPG hero in 4 action states, all in top-down plan view. "
                 f"CHARACTER: {prompt}. "
                 "Top-left: IDLE, neutral standing, relaxed. "
                 "Top-right: WALK, mid-step, one leg forward. "
@@ -351,13 +356,13 @@ def build_prompt(target: str, mode: str, prompt: str, role: str | None = None, s
                 "Single NPC sprite for a top-down RPG. "
                 f"ROLE: {role_desc}. "
                 f"VISUAL DETAILS: {prompt}. "
-                "Front-facing (toward camera), idle standing pose. "
+                "Top-down plan view: flat top-down outline and readable silhouette, NO front/side/top face, no oblique. "
                 "Appearance should INSTANTLY communicate the role. "
                 f"Distinct silhouette and palette so this NPC won't be confused with others. {CHAR_STYLE}"
             )
         else:
             result = (
-                "A 2x2 pixel art sprite sheet, top-down RPG NPC walk cycle, ALL FRAMES FACING DOWN (toward camera). "
+                "A 2x2 pixel art sprite sheet, top-down RPG NPC walk cycle, all frames top-down plan view (no side profiles). "
                 f"ROLE: {role_desc}. "
                 f"VISUAL DETAILS: {prompt}. "
                 "Top-left: neutral standing, both feet together. "
@@ -464,6 +469,58 @@ def clean_edges(img: Image.Image, depth: int = 3) -> Image.Image:
                 if (r < 40 and g < 40 and b < 40) or math.sqrt((r - 255) ** 2 + g**2 + (b - 255) ** 2) < 150:
                     pixels[x, y] = (0, 0, 0, 0)
     return img
+
+
+def pixelate_postprocess(img: Image.Image, grid_size: int = 2) -> Image.Image:
+    """
+    强制像素化后处理：边缘清理 + 最近邻网格对齐
+    
+    只处理靠近品红背景的边缘像素（消除抗锯齿杂色），保留角色内部的所有细节（阴影、褶皱、光影）。
+    然后做最近邻网格对齐，让边缘变成整齐的阶梯状。
+    
+    Args:
+        img: RGBA 图像（AI 生成的原始输出，1024×1024）
+        grid_size: 网格尺寸（2 = 每 2×2 像素块合并成一个像素）
+    
+    Returns:
+        处理后的 RGBA 图像（边缘硬边、内部细节保留、网格对齐）
+    """
+    import numpy as np
+    
+    arr = np.array(img)
+    height, width = arr.shape[:2]
+    
+    # Step 1: Alpha 二值化
+    alpha = arr[:, :, 3]
+    arr[:, :, 3] = np.where(alpha >= 128, 255, 0)
+    
+    # Step 2: 边缘清理（只处理靠近品红的过渡色）
+    magenta = np.array([255, 0, 255], dtype=np.uint8)
+    rgb = arr[:, :, :3].astype(np.float32)
+    magenta_float = magenta.astype(np.float32)
+    dist_to_magenta = np.sqrt(np.sum((rgb - magenta_float) ** 2, axis=2))
+    
+    opaque_mask = arr[:, :, 3] > 0
+    
+    # 只处理"非常接近品红"的边缘像素（距离 < 100）
+    edge_mask = (dist_to_magenta < 100) & opaque_mask
+    
+    # 将边缘像素直接改成纯品红（清除抗锯齿杂色）
+    arr[edge_mask, :3] = magenta
+    
+    # Step 3: 网格对齐（最近邻下采样+上采样）
+    img_cleaned = Image.fromarray(arr)
+    
+    new_h = height // grid_size
+    new_w = width // grid_size
+    
+    # 下采样
+    downsampled = img_cleaned.resize((new_w, new_h), Image.Resampling.NEAREST)
+    
+    # 上采样回原始尺寸
+    aligned = downsampled.resize((width, height), Image.Resampling.NEAREST)
+    
+    return aligned
 
 
 def connected_components(img: Image.Image, min_area: int = 1) -> list[dict[str, object]]:
@@ -1049,6 +1106,9 @@ def split_grid(
                 info["bbox_scale_applied"] = False
                 info["scale_changed"] = False
                 info["anchor_target"] = [target_x, target_y]
+            
+            # Apply pixelate postprocessing to final canvas
+            canvas = pixelate_postprocess(canvas, grid_size=2)
             frames.append(canvas)
 
         for info in frame_info:
@@ -1108,6 +1168,9 @@ def split_grid(
             info["bbox_scale_applied"] = False
         info["scale_strategy"] = "fit"
         info["scale_changed"] = bool(info["bbox_scale_applied"])
+        
+        # Apply pixelate postprocessing to final canvas
+        canvas = pixelate_postprocess(canvas, grid_size=2)
         frames.append(canvas)
     return frames, frame_info
 

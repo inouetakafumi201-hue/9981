@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BehaviorAssertion",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "category", "description", "setup", "expect", "isGolden"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "category": { "type": "string" },
+    "description": { "type": "string" },
+    "source": { "enum": ["initial", "curated", "tuning-derived"] },
+    "temperedByHuman": { "type": "boolean" },
+    "temporalFrom": { "type": "string" },
+    "isGolden": { "type": "boolean" },
+    "setup": {
+      "type": "object",
+      "required": ["stateHash", "serialized"],
+      "properties": {
+        "stateHash": { "type": "string" },
+        "serialized": { "type": "string" }
+      }
+    },
+    "expect": {
+      "type": "object",
+      "properties": {
+        "shouldSelect": { "type": "string" },
+        "shouldNotSelect": { "type": "array", "items": { "type": "string" } },
+        "scoreConstraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["feeItem", "operator", "value", "reason"],
+            "properties": {
+              "feeItem": { "type": "string" },
+              "operator": { "enum": [">", "<", ">=", "<="] },
+              "value": { "type": "number" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "pivotConstraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pivot", "shouldTrigger", "reason"],
+            "properties": {
+              "pivot": { "type": "string" },
+              "shouldTrigger": { "type": "boolean" },
+              "reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

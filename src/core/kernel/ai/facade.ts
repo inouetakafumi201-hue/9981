@@ -1,6 +1,8 @@
 /** The sole public decision facade for bounded AI recommendation and action. */
 import { createAIDiagnostic } from './diagnostics.js';
 import { isSearchPlanner } from './sequential-search.js';
+import { buildDecisionTrace, minimalDecisionTrace, submissionOfResult, type TraceCandidateInput } from './tuning/build-trace.js';
+import { scoreBreakdown } from './design-currency.js';
 import type {
   AICandidate,
   AIDecisionFacade,
@@ -10,6 +12,7 @@ import type {
   AIDiagnosticCode,
   AIReadScope,
   AIRecommendationRequest,
+  BeliefSlice,
   CandidateCommitGateway,
   EvaluationGateway,
   EvaluationGuard,
@@ -35,6 +38,8 @@ export interface AIDecisionFacadeDependencies {
 interface PlannedDecision {
   readonly result: AIDecisionResult;
   readonly scope?: AIReadScope;
+  /** 决策证据链输入（成功规划路径提供）；失败路径为 undefined，由调用方兜底最小 trace。 */
+  readonly trace?: PlanTraceRequest;
 }
 
 function failureDiagnostic(
@@ -68,6 +73,18 @@ function noAction(request: AIDecisionRequest, diagnostic: AIDiagnostic): AIDecis
   };
 }
 
+/** 决策证据链输入：本次决策的候选动作请求。 */
+interface PlanTraceRequest {
+  readonly candidates: readonly TraceCandidateInput[];
+  readonly slice: BeliefSlice;
+  readonly selected: { actionId: string; score: number; reason: string } | null;
+}
+
+/** 提交被拒后的 reject 结果（保留计划期候选与诊断）。 */
+function placedResultWithRejectedSubmission(request: AIDecisionRequest, planned: AIDecisionResult, diagnostic: AIDiagnostic): AIDecisionResult {
+  return { status: 'rejected', candidate: planned.candidate, diagnostics: [...planned.diagnostics, diagnostic] };
+}
+
 /**
  * This facade coordinates only bounded gateways. It never receives WorldState,
  * an arbitrary legal-action callback, or an action application callback.
@@ -86,7 +103,8 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
         'Use the recommendation endpoint only for a recommend request.',
       ));
     }
-    return this.planAndRevalidate(request).result;
+    const planned = this.planAndRevalidate(request);
+    return this.attachTrace(planned.result, request, planned.trace);
   }
 
   act(request: NPCActionRequest): AIDecisionResult {
@@ -103,7 +121,9 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
     }
 
     const planned = this.planAndRevalidate(request);
-    if (planned.scope === undefined || planned.result.candidate === undefined) return planned.result;
+    if (planned.scope === undefined || planned.result.candidate === undefined) {
+      return this.attachTrace(planned.result, request, planned.trace);
+    }
 
     // Revalidation is intentionally repeated immediately before the canonical
     // write boundary; planning and submission may be separated by user code.
@@ -118,7 +138,11 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
         'Create a fresh candidate from the current read scope before submission.',
         planned.result.candidate,
       );
-      return { status: 'rejected', candidate: planned.result.candidate, diagnostics: [...planned.result.diagnostics, diagnostic] };
+      return this.attachTrace(
+        { status: 'rejected', candidate: planned.result.candidate, diagnostics: [...planned.result.diagnostics, diagnostic] },
+        request,
+        planned.trace,
+      );
     }
 
     const submitted = this.deps.commitGateway.submit(
@@ -136,10 +160,18 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
         'Inspect the canonical lifecycle result and generate a fresh legal candidate.',
         planned.result.candidate,
       );
-      return { status: 'rejected', candidate: planned.result.candidate, diagnostics: [...planned.result.diagnostics, diagnostic] };
+      return this.attachTrace(
+        placedResultWithRejectedSubmission(request, planned.result, diagnostic),
+        request,
+        planned.trace,
+      );
     }
 
-    return { status: 'submitted', candidate: planned.result.candidate, diagnostics: planned.result.diagnostics };
+    return this.attachTrace(
+      { status: 'submitted', candidate: planned.result.candidate, diagnostics: planned.result.diagnostics },
+      request,
+      planned.trace,
+    );
   }
 
   private planAndRevalidate(request: AIDecisionRequest): PlannedDecision {
@@ -221,6 +253,7 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
 
     let best: AICandidate | undefined;
     const diagnostics: AIDiagnostic[] = [];
+    const traceCandidates: TraceCandidateInput[] = [];
     if (isSearchPlanner(planner.value)) {
       const rootContext = { request, scope: scope.value, behavior: behavior.value };
       if (this.deps.searchSessions === undefined) {
@@ -301,6 +334,14 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
           scope: scope.value,
         };
       }
+      // 搜索路径：每个候选动作的分数构成由同一 rootSlice 求值（与选中动作同源）。
+      for (const seed of plan.value.candidates) {
+        traceCandidates.push({
+          actionId: seed.legalAction.action,
+          score: best.score,
+          breakdown: scoreBreakdown({ slice: plan.value.rootSlice }),
+        });
+      }
     } else {
       for (const seed of plan.value.candidates) {
         const consumed = plan.value.budget.consume('evaluationCalls');
@@ -351,6 +392,11 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
           rootKnowledgeVersion: scope.value.knowledgeVersion,
           rootActionVersion: scope.value.actionVersion,
         };
+        traceCandidates.push({
+          actionId: seed.legalAction.action,
+          score: outcome.score,
+          breakdown: scoreBreakdown({ slice: plan.value.rootSlice }),
+        });
         if (best === undefined || candidate.score > best.score) best = candidate;
       }
     }
@@ -384,7 +430,33 @@ export class BoundedAIDecisionFacade implements AIDecisionFacade {
     }
 
     const currentCandidate: AICandidate = { ...best, legalAction: revalidated.value };
-    return { result: { status: 'recommended', candidate: currentCandidate, diagnostics }, scope: scope.value };
+    return {
+      result: { status: 'recommended', candidate: currentCandidate, diagnostics },
+      scope: scope.value,
+      trace: {
+        candidates: traceCandidates,
+        slice: plan.value.rootSlice,
+        selected: { actionId: currentCandidate.legalAction.action, score: best.score, reason: 'bounded search/plan selection' },
+      },
+    };
+  }
+
+  /** 在决策结果上附加 DecisionTrace（成功/拒绝路径统一出口）。 */
+  private attachTrace(result: AIDecisionResult, request: AIDecisionRequest, trace: PlanTraceRequest | undefined): AIDecisionResult {
+    if (trace === undefined) {
+      return { ...result, trace: minimalDecisionTrace(request.correlationId, 'none') };
+    }
+    return {
+      ...result,
+      trace: buildDecisionTrace({
+        correlationId: request.correlationId,
+        slice: trace.slice,
+        candidates: trace.candidates,
+        selected: trace.selected,
+        submission: submissionOfResult(result),
+        worldState: null,
+      }),
+    };
   }
 
   private validateBehaviorBinding(request: AIDecisionRequest, behavior: ValidatedAIBehaviorBinding): AIDiagnostic | undefined {

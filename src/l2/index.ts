@@ -24,3 +24,4 @@ export * from './model/space-items-contracts.js';
 
 export * from './kernel/kernel-contract.js';
 export * from './kernel/op-registry-adapter.js';
+export * from './kernel/registry-bridge.js';

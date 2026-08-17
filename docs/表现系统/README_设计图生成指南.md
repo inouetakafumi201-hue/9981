@@ -71,7 +71,7 @@
 ### 视觉风格
 
 - 像素风 + 简笔画叠加
-- Front-facing cabinet/cavalier projection (front oblique, D-025: 规范名称"正面斜投影")
+- 俯视平面视图（top-down plan view；平面轮廓+落地阴影，无前脸/侧脸/顶面/斜投影纵深）
 - 严格的颜色语义系统（红=HP，蓝=SP，橙=AP）
 - 边缘发光交互
 - 1920×1080 分辨率

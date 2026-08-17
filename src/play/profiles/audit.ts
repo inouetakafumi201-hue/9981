@@ -1139,6 +1139,13 @@ function auditBindingValue(
         + `取值将无处可寻，绑定形同虚设`));
     }
   }
+
+  if (shape === 'integer') {
+    if (typeof bound !== 'number' || !Number.isInteger(bound)) {
+      findings.push(finding('PLAY-BIND-SHAPE', profile.sourceId, jsonPath,
+        `参数 ${parameter.key} 需要整数，实际为 ${JSON.stringify(bound)}`));
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

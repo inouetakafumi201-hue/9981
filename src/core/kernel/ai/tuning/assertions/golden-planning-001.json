@@ -1,0 +1,16 @@
+{
+  "id": "golden-planning-001",
+  "category": "planning",
+  "description": "我方残血(1) + 满血敌(3) → 不鲁莽（至少不送死）",
+  "setup": {
+    "stateHash": "d2bf86812e74e1d7",
+    "serialized": "{\"world\":{\"props\":{\"hiddenRefs\":[],\"aiCombatDamageRef\":1},\"agents\":{\"g:ai\":{\"kind\":\"ai\",\"knowledgeVersion\":\"ks:ai\"}},\"knowledge\":{},\"decisions\":{},\"intents\":{},\"attachments\":{},\"turn\":{\"scheduleId\":\"sched:round\",\"phaseIndex\":0,\"phaseEnteredAt\":0},\"rng\":{},\"ruleCircuitState\":{},\"log\":[],\"logSeq\":0,\"deferredEffects\":[],\"deferredSeq\":0},\"defs\":{},\"nodes\":{\"n:hero-a\":{\"def\":\"d:room\",\"kind\":\"node\"},\"n:enemy-a\":{\"def\":\"d:room\",\"kind\":\"node\"},\"n:far-a\":{\"def\":\"d:room\"}},\"links\":{},\"entities\":{\"e:hero\":{\"def\":\"d:fighter\",\"kind\":\"entity\",\"node\":\"n:hero-a\",\"props\":{\"vitality\":1,\"initiative\":3}},\"e:enemy\":{\"def\":\"d:fighter\",\"kind\":\"entity\",\"node\":\"n:enemy-a\",\"props\":{\"vitality\":3,\"initiative\":2}}},\"items\":{},\"containers\":{}}"
+  },
+  "expect": {
+    "shouldNotSelect": [
+      "a:attack"
+    ]
+  },
+  "isGolden": true,
+  "source": "initial"
+}

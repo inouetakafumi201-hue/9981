@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "principles": {
+    "deathAnchor": -10,
+    "lethalWindow": 4,
+    "exhaustionAnchor": -6
+  },
+  "charges": [
+    {
+      "field": "vitality",
+      "unit": 4,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "adjustment": { "when": "<=4", "value": -10 },
+      "scarcity": { "floor": 1, "ceiling": 5, "coefficient": 0.2 },
+      "playerVisible": true,
+      "description": "自身生命值。值越低越该保，压进致死窗口给最大绝对惩罚。"
+    },
+    {
+      "field": "heal",
+      "unit": 3,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "playerVisible": false,
+      "description": "治疗量。健康恢复一点点的内部定价。"
+    },
+    {
+      "field": "E",
+      "unit": 2,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "playerVisible": false,
+      "description": "攻击力（武器/装备）。越强越有助于把目标打进击杀窗口。"
+    },
+    {
+      "field": "range",
+      "unit": 1,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "playerVisible": false,
+      "description": "移动/探索范围。可到达资源节点为价值。"
+    },
+    {
+      "field": "e:enemy.vitality",
+      "unit": 5,
+      "tunableRange": [1, 10],
+      "step": 0.5,
+      "adjustment": { "when": "<=0", "value": 10 },
+      "scarcity": { "floor": 1, "ceiling": 5, "coefficient": 0.5 },
+      "defeated": { "when": "==1" },
+      "playerVisible": false,
+      "description": "敌方生命值（进攻向）。敌方越残血、击杀那刀越值钱；已倒地未终结则换悬着惩罚。"
+    },
+    {
+      "field": "pool.ap",
+      "unit": 2,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "adjustment": { "when": "<=0", "value": -6 },
+      "playerVisible": false,
+      "description": "行动点预算。保有 AP 即保有行动机会，压零会自断后路。"
+    },
+    {
+      "field": "pool.stamina",
+      "unit": 1,
+      "tunableRange": [1, 8],
+      "step": 0.5,
+      "adjustment": { "when": "<=0", "value": -6 },
+      "playerVisible": false,
+      "description": "体力（清醒值）。压零会自断强骰/处决机会。"
+    }
+  ]
+}

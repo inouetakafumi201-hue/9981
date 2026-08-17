@@ -9,6 +9,12 @@ import type { Result } from '../../core/kernel/ops/result.js';
 import type { Value } from '../../core/kernel/state/value.js';
 import type { WorldState } from '../../core/kernel/state/world-state.js';
 import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
+import type { ExprEngine } from '../../core/kernel/expr/engine.js';
+import type { EvalContext } from '../../core/kernel/expr/engine.js';
+import type { QueryEngine } from '../../core/kernel/expr/query-engine.js';
+import type { OutcomeDef } from '../../core/kernel/schedule/playpack.js';
+import { makeDefaultEvalContext } from '../../core/kernel/expr/engine.js';
+import { getPath } from '../../core/kernel/ops/path.js';
 import {
   PATH_MATCH_END_DETAIL,
   PATH_MATCH_ENDED,
@@ -214,4 +220,118 @@ export function consumePlayerQueue(registry: OpRegistry): Result<void> {
 
 export function declaredOutcomeNames(): readonly string[] {
   return CORE_OUTCOMES.map((outcome) => outcome.name);
+}
+
+/**
+ * 一局级运行期评估上下文：绑定到一次状态快照的只读 Expr 求值（与 Op 层同一求值面）。
+ * `when` 谓词里的 `{q:...}` 查询经 `queryEngine.run`/`runValues` 走真实数据源分发。
+ */
+export interface OutcomeEvalDeps {
+  readonly exprEngine: ExprEngine;
+  readonly queryEngine: QueryEngine;
+  /** 当前世界状态快照（只读；评估不产生任何写入）。 */
+  readonly getState: () => WorldState;
+  readonly outcomes?: readonly OutcomeDef[];
+}
+
+/** 一条结局的评估结果：`when` 是否达成，以及达成时按声明优先级的胜者。 */
+export interface OutcomeEvalResult {
+  /** 本次评估命中的结局名（按 `CORE_OUTCOMES_BY_PRECEDENCE` 的 rank 降序取先命中者）；无命中为 null。 */
+  readonly reachedName: string | null;
+  /** 已评估的全部结局（含未命中的），按优先级序。 */
+  readonly evaluated: readonly { readonly name: string; readonly when: boolean }[];
+}
+
+function evalOutcomeExpr(
+  when: OutcomeDef['when'],
+  deps: OutcomeEvalDeps,
+  baseCtx: EvalContext,
+): boolean {
+  return deps.exprEngine.eval(when, baseCtx) === true;
+}
+
+/** 构造绑定到当前状态的一次性只读求值上下文（`when` 是纯读 Expr，无随机/写入 Op）。 */
+function makeOutcomeEvalContext(deps: OutcomeEvalDeps): EvalContext {
+  const state = deps.getState();
+  const baseCtx: EvalContext = makeDefaultEvalContext({
+    resolvePath: (path) => getPath(state, path),
+    runQuery: (query, ctx) => deps.queryEngine.run(state, query, {
+      exprEngine: deps.exprEngine,
+      baseCtx: ctx,
+      ctxForSelf: (ref) => {
+        const selfCtx = makeDefaultEvalContext({
+          self: ref,
+          vars: { self: ref },
+          resolvePath: (path) => getPath(state, path),
+          runQuery: (query, innerCtx) => deps.queryEngine.run(state, query, {
+            exprEngine: deps.exprEngine,
+            baseCtx: innerCtx,
+            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
+          }),
+          runQueryValues: (query, innerCtx) => deps.queryEngine.runValues(state, query, {
+            exprEngine: deps.exprEngine,
+            baseCtx: innerCtx,
+            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
+          }),
+        });
+        return selfCtx;
+      },
+    }),
+    runQueryValues: (query, ctx) => deps.queryEngine.runValues(state, query, {
+      exprEngine: deps.exprEngine,
+      baseCtx: ctx,
+      ctxForSelf: (ref) => {
+        const selfCtx = makeDefaultEvalContext({
+          self: ref,
+          vars: { self: ref },
+          resolvePath: (path) => getPath(state, path),
+          runQuery: (query, innerCtx) => deps.queryEngine.run(state, query, {
+            exprEngine: deps.exprEngine,
+            baseCtx: innerCtx,
+            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
+          }),
+          runQueryValues: (query, innerCtx) => deps.queryEngine.runValues(state, query, {
+            exprEngine: deps.exprEngine,
+            baseCtx: innerCtx,
+            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
+          }),
+        });
+        return selfCtx;
+      },
+    }),
+  });
+  return baseCtx;
+}
+
+/** 嵌套 self 求值上下文（与顶层同源，只替换 self 绑定）。 */
+function makeOutcomeEvalContextSelf(deps: OutcomeEvalDeps, state: WorldState, self: { readonly $: string }): EvalContext {
+  const innerBase = makeOutcomeEvalContext(deps);
+  return makeDefaultEvalContext({
+    ...innerBase,
+    self,
+    vars: { ...innerBase.vars, self },
+  });
+}
+
+/**
+ * 运行期胜负评估（CEME C-1/C-5 的评估端）：按声明优先级（rank 降序、先声明者优先）
+ * 逐条求值 `OutcomeDef.when`，返回首个达成者。纯读，不产生任何写入。
+ */
+export function evaluateOutcomes(deps: OutcomeEvalDeps): OutcomeEvalResult {
+  const candidates = deps.outcomes ?? CORE_OUTCOMES;
+  const byPrecedence = [...candidates].sort((left, right) => {
+    const leftRank = typeof left.rank === 'number' ? left.rank : 0;
+    const rightRank = typeof right.rank === 'number' ? right.rank : 0;
+    if (leftRank !== rightRank) return rightRank - leftRank;
+    return candidates.indexOf(left) - candidates.indexOf(right);
+  });
+  const baseCtx = makeOutcomeEvalContext(deps);
+  const evaluated: { readonly name: string; readonly when: boolean }[] = [];
+  let reachedName: string | null = null;
+  for (const outcome of byPrecedence) {
+    const reached = evalOutcomeExpr(outcome.when, deps, baseCtx);
+    evaluated.push({ name: outcome.name, when: reached });
+    if (reached && reachedName === null) reachedName = outcome.name;
+  }
+  return { reachedName, evaluated };
 }

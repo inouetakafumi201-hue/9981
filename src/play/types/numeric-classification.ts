@@ -413,6 +413,15 @@ const NUMERIC_RULES: readonly NumericRule[] = [
     source: L0,
   },
   {
+    key: 'magazineCapacity',
+    ...GAMEPLAY,
+    rationale:
+      '弹容量是枪的固有属性、弹药满匣的上限刻度，直接决定玩家射击前能打出几发（霰弹枪/手枪 3、'
+      + '冲锋枪/步枪/狙击枪 4、机枪 5），是玩家可见的弹药刻度（2026-08-16 玩法层定案，'
+      + '见 docs/L2_基类层/04_物品装备.md 弹容量与弹匣）。',
+    source: 'docs/L2_基类层/04_物品装备.md 弹容量与弹匣（2026-08-16）',
+  },
+  {
     key: 'range',
     ...GAMEPLAY,
     rationale: '射程与移动距离是玩家可见的空间刻度。',

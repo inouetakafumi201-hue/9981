@@ -1,4 +1,5 @@
-import type { Directionality, MapData, MapEdge, MapNode, SceneScale, Vec2 } from '../ports/map-contracts.js';
+import type { Directionality, MapData, MapEdge, MapNode, ObstructionSpec, SceneScale, TransitionWindowPoints, Vec2 } from '../ports/map-contracts.js';
+import { findSnapTarget, insertControlPoint, simplifyPath } from '../ports/map-contracts.js';
 
 export type EditorMode = 'select' | 'node' | 'edge' | 'sample' | 'playtest';
 
@@ -6,7 +7,12 @@ export const nodeScales: readonly SceneScale[] = ['large', 'medium', 'small'];
 export const directions: readonly Directionality[] = ['bidirectional', 'unidirectional', 'one-way-up', 'one-way-down'];
 
 export function clampPoint(point: Vec2): Vec2 {
-  return { x: Math.max(0, Math.min(1, point.x)), y: Math.max(0, Math.min(1, point.y)) };
+  // Math.max(0, Math.min(1, NaN)) 会得到 NaN，而 NaN 坐标会让校验报 MAP_COORD_OUT_OF_RANGE
+  // 且随拖拽持续蔓延（PBT 反例：editor-state.property.test.ts "任意编辑原语…零 error"）。
+  // 属性轰炸在任意合法地图上跑随机操作，坐标必须是有限数才配得上"合法地图"前提。
+  const x = Number.isFinite(point.x) ? point.x : 0;
+  const y = Number.isFinite(point.y) ? point.y : 0;
+  return { x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
 }
 
 /** 内置的可切换、可编辑地图样例。 */
@@ -125,4 +131,201 @@ export function updateNode(map: MapData, id: string, patch: Partial<MapNode>): M
 
 export function updateEdge(map: MapData, id: string, patch: Partial<MapEdge>): MapData {
   return { ...map, edges: map.edges.map((edge) => edge.id === id ? { ...edge, ...patch } : edge) };
+}
+
+/* ── 拉边描线（§九 拉边流程）────────────────────────────────────────── */
+/**
+ * 描线中的一次拖拽吸附判定。只有松手点吸附，中间采样点永不吸附
+ * （§九：否则曲线绕过节点旁时会被抢走）。返回命中的节点，否则 null。
+ */
+export function snapEdgeEndpoint(
+  candidates: readonly MapNode[],
+  point: Vec2,
+  snapRadius: number,
+): MapNode | null {
+  return findSnapTarget(candidates, point, snapRadius);
+}
+
+/** RDP 简化拉边阶段采到的原始点，压成少量折点（首尾恒保留）。 */
+export function simplifyEdgePath(points: readonly Vec2[], epsilon: number): readonly Vec2[] {
+  return simplifyPath(points, epsilon);
+}
+
+/* ── 样条塑形（§九 拉线后的塑形：Catmull-Rom 非贝塞尔）───────────────── */
+/** 拉弯即追加：在 path 上鼠标落点追加一个隐藏样条点（松手定型，无上限）。 */
+export function bendEdgePath(map: MapData, edgeId: string, point: Vec2): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const path = insertControlPoint(edge.path, point);
+  return { ...map, edges: map.edges.map((e) => e.id === edgeId ? { ...e, path } : e) };
+}
+
+/** 双击线段拉直：清空该线段内全部隐藏样条点，瞬间绷直为直线（唯一重塑入口）。 */
+export function straightenEdgePath(map: MapData, edgeId: string): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const from = edge.path[0];
+  const to = edge.path[edge.path.length - 1];
+  if (!from || !to) return map;
+  return { ...map, edges: map.edges.map((e) => e.id === edgeId ? { ...e, path: [from, to] } : e) };
+}
+
+/* ── 遮挡 / 锚点 / 过渡窗口（§八 图元穷举，落在既有 MapEdge 字段）───── */
+/**
+ * 在边中点上方放置一个 box 遮挡框（视觉黄 / 物理红）。框中心取边中点，边长取归一化固定值，
+ * 自带 shape + 半透明渲染。bounds 用归一化坐标。
+ */
+function edgeObstruction(map: MapData, edgeId: string, boxSize: number): ObstructionSpec | undefined {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return undefined;
+  const from = edge.path[0];
+  const to = edge.path[edge.path.length - 1];
+  if (!from || !to) return undefined;
+  const cx = (from.x + to.x) / 2;
+  const cy = (from.y + to.y) / 2;
+  const half = boxSize / 2;
+  const bounds: Vec2[] = [
+    { x: cx - half, y: cy - half },
+    { x: cx + half, y: cy - half },
+    { x: cx + half, y: cy + half },
+    { x: cx - half, y: cy + half },
+  ];
+  return { shape: 'box', bounds };
+}
+
+/** 在选中边上追加/更新一个视觉遮挡框（黄）。 */
+export function setVisualObstruction(map: MapData, edgeId: string, boxSize = 0.16): MapData {
+  const spec = edgeObstruction(map, edgeId, boxSize);
+  if (!spec) return map;
+  return updateEdge(map, edgeId, { visualObstruction: spec });
+}
+
+/** 在选中边上追加/更新一个物理遮挡框（红，不可通行）。 */
+export function setPhysicalObstruction(map: MapData, edgeId: string, boxSize = 0.16): MapData {
+  const spec = edgeObstruction(map, edgeId, boxSize);
+  if (!spec) return map;
+  return updateEdge(map, edgeId, { physicalObstruction: spec });
+}
+
+/** 移除选中边上的视觉遮挡框。 */
+export function clearVisualObstruction(map: MapData, edgeId: string): MapData {
+  return updateEdge(map, edgeId, { visualObstruction: undefined });
+}
+
+/** 移除选中边上的物理遮挡框。 */
+export function clearPhysicalObstruction(map: MapData, edgeId: string): MapData {
+  return updateEdge(map, edgeId, { physicalObstruction: undefined });
+}
+
+/** 给选中边打语义锚点（高地 / 洼地 / 中性），框可视化在画布由 edges 渲染。 */
+export function setSemanticAnchor(map: MapData, edgeId: string, anchor: 'high' | 'low' | 'neutral'): MapData {
+  return updateEdge(map, edgeId, { semanticAnchor: anchor });
+}
+
+/** 给选中边追加/清空一个过渡窗口（非节点悬浮组件，落在 TransitionWindowPoints）。 */
+export function setTransitionWindow(map: MapData, edgeId: string, enabled: boolean): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const from = edge.path[0];
+  const to = edge.path[edge.path.length - 1];
+  if (!from || !to) return map;
+  const control: TransitionWindowPoints = from
+    ? { control: [{ x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }] }
+    : { control: [] };
+  return updateEdge(map, edgeId, enabled ? { transitionWindow: control } : { transitionWindow: undefined });
+}
+
+/* ── 样条塑形 [B] 折点调整 / [D] 折点删除（§九 三态合一最小动作集）────────── */
+/**
+ * [B] 折点调整：移动 `path[pathIndex]` 坐标，左右连线跟随（Catmull-Rom 重采样）。
+ * 首末折点恒吸附节点中心（`clampPoint`），中段折点可自由移动。
+ */
+export function moveKnot(map: MapData, edgeId: string, pathIndex: number, to: Vec2): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  if (pathIndex <= 0 || pathIndex >= edge.path.length - 1) return map; // 首末由节点吸附，不直接改
+  const point = clampPoint(to);
+  const path = edge.path.map((p, i) => (i === pathIndex ? point : p));
+  return { ...map, edges: map.edges.map((e) => e.id === edgeId ? { ...e, path } : e) };
+}
+
+/**
+ * [D] 折点删除：移除 `path[pathIndex]`，前/后折点直接连成**绝对直线**（拍直）。
+ * 因为重连是新建线段、隐藏样条点天然为空，这是"安全降级"——避免幽灵曲线。
+ */
+export function deleteKnot(map: MapData, edgeId: string, pathIndex: number): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  if (pathIndex <= 0 || pathIndex >= edge.path.length - 1) return map; // 首末不可删
+  const path = edge.path.filter((_, i) => i !== pathIndex);
+  return { ...map, edges: map.edges.map((e) => e.id === edgeId ? { ...e, path } : e) };
+}
+
+/**
+ * [D] 吸附删除：折点拖至邻折点时触发"融合删除"，删点即拍直两侧。
+ * 与 `deleteKnot` 同语义（删点后前/后直接连成直线），供 UI 在吸附提示后调用。
+ */
+export function mergeDeleteKnot(map: MapData, edgeId: string, pathIndex: number): MapData {
+  return deleteKnot(map, edgeId, pathIndex);
+}
+
+/**
+ * [C] 拉弯即追加（Fire-and-Forget）：在鼠标落点追加一个隐藏样条点进该线段。
+ * 拖多少次塞多少、无上限；**不调用 simplifyPath**（拉弯后点不再被简化）。
+ */
+export function pushKnot(map: MapData, edgeId: string, point: Vec2): MapData {
+  return bendEdgePath(map, edgeId, point);
+}
+
+/**
+ * [C] 双击拉直：清空该线段内全部隐藏样条点，瞬间绷直回直线（唯一重塑入口）。
+ */
+export function straightenKnots(map: MapData, edgeId: string): MapData {
+  return straightenEdgePath(map, edgeId);
+}
+
+/* ── 遮挡框旋转（§八 涂鸦式交互：滚轮 10°/格）────────────────────────────── */
+/** 绕框中心旋转 bounds 顶点任意角度；`shape` 保持 'box'。 */
+export function rotateObstruction(map: MapData, edgeId: string, which: 'visual' | 'physical', degrees: number): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const spec = which === 'visual' ? edge.visualObstruction : edge.physicalObstruction;
+  if (!spec || !spec.bounds || spec.bounds.length < 4) return map;
+  const rad = (degrees * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // 框中心 = bounds 顶点均值
+  let cx = 0;
+  let cy = 0;
+  for (const p of spec.bounds) { cx += p.x; cy += p.y; }
+  cx /= spec.bounds.length;
+  cy /= spec.bounds.length;
+  const bounds = spec.bounds.map((p) => {
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    return { x: clampPoint({ x: cx + dx * cos - dy * sin, y: cy + dx * sin + dy * cos }).x, y: clampPoint({ x: cx + dx * cos - dy * sin, y: cy + dx * sin + dy * cos }).y };
+  });
+  const next: ObstructionSpec = { ...spec, bounds };
+  return updateEdge(map, edgeId, which === 'visual' ? { visualObstruction: next } : { physicalObstruction: next });
+}
+
+/** 遮挡框整体平移：拖拽 delta 归一化位移，全部顶点同移（涂鸦交互：框整体拖动，不逐控制点变形）。 */
+export function translateObstruction(map: MapData, edgeId: string, which: 'visual' | 'physical', dx: number, dy: number): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const spec = which === 'visual' ? edge.visualObstruction : edge.physicalObstruction;
+  if (!spec || !spec.bounds) return map;
+  const bounds = spec.bounds.map((p) => clampPoint({ x: p.x + dx, y: p.y + dy }));
+  const next: ObstructionSpec = { ...spec, bounds };
+  return updateEdge(map, edgeId, which === 'visual' ? { visualObstruction: next } : { physicalObstruction: next });
+}
+
+/* ── 过渡窗口独立拖拽（§八：不吸附节点，独立拖到任意位置）────────────────── */
+/** 把过渡窗口移动到任意位置（不吸附节点）。 */
+export function moveTransitionWindow(map: MapData, edgeId: string, to: Vec2): MapData {
+  const edge = map.edges.find((e) => e.id === edgeId);
+  if (!edge) return map;
+  const point = clampPoint(to);
+  const control: TransitionWindowPoints = { control: [point] };
+  return updateEdge(map, edgeId, { transitionWindow: control });
 }

@@ -4,7 +4,9 @@
   "name": "WakeUp 武器族语义目录",
   "description": "基类层武器语义最小单元目录：武器类按攻击实施方式区分类型身份；武器属性（散射/扫射/连发）、时序节奏、射程档、负重档、伤害结算与弹药配件全部经组合表达。目录不承载具体玩法数值、具体玩法规则或具名武器实例。2026-08-08 权威变更：已废除攻击形状/形状轴设计。2026-08-12 紧急修复（D-071）：删除3个空参数占位能力，新增6个战术能力（快拔/架枪/压制射击/散射/屏息/突击推进）。",
   "category": "weapons",
-  "semanticFamilies": ["weapon"],
+  "semanticFamilies": [
+    "weapon"
+  ],
   "classificationEvidence": {
     "enumerable": true,
     "enumerationRationale": "武器按攻击实施方式只有近战、非枪械远程、枪械三种，可有限列举。",
@@ -144,67 +146,154 @@
       "name": "快拔技能",
       "description": "手枪专属技能。当武器在背包内时，授予持有者一个0费动作【快拔】：将该武器与一只手上的物品交换位置（若手为空则直接装备）。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "swapActionId", "description": "快拔动作的稳定标识。", "required": true, "valueShape": "string" }
+        {
+          "key": "swapActionId",
+          "description": "快拔动作的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        }
       ],
-      "kernelOps": ["slot.swap", "entity.grantAction"]
+      "kernelOps": [
+        "slot.swap",
+        "entity.grantAction"
+      ]
     },
     {
       "id": "weapon.capability.ready_stance",
       "name": "架枪技能",
       "description": "步枪专属技能。1费动作【架枪】：进入架枪状态，获得一个无需瞄准的群体射击能力——可对当前位置能攻击到的所有目标直接射击。一旦移动，自动取消架枪状态。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "readyStateId", "description": "架枪状态的稳定标识。", "required": true, "valueShape": "string" },
-        { "key": "readyActionId", "description": "架枪动作的稳定标识。", "required": true, "valueShape": "string" }
+        {
+          "key": "readyStateId",
+          "description": "架枪状态的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        },
+        {
+          "key": "readyActionId",
+          "description": "架枪动作的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        }
       ],
-      "kernelOps": ["state.add", "state.del", "entity.grantAction", "prop.add"]
+      "kernelOps": [
+        "state.add",
+        "state.del",
+        "entity.grantAction",
+        "prop.add"
+      ]
     },
     {
       "id": "weapon.capability.suppressive_fire",
       "name": "压制射击技能",
       "description": "机枪专属技能。命中目标时，同时对目标所在微型场景的所有其他角色造成1点穿刺伤害；在掩体或半掩体内的角色免疫此穿刺效果。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "pierceDamageAmount", "description": "穿刺伤害量参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
-        { "key": "pierceDamageTypeId", "description": "穿刺伤害类别引用。", "required": true, "valueShape": "reference<damage-type>" }
+        {
+          "key": "pierceDamageAmount",
+          "description": "穿刺伤害量参数字段名；取值归玩法层。",
+          "required": true,
+          "valueShape": "field-name"
+        },
+        {
+          "key": "pierceDamageTypeId",
+          "description": "穿刺伤害类别引用。",
+          "required": true,
+          "valueShape": "reference<damage-type>"
+        }
       ],
-      "kernelOps": ["prop.add", "query.entitiesInNode"]
+      "kernelOps": [
+        "prop.add",
+        "query.entitiesInNode"
+      ]
     },
     {
       "id": "weapon.capability.scatter_shot",
       "name": "散射射击技能",
       "description": "霰弹枪专属技能。当距离为1时，射击无需瞄准；若命中，对目标所在微型场景的所有单位造成同等伤害。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "closeRangeThreshold", "description": "近距阈值参数字段名；取值归玩法层，通常为1。", "required": true, "valueShape": "field-name" }
+        {
+          "key": "closeRangeThreshold",
+          "description": "近距阈值参数字段名；取值归玩法层，通常为1。",
+          "required": true,
+          "valueShape": "field-name"
+        }
       ],
-      "kernelOps": ["prop.add", "query.entitiesInNode"]
+      "kernelOps": [
+        "prop.add",
+        "query.entitiesInNode"
+      ]
     },
     {
       "id": "weapon.capability.hold_breath",
       "name": "屏息技能",
       "description": "狙击枪专属技能。在瞄准状态下，可花1AP进入屏息状态；在瞄准状态脱离前（瞄准目标切换或重新瞄准不算脱离），若开枪，DC-2。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "holdBreathStateId", "description": "屏息状态的稳定标识。", "required": true, "valueShape": "string" },
-        { "key": "holdBreathActionId", "description": "屏息动作的稳定标识。", "required": true, "valueShape": "string" },
-        { "key": "dcModifier", "description": "DC修正值参数字段名；取值归玩法层，通常为-2。", "required": true, "valueShape": "field-name" }
+        {
+          "key": "holdBreathStateId",
+          "description": "屏息状态的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        },
+        {
+          "key": "holdBreathActionId",
+          "description": "屏息动作的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        },
+        {
+          "key": "dcModifier",
+          "description": "DC修正值参数字段名；取值归玩法层，通常为-2。",
+          "required": true,
+          "valueShape": "field-name"
+        }
       ],
-      "kernelOps": ["state.add", "state.del", "entity.grantAction"]
+      "kernelOps": [
+        "state.add",
+        "state.del",
+        "entity.grantAction"
+      ]
     },
     {
       "id": "weapon.capability.assault_advance",
       "name": "冲锋技能",
       "description": "冲锋枪专属技能。射击后，下一次AP花费前，获得一个只可使用一次的0费动作【冲锋】：进行一次常规移动。可选能力，不构成类型身份。2026-08-12 权威定义（D-071）。",
       "parameters": [
-        { "key": "advanceActionId", "description": "冲锋动作的稳定标识。", "required": true, "valueShape": "string" },
-        { "key": "triggerEventId", "description": "触发冲锋的事件标识，通常为 OnWeaponFire。", "required": true, "valueShape": "string" }
+        {
+          "key": "advanceActionId",
+          "description": "冲锋动作的稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        },
+        {
+          "key": "triggerEventId",
+          "description": "触发冲锋的事件标识，通常为 OnWeaponFire。",
+          "required": true,
+          "valueShape": "string"
+        }
       ],
-      "kernelOps": ["entity.grantAction", "entity.revokeAction", "entity.move"]
+      "kernelOps": [
+        "entity.grantAction",
+        "entity.revokeAction",
+        "entity.move"
+      ]
     },
     {
       "id": "weapon.capability.range_profile",
       "name": "射程档组合能力",
       "description": "声明武器在射程档轴上组合的档位标识；档位边界与具体距离取值由玩法层提供。",
       "parameters": [
-        { "key": "rangeTierId", "description": "射程档标识引用。", "required": true, "valueShape": "reference<range-tier>" },
-        { "key": "effectiveRangeField", "description": "有效射程参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+        {
+          "key": "rangeTierId",
+          "description": "射程档标识引用。",
+          "required": true,
+          "valueShape": "reference<range-tier>"
+        },
+        {
+          "key": "effectiveRangeField",
+          "description": "有效射程参数字段名；取值归玩法层。",
+          "required": false,
+          "valueShape": "field-name"
+        }
       ],
       "kernelOps": []
     },
@@ -213,8 +302,18 @@
       "name": "负重档组合能力",
       "description": "声明武器在负重档轴上组合的档位标识与持握方式；具体行动负担取值由玩法层提供。",
       "parameters": [
-        { "key": "weightTierId", "description": "负重档标识引用。", "required": true, "valueShape": "reference<weight-tier>" },
-        { "key": "handedness", "description": "持握方式语义标识。", "required": false, "valueShape": "string" }
+        {
+          "key": "weightTierId",
+          "description": "负重档标识引用。",
+          "required": true,
+          "valueShape": "reference<weight-tier>"
+        },
+        {
+          "key": "handedness",
+          "description": "持握方式语义标识。",
+          "required": false,
+          "valueShape": "string"
+        }
       ],
       "kernelOps": []
     },
@@ -223,9 +322,24 @@
       "name": "伤害引用能力",
       "description": "声明武器引用的伤害结算语义与伤害类别组合入口；伤害量取值由玩法层提供。",
       "parameters": [
-        { "key": "damageClassId", "description": "伤害结算语义类引用。", "required": true, "valueShape": "reference<damage-class>" },
-        { "key": "damageTypeIds", "description": "伤害类别引用集合；由玩法层组合。", "required": false, "valueShape": "array<reference<damage-type>>" },
-        { "key": "damageAmountField", "description": "伤害量参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+        {
+          "key": "damageClassId",
+          "description": "伤害结算语义类引用。",
+          "required": true,
+          "valueShape": "reference<damage-class>"
+        },
+        {
+          "key": "damageTypeIds",
+          "description": "伤害类别引用集合；由玩法层组合。",
+          "required": false,
+          "valueShape": "array<reference<damage-type>>"
+        },
+        {
+          "key": "damageAmountField",
+          "description": "伤害量参数字段名；取值归玩法层。",
+          "required": false,
+          "valueShape": "field-name"
+        }
       ],
       "kernelOps": []
     },
@@ -234,30 +348,72 @@
       "name": "目标上限能力",
       "description": "声明目标上限所引用的参数字段名；上限取值由玩法层提供。可选能力：只有当武器需要一个固定的命中目标数时才组合它（如连发武器的点射）；散射/扫射属性不适用本能力，其命中数不设固定上限。",
       "parameters": [
-        { "key": "maxTargetsField", "description": "目标上限参数字段名。", "required": true, "valueShape": "field-name" }
+        {
+          "key": "maxTargetsField",
+          "description": "目标上限参数字段名。",
+          "required": true,
+          "valueShape": "field-name"
+        }
       ],
       "kernelOps": []
     },
     {
       "id": "weapon.capability.ammunition_binding",
       "name": "弹药绑定能力",
-      "description": "声明武器所消耗的弹药物品类引用与弹药类别字段名。弹药具体类别与消耗量由玩法层提供。",
+      "description": "声明武器所消耗的弹药物品类引用、弹药类别字段名与固有弹容量。弹药具体类别与每次射击消耗量由玩法层提供；弹容量 = 枪的固有属性（2026-08-16 玩法层定案，见 docs/L2_基类层/04_物品装备.md 弹容量与弹匣），取值归玩法层。",
       "parameters": [
-        { "key": "ammunitionClassId", "description": "弹药物品类引用。", "required": true, "valueShape": "reference<item-class>" },
-        { "key": "ammunitionTypeField", "description": "弹药类别参数字段名；取值归玩法层。", "required": true, "valueShape": "field-name" },
-        { "key": "ammunitionCostField", "description": "弹药消耗参数字段名；取值归玩法层。", "required": false, "valueShape": "field-name" }
+        {
+          "key": "ammunitionClassId",
+          "description": "弹药物品类引用。",
+          "required": true,
+          "valueShape": "reference<item-class>"
+        },
+        {
+          "key": "ammunitionTypeField",
+          "description": "弹药类别参数字段名；取值归玩法层。",
+          "required": true,
+          "valueShape": "field-name"
+        },
+        {
+          "key": "ammunitionCostField",
+          "description": "弹药消耗参数字段名；取值归玩法层。",
+          "required": false,
+          "valueShape": "field-name"
+        },
+        {
+          "key": "magazineCapacity",
+          "description": "枪的固有弹容量（玩家可见数值，1-5）；取值归玩法层。",
+          "required": true,
+          "valueShape": "integer"
+        }
       ],
-      "kernelOps": ["item.destroy", "prop.add"]
+      "kernelOps": [
+        "item.destroy",
+        "prop.add"
+      ]
     },
     {
       "id": "weapon.capability.accessory_compatibility",
       "name": "配件兼容能力",
       "description": "声明武器可接受的配件挂点与可接受的配件物品类引用。",
       "parameters": [
-        { "key": "mountPointId", "description": "挂点稳定标识。", "required": true, "valueShape": "string" },
-        { "key": "acceptedItemClassIds", "description": "可接受的配件物品类引用集合。", "required": true, "valueShape": "array<reference<item-class>>" }
+        {
+          "key": "mountPointId",
+          "description": "挂点稳定标识。",
+          "required": true,
+          "valueShape": "string"
+        },
+        {
+          "key": "acceptedItemClassIds",
+          "description": "可接受的配件物品类引用集合。",
+          "required": true,
+          "valueShape": "array<reference<item-class>>"
+        }
       ],
-      "kernelOps": ["slot.add", "slot.del"]
+      "kernelOps": [
+        "slot.add",
+        "slot.del"
+      ]
     }
   ],
   "valueSets": [
@@ -266,8 +422,16 @@
       "name": "伤害结算输入来源",
       "description": "伤害结算语义类的结算输入来源。该取值把结算语义类的不变量表述为可机械校验的语义标识，使两个结算语义类的类型身份差异不只存在于散文陈述中；它不携带任何伤害取值。",
       "tokens": [
-        { "id": "firing-mechanism", "name": "发射机构", "description": "结算输入来自发射机构行为。" },
-        { "id": "direct-contact", "name": "直接接触", "description": "结算输入来自直接接触，不经过发射机构。" }
+        {
+          "id": "firing-mechanism",
+          "name": "发射机构",
+          "description": "结算输入来自发射机构行为。"
+        },
+        {
+          "id": "direct-contact",
+          "name": "直接接触",
+          "description": "结算输入来自直接接触，不经过发射机构。"
+        }
       ]
     },
     {
@@ -275,9 +439,21 @@
       "name": "负重档轴",
       "description": "武器负担档位轴。档位是有序语义标识，不是子类型：不同档位不构成不同武器类，只作为组合输入。",
       "tokens": [
-        { "id": "weight-tier.light", "name": "轻型", "description": "在负重档轴上表示最低负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。" },
-        { "id": "weight-tier.medium", "name": "中型", "description": "在负重档轴上表示中间负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。" },
-        { "id": "weight-tier.heavy", "name": "重型", "description": "在负重档轴上表示最高负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。" }
+        {
+          "id": "weight-tier.light",
+          "name": "轻型",
+          "description": "在负重档轴上表示最低负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。"
+        },
+        {
+          "id": "weight-tier.medium",
+          "name": "中型",
+          "description": "在负重档轴上表示中间负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。"
+        },
+        {
+          "id": "weight-tier.heavy",
+          "name": "重型",
+          "description": "在负重档轴上表示最高负担档位的语义标识。档位边界与其带来的具体行动负担取值由玩法层提供。"
+        }
       ]
     },
     {
@@ -285,10 +461,26 @@
       "name": "射程档轴",
       "description": "武器射程档位轴。档位是有序语义标识，不是子类型：不同档位不构成不同武器类，只作为组合输入。",
       "tokens": [
-        { "id": "range-tier.close", "name": "近距", "description": "在射程档轴上表示最近档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。" },
-        { "id": "range-tier.medium", "name": "中距", "description": "在射程档轴上表示中间档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。" },
-        { "id": "range-tier.long", "name": "远距", "description": "在射程档轴上表示较远档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。" },
-        { "id": "range-tier.extreme", "name": "超远距", "description": "在射程档轴上表示最远档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。" }
+        {
+          "id": "range-tier.close",
+          "name": "近距",
+          "description": "在射程档轴上表示最近档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。"
+        },
+        {
+          "id": "range-tier.medium",
+          "name": "中距",
+          "description": "在射程档轴上表示中间档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。"
+        },
+        {
+          "id": "range-tier.long",
+          "name": "远距",
+          "description": "在射程档轴上表示较远档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。"
+        },
+        {
+          "id": "range-tier.extreme",
+          "name": "超远距",
+          "description": "在射程档轴上表示最远档位的语义标识。档位对应的具体距离与命中修正由玩法层提供。"
+        }
       ]
     }
   ],
@@ -377,7 +569,17 @@
     "damageClassReferenceField": "classComposition.damageClassId",
     "capabilityReferenceField": "classComposition.capabilityIds",
     "parameterBindingField": "weaponParameters",
-    "playLayerOwnedFieldNames": ["damage", "range", "apCost", "ammoCost", "ammoType", "weightClass", "rangeClass", "volume", "maxTargets"],
+    "playLayerOwnedFieldNames": [
+      "damage",
+      "range",
+      "apCost",
+      "ammoCost",
+      "ammoType",
+      "weightClass",
+      "rangeClass",
+      "volume",
+      "maxTargets"
+    ],
     "description": "玩法层以 classComposition 引用武器类与伤害结算类，并在上列玩法层字段中提供伤害、射程、成本、档位与目标上限取值。2026-08-08 权威变更：spectrumReferenceField 已删除（攻击形状/形状轴已废止），武器属性（散射/扫射/连发）改由 classComposition.capabilityIds 引用能力，无需专用参照字段。2026-08-12 紧急修复（D-071）：战术能力参数需在 weaponParameters 中提供（如 quickdraw.swapActionId、suppressive_fire.pierceDamageAmount 等）。"
   }
 }
