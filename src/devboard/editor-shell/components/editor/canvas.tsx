@@ -55,7 +55,6 @@ import {
   simplifyEdgeHiddenRuns,
   straightenEdgeSegment,
   addScene,
-  addBuildingGroup,
   addEdge,
   updateObstruction,
   updateTerrain,
@@ -243,7 +242,7 @@ function SceneBoxRect({
         y={b.y}
         width={b.width}
         height={b.height}
-        rx={10}
+        rx={6}
         fill={
           selected
             ? 'color-mix(in srgb, var(--edge-selected) 12%, transparent)'
@@ -301,26 +300,27 @@ function SceneLabel({
         vectorEffect="non-scaling-stroke"
       />
       <text
-        x={bbox.x + 16}
-        y={bbox.y + 26}
-        fill="var(--foreground)"
-        fontSize={15}
-        fontWeight={700}
-        className="select-none"
-      >
-        {node.name}
-      </text>
-      <text
-        x={bbox.x + bbox.width - 16}
-        y={bbox.y + 26}
-        textAnchor="end"
+        x={bbox.x + bbox.width / 2}
+        y={bbox.y + bbox.height / 2 + 8}
+        textAnchor="middle"
         fill={selected ? 'var(--edge-selected)' : 'var(--primary)'}
-        fontSize={13}
+        fontSize={28}
         fontWeight={800}
         fontFamily="var(--font-mono)"
         className="select-none"
       >
-        {SCALE_LABEL[node.scale]}
+        {node.scale.charAt(0).toUpperCase()}
+      </text>
+      <text
+        x={bbox.x + bbox.width / 2}
+        y={bbox.y + bbox.height + 20}
+        textAnchor="middle"
+        fill="var(--foreground)"
+        fontSize={14}
+        fontWeight={700}
+        className="select-none"
+      >
+        {node.name}
       </text>
     </g>
   )
@@ -954,10 +954,24 @@ export function Canvas() {
         case 'marquee': {
           const rect = rectFromDrag(drag.start, w)
           if (rect.width > 5 || rect.height > 5) {
-            const buildingId = addBuildingGroup(rect)
-            selectOne('building', buildingId)
-            setPreview({})
-            break
+            const next: { type: 'scene' | 'obstruction' | 'terrain' | 'placement'; id: string }[] = []
+            for (const node of getState().doc.sceneNodes) {
+              const boxes = boxesOfScene(node.id, getState().doc)
+              if (boxes.some((box) => rectsOverlap(rect, rotatedRectAABB(box, box.rotation ?? 0)))) {
+                next.push({ type: 'scene', id: node.id })
+              }
+            }
+            for (const item of getState().doc.obstructions) {
+              if (rectsOverlap(rect, rotatedRectAABB(item, item.rotation))) next.push({ type: 'obstruction', id: item.id })
+            }
+            for (const item of getState().doc.terrains) {
+              if (rectsOverlap(rect, rotatedRectAABB(item, item.rotation))) next.push({ type: 'terrain', id: item.id })
+            }
+            for (const item of getState().doc.placements) {
+              if (pointInRect({ x: item.x, y: item.y }, rect, 18)) next.push({ type: 'placement', id: item.id })
+            }
+            if (ev.shiftKey) setSelection([...selection, ...next])
+            else setSelection(next)
           }
           setPreview({})
           break
@@ -1577,7 +1591,8 @@ export function Canvas() {
                     y={bbox.y - 3}
                     width={bbox.width + 6}
                     height={bbox.height + 6}
-                    rx={10}
+        rx={6}
+
                     fill="none"
                     stroke="#3182ce"
                     strokeWidth={3}
