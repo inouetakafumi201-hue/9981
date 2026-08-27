@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@source '../../editor-shell/components/**/*.{ts,tsx}';
+@source '../../editor-shell/lib/**/*.{ts,tsx}';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -9,6 +11,24 @@
   --color-foreground: var(--foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-panel-inset: var(--panel-inset);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dim: var(--primary-dim);
+  --color-edge: var(--edge);
+  --color-edge-selected: var(--edge-selected);
+  --color-box-mask: var(--box-mask);
+  --color-box-physics: var(--box-physics);
+  --color-transition: var(--transition);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --font-sans: var(--font-display);
   --font-mono: var(--font-mono-face);
 }
