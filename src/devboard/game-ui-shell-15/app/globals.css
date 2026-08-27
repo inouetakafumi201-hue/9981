@@ -499,6 +499,45 @@ button:focus-visible { outline: 1px solid var(--acid); outline-offset: 3px; }
 .bh-hand-card-target { flex: 1 1 35%; min-width: 0; font-size: clamp(8px, 0.6vw, 9px); font-weight: 600; overflow: hidden; overflow-wrap: anywhere; color: var(--card-accent); }
 .bh-hand-card-warn { display: block; flex: none; max-width: 100%; padding-bottom: 4px; font-size: clamp(8px, 0.6vw, 9px); font-weight: 700; overflow: hidden; overflow-wrap: anywhere; color: var(--hp-hi); }
 
+/* -- B9 action availability, submission and target feedback -- */
+.action-card--disabled-ap-insufficient .bh-hand-card-face { filter: saturate(0) brightness(.62); }
+.action-card--disabled-ap-insufficient .bh-hand-card-face::before { background: var(--hp); }
+.action-card--disabled-target-required .bh-hand-card-face::before { background: var(--gold); }
+.action-card--disabled-roll-missing-symbol .bh-hand-card-face::before { background: var(--amber); }
+.action-card--disabled-cooldown .bh-hand-card-face::before { background: var(--res); }
+.action-card--disabled-not-your-turn .bh-hand-card-face::before { background: #737b88; }
+.action-card[class*='action-card--disabled-'] .bh-card-icon-svg { opacity: .55; }
+.action-card--pending .bh-hand-card-face::before { background: var(--amber-hi); animation: bh-pending-border .7s linear infinite alternate; }
+.action-card--accepted .bh-hand-card-face::before { background: var(--fac-goblin); animation: bh-accepted-flash .45s ease-out 2; }
+.action-card--rejected .bh-hand-card-face::before, .action-card--timeout .bh-hand-card-face::before { background: var(--hp-hi); }
+@keyframes bh-pending-border { to { filter: brightness(1.7); } }
+@keyframes bh-accepted-flash { 50% { filter: brightness(2); } }
+.disabled-action-tooltip { position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 95; width: max-content; max-width: 210px; padding: 6px 8px; color: #f0f2f5; background: rgba(5,7,12,.98); border: 1px solid var(--hp-hi); border-radius: 4px; font-size: 10px; line-height: 1.4; opacity: 0; pointer-events: none; transform: translateX(-50%); }
+.action-card:hover .disabled-action-tooltip, .action-card:focus-within .disabled-action-tooltip { opacity: 1; }
+.action-pending-indicator { position: absolute; left: 50%; top: 44px; z-index: 4; display: flex; align-items: center; gap: 4px; padding: 3px 5px; color: var(--amber-hi); background: rgba(5,7,12,.9); font-size: 9px; transform: translateX(-50%); }
+.action-pending-indicator > span { width: 9px; height: 9px; border: 1px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: bh-spin .65s linear infinite; }
+@keyframes bh-spin { to { transform: rotate(360deg); } }
+.action-error-float { position: absolute; left: 50%; bottom: calc(100% + 6px); z-index: 96; padding: 4px 7px; color: #fff; background: var(--hp); border-radius: 3px; font-size: 9px; white-space: nowrap; transform: translateX(-50%); }
+.submit-toast { position: absolute; left: 50%; top: 52px; z-index: 100; padding: 8px 14px; color: #f4f6f8; background: rgba(7,10,16,.96); border: 1px solid currentColor; border-radius: 4px; font-size: 11px; box-shadow: 0 8px 22px rgba(0,0,0,.45); transform: translateX(-50%); }
+.ap-bar { position: relative; }
+.ap-bar:hover::after, .ap-bar:focus-within::after { content: attr(aria-label); position: absolute; left: 0; bottom: calc(100% + 5px); padding: 4px 6px; color: #f0f2f5; background: rgba(5,7,12,.96); border: 1px solid var(--amber); font-size: 9px; white-space: nowrap; }
+.ap-bar--depleted { filter: saturate(0); }
+.bh-ap-diamond { transition: opacity .2s ease-out, background .2s ease-out; }
+.roll-bar--satisfied { filter: drop-shadow(0 0 5px var(--res-hi)); }
+.roll-bar--missing { filter: drop-shadow(0 0 4px var(--hp)); }
+.bh-roll-requirement { position: absolute; right: 8px; bottom: -18px; padding: 2px 5px; color: #dfe3e9; background: rgba(5,7,12,.9); border: 1px solid var(--line-dim); font-size: 8px; }
+.target-overlay { position: absolute; inset: 0; z-index: 60; pointer-events: none; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); }
+.target-overlay-banner { position: absolute; top: 52px; left: 50%; display: flex; align-items: center; gap: 10px; padding: 8px 14px; color: #dfe3e9; background: rgba(8,10,15,.94); border: 1px solid var(--line); border-radius: 4px; font-size: 11px; transform: translateX(-50%); }
+.target-overlay-banner strong { color: var(--gold); font-size: 13px; }
+.target-counter { color: var(--res-hi); font-weight: 700; }
+.target-overlay-actions { position: absolute; left: 50%; bottom: 190px; display: flex; gap: 8px; pointer-events: auto; transform: translateX(-50%); }
+.target-overlay-actions button { padding: 6px 10px; color: #dfe3e9; background: rgba(8,10,15,.96); border: 1px solid var(--line); border-radius: 3px; cursor: pointer; }
+.target-overlay-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.target-cursor--valid { cursor: crosshair; }
+.target-cursor--invalid { cursor: not-allowed; }
+.target-overlay-banner .target-cursor--valid { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--fac-goblin); box-shadow: 0 0 5px var(--fac-goblin); }
+.bh-token.is-target-selected .bh-token-ring, .bh-token.is-keyboard-target .bh-token-ring { border-color: var(--fac-goblin); border-width: 3px; opacity: 1; box-shadow: 0 0 9px var(--fac-goblin); }
+
 /* -- targeting overlay: hint banner + ghost card that chases the cursor -- */
 .bh-targeting-hint { position: absolute; left: 50%; bottom: 210px; transform: translateX(-50%); z-index: 30; padding: 7px 16px; font-size: 12px; color: #dfe3e9; background: rgba(8,10,15,.88); border: 1px solid var(--line-dim); border-radius: 20px; box-shadow: 0 6px 16px rgba(0,0,0,.4); white-space: nowrap; }
 .bh-targeting-hint strong { color: var(--gold); }
