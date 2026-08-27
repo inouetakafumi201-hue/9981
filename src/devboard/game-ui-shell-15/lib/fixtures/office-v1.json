@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "id": "office_v1",
+  "name": "办公室示意图",
+  "backdrop": {
+    "image": "run/v0-assets/scenes/office.png",
+    "pixelWidth": 1920,
+    "pixelHeight": 1080,
+    "tileRows": 1,
+    "tileCols": 1
+  },
+  "floors": [0],
+  "nodes": [
+    {
+      "id": "office_root",
+      "def": "d:scene/yard",
+      "scale": "large",
+      "at": { "x": 0.52, "y": 0.54 },
+      "floor": 0,
+      "name": "办公室主区"
+    },
+    {
+      "id": "meeting_room",
+      "def": "d:scene/room",
+      "scale": "medium",
+      "at": { "x": 0.29, "y": 0.34 },
+      "floor": 0,
+      "parent": "office_root",
+      "name": "会议室"
+    },
+    {
+      "id": "work_zone",
+      "def": "d:scene/room",
+      "scale": "medium",
+      "at": { "x": 0.69, "y": 0.35 },
+      "floor": 0,
+      "parent": "office_root",
+      "name": "工位区"
+    },
+    {
+      "id": "archive_closet",
+      "def": "d:scene/closet",
+      "scale": "small",
+      "at": { "x": 0.79, "y": 0.66 },
+      "floor": 0,
+      "parent": "work_zone",
+      "name": "档案间"
+    }
+  ],
+  "edges": [
+    {
+      "id": "door_meeting",
+      "def": "d:transition/door",
+      "a": "office_root",
+      "b": "meeting_room",
+      "directionality": "bidirectional",
+      "path": [
+        { "x": 0.52, "y": 0.54 },
+        { "x": 0.41, "y": 0.46 },
+        { "x": 0.29, "y": 0.34 }
+      ]
+    },
+    {
+      "id": "door_work",
+      "def": "d:transition/door",
+      "a": "office_root",
+      "b": "work_zone",
+      "directionality": "bidirectional",
+      "path": [
+        { "x": 0.52, "y": 0.54 },
+        { "x": 0.61, "y": 0.45 },
+        { "x": 0.69, "y": 0.35 }
+      ]
+    },
+    {
+      "id": "door_archive",
+      "def": "d:transition/door",
+      "a": "work_zone",
+      "b": "archive_closet",
+      "directionality": "bidirectional",
+      "path": [
+        { "x": 0.69, "y": 0.35 },
+        { "x": 0.76, "y": 0.48 },
+        { "x": 0.79, "y": 0.66 }
+      ]
+    }
+  ],
+  "placements": [
+    { "id": "office_locker", "at": "archive_closet", "def": "inst_locker_7f3a" }
+  ]
+}

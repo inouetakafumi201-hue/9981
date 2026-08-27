@@ -130,6 +130,26 @@ const mockPlayers = [
   { id: 'p1', name: '玩家A', hp: 5, sp: 3, ap: 2 },
   { id: 'p2', name: '玩家B', hp: 4, sp: 5, ap: 1 },
 ];
+
+// 占位：动作卡列表（双轨制 P1：ActionView with track + cardPresentation）
+const mockActionViews: ActionView[] = [
+  {
+    actionId: 'act:move',
+    label: '移动',
+    track: 'card',                        // 'card' | 'highlight'
+    costCategory: 'paid',
+    cost: 1,
+    cardPresentation: {
+      icon: 'icons/action/move.svg',
+      colorTheme: 'neutral',
+      effectText: '移动至相邻节点',
+      interactionMode: 'target',
+      tags: ['movement'],
+    },
+    requires: { targets: 1, targetKind: '节点', ref: { $: 'varOf(\'node\')' } },
+    disabled: false,
+  },
+];
 ```
 
 ### 5.2 真实端口映射（接线时替换）
@@ -137,7 +157,13 @@ const mockPlayers = [
 | 占位数据 | 真实端口路径 | 数据类型 |
 |---|---|---|
 | `mockPlayers` | `src/play/loading-runtime/ui-host.ts` 的 `TurnOrderProjection` | `readonly Player[]` |
-| `mockActions` | `src/play/core-mechanics/projection.ts` 的 `availableActions` | `ActionDescriptor[]` |
+| `mockActionViews` | `src/play/loading-runtime/ui-host.ts` 的 `availableActions` | `readonly ActionView[]`（含 `track` + `cardPresentation` 字段） |
+| `mockHighlightViews` | `src/play/loading-runtime/ui-host.ts` 的 `availableActions`（过滤 `track === 'highlight'`） | `readonly ActionView[]` |
+
+> **双轨制 P1 说明**：动作现在按 `track` 分流。BattleHud 渲染时：
+> - `track === 'card'` + `costCategory === 'paid'` → 渲染进 paid 动作卡区
+> - `track === 'card'` + `costCategory === 'zero-cost'` → 渲染进 0费池（底部 tab 切换）
+> - `track === 'highlight'` → 渲染进地图 HUD 层（实体点击触发，不消耗 AP）
 
 ---
 

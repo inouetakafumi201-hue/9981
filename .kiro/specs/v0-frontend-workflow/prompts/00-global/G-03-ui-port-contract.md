@@ -25,6 +25,40 @@ UI 只读 `StatePort`，通过 `ActionPort` 发 intent，通过 `CadencePort` �
 ## 6 只读数据
 
 ```typescript
+// 双轨制 P1 新增：binding 值支持 Ref（指向状态树中的实体/节点 ID）
+type BindingValue = string | number | boolean | null | { readonly $: string } // Ref 引用
+
+// 双轨制 P1 新增：动作轨道（决定 HUD 渲染容器）
+type ActionTrack = 'highlight' | 'card'
+// 'highlight'：地图实体点击触发，不消耗 AP，显示在地图 HUD 层
+// 'card'：手牌动作，消耗 AP，显示在 BattleHud 卡片轨
+
+// 双轨制 P1 新增：卡片表现元数据（来自 CardPresentationDef）
+interface CardPresentation {
+  readonly icon: string          // asset 路径，如 'icons/action/attack.svg'
+  readonly colorTheme: 'neutral' | 'aggressive' | 'defensive' | 'utility' | 'mystical'
+  readonly effectText: string    // 效果描述，如 '对目标造成伤害'
+  readonly interactionMode: 'instant' | 'toggle' | 'target'
+  readonly tags: readonly string[]
+}
+
+// 双轨制 P1：动作卡视图（来自 useRealActions 的 cardActions / highlightActions）
+interface ActionView {
+  readonly actionId: string
+  readonly label: string
+  readonly track: ActionTrack
+  readonly costCategory: 'paid' | 'attached' | 'zero-cost'
+  readonly cost: number          // AP 消耗（paid 轨）
+  readonly cardPresentation: CardPresentation | null
+  readonly requires: {
+    readonly targets?: number     // 需要多少个目标
+    readonly targetKind?: string // 目标类型描述
+    readonly ref?: { $: string } // Ref 类型 binding（目标变量引用）
+  }
+  readonly disabled: boolean
+  readonly disabledReason?: string
+}
+
 interface StateSnapshot {
   screen: string;
   phase: string;
@@ -33,11 +67,15 @@ interface StateSnapshot {
   notices: readonly Record<string, unknown>[];
   source: 'mock' | 'projection';
   revision: number;
+  // 双轨制 P1：动作视图（已按 track 分流）
+  actionViews: readonly ActionView[];
 }
 interface IntentRequest {
   intentId: string;
   payload: Record<string, unknown>;
   requestId: string;
+  // 双轨制 P1：binding 值透传（支持 Ref 引用）
+  bindings?: Readonly<Record<string, BindingValue>>;
 }
 interface IntentResult {
   requestId: string;
@@ -80,10 +118,26 @@ pending = 橙色进行中；rejected/error = 红色；stale = 灰白/黄色说�
 
 不调用 `OpRegistry.invoke`，不直接写 store，不读后端路径，不实现规则判定、AI 决策或真实存档。
 
+> **双轨制 P1 补充约束**：
+> - 不在 IntentRequest 之外计算 binding 值（binding 的求值是 kernel 职责，UI 只透传 Ref）
+> - 不在 IntentRequest 之外计算 AP 消耗（cost 是 Def 上的静态字段）
+> - 不在 IntentRequest 之外判断 target 是否有效（kernel 会判罚）
+> - 不把 `track: 'highlight'` 轨的动作渲染进 `card` 轨容器（HUD 层按 track 分流）
+
 ## 14 依赖交接
 
 真实接线方只需实现 `UiPorts` 或等价 adapter；页面组件签名和 mock fixture 保持不变。
 
+> **双轨制 P1 接线变化**：
+> - `useRealActions` 现在返回 `cardActions: ActionView[]` 和 `highlightActions: ActionView[]` 两路
+> - `IntentRequest.bindings` 支持 `{ $: string }` Ref 形式
+> - `state.actionViews` 包含 `track` + `cardPresentation` 字段
+
 ## 15 验收条件
 
 所有交互都有 requestId 和结果态；mock 可独立运行；切换到 projection 不改组件树；无本地规则推断；错误可见且可恢复。
+
+> **双轨制 P1 补充验收**：
+> - `cardActions` 不含 `track: 'highlight'` 的动作
+> - `highlightActions` 不含 `track: 'card'` 的动作
+> - `IntentRequest.bindings` 中的 Ref 透传到 kernel 判罚层

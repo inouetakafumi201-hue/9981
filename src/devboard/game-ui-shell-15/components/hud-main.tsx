@@ -2,6 +2,7 @@
 
 import { BattleHud } from './battle-hud'
 import { useRealActions } from '@/lib/use-real-actions'
+import { InMatchMapDemo } from './in-match-map'
 import type { VariantId } from '@/lib/shell-catalog'
 
 const VARIANT_TO_HUD: Record<VariantId, 'Default' | 'Compact' | 'Cinematic'> = {
@@ -39,6 +40,12 @@ export function HudMain({
       <div className="hm-hud-slot">
         <BattleHud variant={VARIANT_TO_HUD[variant]} realActions={realActions} />
       </div>
+
+      {/* 局内地图：从 UiSystem 真实读 SpatialProjection（office-v1 fixture） */}
+      <div className="hm-map-slot" style={{ marginTop: 12 }}>
+        <InMatchMapDemo />
+      </div>
+
       {lastError !== null && (
         <div className="hm-backend-error" aria-live="polite" style={{ color: 'var(--color-text-muted, #888)', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
           ⚠ 后端未就绪（{lastError}）；显示 mock 视图

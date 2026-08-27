@@ -122,9 +122,44 @@ const actionCards: ActionCard[] = [
 
 ## 4. Technical Constraints
 
-### DisabledAction 原因结构
+### DisabledAction 原因结构（双轨制 P1 补充）
 
 ```typescript
+// 双轨制 P1：从 StateSnapshot.actionViews 获取，而非 actionCards 数组
+type BindingValue = string | number | boolean | null | { readonly $: string }
+
+type ActionTrack = 'highlight' | 'card'
+
+interface CardPresentation {
+  readonly icon: string
+  readonly colorTheme: 'neutral' | 'aggressive' | 'defensive' | 'utility' | 'mystical'
+  readonly effectText: string
+  readonly interactionMode: 'instant' | 'toggle' | 'target'
+  readonly tags: readonly string[]
+}
+
+// 双轨制 P1：ActionView 来自 useRealActions，按 track 分流
+interface ActionView {
+  readonly actionId: string
+  readonly label: string
+  readonly track: ActionTrack       // P1 新增：决定渲染容器
+  readonly costCategory: 'paid' | 'attached' | 'zero-cost'
+  readonly cost: number
+  readonly cardPresentation: CardPresentation | null  // P1 新增
+  readonly requires: {
+    readonly targets?: number
+    readonly targetKind?: string
+    readonly ref?: { $: string }
+  }
+  readonly disabled: boolean
+  readonly disabledReason?: string
+}
+
+// 双轨制 P1：BattleHud 渲染时按 track 过滤
+const cardActions = actionViews.filter(a => a.track === 'card' && a.costCategory === 'paid')
+const zeroActions = actionViews.filter(a => a.track === 'card' && a.costCategory === 'zero-cost')
+const highlightActions = actionViews.filter(a => a.track === 'highlight')
+
 type UnavailabilityReason =
   | { kind: 'ap-insufficient'; required: number; current: number }
   | { kind: 'target-required'; targetKind: TargetKind }
@@ -134,7 +169,7 @@ type UnavailabilityReason =
   | { kind: 'opponent-invisible' }
 
 interface ActionCardView {
-  card: ActionCard
+  card: ActionView
   available: boolean
   unavailability: UnavailabilityReason | null
   pending: boolean  // submit 中

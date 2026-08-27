@@ -11,6 +11,7 @@ const projection: SpatialProjection = {
   entities: [],
   clusters: [],
   tiles: [],
+  buildingRenderMode: { kind: 'exterior' as const },
 }
 
 const commands = {} as RenderCommandApi

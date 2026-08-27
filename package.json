@@ -15,6 +15,7 @@
     "asset:view": "node scripts/asset-pipeline/map-to-mermaid.mjs",
     "asset:register-characters": "node scripts/asset-pipeline/register-character-assets.mjs",
     "test:watch": "vitest",
+    "test:python": "cd .agents/skills/sprite-forge/tools && python -m pytest -c pytest.ini",
     "typecheck": "tsc --noEmit",
     "typecheck:l2": "tsc --noEmit -p tsconfig.l2.json",
     "typecheck:devboard": "tsc --noEmit -p tsconfig.devboard.json",

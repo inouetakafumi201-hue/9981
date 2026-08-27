@@ -58,7 +58,7 @@ describe('building-group editor ops', () => {
     expect(f1).toBeTruthy()
     expect(f2).toBeTruthy()
     const doc = __test_getDoc()
-    const group = doc.buildingGroups![0]
+    const group = doc.buildingGroups![0]!
     expect(group.floors).toHaveLength(2)
     expect(group.floors.map((f) => f.id)).toEqual([f1, f2])
     expect(group.floors.map((f) => f.height)).toEqual([0, 0])
@@ -72,7 +72,7 @@ describe('building-group editor ops', () => {
       frame: { x: 12, y: 12, width: 200, height: 150 },
     })
     const doc = __test_getDoc()
-    const floor = doc.buildingGroups![0].floors[0]
+    const floor = doc.buildingGroups![0]!.floors[0]!
     expect(floor.frame).toEqual(frame)
   })
 
@@ -81,7 +81,7 @@ describe('building-group editor ops', () => {
     const floor = addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [], frame: { x: 0, y: 0, width: 100, height: 100 } })
     setBuildingFloorImage(id, floor!, 'data:image/png;base64,AAAA')
     const doc = __test_getDoc()
-    const f = doc.buildingGroups![0].floors[0]
+    const f = doc.buildingGroups![0]!.floors[0]!
     expect(f.image).toBe('data:image/png;base64,AAAA')
     expect(f.frame).toEqual({ x: 0, y: 0, width: 100, height: 100 })
     expect(f.ordinal).toBe(1)
@@ -93,7 +93,7 @@ describe('building-group editor ops', () => {
     const pid = bindBuildingPortal(id, { from: floor!, to: 'stair:down', def: 'portal:default' })
     expect(pid).toBeTruthy()
     const doc = __test_getDoc()
-    const portal = doc.buildingGroups![0].portals[0]
+    const portal = doc.buildingGroups![0]!.portals[0]!
     expect(portal.from).toBe(floor)
     expect(portal.to).toBe('stair:down')
     expect(portal.def).toBe('portal:default')
@@ -115,7 +115,7 @@ describe('building-group editor ops', () => {
     const f2 = addBuildingFloor(id, { ordinal: 2, height: 2, nodes: [], frame: { x: 0, y: 0, width: 100, height: 100 } })
     removeBuildingFloor(id, f1!)
     const doc = __test_getDoc()
-    const floors = doc.buildingGroups![0].floors
+    const floors = doc.buildingGroups![0]!.floors
     expect(floors.map((f) => f.id)).toEqual([f2])
   })
 
@@ -132,7 +132,7 @@ describe('building-group editor ops', () => {
     const f = addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [], frame: { x: 0, y: 0, width: 100, height: 100 } })
     setBuildingFloorOrdinal(id, f!, 3)
     const doc = __test_getDoc()
-    expect(doc.buildingGroups![0].floors[0].ordinal).toBe(3)
-    expect(doc.buildingGroups![0].floors[0].height).toBe(0)
+    expect(doc.buildingGroups![0]!.floors[0]!.ordinal).toBe(3)
+    expect(doc.buildingGroups![0]!.floors[0]!.height).toBe(0)
   })
 })
