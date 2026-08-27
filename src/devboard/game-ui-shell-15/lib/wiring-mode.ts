@@ -9,7 +9,7 @@
  *  3. 导出 WiringMode badge 信息供控制面板消费
  */
 
-import type { UiSystem } from '../../../ui/model/view'
+import type { UiSystem } from '../../../ui/index'
 import { setActiveRouterAdapter as _setActiveRouterAdapter } from './shell-route'
 import { installRealIntentBridge, uninstallRealIntentBridge, type RealIntentBridgeDeps } from './real-intent-bridge'
 import { getForcedIntentOutcome, OUTCOME_MESSAGES, OUTCOME_REASONS } from './shell-intent'

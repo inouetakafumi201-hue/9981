@@ -15,9 +15,9 @@
  * 注册：见 `lib/wiring-mode.ts` 的 `installRealIntentBridge()`。
  */
 
-import type { UiSystem } from '../../../ui/model/view'
+import type { UiSystem } from '../../../ui/index'
 import type { StateRevision } from '../../../ui/model/revision'
-import { createPresentationGatewayAdapter } from '../../../wiring/presentation-wiring/presentation-gateway-adapter'
+import { createPresentationGatewayAdapter } from '../../wiring/presentation-wiring/presentation-gateway-adapter'
 import type { ShellIntentRequest, ShellIntentResult, ShellIntentOutcome } from './shell-intent'
 import { OUTCOME_MESSAGES, OUTCOME_REASONS, isRealIntentRegistered, registerRealSubmitIntent } from './shell-intent'
 

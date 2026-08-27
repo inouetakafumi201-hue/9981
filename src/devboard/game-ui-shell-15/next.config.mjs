@@ -10,6 +10,9 @@ const shimsDir = path.join(__dirname, 'lib/shims')
 const shimPath = (name) => path.join(shimsDir, name)
 
 const nextConfig = {
+  turbopack: {
+    root: repoRoot,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
