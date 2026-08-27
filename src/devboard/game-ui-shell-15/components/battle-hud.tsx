@@ -249,7 +249,7 @@ function ActionPendingIndicator() {
 
 function ApResourceBar() {
   return (
-    <div className={`bh-instrument-ap ap-bar ${AVAILABLE_AP === 0 ? 'ap-bar--depleted' : ''}`} title={`AP: ${AVAILABLE_AP} / ${AP_MAX}（可恢复：${AP_MAX - AVAILABLE_AP}）`} aria-label={`AP ${AVAILABLE_AP} / ${AP_MAX}`}>
+    <div className={`bh-instrument-ap ap-bar ${Number(AVAILABLE_AP) === 0 ? 'ap-bar--depleted' : ''}`} title={`AP: ${AVAILABLE_AP} / ${AP_MAX}（可恢复：${AP_MAX - AVAILABLE_AP}）`} aria-label={`AP ${AVAILABLE_AP} / ${AP_MAX}`}>
       <span className="bh-ap-label">AP</span>
       <div className="bh-ap-diamonds" aria-hidden="true">
         {Array.from({ length: AP_MAX }).map((_, i) => <span key={i} className={i < AVAILABLE_AP ? 'bh-ap-diamond is-filled' : 'bh-ap-diamond'} />)}
