@@ -12,6 +12,7 @@ import { HudMain } from '@/components/hud-main'
 import { MenuPause } from '@/components/menu-pause'
 import { SettingsPanel } from '@/components/settings-panel'
 import { TransitionResult } from '@/components/transition-result'
+import { CreationPage } from '@/components/creation-page'
 import { useShellRouter, type ShellRouteTransition } from '@/lib/shell-route'
 import { getJourneyEdge, getJourneyNode, JOURNEY_NODES } from '@/lib/shell-journey'
 import { UiBackendProvider, useUiBackend } from '@/lib/ui-backend'
@@ -117,6 +118,9 @@ function ProductShellContent() {
       case 'menu-pause': return <MenuPause onResume={() => request('pause.resume')} onSettings={() => request('pause.settings')} onTitle={() => request('pause.to-title')} onRestart={() => router.safeReturn('重新开始使用安全返回投影；真实重启需要宿主。')} />
       case 'utility-settings': return <div className="product-settings-stage"><SettingsPanel onClose={() => request('settings.back-to-pause')} /></div>
       case 'transition-result': return router.nodeId === 'transition.result' ? <TransitionResult actionLabel="查看奖励投影" onReturn={() => request('result.to-reward')} /> : <TransitionResult rewardMode actionLabel="返回驻地" onReturn={() => request('reward.to-return')} />
+      case 'map-editor': return <CreationPage tool="map-editor" />
+      case 'asset-library': return <CreationPage tool="asset-library" />
+      case 'research-bench': return <CreationPage tool="research-bench" />
       default: return null
     }
   }, [reducedMotion, request, retry, returnOrigin, router])

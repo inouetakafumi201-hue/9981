@@ -86,8 +86,6 @@ import { ClickPlayScene, CombatFeedbackScene, MapScene, VictoryScene } from '@/c
 import { B5_STAGES, INITIAL_B5_SESSION, type B5Session, type B5Stage } from '@/lib/b5-session'
 import { type PortScenario } from '@/lib/b6-journey'
 import { ProductShell } from '@/components/product-shell'
-import { creationHref } from '@/lib/creation-navigation'
-import { CreationPage } from '@/components/creation-page'
 
 export default function Page() {
   return <ProductShell />
@@ -124,12 +122,6 @@ function mountSurface(pageId: string, ctx: MountContext, extras: {
   switch (pageId) {
     case 'control-panel-main':
       return <ControlPanelSelfSurface />
-    case 'map-editor':
-      return <CreationPage tool="map-editor" />
-    case 'asset-library':
-      return <CreationPage tool="asset-library" />
-    case 'research-bench':
-      return <CreationPage tool="research-bench" />
     case 'startup-loading':
       return <StartupLoading onReady={() => ctx.navigate('menu-title')} />
     case 'menu-title':
