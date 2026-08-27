@@ -67,6 +67,46 @@ type ActionCard = {
   cost: number
   target: TargetKind
   description: string
+  available?: boolean
+  unavailabilityText?: string
+}
+
+type UnavailabilityReason =
+  | { kind: 'ap-insufficient'; required: number; current: number }
+  | { kind: 'target-required'; targetKind: TargetKind }
+  | { kind: 'roll-missing-symbol'; missing: ReqKind[] }
+  | { kind: 'cooldown'; rounds: number }
+  | { kind: 'not-your-turn' }
+
+type ActionResult = 'accepted' | 'rejected' | 'timeout' | null
+type RollHighlight = 'full' | 'partial' | 'none'
+
+const PLAYER_ROLL_SYMBOLS: ReqKind[] = ['sword', 'burst']
+const AP_MAX = 5
+const SUBMIT_DEBOUNCE_MS = 200
+
+export function rollBarState(available: readonly ReqKind[], required: readonly ReqKind[]) {
+  const pool = [...available]
+  const missing = required.filter((symbol) => {
+    const index = pool.indexOf(symbol)
+    if (index < 0) return true
+    pool.splice(index, 1)
+    return false
+  })
+  const matched = required.length - missing.length
+  return {
+    satisfied: missing.length === 0,
+    missing,
+    highlight: (matched === 0 ? 'none' : missing.length === 0 ? 'full' : 'partial') as RollHighlight,
+  }
+}
+
+function reasonText(reason: UnavailabilityReason) {
+  if (reason.kind === 'ap-insufficient') return `AP 不足：需要 ${reason.required}，当前 ${reason.current}`
+  if (reason.kind === 'target-required') return `需要选中有效${reason.targetKind === 'ally' ? '友方' : '敌方'}目标`
+  if (reason.kind === 'roll-missing-symbol') return `骰子结果缺 ${reason.missing.map((item) => item === 'sword' ? 'Sword' : item === 'shield' ? 'Shield' : 'Burst').join('、')}`
+  if (reason.kind === 'cooldown') return `冷却中（${reason.rounds} 回合）`
+  return '当前不是你的回合'
 }
 
 const PORTRAITS: Record<Faction, string> = {
@@ -199,6 +239,54 @@ function ActionGlyph({ kind }: { kind: ActionIcon }) {
   return <Icon className="bh-card-icon-svg" strokeWidth={2.2} aria-hidden="true" />
 }
 
+function DisabledActionTooltip({ id, reason }: { id: string; reason: string }) {
+  return <span id={id} role="tooltip" className="disabled-action-tooltip">{reason}</span>
+}
+
+function ActionPendingIndicator() {
+  return <span className="action-pending-indicator" role="status"><span aria-hidden="true" />提交中…</span>
+}
+
+function ApResourceBar() {
+  return (
+    <div className={`bh-instrument-ap ap-bar ${AVAILABLE_AP === 0 ? 'ap-bar--depleted' : ''}`} title={`AP: ${AVAILABLE_AP} / ${AP_MAX}（可恢复：${AP_MAX - AVAILABLE_AP}）`} aria-label={`AP ${AVAILABLE_AP} / ${AP_MAX}`}>
+      <span className="bh-ap-label">AP</span>
+      <div className="bh-ap-diamonds" aria-hidden="true">
+        {Array.from({ length: AP_MAX }).map((_, i) => <span key={i} className={i < AVAILABLE_AP ? 'bh-ap-diamond is-filled' : 'bh-ap-diamond'} />)}
+      </div>
+      <span className="bh-ap-readout">{AVAILABLE_AP} / {AP_MAX}</span>
+    </div>
+  )
+}
+
+function RollBarHighlight({ state, missing }: { state: RollHighlight; missing: readonly ReqKind[] }) {
+  return <span className="bh-roll-requirement" aria-label={state === 'full' ? '动作骰子需求已满足' : `动作骰子需求${state === 'partial' ? '部分满足' : '未满足'}：缺少 ${missing.join('、')}`}>{state === 'full' ? '需求满足' : `缺 ${missing.join(' / ')}`}</span>
+}
+
+function TargetCursor({ valid }: { valid: boolean }) {
+  return <span className={valid ? 'target-cursor--valid' : 'target-cursor--invalid'} aria-hidden="true" />
+}
+
+function TargetOverlay({ card, selected, limit, onConfirm, onCancel }: { card: ActionCard; selected: number; limit: number; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className="target-overlay" role="dialog" aria-modal="true" aria-label={`请选择目标：${card.name}`}>
+      <div className="target-overlay-banner">
+        <strong>请选择目标</strong>
+        <span><TargetCursor valid />{`选择 ${limit} 个${card.target === 'ally' ? '友方' : '敌方'}目标`}</span>
+        <span className="target-counter">已选 {selected} / {limit}</span>
+      </div>
+      <div className="target-overlay-actions">
+        <button type="button" onClick={onCancel}>取消（Esc）</button>
+        <button type="button" onClick={onConfirm} disabled={selected === 0}>确认（Enter）</button>
+      </div>
+    </div>
+  )
+}
+
+function SubmitToast({ feedback }: { feedback: { status: IntentStatus; message: string } }) {
+  return <div className={`submit-toast bh-intent-${feedback.status}`} role={feedback.status === 'accepted' ? 'status' : 'alert'}>{feedback.message}</div>
+}
+
 const springTransition: Transition = { type: 'spring', stiffness: 300, damping: 28 }
 
 // Kards/Hearthstone-style hand-fan geometry: cards arc slightly with the outer
@@ -280,8 +368,8 @@ export function BattleHud({
    * 替换模块顶部的 mock `actionCards`。CSS / 动画 / 交互手势全部保留。
    */
   realActions?: {
-    readonly cardActions: ReadonlyArray<{ readonly actionId: string; readonly costCategory: 'paid' | 'attached'; readonly available: boolean; readonly accessibleLabel: string; readonly effectText?: string }>
-    readonly highlightActions: ReadonlyArray<{ readonly actionId: string; readonly costCategory: 'paid' | 'attached'; readonly available: boolean; readonly accessibleLabel: string; readonly effectText?: string }>
+    readonly cardActions: ReadonlyArray<{ readonly actionId: string; readonly costCategory: 'paid' | 'attached'; readonly available: boolean; readonly accessibleLabel: string; readonly effectText?: string; readonly unavailabilityText?: string }>
+    readonly highlightActions: ReadonlyArray<{ readonly actionId: string; readonly costCategory: 'paid' | 'attached'; readonly available: boolean; readonly accessibleLabel: string; readonly effectText?: string; readonly unavailabilityText?: string }>
     readonly submitAction: (actionId: string, opts?: { readonly targetId?: string; readonly bindings?: Record<string, unknown> }) => boolean
   }
 }) {
@@ -358,6 +446,12 @@ export function BattleHud({
     })
   }
   const [targetingCard, setTargetingCard] = useState<ActionCard | null>(null)
+  const [selectedTargetIds, setSelectedTargetIds] = useState<number[]>([])
+  const [focusedTargetIndex, setFocusedTargetIndex] = useState(0)
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
+  const [actionResults, setActionResults] = useState<Record<string, ActionResult>>({})
+  const lastSubmitRef = useRef<{ time: number; actionId: string } | null>(null)
+  const feedbackTimerRef = useRef<number | null>(null)
   const [playedCardIds, setPlayedCardIds] = useState<string[]>([])
   const [dragOrigin, setDragOrigin] = useState<{ x: number; y: number } | null>(null)
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number } | null>(null)
@@ -379,6 +473,7 @@ export function BattleHud({
         cost: a.costCategory === 'paid' ? 1 : 0,
         target: 'hostile',
         available: a.available,
+        unavailabilityText: a.unavailabilityText,
         damage: 0,
         speed: 0,
         theme: 'blue',
@@ -452,11 +547,28 @@ export function BattleHud({
     return () => window.removeEventListener('resize', recalc)
   }, [paidCards.length])
 
+  const targetCandidates = useMemo(() => targetingCard
+    ? railUnits.filter((unit) => (targetingCard.target === 'hostile' && unit.faction !== 'player') || (targetingCard.target === 'ally' && unit.faction === 'player'))
+    : [], [targetingCard])
+  const targetLimit = targetingCard?.id === 'fireball' ? 3 : 1
+
   useEffect(() => {
     if (!targetingCard) return
-    const onMove = (e: PointerEvent) => setPointerPos({ x: e.clientX, y: e.clientY })
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setTargetingCard(null)
+    const onMove = (event: PointerEvent) => setPointerPos({ x: event.clientX, y: event.clientY })
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setTargetingCard(null)
+        setSelectedTargetIds([])
+        setIntentFeedback({ status: 'cancelled', message: '已按 ESC 取消目标选择' })
+      }
+      if (event.key === 'Tab' && targetCandidates.length > 0) {
+        event.preventDefault()
+        setFocusedTargetIndex((index) => (index + (event.shiftKey ? -1 : 1) + targetCandidates.length) % targetCandidates.length)
+      }
+      if (event.key === 'Enter' && selectedTargetIds.length > 0) {
+        event.preventDefault()
+        void confirmTargets()
+      }
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('keydown', onKey)
@@ -464,7 +576,7 @@ export function BattleHud({
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('keydown', onKey)
     }
-  }, [targetingCard])
+  }, [selectedTargetIds, targetCandidates, targetingCard])
 
   async function sendBattleIntent(intentId: Parameters<typeof createIntent>[0], payload: Record<string, unknown>): Promise<IntentStatus> {
     // 双轨制 step 6: action-selection intents → 走真实后端 submit
@@ -532,59 +644,79 @@ export function BattleHud({
     window.setTimeout(() => setResolveFlash((r) => (r?.unitIndex === unitIndex ? null : r)), 640)
   }
 
+  function showActionResult(card: ActionCard, result: ActionResult, message: string) {
+    setPendingActionId(null)
+    setActionResults((current) => ({ ...current, [card.id]: result }))
+    setIntentFeedback({ status: result === 'accepted' ? 'accepted' : result === 'timeout' ? 'timeout' : 'rejected', message })
+    if (feedbackTimerRef.current !== null) window.clearTimeout(feedbackTimerRef.current)
+    feedbackTimerRef.current = window.setTimeout(() => setActionResults((current) => ({ ...current, [card.id]: null })), 1500)
+  }
+
+  async function submitCard(card: ActionCard, targetIds: readonly number[] = []) {
+    const now = Date.now()
+    const last = lastSubmitRef.current
+    if (last?.actionId === card.id && now - last.time < SUBMIT_DEBOUNCE_MS) return 'cancelled' as IntentStatus
+    lastSubmitRef.current = { time: now, actionId: card.id }
+    setPendingActionId(card.id)
+    const status = await sendBattleIntent(targetIds.length > 0 ? 'battle.select-target' : 'battle.select-action', {
+      actionId: card.id,
+      source: card.cost === 0 ? 'free' : 'paid',
+      ...(targetIds.length > 0 ? { targetId: targetIds.map(String).join(',') } : {}),
+    })
+    showActionResult(card, status === 'accepted' ? 'accepted' : status === 'timeout' ? 'timeout' : 'rejected', status === 'accepted' ? `已提交：${card.name}` : status === 'timeout' ? '请求超时' : `目标不可用：${card.name}`)
+    return status
+  }
+
   async function handleCardPlay(card: ActionCard, el: HTMLElement) {
-    if (spectatorMode || card.cost > AVAILABLE_AP || intentPending) return
-    const actionStatus = await sendBattleIntent('battle.select-action', { actionId: card.id, source: card.cost === 0 ? 'free' : 'paid', intentId: card.target === 'none' ? 'none' : 'executable-target' })
-    if (actionStatus !== 'accepted') return
+    if (spectatorMode || card.cost > AVAILABLE_AP || card.available === false || intentPending || pendingActionId !== null) return
     if (card.target === 'none') {
       const originRect = el.getBoundingClientRect()
-      const targetEl = tokenRefs.current[selectedUnit.index]
-      const targetRect = targetEl?.getBoundingClientRect()
+      const status = await submitCard(card)
+      if (status !== 'accepted') return
+      const targetRect = tokenRefs.current[selectedUnit.index]?.getBoundingClientRect()
       setHandHoverId(null)
       updateHandLift(null)
       setPlayedCardIds((ids) => (ids.includes(card.id) ? ids : [...ids, card.id]))
-      setCastFlight({
-        card,
-        from: { x: originRect.left + originRect.width / 2, y: originRect.top + originRect.height / 2 },
-        to: targetRect
-          ? { x: targetRect.left + targetRect.width / 2, y: targetRect.top + targetRect.height / 2 }
-          : { x: originRect.left, y: originRect.top - 120 },
-      })
+      setCastFlight({ card, from: { x: originRect.left + originRect.width / 2, y: originRect.top + originRect.height / 2 }, to: targetRect ? { x: targetRect.left + targetRect.width / 2, y: targetRect.top + targetRect.height / 2 } : { x: originRect.left, y: originRect.top - 120 } })
       flashResolve(selectedUnit.index, card.theme)
       window.setTimeout(() => setCastFlight(null), 560)
-    } else {
-      const rect = el.getBoundingClientRect()
-      const origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
-      setHandHoverId(null)
-      updateHandLift(null)
-      setDragOrigin(origin)
-      setPointerPos(origin)
-      setTargetingCard(card)
+      return
     }
+    const rect = el.getBoundingClientRect()
+    const origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+    setHandHoverId(card.id)
+    setSelectedTargetIds([])
+    setFocusedTargetIndex(0)
+    setDragOrigin(origin)
+    setPointerPos(origin)
+    setTargetingCard(card)
   }
 
-  async function handleTokenActivate(unit: RailUnit) {
-    if (targetingCard) {
-      const valid =
-        (targetingCard.target === 'hostile' && unit.faction !== 'player') ||
-        (targetingCard.target === 'ally' && unit.faction === 'player')
-      if (valid && !intentPending) {
-        const card = targetingCard
-        setTargetingCard(null)
-        const status = await sendBattleIntent('battle.select-target', { actionId: card.id, targetId: String(unit.index) })
-        if (status === 'accepted') {
-          flashResolve(unit.index, card.theme)
-          setPlayedCardIds((ids) => (ids.includes(card.id) ? ids : [...ids, card.id]))
-        }
-      }
-      setTargetingCard(null)
-    } else {
+  function handleTokenActivate(unit: RailUnit) {
+    if (!targetingCard) {
       setSelectedIndex(unit.index)
+      return
+    }
+    const valid = (targetingCard.target === 'hostile' && unit.faction !== 'player') || (targetingCard.target === 'ally' && unit.faction === 'player')
+    if (!valid) return
+    setSelectedTargetIds((ids) => ids.includes(unit.index) ? ids.filter((id) => id !== unit.index) : ids.length < targetLimit ? [...ids, unit.index] : ids)
+  }
+
+  async function confirmTargets() {
+    if (!targetingCard || selectedTargetIds.length === 0 || pendingActionId !== null) return
+    const card = targetingCard
+    const ids = [...selectedTargetIds]
+    const status = await submitCard(card, ids)
+    if (status === 'accepted') {
+      ids.forEach((id) => flashResolve(id, card.theme))
+      setPlayedCardIds((cards) => cards.includes(card.id) ? cards : [...cards, card.id])
+      setTargetingCard(null)
+      setSelectedTargetIds([])
     }
   }
 
   function handleWorldBackgroundClick() {
-    if (targetingCard) setTargetingCard(null)
+    // Target mode is cancelled explicitly with Esc or the visible cancel button.
   }
 
   const selectedUnit = useMemo(
@@ -597,6 +729,39 @@ export function BattleHud({
   useEffect(() => {
     setPlayedCardIds([])
   }, [selectedIndex])
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (targetingCard || event.altKey || event.ctrlKey || event.metaKey) return
+      const index = Number(event.key) - 1
+      const card = [...paidCards, ...freeCards][index]
+      if (card) {
+        event.preventDefault()
+        tokenRefs.current[selectedUnit.index]?.focus()
+        const slot = document.querySelector(`[data-action-id="${CSS.escape(card.id)}"] button`) as HTMLButtonElement | null
+        slot?.click()
+      }
+      if (event.code === 'Space' && handHoverId) {
+        event.preventDefault()
+        setHandHoverId(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [freeCards, handHoverId, paidCards, selectedUnit.index, targetingCard])
+
+  function getUnavailability(card: ActionCard): UnavailabilityReason | null {
+    if (spectatorMode) return { kind: 'not-your-turn' }
+    if (card.cost > AVAILABLE_AP) return { kind: 'ap-insufficient', required: card.cost, current: AVAILABLE_AP }
+    if (card.available !== false) return null
+    const text = card.unavailabilityText?.toLowerCase() ?? ''
+    if (text.includes('cooldown') || text.includes('冷却')) return { kind: 'cooldown', rounds: 1 }
+    if (text.includes('roll') || text.includes('dice') || text.includes('骰')) return { kind: 'roll-missing-symbol', missing: card.reqIcons.length > 0 ? card.reqIcons : ['sword'] }
+    return { kind: 'target-required', targetKind: card.target }
+  }
+
+  const highlightedAction = targetingCard ?? paidCards.find((card) => card.id === handHoverId) ?? freeCards.find((card) => card.id === handHoverId) ?? null
+  const highlightedRoll = highlightedAction ? rollBarState(PLAYER_ROLL_SYMBOLS, highlightedAction.reqIcons) : null
 
   useEffect(() => {
     const reduceMotion =
@@ -670,6 +835,8 @@ export function BattleHud({
               (targetingCard.target === 'ally' && unit.faction === 'player')
             : false
           const isDimmed = Boolean(targetingCard) && !isCandidate
+          const isTargetSelected = selectedTargetIds.includes(unit.index)
+          const isKeyboardTarget = targetingCard !== null && targetCandidates[focusedTargetIndex]?.index === unit.index
           return (
             <button
               key={unit.index}
@@ -678,9 +845,11 @@ export function BattleHud({
                 tokenRefs.current[unit.index] = el
               }}
               className={`bh-token bh-faction-${unit.faction} ${unit.index === selectedIndex ? 'is-selected' : ''} ${
-                isCandidate ? `is-target-candidate bh-theme-${targetingCard!.theme}` : ''
-              } ${isDimmed ? 'is-target-dimmed' : ''}`}
+                isCandidate ? `is-target-candidate target-cursor--valid bh-theme-${targetingCard!.theme}` : targetingCard ? 'target-cursor--invalid' : ''
+              } ${isDimmed ? 'is-target-dimmed' : ''} ${isTargetSelected ? 'is-target-selected' : ''} ${isKeyboardTarget ? 'is-keyboard-target' : ''}`}
               style={{ left: `${unit.pos.x}%`, top: `${unit.pos.y}%` }}
+              aria-pressed={targetingCard ? isTargetSelected : unit.index === selectedIndex}
+              title={targetingCard ? isCandidate ? unit.name : '无效目标' : unit.name}
               onClick={(e) => {
                 e.stopPropagation()
                 handleTokenActivate(unit)
@@ -827,15 +996,7 @@ export function BattleHud({
           <span className="bh-vital-readout">{playerUnit.resourcePips}/{playerUnit.resourceMax}</span>
         </div>
         <span className="bh-instrument-divider" aria-hidden="true" />
-        <div className="bh-instrument-ap">
-          <span className="bh-ap-label">AP</span>
-          <div className="bh-ap-diamonds">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={i < 4 ? 'bh-ap-diamond is-filled' : 'bh-ap-diamond'} />
-            ))}
-          </div>
-          <span className="bh-ap-readout">4 / 5</span>
-        </div>
+        <ApResourceBar />
       </div>
       </div>
 
@@ -858,7 +1019,7 @@ export function BattleHud({
           </motion.span>
           <div className="bh-roll-bars">
             {rollBars.map((bar) => (
-              <div key={bar.index} className="bh-roll-line">
+              <div key={bar.index} className={`bh-roll-line ${highlightedRoll && bar.index === 5 ? highlightedRoll.highlight === 'full' ? 'roll-bar--satisfied' : 'roll-bar--missing' : ''}`}>
                 <span className={`bh-roll-index bh-tone-${bar.tone}`}>{bar.index}</span>
                 <span className="bh-roll-track">
                   <motion.span
@@ -872,6 +1033,7 @@ export function BattleHud({
               </div>
             ))}
           </div>
+          {highlightedRoll && <RollBarHighlight state={highlightedRoll.highlight} missing={highlightedRoll.missing} />}
           <AnimatePresence>
             {rollStage === 'flash' && (
               <motion.span
@@ -972,7 +1134,12 @@ export function BattleHud({
             const isHovered = handHoverId === card.id
             const isPlayed = playedCardIds.includes(card.id)
             const g = fanGeometry(i, paidCards.length)
-            const tier = card.cost > AVAILABLE_AP ? 'unavailable' : card.cost === AVAILABLE_AP ? 'limited' : 'available'
+            const unavailability = getUnavailability(card)
+            const reason = unavailability ? reasonText(unavailability) : null
+            const isPending = pendingActionId === card.id
+            const result = actionResults[card.id]
+            const tier = unavailability ? 'unavailable' : card.cost === AVAILABLE_AP ? 'limited' : 'available'
+            const tooltipId = `action-disabled-${card.id}`
             return (
               // Static hit-box: fixed size/position, only ever changes z-index.
               // Pointer/focus listeners live here — NOT on the animated inner
@@ -982,6 +1149,7 @@ export function BattleHud({
               <motion.div
                 key={`${card.id}-${selectedIndex}`}
                 className="bh-hand-card-slot"
+                data-action-id={card.id}
                 exit={{ opacity: 0, y: -140, scale: 0.85, transition: { duration: 0.42, ease: [0.4, 0, 0.2, 1] } }}
                 style={{ zIndex: isPlayed ? 70 : isHovered ? 65 : g.zIndex, marginLeft: i === 0 ? 0 : -(HAND_CARD_WIDTH - fanStep), pointerEvents: isPlayed ? 'none' : 'auto' }}
                 onMouseEnter={(event) => {
@@ -1020,7 +1188,7 @@ export function BattleHud({
                   transition={{ delay: 0.03 * i, ...springTransition }}
                 >
                 <div
-                  className={`bh-hand-card bh-theme-${card.theme} bh-tier-${tier} ${isHovered ? 'is-hovered' : ''}`}
+                  className={`bh-hand-card action-card bh-theme-${card.theme} bh-tier-${tier} ${isHovered ? 'is-hovered' : ''} ${unavailability ? `action-card--disabled-${unavailability.kind}` : ''} ${isPending ? 'action-card--pending' : ''} ${result ? `action-card--${result}` : ''}`}
                   // This element's rest transform is the resting-fan geometry
                   // (--fan-rotate/--fan-y). isHovered by itself changes
                   // nothing here — only .bh-hand-card-face's height and this
@@ -1061,7 +1229,9 @@ export function BattleHud({
                   <button
                     type="button"
                     className="bh-hand-card-face"
-                    disabled={spectatorMode || tier === 'unavailable'}
+                    aria-disabled={isPending || Boolean(unavailability)}
+                    aria-describedby={reason ? tooltipId : undefined}
+                    aria-label={`${card.name}${reason ? `，不可用：${reason}` : `，快捷键 ${i + 1}`}`}
                     aria-expanded={isHovered}
                     onClick={(e) => {
                       // One click commits the card. Hover/focus still expands the
@@ -1072,6 +1242,9 @@ export function BattleHud({
                     {/* Persistent, never fades — stays anchored top-right in both
                         states so the cost is always readable regardless of overlap. */}
                     <span className="bh-hand-card-cost">{card.cost}</span>
+                    {reason && <DisabledActionTooltip id={tooltipId} reason={reason} />}
+                    {isPending && <ActionPendingIndicator />}
+                    {result === 'rejected' && <span className="action-error-float" role="alert">目标不可用</span>}
                     {/* Collapsed state: icon + name live inside the one strip
                         (this card's right edge) that a static, monotonic stacking
                         order guarantees is never covered by a neighbor — see the
@@ -1113,7 +1286,7 @@ export function BattleHud({
                               {card.target === 'none' ? 'Self' : card.target === 'hostile' ? 'Target enemy' : 'Target ally'}
                             </span>
                           </div>
-                          {tier === 'unavailable' && <span className="bh-hand-card-warn">Not enough AP</span>}
+                          {reason && <span className="bh-hand-card-warn">{reason}</span>}
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1127,16 +1300,21 @@ export function BattleHud({
         </div>
       </div>
 
-      {/* TARGETING HINT — appears only while a targeted card is armed */}
+      {/* TARGETING OVERLAY — explicit selection, count, confirm and cancel flow. */}
       <AnimatePresence>
         {targetingCard && (
-          <motion.div
-            className="bh-targeting-hint"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-          >
-            Choose a target for <strong>{targetingCard.name}</strong> · Esc or click empty space to cancel
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <TargetOverlay
+              card={targetingCard}
+              selected={selectedTargetIds.length}
+              limit={targetLimit}
+              onConfirm={() => void confirmTargets()}
+              onCancel={() => {
+                setTargetingCard(null)
+                setSelectedTargetIds([])
+                setIntentFeedback({ status: 'cancelled', message: '已取消目标选择' })
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -1174,6 +1352,10 @@ export function BattleHud({
             <ActionGlyph kind={castFlight.card.icon} />
           </motion.div>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {intentFeedback && <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}><SubmitToast feedback={intentFeedback} /></motion.div>}
       </AnimatePresence>
 
       <AnimatePresence>
