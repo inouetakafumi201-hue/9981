@@ -10,17 +10,17 @@ import {
   formatStopwatch,
   ACCENT_COLOR,
   type SynthesisJob,
-} from '@/lib/bench-data'
-import { materialMetaById, QUALITY_COLOR, QUALITY_LABEL } from '@/lib/library-data'
-import { useBench, focusJob, claimJob, dismissFailedJob, rushJob, closeBench } from '@/lib/bench-store'
-import { openDetail } from '@/lib/library-store'
-import { openPixelPainter } from '@/lib/painter-store'
-import { LibTile } from '@/components/library/library-tile'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { RandomBurstField } from '@/components/fx/random-burst-field'
-import { useOrganicDrift } from '@/components/fx/use-organic-drift'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { playSfx } from '@/lib/sound'
+} from '@editor/lib/bench-data'
+import { materialMetaById, QUALITY_COLOR, QUALITY_LABEL } from '@editor/lib/library-data'
+import { useBench, focusJob, claimJob, dismissFailedJob, rushJob, closeBench } from '@editor/lib/bench-store'
+import { openDetail } from '@editor/lib/library-store'
+import { openPixelPainter } from '@editor/lib/painter-store'
+import { LibTile } from '@editor/components/library/library-tile'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { RandomBurstField } from '@editor/components/fx/random-burst-field'
+import { useOrganicDrift } from '@editor/components/fx/use-organic-drift'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
 
 /**
  * 研究台的「合成任务」不是一段播放完就结束的仪式动画——它是真实异步的后台任务

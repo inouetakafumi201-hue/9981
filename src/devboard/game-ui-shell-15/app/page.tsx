@@ -390,6 +390,22 @@ function ControlPanelMain() {
           </div>
 
           <div className="control-block">
+            <div className="block-heading"><span>CREATION SUITE</span><span className="count">3 页面</span></div>
+            <div className="cp-creation-grid">
+              <a className="cp-creation-link is-map" href={creationHref('map-editor', { returnTo: '/' })}>
+                <Layers size={15} /><span>地图编辑器</span><small>/map-editor</small>
+              </a>
+              <a className="cp-creation-link is-lib" href={creationHref('asset-library', { returnTo: '/' })}>
+                <Boxes size={15} /><span>素材库</span><small>/asset-library</small>
+              </a>
+              <a className="cp-creation-link is-bench" href={creationHref('research-bench', { returnTo: '/' })}>
+                <ScanLine size={15} /><span>研究台</span><small>/research-bench</small>
+              </a>
+            </div>
+            <p className="cp-note">三个独立入口进入创作页面；进入后可互相切换���退出仅归因最初入口。</p>
+          </div>
+
+          <div className="control-block">
             <div className="block-heading"><span>KIND FILTER</span></div>
             <div className="category-list">
               {KIND_FILTERS.map((kind) => (
@@ -428,10 +444,11 @@ function ControlPanelMain() {
           <div className="control-block">
             <div className="block-heading">
               <span>WIRING MODE</span>
-              <span className="wiring-badge" style={{ background: wiringModeColor(wiringMode) }}>{wiringModeLabel(wiringMode)}</span>
+              <span className="wiring-badge" style={{ background: wiringModeColor(wiringMode) }}>{wiringModeLabel(wiringMode)} · {wiringMode === 'real' ? '待机' : '未连接'}</span>
             </div>
             <div className="cp-info-row">
-              <span>Revision</span><code className="cp-revision">{revision}</code>
+              <span>Revision</span><motion.code key={revision} className="cp-revision" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .2 }}>{revision}</motion.code>
+              <span>Boot</span><code>{wiringMode === 'real' ? '等待宿主' : '演示就绪'}</code>
               <span>Current</span><code>{wiringModeLabel(wiringMode)}</code>
             </div>
             <p className="cp-note">生产环境强制 Real；开发期通过 <code>?wiring=mock|iter-V0|real</code> 切换。</p>

@@ -1,9 +1,9 @@
 'use client'
 
 import { Plus } from 'lucide-react'
-import { MIDTONE_COLORS, SEMANTIC_COLORS } from '@/lib/painter-types'
+import { MIDTONE_COLORS, SEMANTIC_COLORS } from '@editor/lib/painter-types'
 import { ColorPickerStrip } from './color-picker-strip'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 
 /**
  * 取色板（§4.4）：两排固定常用色 + 当前色展示 + 自定义格（8 格增删）+

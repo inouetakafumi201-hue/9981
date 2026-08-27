@@ -10,7 +10,7 @@ import {
   IconSoundOff,
   IconImport,
 } from './icons'
-import { playSfx, useSfxMuted, toggleSfxMuted } from '@/lib/sound'
+import { playSfx, useSfxMuted, toggleSfxMuted } from '@editor/lib/sound'
 import {
   useEditor,
   undo,
@@ -22,7 +22,7 @@ import {
   setMapName,
   importMapJson,
   toast,
-} from '@/lib/editor-store'
+} from '@editor/lib/editor-store'
 
 function BarButton({
   icon,
@@ -198,8 +198,12 @@ export function TopBar() {
 
       {/* right: actions */}
       <div className="flex items-center gap-2">
-        <SoundToggle />
-        <div className="mx-1 h-6 w-px bg-border" />
+          <button
+            onClick={() => window.dispatchEvent(new Event('creation:exit'))}
+            className="hud-btn hud-b chamfer-sm chamfer h-10 px-3.5 text-[13px] font-medium text-muted-foreground hover:text-foreground"
+          >退出</button>
+          <SoundToggle />
+          <div className="mx-1 h-6 w-px bg-border" />
         <BarButton icon={<IconUndo />} label="撤销" onClick={undo} disabled={!undoOk} />
         <BarButton icon={<IconRedo />} label="重做" onClick={redo} disabled={!redoOk} />
         <div className="mx-1 h-6 w-px bg-border" />

@@ -1,9 +1,9 @@
 'use client'
 
 import { Paintbrush, Eraser, Pipette, Undo2, Redo2 } from 'lucide-react'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { playSfx } from '@/lib/sound'
-import type { PainterTool } from '@/lib/painter-types'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
+import type { PainterTool } from '@editor/lib/painter-types'
 
 /**
  * 左侧竖排工具栏（§4.2）：画笔/橡皮/取色器互斥选中（青描边高亮），

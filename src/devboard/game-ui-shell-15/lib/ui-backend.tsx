@@ -14,7 +14,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { UiSystem } from '../../../ui/model/view'
+import type { UiSystem } from '../../../ui/index'
 import { bootUiBackend } from './match-boot'
 
 interface UiBackendContextValue {

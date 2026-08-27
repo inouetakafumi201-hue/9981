@@ -7,10 +7,10 @@ import {
   QUALITY_COLOR,
   QUALITY_LABEL,
   badgeStateOf,
-} from '@/lib/library-data'
-import { isStarred, toggleStar, showToast, useLibApp, materialTexture } from '@/lib/library-store'
-import { openBench } from '@/lib/bench-store'
-import { openPixelPainter } from '@/lib/painter-store'
+} from '@editor/lib/library-data'
+import { isStarred, toggleStar, showToast, useLibApp, materialTexture } from '@editor/lib/library-store'
+import { openBench } from '@editor/lib/bench-store'
+import { openPixelPainter } from '@editor/lib/painter-store'
 import { LibTile } from './library-tile'
 import { Chip } from './library-badges'
 import {
@@ -23,12 +23,12 @@ import {
   StatDefense,
   StatMobility,
 } from './library-icons'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 import type { ComponentType, SVGProps } from 'react'
-import type { TokenSlot } from '@/lib/library-data'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { SingleBurst } from '@/components/fx/random-burst-field'
+import type { TokenSlot } from '@editor/lib/library-data'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { SingleBurst } from '@editor/components/fx/random-burst-field'
 
 const SLOT_ICON: Record<TokenSlot, ComponentType<SVGProps<SVGSVGElement>>> = {
   attr: StatAttr,
@@ -195,6 +195,9 @@ export function LibraryDetail({ asset }: { asset: MaterialMeta }) {
               x: (r.left + r.width / 2) / window.innerWidth,
               y: (r.top + r.height / 2) / window.innerHeight,
             })
+            window.setTimeout(() => {
+              window.location.assign(`/research-bench?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
+            }, 360)
           }}
           className="chamfer lib-btn-cyan flex items-center justify-center gap-1.5 px-4 py-2.5 font-sans text-[14px] font-bold"
         >

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { IconFolder, IconEye, IconEyeOff, IconPlus, IconChevronLeft, IconChevronRight, IconImage } from './icons'
 import { HoloScan, HoloStatic } from './fx'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 import {
   SCALE_LABEL,
   nodeAnchor,
@@ -12,7 +12,7 @@ import {
   type Layer,
   type BuildingGroup,
   type BuildingFloor,
-} from '@/lib/map-types'
+} from '@editor/lib/map-types'
 import {
   useEditor,
   getState,
@@ -28,8 +28,8 @@ import {
   setBuildingFloorOrdinal,
   bindBuildingPortal,
   removeBuildingFloor,
-} from '@/lib/editor-store'
-import { uploadPngFile, type UploadCategory } from '@/lib/file-upload'
+} from '@editor/lib/editor-store'
+import { uploadPngFile, type UploadCategory } from '@editor/lib/file-upload'
 
 function SectionHeader({
   title,

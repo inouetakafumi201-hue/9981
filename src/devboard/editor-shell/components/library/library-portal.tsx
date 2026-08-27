@@ -1,7 +1,7 @@
 'use client'
 
-import { useLibrary } from '@/lib/library-store'
-import { PortalTransition } from '@/components/fx/portal-transition'
+import { useLibrary } from '@editor/lib/library-store'
+import { PortalTransition } from '@editor/components/fx/portal-transition'
 
 /**
  * 「梦境接入」传送门过场——只在 entering 阶段挂载（store 计时切到 open 时卸载）。

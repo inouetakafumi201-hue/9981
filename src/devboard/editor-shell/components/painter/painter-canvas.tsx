@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
-import { CANVAS_SIZE, GRID_MIN_ZOOM, hexToRgba, rgbaToHex, type PainterTool } from '@/lib/painter-types'
-import type { PixelEngine } from '@/lib/use-pixel-engine'
+import { CANVAS_SIZE, GRID_MIN_ZOOM, hexToRgba, rgbaToHex, type PainterTool } from '@editor/lib/painter-types'
+import type { PixelEngine } from '@editor/lib/use-pixel-engine'
 
 /**
  * 128×128 画布视口（§4.3）：内部分辨率固定 128×128，显示层用 CSS 缩放 +

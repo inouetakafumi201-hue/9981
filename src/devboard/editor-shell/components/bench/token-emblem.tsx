@@ -1,7 +1,7 @@
 'use client'
 
-import type { BenchToken } from '@/lib/bench-data'
-import { ACCENT_COLOR } from '@/lib/bench-data'
+import type { BenchToken } from '@editor/lib/bench-data'
+import { ACCENT_COLOR } from '@editor/lib/bench-data'
 
 /**
  * 词条像素徽标（占位）：元素强调色底 + 首字，营造「印章/图腾」质感。真实版由

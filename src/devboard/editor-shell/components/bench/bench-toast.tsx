@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { useBench } from '@/lib/bench-store'
+import { useBench } from '@editor/lib/bench-store'
 
 /** 研究台底部居中的轻提示（限免拒绝/待接线动作反馈）。 */
 export function BenchToastLayer() {

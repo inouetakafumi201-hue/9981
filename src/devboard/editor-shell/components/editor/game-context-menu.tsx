@@ -10,8 +10,8 @@ import {
   IconAnchor,
   IconSample,
 } from './icons'
-import { playSfx } from '@/lib/sound'
-import { WORLD, nodeAnchor } from '@/lib/map-types'
+import { playSfx } from '@editor/lib/sound'
+import { WORLD, nodeAnchor } from '@editor/lib/map-types'
 import {
   getState,
   deleteSelection,
@@ -20,7 +20,7 @@ import {
   flyTo,
   setCamera,
   updateEdge,
-} from '@/lib/editor-store'
+} from '@editor/lib/editor-store'
 
 interface MenuAction {
   label: string

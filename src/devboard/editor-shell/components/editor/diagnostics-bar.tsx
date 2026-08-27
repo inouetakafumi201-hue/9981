@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 import { IconCheck, IconWarn, IconChevronDown } from './icons'
-import { playSfx } from '@/lib/sound'
-import { WORLD, nodeAnchor } from '@/lib/map-types'
+import { playSfx } from '@editor/lib/sound'
+import { WORLD, nodeAnchor } from '@editor/lib/map-types'
 import {
   useEditor,
   flyTo,
   selectOne,
   pulseElement,
-} from '@/lib/editor-store'
-import { catmullRomPath } from '@/lib/geometry'
+} from '@editor/lib/editor-store'
+import { catmullRomPath } from '@editor/lib/geometry'
 
 function Metric({
   label,

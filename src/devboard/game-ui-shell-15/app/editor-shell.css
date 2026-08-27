@@ -1,0 +1,1336 @@
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'PingFang SC', 'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-panel-inset: var(--panel-inset);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dim: var(--primary-dim);
+  --color-edge: var(--edge);
+  --color-edge-selected: var(--edge-selected);
+  --color-box-mask: var(--box-mask);
+  --color-box-physics: var(--box-physics);
+  --color-transition: var(--transition);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+.creation-page-transition {
+  color-scheme: only dark;
+
+  --background: #07111b;
+  --foreground: #dbe7f0;
+
+  --panel: #0d1c29;
+  --panel-raised: #12263616;
+  --panel-inset: #071019;
+
+  --card: #10222f;
+  --card-foreground: #dbe7f0;
+
+  --border: #1c3243;
+  --border-strong: #2a4a5f;
+
+  --muted: #0f2130;
+  --muted-foreground: #6f8598;
+
+  --primary: #35d6e6;
+  --primary-foreground: #04141a;
+  --primary-dim: #1a7a86;
+
+  --edge: #2fd4d6;
+  --edge-selected: #f5c542;
+  --box-mask: #f5c542;
+  --box-physics: #e5484d;
+  --transition: #f5893f;
+
+  --success: #3fbf6f;
+  --warning: #f5b544;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html,
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* ------- Game-feel utilities ------- */
+
+/* crisp pixel-art rendering for node/material thumbnails */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* =====================================================================
+   Angular HUD hardware system — kills the "web widget" look.
+   Signature shape: top-left + bottom-right chamfer.
+   ===================================================================== */
+
+/* chamfer shapes (var --cf controls cut size) */
+.chamfer {
+  --cf: 8px;
+  clip-path: polygon(
+    var(--cf) 0,
+    100% 0,
+    100% calc(100% - var(--cf)),
+    calc(100% - var(--cf)) 100%,
+    0 100%,
+    0 var(--cf)
+  );
+}
+.chamfer-sm {
+  --cf: 5px;
+}
+.chamfer-lg {
+  --cf: 12px;
+}
+
+/* hairline border that follows the chamfer via mask trick.
+   The position rule lives in @layer components so Tailwind's utilities
+   layer (absolute/fixed) still wins the cascade. */
+@layer components {
+  .hud-b {
+    position: relative;
+  }
+}
+.hud-b::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: inherit;
+  padding: 1px;
+  background: var(--hud-bc, var(--border-strong));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* faint diagonal machine texture for panel surfaces */
+.hud-grain {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(90, 224, 240, 0.022) 0px,
+    rgba(90, 224, 240, 0.022) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+/* engraved / recessed readout field */
+.hud-field {
+  background: var(--panel-inset);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(120, 220, 240, 0.07);
+}
+.hud-field-hover:hover {
+  --hud-bc: var(--primary-dim);
+}
+
+/* beveled mechanical button */
+.hud-btn {
+  background: linear-gradient(180deg, var(--card), var(--panel));
+  box-shadow:
+    inset 0 1px 0 rgba(140, 220, 240, 0.09),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+  transition:
+    filter 0.15s ease,
+    transform 0.1s ease;
+}
+.hud-btn:hover {
+  filter: brightness(1.18);
+  --hud-bc: var(--border-strong);
+}
+.hud-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 0 0 rgba(0, 0, 0, 0);
+}
+
+/* primary energized action */
+.hud-btn-primary {
+  background: linear-gradient(180deg, #4ff0e6, var(--primary) 55%, #189bb0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 8px rgba(0, 40, 50, 0.5),
+    0 0 22px -6px var(--primary);
+}
+.hud-btn-primary:hover {
+  filter: brightness(1.08) saturate(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 8px rgba(0, 40, 50, 0.5),
+    0 0 30px -4px var(--primary);
+}
+.hud-btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* section header bar with leading marker + tick divider */
+.hud-head-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--border-strong),
+    transparent
+  );
+}
+
+/* pulsing status dot */
+@keyframes soft-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.soft-blink {
+  animation: soft-blink 2.2s ease-in-out infinite;
+}
+
+/* animated connected edge flow */
+@keyframes edge-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+.edge-flow {
+  stroke-dasharray: 10 6;
+  animation: edge-flow 1.1s linear infinite;
+}
+
+/* pulsing selection glow */
+@keyframes node-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--primary-dim), 0 0 22px -6px var(--primary);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--primary), 0 0 34px -4px var(--primary);
+  }
+}
+.node-pulse {
+  animation: node-pulse 2.6s ease-in-out infinite;
+}
+
+/* 诊断列表点击定位（B6）：SVG <g> 不支持 box-shadow，用 drop-shadow
+ *  filter 强度脈動代替。`pulseElement` 会在 1.6s 后把 class 摘掉——这里
+ *  的 3 次 0.4s 闪烁（合计 1.2s）在那之前完整播完，不会被生硬打断。 */
+@keyframes diag-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px var(--edge-selected)) drop-shadow(0 0 0px var(--edge-selected));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px var(--edge-selected)) drop-shadow(0 0 18px var(--edge-selected));
+  }
+}
+.diag-pulse {
+  animation: diag-pulse 0.4s ease-in-out 3;
+}
+
+/* staggered entrance */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.rise-in {
+  animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes marker-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4) rotate(var(--rot, 0deg));
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(var(--rot, 0deg));
+    opacity: 1;
+  }
+}
+.marker-pop {
+  animation: marker-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* scrollbars */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =====================================================================
+   Holographic research-table game FX
+   ===================================================================== */
+
+/* --- Holographic map/scene projection --- */
+/* faint horizontal scanlines baked into a projected image */
+.holo-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(90, 224, 240, 0.1) 0px,
+    rgba(90, 224, 240, 0.1) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+/* cyan tint so photos read as light projections */
+.holo-tint {
+  background: linear-gradient(
+    180deg,
+    rgba(53, 214, 230, 0.14),
+    transparent 45%,
+    rgba(20, 120, 150, 0.12)
+  );
+  mix-blend-mode: screen;
+}
+/* sweeping scan band travelling down the projection */
+@keyframes holo-sweep {
+  0% {
+    transform: translateY(-130%);
+  }
+  100% {
+    transform: translateY(230%);
+  }
+}
+.holo-scan {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 45%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(120, 240, 255, 0.16) 42%,
+    rgba(180, 250, 255, 0.4) 50%,
+    rgba(120, 240, 255, 0.16) 58%,
+    transparent
+  );
+  filter: blur(0.5px);
+  mix-blend-mode: screen;
+  animation: holo-sweep 3.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+/* irregular signal flicker */
+@keyframes holo-flicker {
+  0%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.72;
+  }
+  91% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.85;
+  }
+  96% {
+    opacity: 1;
+  }
+}
+.holo-flicker {
+  animation: holo-flicker 5.5s steps(1, end) infinite;
+}
+
+/* =====================================================================
+   Full-screen holographic atmosphere. This layer sits above every panel,
+   so it is intentionally very restrained: `mix-blend-mode: overlay` at
+   high opacity (the previous version) recolors and desaturates whatever
+   is underneath, which is why the whole UI looked washed out. `screen`
+   blending only ever ADDS light — it can't darken or desaturate a pixel
+   below its own low opacity, so panels keep their real color and
+   vibrance. Everything here is opacity <= 0.12 for exactly that reason.
+   Corner brackets / edge beams were removed entirely — on top of the
+   real toolbar/panel chrome they read as a mismatched decorative layer
+   rather than a cohesive HUD, so the atmosphere is now scanlines +
+   vignette + one slow scan band + rare flicker only.
+   ===================================================================== */
+.crt-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(140, 245, 255, 0.05) 0px,
+    rgba(140, 245, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+@keyframes vignette-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.crt-vignette {
+  background: radial-gradient(ellipse at center, transparent 62%, rgba(2, 9, 14, 0.34) 100%);
+  animation: vignette-breathe 7s ease-in-out infinite;
+}
+@keyframes crt-roll {
+  0% {
+    transform: translateY(-30vh);
+  }
+  100% {
+    transform: translateY(130vh);
+  }
+}
+.crt-roll {
+  height: 22vh;
+  background: linear-gradient(to bottom, transparent, rgba(120, 235, 250, 0.07) 50%, transparent);
+  mix-blend-mode: screen;
+  animation: crt-roll 10s linear infinite;
+}
+@keyframes screen-flicker {
+  0%,
+  92%,
+  94%,
+  100% {
+    opacity: 0;
+  }
+  92.5% {
+    opacity: 0.05;
+  }
+  93.5% {
+    opacity: 0.03;
+  }
+}
+.screen-flicker {
+  background: var(--primary);
+  mix-blend-mode: screen;
+  animation: screen-flicker 9s steps(1, end) infinite;
+}
+
+/* --- Canvas ambience --- */
+@keyframes grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 40px 40px, 40px 40px;
+  }
+}
+.grid-drift {
+  animation: grid-drift 9s linear infinite;
+}
+@keyframes energy-sweep {
+  0% {
+    transform: translateX(-60%) skewX(-14deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.5;
+  }
+  45% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(180%) skewX(-14deg);
+    opacity: 0;
+  }
+}
+.energy-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(53, 214, 230, 0.09),
+    transparent
+  );
+  animation: energy-sweep 9s ease-in-out infinite;
+}
+@keyframes dust-float {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(14px, -46px);
+    opacity: 0;
+  }
+}
+.dust {
+  animation: dust-float linear infinite;
+}
+
+/* projector base glow */
+@keyframes projector-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+.projector-glow {
+  background: radial-gradient(
+    ellipse at 50% 120%,
+    rgba(53, 214, 230, 0.22),
+    transparent 62%
+  );
+  animation: projector-breathe 4.5s ease-in-out infinite;
+}
+
+/* data readout flicker for HUD text */
+@keyframes data-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.data-flicker {
+  animation: data-flicker 1.4s ease-in-out infinite;
+}
+
+/* =====================================================================
+   Custom reticle cursor — replaces the system arrow so nothing reads
+   as a plain web page. Position is set via inline transform from JS;
+   everything else here is pure CSS (rotation, glow, lock/pulse states).
+   ===================================================================== */
+
+/* hide the system cursor everywhere once the reticle takes over, but
+   keep a real text caret inside editable fields for usability */
+.game-cursor-active,
+.game-cursor-active * {
+  cursor: none !important;
+}
+.game-cursor-active input,
+.game-cursor-active textarea {
+  cursor: text !important;
+}
+
+.game-cursor-glow,
+.game-cursor-ring,
+.game-cursor-core {
+  position: fixed;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  transition: opacity 0.15s ease;
+}
+
+.game-cursor-glow {
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(90, 224, 240, 0.28), transparent 70%);
+  transition:
+    opacity 0.15s ease,
+    background 0.2s ease;
+}
+.game-cursor-glow.game-cursor-locked {
+  background: radial-gradient(circle, rgba(255, 209, 102, 0.32), transparent 70%);
+}
+
+.game-cursor-ring {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(90, 224, 240, 0.75);
+  box-shadow: 0 0 8px -1px var(--primary);
+  transition:
+    opacity 0.15s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    width 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cursor-ring-spin-static 6s linear infinite;
+}
+@keyframes cursor-ring-spin-static {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+.game-cursor-ring.game-cursor-locked {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-color: rgba(255, 209, 102, 0.9);
+  box-shadow: 0 0 12px -1px var(--warning);
+}
+.game-cursor-ring.game-cursor-pulse {
+  border-color: #fff;
+}
+
+/* corner brackets that appear only in the locked (interactive) state */
+.game-cursor-bracket {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  border-color: inherit;
+}
+.game-cursor-ring.game-cursor-locked .game-cursor-bracket {
+  opacity: 1;
+}
+.game-cursor-bracket-tl {
+  top: -3px;
+  left: -3px;
+  border-top: 1.5px solid var(--warning);
+  border-left: 1.5px solid var(--warning);
+}
+.game-cursor-bracket-tr {
+  top: -3px;
+  right: -3px;
+  border-top: 1.5px solid var(--warning);
+  border-right: 1.5px solid var(--warning);
+}
+.game-cursor-bracket-bl {
+  bottom: -3px;
+  left: -3px;
+  border-bottom: 1.5px solid var(--warning);
+  border-left: 1.5px solid var(--warning);
+}
+.game-cursor-bracket-br {
+  bottom: -3px;
+  right: -3px;
+  border-bottom: 1.5px solid var(--warning);
+  border-right: 1.5px solid var(--warning);
+}
+
+.game-cursor-core {
+  width: 2px;
+  height: 2px;
+}
+.game-cursor-core-h,
+.game-cursor-core-v {
+  position: absolute;
+  background: var(--primary);
+  box-shadow: 0 0 4px var(--primary);
+}
+.game-cursor-core-h {
+  width: 5px;
+  height: 1px;
+  top: 0.5px;
+  left: -1.5px;
+}
+.game-cursor-core-v {
+  width: 1px;
+  height: 5px;
+  left: 0.5px;
+  top: -1.5px;
+}
+.game-cursor-core.game-cursor-locked .game-cursor-core-h,
+.game-cursor-core.game-cursor-locked .game-cursor-core-v {
+  background: var(--warning);
+  box-shadow: 0 0 4px var(--warning);
+}
+
+/* =====================================================================
+   Custom HUD context menu (replaces the native browser right-click menu)
+   ===================================================================== */
+@keyframes ctx-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.game-ctx-menu {
+  transform-origin: top left;
+  animation: ctx-menu-in 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.85);
+}
+
+/* =====================================================================
+   Toast — transient bottom-center status readout
+   ===================================================================== */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.toast-in {
+  animation: toast-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.8);
+}
+
+/* =====================================================================
+   Boot sequence — one-shot "device power on" overlay
+   ===================================================================== */
+@keyframes boot-flicker-burst {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.9;
+  }
+  14% {
+    opacity: 0.1;
+  }
+  22% {
+    opacity: 0.7;
+  }
+  30% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.4;
+  }
+  48% {
+    opacity: 0;
+  }
+}
+.boot-flicker-burst {
+  animation: boot-flicker-burst 0.42s steps(1, end) 1;
+}
+
+@keyframes boot-cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+.boot-cursor {
+  animation: boot-cursor-blink 0.6s steps(1, end) infinite;
+}
+
+@keyframes boot-iris-out {
+  0% {
+    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
+  }
+  70% {
+    clip-path: circle(38% at 50% 50%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 1;
+  }
+}
+.boot-iris-out {
+  animation: boot-iris-out 0.62s cubic-bezier(0.6, 0, 0.4, 1) forwards;
+}
+
+/* =====================================================================
+   梦境素材库 — 像素前景 + 暖光全息投影主题（对齐需求文档 §2）。
+
+   色彩语义严格遵守 §2.2：**青(#06b6d4) 是唯一高饱和主操作色**（W 徽标、回编辑
+   器/去研究台、当前筛选左条、蓝本/UGC 徽章、卡片激活）；暖木色只承载「书架氛
+   围」的**背景全息光层**，绝不喧宾夺主。整体克制暗调略冷 + 暖灯：面板走墨蓝半
+   透明玻璃，可交互元素才发光（悬停白/青、激活青），不可交互一律扁平灰。
+
+   仅在 `.lib-root` 作用域内覆盖，绝不影响编辑器本体。
+   ===================================================================== */
+.lib-root {
+  /* —— §2.2 颜色语义 —— */
+  --cyan: #06b6d4; /* social 主操作色（唯一高饱和） */
+  --cyan-bright: #38dcf0;
+  --cyan-deep: #0e7d90;
+  --free: #38a169; /* safe：限免 */
+  --gold: #d4af37; /* 品级 5 / 合成高光 */
+  --silver: #a8b2bd; /* 品级 4 */
+  --orange: #dd6b20; /* 已改动小点 */
+  --star: #d69e2e; /* 星标 */
+  --danger: #e53e3e; /* 弱点 / 拖拽拒绝 */
+
+  /* 品级描边：灰白1 / 绿2 / 蓝3 / 银4 / 金5 */
+  --q1: #f3f4f6;
+  --q2: #38a169;
+  --q3: #4a90d9;
+  --q4: #a8b2bd;
+  --q5: #d4af37;
+
+  /* 暖光只做背景氛围 */
+  --amber-glow: rgba(214, 158, 74, 0.4);
+
+  /* 墨蓝面板体系（略冷暗调） */
+  --lib-bg: #0d1824; /* ink：最深背景 */
+  --lib-panel: rgba(11, 18, 26, 0.58);
+  --lib-panel-solid: #0e1a26;
+  --lib-inset: rgba(0, 0, 0, 0.5);
+  --lib-line: #2a3a44; /* 暗边分隔线 */
+  --lib-text: #f3f4f6; /* 灰白主文字 */
+  --lib-dim: #627383; /* muted 次要文字 */
+}
+
+/* 半透明墨蓝玻璃面板——降低不透明度让底下场景底图能"泛"进来，同时用一条
+   顶部高光 + 大范围外阴影让面板从背景上"浮起"，而不是与背景齐平的实色块。
+   这是消除"方块 UI 填满"网页感的关键：面板要像悬浮的玻璃牌，不是页面分区。 */
+.lib-glass {
+  background: var(--lib-panel);
+  backdrop-filter: blur(11px) saturate(1.15);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(6, 182, 212, 0.02) 0px,
+      rgba(6, 182, 212, 0.02) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.75),
+    0 2px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+/* 容器框：默认克制暗边 + 极淡暖光内晕（氛围，非交互高光）+ 外发光让边框
+   在深色背景缝隙里"泛光" */
+.lib-frame {
+  --hud-bc: var(--lib-line);
+  box-shadow:
+    inset 0 0 26px -14px var(--amber-glow),
+    0 0 46px -20px rgba(232, 180, 110, 0.35);
+}
+/* 主视图/详情这类「活跃容器」：淡青描边 + 轻外发光，点明是当前焦点区 */
+.lib-frame-strong {
+  --hud-bc: color-mix(in srgb, var(--cyan) 55%, var(--lib-line));
+  box-shadow:
+    inset 0 0 26px -12px rgba(6, 182, 212, 0.4),
+    0 0 52px -16px rgba(6, 182, 212, 0.55);
+}
+
+/* 网格里的单个素材卡片：不是拼接的实色方块，而是每张都自带一圈外发光的
+   独立浮起物件——配合外层 gap-4，让卡片之间露出一条能看见底图的暗缝，
+   彻底告别"方块 UI 填满"的马赛克感。悬停时发光和位移都进一步放大，
+   强化"能拿起来的实物"而非"页面里的一格"。 */
+.lib-card-chip {
+  transition: box-shadow 160ms ease, transform 160ms ease;
+  box-shadow:
+    0 10px 22px -12px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+}
+.lib-card-chip:hover {
+  box-shadow:
+    0 14px 28px -12px rgba(0, 0, 0, 0.75),
+    0 0 26px -8px rgba(6, 182, 212, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+}
+
+/* 中性机械按钮（可交互 → 悬停青边发光） */
+.lib-btn {
+  background: linear-gradient(180deg, #16232f, #0c151d);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 220, 0.08),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+  transition:
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+.lib-btn:hover {
+  filter: brightness(1.22);
+  --hud-bc: var(--cyan);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 200, 220, 0.12),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 0 18px -6px var(--cyan);
+}
+.lib-btn:active {
+  transform: translateY(1px);
+}
+/* 青色主操作按钮（回编辑器 / 去研究台 / 主行动） */
+.lib-btn-cyan {
+  background: linear-gradient(180deg, var(--cyan-bright), var(--cyan) 55%, var(--cyan-deep));
+  color: #04141a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 8px rgba(0, 40, 50, 0.5),
+    0 0 22px -6px var(--cyan);
+}
+.lib-btn-cyan:hover {
+  filter: brightness(1.08) saturate(1.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 8px rgba(0, 40, 50, 0.5),
+    0 0 32px -4px var(--cyan);
+}
+
+/* 像素贴图槽（卡片/快捷栏/网格通用底） */
+.lib-tile {
+  background-color: #0a121a;
+  box-shadow: inset 0 0 0 1px rgba(120, 200, 220, 0.06), inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 品级描边（叠在贴图外框；--q 由内联样式指定品级色） */
+.lib-quality-ring {
+  box-shadow: inset 0 0 0 2px var(--q, var(--lib-line)), 0 0 16px -6px var(--q, transparent);
+}
+
+/* 不可交互（UGC 在快捷栏灰显） */
+.lib-disabled {
+  filter: grayscale(0.85) brightness(0.7);
+  cursor: not-allowed;
+}
+
+/* 拖拽拒绝红闪（落点） */
+@keyframes lib-reject-flash {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 1px var(--lib-line);
+  }
+  25%,
+  75% {
+    box-shadow: inset 0 0 0 2px var(--danger), 0 0 20px -4px var(--danger);
+  }
+}
+.lib-reject {
+  animation: lib-reject-flash 0.45s ease-in-out;
+}
+
+/* 卡片选中：青色全息脉动 */
+@keyframes lib-select-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--cyan), 0 0 24px -6px var(--cyan);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--cyan), 0 0 40px -4px var(--cyan);
+  }
+}
+.lib-selected {
+  animation: lib-select-pulse 2.4s ease-in-out infinite;
+}
+
+/* 青色/暖色 能量道具辉光（叠在像素贴图上） */
+.lib-glow-cyan::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, rgba(6, 182, 212, 0.45), transparent 62%);
+  mix-blend-mode: screen;
+}
+.lib-glow-warm::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, rgba(255, 200, 110, 0.42), transparent 62%);
+  mix-blend-mode: screen;
+}
+
+/* 徽标：限免的柔和呼吸 */
+@keyframes lib-free-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 8px -2px var(--free);
+  }
+  50% {
+    box-shadow: 0 0 16px -1px var(--free);
+  }
+}
+.lib-badge-free {
+  animation: lib-free-breathe 2.6s ease-in-out infinite;
+}
+
+/* 进度条流光 */
+@keyframes lib-bar-shine {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+.lib-bar-shine {
+  animation: lib-bar-shine 2.8s ease-in-out infinite;
+}
+
+/* 详情大图：悬浮微动 + 底座光晕呼吸 */
+@keyframes lib-hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.lib-hero-float {
+  animation: lib-hero-float 4.2s ease-in-out infinite;
+}
+@keyframes lib-pedestal {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scaleX(1.12);
+  }
+}
+.lib-pedestal {
+  animation: lib-pedestal 4.2s ease-in-out infinite;
+}
+
+/* 左侧导航当前项的竖光条 */
+@keyframes lib-nav-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.lib-nav-in {
+  animation: lib-nav-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* =====================================================================
+   传送门过场 — 打开素材库时的「暖色梦境接入」仪式（entering 阶段）。
+   光晕从触发按钮处（--ox/--oy）绽开，叠加扩张金环 + 像素抖动，随后素材库
+   本体做一次 warp-in 放大淡入。关闭只用 lib-leave 轻量淡出。
+   ===================================================================== */
+@keyframes lib-portal-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  22% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+.lib-portal-bloom {
+  position: absolute;
+  left: var(--ox, 50%);
+  top: var(--oy, 50%);
+  width: 160vmax;
+  height: 160vmax;
+  margin: -80vmax 0 0 -80vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 150, 0.95) 0%,
+    rgba(245, 182, 66, 0.7) 18%,
+    rgba(200, 134, 42, 0.35) 34%,
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+  animation: lib-portal-bloom 0.76s cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+@keyframes lib-portal-ring {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.05);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.9);
+  }
+}
+.lib-portal-ring {
+  position: absolute;
+  left: var(--ox, 50%);
+  top: var(--oy, 50%);
+  width: 120vmax;
+  height: 120vmax;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 216, 115, 0.85);
+  box-shadow: 0 0 40px 4px var(--amber-glow), inset 0 0 40px 4px var(--amber-glow);
+  animation: lib-portal-ring 0.76s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes lib-portal-flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  40% {
+    opacity: 0.1;
+  }
+}
+.lib-portal-scan {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 210, 120, 0.14) 0px,
+    rgba(255, 210, 120, 0.14) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: screen;
+  animation: lib-portal-flash 0.76s steps(1, end) forwards;
+}
+@keyframes lib-warp-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(8px) brightness(1.6);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+.lib-warp-in {
+  animation: lib-warp-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes lib-leave {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(3px);
+  }
+}
+.lib-leave {
+  animation: lib-leave 0.34s ease-in forwards;
+}
+
+/* 触发按钮的一次性能量吸入反馈（可选，套在编辑器入口按钮上） */
+@keyframes lib-entry-charge {
+  0% {
+    box-shadow: 0 0 0 0 var(--primary);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(53, 214, 230, 0);
+  }
+}
+.lib-entry-charge {
+  animation: lib-entry-charge 0.5s ease-out;
+}
+
+/* =====================================================================
+   研究台（素材级工作台）主题。BenchApp 根节点带 `lib-root bench-root`，
+   因此**继承**素材库全套令牌与工具类（cyan 主色、品级色、lib-glass /
+   lib-btn-cyan / chamfer / hud-b / lib-tile / lib-quality-ring / lib-reject
+   / lib-disabled / lib-hero-float / lib-glow-*）。这里只**新增**研究台特有的
+   五大类语义色、暖光锻造台舞台、未收集剪影、以及仪式演出辅助层——色调更暖、
+   游戏感更强，但仍恪守「青是唯一高饱和主操作色」（暖光只在中央舞台做氛围）。
+   ===================================================================== */
+.bench-root {
+  /* 五大类语义色（小标签/圆点用；均在既有色板内） */
+  --bench-cat-attr: var(--orange);
+  --bench-cat-skill: var(--cyan);
+  --bench-cat-state: var(--free);
+  --bench-cat-defense: var(--q3);
+  --bench-cat-mobility: var(--gold);
+
+  --bench-dim: var(--lib-dim);
+  /* 中央舞台暖光（橙金） */
+  --forge-warm: rgba(232, 158, 66, 0.5);
+  --forge-warm-soft: rgba(232, 158, 66, 0.16);
+}
+
+/* 研究台背景：篝火锻造工坊实景底图 + 暗角，暖意集中在中央舞台而非铺满面板 */
+.bench-bg {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(150, 96, 34, 0.16), transparent 62%),
+    radial-gradient(ellipse at 50% 120%, rgba(6, 60, 72, 0.14), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(6, 9, 14, 0.2) 40%, rgba(4, 6, 9, 0.88) 100%),
+    url('/bench/backdrop.png') center 38% / cover no-repeat,
+    #0a0b0f;
+}
+
+/* 中央锻造舞台：暖金全息投影底 + 木纹微光（台面感），gold 描边 + 内外发光 */
+.forge-stage {
+  --hud-bc: color-mix(in srgb, var(--gold) 55%, var(--lib-line));
+  background:
+    radial-gradient(ellipse 62% 70% at 50% 40%, var(--forge-warm-soft), transparent 70%),
+    var(--lib-panel);
+  background-blend-mode: screen, normal;
+  box-shadow:
+    inset 0 0 60px -18px var(--forge-warm),
+    0 0 44px -18px var(--forge-warm);
+}
+/* 舞台里透出的「工具剪影/木纹」全息光层——斜纹微光，轻微闪烁 */
+@keyframes forge-stage-flicker {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+.forge-stage-grain {
+  background-image: repeating-linear-gradient(
+    58deg,
+    rgba(232, 180, 110, 0.05) 0px,
+    rgba(232, 180, 110, 0.05) 2px,
+    transparent 2px,
+    transparent 9px
+  );
+  animation: forge-stage-flicker 5.5s ease-in-out infinite;
+}
+
+/* 锻造槽有词条 = 进行中/消耗（橙），空槽 = 扁平灰虚线 */
+.forge-slot-filled {
+  --hud-bc: var(--orange);
+  box-shadow: inset 0 0 18px -8px var(--orange), 0 0 16px -8px var(--orange);
+}
+.forge-slot-empty {
+  --hud-bc: var(--lib-line);
+  border-style: dashed;
+}
+
+/* 未收集词条剪影：压暗去色 + 轻微内阴影 */
+.token-silhouette {
+  filter: grayscale(1) brightness(0.32) contrast(0.85);
+}
+
+/* 基体/成品的持续悬浮 + 底座呼吸已有 lib-hero-float / lib-pedestal 可复用 */
+
+/* 合成仪式：锻造门能量脉冲 */
+@keyframes forge-gate-pulse {
+  0%,
+  100% {
+    box-shadow: inset 0 0 60px -10px var(--cyan), 0 0 80px -20px var(--cyan);
+    opacity: 0.92;
+  }
+  50% {
+    box-shadow: inset 0 0 90px -6px var(--cyan-bright), 0 0 120px -14px var(--cyan-bright);
+    opacity: 1;
+  }
+}
+.forge-gate-pulse {
+  animation: forge-gate-pulse 1.5s ease-in-out infinite;
+}
+
+/* 三台子工作光柱底座 */
+.forge-station-base {
+  background: radial-gradient(ellipse at 50% 100%, var(--forge-warm), transparent 72%);
+}
+
+/* ==========================================================================
+   像素绘制器 —— 缩放/色相/饱和/明度滑条统一样式（缩放条走默认灰轨，色相类
+   滑条用 --painter-track / --painter-thumb 自定义每条各自的渐变与滑块色）。
+   ========================================================================== */
+.painter-range {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  background: var(--painter-track, var(--lib-line));
+  outline: none;
+}
+.painter-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--painter-thumb, var(--cyan));
+  border: 2px solid var(--lib-text);
+  box-shadow: 0 0 6px -1px var(--painter-thumb, var(--cyan));
+  cursor: pointer;
+}
+.painter-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--painter-thumb, var(--cyan));
+  border: 2px solid var(--lib-text);
+  box-shadow: 0 0 6px -1px var(--painter-thumb, var(--cyan));
+  cursor: pointer;
+}
+.painter-range::-moz-range-track {
+  background: var(--painter-track, var(--lib-line));
+  border-radius: 999px;
+}

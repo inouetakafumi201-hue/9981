@@ -1,8 +1,8 @@
 'use client'
 
 import { Minus, Plus } from 'lucide-react'
-import { ZOOM_MAX, ZOOM_MIN } from '@/lib/painter-types'
-import { playSfx } from '@/lib/sound'
+import { ZOOM_MAX, ZOOM_MIN } from '@editor/lib/painter-types'
+import { playSfx } from '@editor/lib/sound'
 
 /** 画布下方缩放滑条（§4.3）：2x–16x，默认 8x，两端 −/+ 按钮步进 1x。 */
 export function ZoomSlider({ zoom, onZoom }: { zoom: number; onZoom: (z: number) => void }) {

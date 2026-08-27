@@ -10,14 +10,14 @@ import {
   IconAnchor,
   IconTrash,
 } from './icons'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 import {
   MATERIALS,
   CATEGORIES,
   tileStyle,
   materialById,
   type MaterialCategory,
-} from '@/lib/materials'
+} from '@editor/lib/materials'
 import {
   SCALE_LIMIT,
   DIRECTIONALITY_LABEL,
@@ -29,7 +29,7 @@ import {
   type Obstruction,
   type Terrain,
   type Placement,
-} from '@/lib/map-types'
+} from '@editor/lib/map-types'
 import {
   useEditor,
   getState,
@@ -44,13 +44,13 @@ import {
   moveMaterialDrag,
   endMaterialDrag,
   addPlacement,
-} from '@/lib/editor-store'
+} from '@editor/lib/editor-store'
 import {
   screenToWorld,
   sceneIdAtPoint,
   isOverCanvas,
-} from '@/lib/canvas-coords'
-import { openLibrary } from '@/lib/library-store'
+} from '@editor/lib/canvas-coords'
+import { openLibrary } from '@editor/lib/library-store'
 
 /* ------------------------------------------------------------------ */
 /* shared UI                                                           */
@@ -549,6 +549,9 @@ function LibraryEntryButton() {
         } else {
           openLibrary()
         }
+        window.setTimeout(() => {
+          window.location.assign(`/asset-library?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
+        }, 360)
       }}
       style={{ ['--hud-bc' as string]: 'var(--primary)' }}
       className="chamfer hud-b group flex items-center gap-1.5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-primary transition-colors hover:text-primary-foreground hover:bg-primary/90"

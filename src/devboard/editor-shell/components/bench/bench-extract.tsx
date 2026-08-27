@@ -1,9 +1,9 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { useBench, finishExtract } from '@/lib/bench-store'
-import { materialMetaById } from '@/lib/library-data'
-import { LibTile } from '@/components/library/library-tile'
+import { useBench, finishExtract } from '@editor/lib/bench-store'
+import { materialMetaById } from '@editor/lib/library-data'
+import { LibTile } from '@editor/components/library/library-tile'
 
 /**
  * 提取演出（§一「素材溶解 → 词条浮现」）：素材像素化溶解成青色粒子，一枚词条印章

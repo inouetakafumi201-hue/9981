@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Press_Start_2P, Silkscreen, Noto_Sans_SC } from 'next/font/google'
 import './globals.css'
+import './editor-shell.css'
 
 // True bitmap-style pixel faces — no rounded/humanist sans anywhere in the
 // UI's Latin type. Press Start 2P carries big display type (titles, seals);
@@ -22,14 +23,14 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
+  colorScheme: 'only dark',
   themeColor: '#080a0c',
   userScalable: false,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`dark bg-background ${pixelDisplay.variable} ${pixelMono.variable} ${notoSansSC.variable}`}>
+    <html lang="zh-CN" className={`bg-background ${pixelDisplay.variable} ${pixelMono.variable} ${notoSansSC.variable}`}>
       <body className="antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
