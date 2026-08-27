@@ -5,9 +5,9 @@
   "type": "module",
   "description": "MetaKernel: 元机制内核 - 零渲染依赖的纯 TypeScript 状态机库",
   "scripts": {
-    "dev": "cd src/devboard/game-ui-shell-15 && (test -d node_modules || npx pnpm@latest install) && npx next dev -H 0.0.0.0 -p 3000",
-    "build": "cd src/devboard/game-ui-shell-15 && (test -d node_modules || npx pnpm@latest install) && npx next build",
-    "start": "cd src/devboard/game-ui-shell-15 && npx next start -H 0.0.0.0 -p 3000",
+    "dev": "cd src/devboard/game-ui-shell-15 && (test -d node_modules || npx --yes pnpm@9 install) ; ./node_modules/.bin/next dev -H 0.0.0.0 -p 3000",
+    "build": "cd src/devboard/game-ui-shell-15 && (test -d node_modules || npx --yes pnpm@9 install) && ./node_modules/.bin/next build",
+    "start": "cd src/devboard/game-ui-shell-15 && ./node_modules/.bin/next start -H 0.0.0.0 -p 3000",
     "test": "vitest run",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run verify:data && npm run verify:docs",
     "verify:data": "node scripts/verify-data-json.mjs",
