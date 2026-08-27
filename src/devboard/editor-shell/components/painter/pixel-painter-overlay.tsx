@@ -13,20 +13,20 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { usePixelEngine } from '@/lib/use-pixel-engine'
+import { usePixelEngine } from '@editor/lib/use-pixel-engine'
 import {
   CUSTOM_SLOTS,
   ZOOM_DEFAULT,
   type PainterTool,
   type PixelPainterSaveResult,
   type TextureData,
-} from '@/lib/painter-types'
+} from '@editor/lib/painter-types'
 import { PainterToolbar } from './painter-toolbar'
 import { PainterCanvas } from './painter-canvas'
 import { ZoomSlider } from './zoom-slider'
 import { PalettePanel } from './palette-panel'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { playSfx } from '@/lib/sound'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
 
 export interface PixelPainterOverlayProps {
   open: boolean

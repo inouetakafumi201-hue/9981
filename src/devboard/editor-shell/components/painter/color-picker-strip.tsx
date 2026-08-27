@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { hexToHsl, hslToHex } from '@/lib/painter-types'
+import { hexToHsl, hslToHex } from '@editor/lib/painter-types'
 
 /** 色相条 + 饱和度/明度滑条（§4.4）：拖动即时预览为当前色。 */
 export function ColorPickerStrip({ color, onChange }: { color: string; onChange: (hex: string) => void }) {

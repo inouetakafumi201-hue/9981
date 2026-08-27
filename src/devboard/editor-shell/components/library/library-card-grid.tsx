@@ -8,7 +8,7 @@ import {
   filteredMaterials,
   PAGE_SIZE,
   type MaterialMeta,
-} from '@/lib/library-data'
+} from '@editor/lib/library-data'
 import {
   useLibApp,
   setTab,
@@ -17,13 +17,13 @@ import {
   setDrag,
   isStarred,
   materialTexture,
-} from '@/lib/library-store'
+} from '@editor/lib/library-store'
 import { LibTile } from './library-tile'
 import { BadgeGroup } from './library-badges'
 import { BlueprintList } from './library-blueprints'
-import { playSfx } from '@/lib/sound'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { WeightedButton } from '@/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
 
 /**
  * 中部主区（§4.3）：两个语义完全不同的标签——「可放置元素」= 积木网格，「地图·

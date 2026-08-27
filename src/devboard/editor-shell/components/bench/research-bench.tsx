@@ -1,21 +1,21 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { PortalTransition } from '@/components/fx/portal-transition'
+import { PortalTransition } from '@editor/components/fx/portal-transition'
 import {
   useBench,
   useBenchNav,
   closeBench,
   setSection,
-} from '@/lib/bench-store'
+} from '@editor/lib/bench-store'
 import { BenchTokenPanel } from './bench-token-panel'
 import { BenchForge } from './bench-forge'
 import { BenchTokenLibrary } from './bench-token-library'
 import { BenchMoldingBar } from './bench-molding-bar'
 import { BenchJobFocusOverlay } from './bench-pod'
 import { BenchToastLayer } from './bench-toast'
-import { playSfx } from '@/lib/sound'
-import { WeightedButton } from '@/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
 
 /**
  * 研究台整屏覆盖层（BenchApp）。与素材库同构：模块级 store 驱动的相位机
@@ -110,7 +110,7 @@ export function ResearchBench() {
           <WeightedButton
             onClick={() => {
               playSfx('toggle')
-              closeBench()
+              window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'asset-library' } }))
             }}
             className="chamfer lib-btn hud-b flex items-center gap-1.5 px-4 py-2 font-sans text-[13px] font-bold text-[color:var(--cyan)]"
             style={{ ['--hud-bc' as string]: 'var(--cyan)' }}

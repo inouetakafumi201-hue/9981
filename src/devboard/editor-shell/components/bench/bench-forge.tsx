@@ -10,8 +10,8 @@ import {
   QUALITY_COLOR,
   EXTRACT_WHITELIST,
   type ForgeSlotState,
-} from '@/lib/bench-data'
-import { materialMetaById } from '@/lib/library-data'
+} from '@editor/lib/bench-data'
+import { materialMetaById } from '@editor/lib/library-data'
 import {
   useBench,
   forgeSetToken,
@@ -19,14 +19,14 @@ import {
   forgeSave,
   forgeDerive,
   startSynthesis,
-} from '@/lib/bench-store'
-import { LibTile } from '@/components/library/library-tile'
+} from '@editor/lib/bench-store'
+import { LibTile } from '@editor/components/library/library-tile'
 import { TokenEmblem } from './token-emblem'
 import { BenchExtract } from './bench-extract'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { DropSettle } from '@/components/fx/drop-settle'
-import { playSfx } from '@/lib/sound'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { DropSettle } from '@editor/components/fx/drop-settle'
+import { playSfx } from '@editor/lib/sound'
 
 /**
  * 中央「锻造台」：暖光全息舞台。上=基础素材(基体) + 组合预览；中=五槽塑形（底图感，

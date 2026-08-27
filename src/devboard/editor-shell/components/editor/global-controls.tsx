@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 import {
   useEditor,
   setMode,
@@ -12,8 +12,8 @@ import {
   duplicateSelection,
   exportMap,
   clearSelection,
-} from '@/lib/editor-store'
-import type { Mode } from '@/lib/map-types'
+} from '@editor/lib/editor-store'
+import type { Mode } from '@editor/lib/map-types'
 
 function isTyping(): boolean {
   const el = document.activeElement

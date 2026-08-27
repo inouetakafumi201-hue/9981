@@ -9,7 +9,7 @@ import {
   TOKEN_PAGE_SIZE,
   QUALITY_COLOR,
   type BenchToken,
-} from '@/lib/bench-data'
+} from '@editor/lib/bench-data'
 import {
   useBench,
   setCategory,
@@ -17,11 +17,11 @@ import {
   setHoveredToken,
   setTokenDrag,
   isTokenStarred,
-} from '@/lib/bench-store'
+} from '@editor/lib/bench-store'
 import { TokenEmblem } from './token-emblem'
-import { playSfx } from '@/lib/sound'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { WeightedButton } from '@/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
 
 /**
  * 左栏「词条库」：5 大类 tab + 「x / y 已收集」进度 + 词条卡网格（已收集可选中/

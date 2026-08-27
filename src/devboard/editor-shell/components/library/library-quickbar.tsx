@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { DropSettle } from '@/components/fx/drop-settle'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { DropSettle } from '@editor/components/fx/drop-settle'
 import {
   MATERIALS_META,
   materialMetaById,
@@ -12,7 +12,7 @@ import {
   badgeStateOf,
   type CategoryFilter,
   type MaterialMeta,
-} from '@/lib/library-data'
+} from '@editor/lib/library-data'
 import {
   useLibApp,
   setQuickExpanded,
@@ -21,12 +21,12 @@ import {
   setDrag,
   openDetail,
   showToast,
-} from '@/lib/library-store'
+} from '@editor/lib/library-store'
 import { LibTile } from './library-tile'
 import { Chip } from './library-badges'
 import { IconChevronUp, IconFilter } from './library-icons'
 import { ChevronDown, Search, X } from 'lucide-react'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 
 /**
  * 底部快捷栏（§4.5）。

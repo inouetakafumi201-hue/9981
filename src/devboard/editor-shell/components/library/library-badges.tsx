@@ -1,7 +1,7 @@
 'use client'
 
 import { Star } from 'lucide-react'
-import { badgeStateOf, type MaterialMeta } from '@/lib/library-data'
+import { badgeStateOf, type MaterialMeta } from '@editor/lib/library-data'
 
 /**
  * 卡片角标组（§4.1）：一个素材可同时具多个角标，主色取最显眼者，其余做小徽章。

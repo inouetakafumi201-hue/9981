@@ -86,6 +86,7 @@ import { ClickPlayScene, CombatFeedbackScene, MapScene, VictoryScene } from '@/c
 import { B5_STAGES, INITIAL_B5_SESSION, type B5Session, type B5Stage } from '@/lib/b5-session'
 import { type PortScenario } from '@/lib/b6-journey'
 import { ProductShell } from '@/components/product-shell'
+import { creationHref } from '@/lib/creation-navigation'
 
 export default function Page() {
   return <ProductShell />
@@ -387,6 +388,22 @@ function ControlPanelMain() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="control-block">
+            <div className="block-heading"><span>CREATION SUITE</span><span className="count">3 页面</span></div>
+            <div className="cp-creation-grid">
+              <a className="cp-creation-link is-map" href={creationHref('map-editor', { returnTo: '/' })}>
+                <Layers size={15} /><span>地图编辑器</span><small>/map-editor</small>
+              </a>
+              <a className="cp-creation-link is-lib" href={creationHref('asset-library', { returnTo: '/' })}>
+                <Boxes size={15} /><span>素材库</span><small>/asset-library</small>
+              </a>
+              <a className="cp-creation-link is-bench" href={creationHref('research-bench', { returnTo: '/' })}>
+                <ScanLine size={15} /><span>研究台</span><small>/research-bench</small>
+              </a>
+            </div>
+            <p className="cp-note">三个独立入口进入创作页面；进入后可互相切换，退出仅归因最初入口。</p>
           </div>
 
           <div className="control-block">

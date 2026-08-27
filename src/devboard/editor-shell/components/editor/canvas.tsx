@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IconSelect, IconPlace, IconEdge, IconSample, IconPlay } from './icons'
 import { DustField } from './fx'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 import {
   WORLD,
   SCALE_LABEL,
@@ -19,7 +19,7 @@ import {
   type Edge,
   type Vec,
   type EdgePoint,
-} from '@/lib/map-types'
+} from '@editor/lib/map-types'
 import {
   catmullRomPath,
   catmullRomAt,
@@ -33,7 +33,7 @@ import {
   dist,
   clamp,
   type Rect,
-} from '@/lib/geometry'
+} from '@editor/lib/geometry'
 import {
   useEditor,
   getState,
@@ -68,13 +68,13 @@ import {
   flyTo,
   layerOpacity,
   type Camera,
-} from '@/lib/editor-store'
+} from '@editor/lib/editor-store'
 import {
   registerCanvas,
   screenToWorld,
   sceneIdAtPoint,
   worldPerPixel,
-} from '@/lib/canvas-coords'
+} from '@editor/lib/canvas-coords'
 
 /* ------------------------------------------------------------------ */
 /*  Toolbar                                                            */

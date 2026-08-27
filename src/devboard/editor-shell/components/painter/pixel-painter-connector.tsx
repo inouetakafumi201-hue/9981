@@ -9,9 +9,9 @@
    （pixel-painter-overlay.tsx）不 import 这里的任何东西。
    ========================================================================= */
 
-import { usePainterNav, closePixelPainter } from '@/lib/painter-store'
-import { useLibApp, materialTexture, materialSetTexture } from '@/lib/library-store'
-import { materialMetaById } from '@/lib/library-data'
+import { usePainterNav, closePixelPainter } from '@editor/lib/painter-store'
+import { useLibApp, materialTexture, materialSetTexture } from '@editor/lib/library-store'
+import { materialMetaById } from '@editor/lib/library-data'
 import { PixelPainterOverlay } from './pixel-painter-overlay'
 
 export function PixelPainter() {

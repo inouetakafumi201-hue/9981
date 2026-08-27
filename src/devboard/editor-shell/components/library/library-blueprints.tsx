@@ -2,14 +2,14 @@
 
 import { Lock, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BLUEPRINTS, type BlueprintMeta } from '@/lib/library-data'
-import { useLibApp, openBlueprint, showToast } from '@/lib/library-store'
+import { BLUEPRINTS, type BlueprintMeta } from '@editor/lib/library-data'
+import { useLibApp, openBlueprint, showToast } from '@editor/lib/library-store'
 import { LibTile } from './library-tile'
-import { playSfx } from '@/lib/sound'
-import { WeightedButton } from '@/components/fx/weighted-button'
-import { importMapData, getState } from '@/lib/editor-store'
-import { closeLibrary } from '@/lib/library-store'
-import { editorDocToCanonical } from '@/lib/map-bridge'
+import { playSfx } from '@editor/lib/sound'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
+import { importMapData, getState } from '@editor/lib/editor-store'
+import { closeLibrary } from '@editor/lib/library-store'
+import { editorDocToCanonical } from '@editor/lib/map-bridge'
 
 /**
  * Tab 2 · 地图·蓝本（§4.3，只读总览）：每行 = 封面 + 名 + 「N 场景」+ 熟悉度进度

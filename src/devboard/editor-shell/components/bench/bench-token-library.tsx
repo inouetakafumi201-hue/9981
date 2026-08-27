@@ -9,10 +9,10 @@ import {
   badgeStateOf,
   type MaterialMeta,
   type CategoryFilter,
-} from '@/lib/library-data'
-import { useBench, setForgeBase } from '@/lib/bench-store'
-import { LibTile } from '@/components/library/library-tile'
-import { playSfx } from '@/lib/sound'
+} from '@editor/lib/library-data'
+import { useBench, setForgeBase } from '@editor/lib/bench-store'
+import { LibTile } from '@editor/components/library/library-tile'
+import { playSfx } from '@editor/lib/sound'
 
 const PAGE = 20 // 5 列 × 4 行，对齐参考图右栏
 

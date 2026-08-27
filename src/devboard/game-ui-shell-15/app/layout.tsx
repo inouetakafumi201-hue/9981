@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Press_Start_2P, Silkscreen, Noto_Sans_SC } from 'next/font/google'
 import './globals.css'
+import './editor-shell.css'
 
 // True bitmap-style pixel faces — no rounded/humanist sans anywhere in the
 // UI's Latin type. Press Start 2P carries big display type (titles, seals);

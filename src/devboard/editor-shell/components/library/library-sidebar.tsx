@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CATEGORIES } from '@/lib/materials'
-import { COLLECTION, SCOPE_ITEMS } from '@/lib/library-data'
-import { useLibApp, setScope, setCategory } from '@/lib/library-store'
-import { playSfx } from '@/lib/sound'
-import { WeightedButton } from '@/components/fx/weighted-button'
+import { CATEGORIES } from '@editor/lib/materials'
+import { COLLECTION, SCOPE_ITEMS } from '@editor/lib/library-data'
+import { useLibApp, setScope, setCategory } from '@editor/lib/library-store'
+import { playSfx } from '@editor/lib/sound'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
 
 /**
  * 左栏（§4.2）：上「范围」分栏（全部 / 我的素材，全部含限免），下「类别」筛选

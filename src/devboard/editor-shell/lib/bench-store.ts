@@ -28,7 +28,7 @@ import {
   type TokenSlot,
 } from './bench-data'
 import { materialMetaById } from './library-data'
-import type { PortalTheme } from '@/components/fx/portal-transition'
+import type { PortalTheme } from '@editor/components/fx/portal-transition'
 import { moldingSet as metaMoldingSet, forgeModify as metaForgeModify, extractToken as metaExtractToken } from '../../../meta-state/actions/bench-actions'
 import type { MetaStateStore } from '../../../meta-state/store'
 

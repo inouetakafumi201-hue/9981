@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 
 const LINES = [
   'SYS://WAKEUP_DREAMTABLE  v2.7.1',

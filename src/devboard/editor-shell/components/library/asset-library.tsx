@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useLibrary, closeLibrary, useLibApp, setQuery } from '@/lib/library-store'
-import { MATERIALS_META, materialMetaById } from '@/lib/library-data'
+import { useLibrary, closeLibrary, useLibApp, setQuery } from '@editor/lib/library-store'
+import { MATERIALS_META, materialMetaById } from '@editor/lib/library-data'
 import { LibrarySidebar } from './library-sidebar'
 import { LibraryCardGrid } from './library-card-grid'
 import { LibraryDetail } from './library-detail'
@@ -10,8 +10,8 @@ import { LibraryQuickbar } from './library-quickbar'
 import { LibraryPortal } from './library-portal'
 import { IconBack } from './library-icons'
 import { Search } from 'lucide-react'
-import { playSfx } from '@/lib/sound'
-import { WeightedButton } from '@/components/fx/weighted-button'
+import { playSfx } from '@editor/lib/sound'
+import { WeightedButton } from '@editor/components/fx/weighted-button'
 
 /**
  * 梦境素材库整屏覆盖层。挂在编辑器同一 page 内（编辑器不卸载），因此：
@@ -121,7 +121,7 @@ function TopBar({ query }: { query: string }) {
       <WeightedButton
         onClick={() => {
           playSfx('toggle')
-          closeLibrary()
+          window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'map-editor' } }))
         }}
         className="chamfer lib-btn-cyan shrink-0 px-5 py-2.5 font-sans text-[15px] font-bold"
       >

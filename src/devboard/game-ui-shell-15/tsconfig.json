@@ -24,7 +24,8 @@
       "@core/*": ["../../../src/core/*"],
       "@play/*": ["../../../src/play/*"],
       "@ui/*": ["../../../src/ui/*"],
-      "@devboard/*": ["../../../src/devboard/*"]
+      "@devboard/*": ["../../../src/devboard/*"],
+      "@editor/*": ["../editor-shell/*"]
     }
   },
   "include": [

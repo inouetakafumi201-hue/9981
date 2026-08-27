@@ -1,6 +1,6 @@
 'use client'
 
-import { tileStyle } from '@/lib/materials'
+import { tileStyle } from '@editor/lib/materials'
 
 /**
  * 素材贴图 —— 在编辑器 8×8 像素图集之上，按 glow 叠一层青色/暖色径向辉光

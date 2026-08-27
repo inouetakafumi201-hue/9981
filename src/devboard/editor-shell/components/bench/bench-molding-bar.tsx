@@ -1,13 +1,13 @@
 'use client'
 
-import { materialMetaById, QUALITY_COLOR } from '@/lib/library-data'
-import { useBench, moldingSet, setForgeBase } from '@/lib/bench-store'
-import { LibTile } from '@/components/library/library-tile'
-import { isTokenStarred } from '@/lib/bench-store'
-import { TiltCard } from '@/components/fx/tilt-card'
-import { DropSettle } from '@/components/fx/drop-settle'
+import { materialMetaById, QUALITY_COLOR } from '@editor/lib/library-data'
+import { useBench, moldingSet, setForgeBase } from '@editor/lib/bench-store'
+import { LibTile } from '@editor/components/library/library-tile'
+import { isTokenStarred } from '@editor/lib/bench-store'
+import { TiltCard } from '@editor/components/fx/tilt-card'
+import { DropSettle } from '@editor/components/fx/drop-settle'
 import { BenchJobStrip } from './bench-pod'
-import { playSfx } from '@/lib/sound'
+import { playSfx } from '@editor/lib/sound'
 
 /**
  * 底部「塑形备选栏」：5 格常用/解锁塑形（作为基体来源，点击=设为基础素材，拖入=替换）。
