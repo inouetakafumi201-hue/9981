@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HookDispatcher } from '../dispatcher.js';
-import { ok } from '../../ops/result.js';
-import { Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
+import { HookDispatcher } from '../dispatcher';
+import { ok } from '../../ops/result';
+import { Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
 
 describe('架构测试：HookDispatcher 内部不导出任何等待类型（需求28.1, 28.4）', () => {
   it('dispatcher.ts 源码不包含 Promise/async/await/setTimeout 等阻塞或异步等待原语', () => {

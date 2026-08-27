@@ -5,5 +5,5 @@
  * performed only through SearchDecisionContext, SearchSession and the
  * SimulationAdapter-backed canonical lifecycle.
  */
-export { SequentialSearchPlanner, isSearchPlanner } from './sequential-search.js';
-export type { SearchDecisionContext, SearchPlanner, SearchSession } from './types.js';
+export { SequentialSearchPlanner, isSearchPlanner } from './sequential-search';
+export type { SearchDecisionContext, SearchPlanner, SearchSession } from './types';

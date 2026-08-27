@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbRollTierMultiset } from './generators.js';
+import { arbRollTierMultiset } from './generators';
 
 describe('Property 4: 资源耗尽的离散投影', () => {
   it('AP 耗尽表示为字段缺失而非 0', () => {

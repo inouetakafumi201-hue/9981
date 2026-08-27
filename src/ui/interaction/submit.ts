@@ -9,11 +9,11 @@
  * 两条路径都**不合成任何补偿写入**（Requirement 4.6）。
  */
 
-import { compareRevision, type StateRevision } from '../model/revision.js';
-import type { UiDiagnostic } from '../model/diagnostic.js';
-import type { InteractionIntent } from '../model/intent.js';
-import type { ActionPort, SubmissionOutcome } from '../ports/action-port.js';
-import type { PendingRegistry } from './pending-registry.js';
+import { compareRevision, type StateRevision } from '../model/revision';
+import type { UiDiagnostic } from '../model/diagnostic';
+import type { InteractionIntent } from '../model/intent';
+import type { ActionPort, SubmissionOutcome } from '../ports/action-port';
+import type { PendingRegistry } from './pending-registry';
 
 export const SUBMISSION_STATES = [
   'idle',

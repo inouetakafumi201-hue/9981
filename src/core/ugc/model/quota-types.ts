@@ -4,7 +4,7 @@
  * 类型放在 model、执行放在 quota/：model 是依赖 DAG 的根，`ValidationReport` 需要引用配额快照，
  * 若类型定义在 quota/ 会造成 model 反向依赖 quota。这与内核把 ErrCode/Diagnostic 放在 L1 的理由一致。
  */
-import type { SourceSpan } from '../../kernel/state/diagnostic.js';
+import type { SourceSpan } from '../../kernel/state/diagnostic';
 
 /**
  * 全部配额类别。顺序固定，用于快照的确定性序列化。

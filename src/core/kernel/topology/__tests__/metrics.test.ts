@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { dist, spread } from '../metrics.js';
-import { createNodeShape, createLinkShape } from '../types.js';
-import type { Node, Link } from '../types.js';
+import { dist, spread } from '../metrics';
+import { createNodeShape, createLinkShape } from '../types';
+import type { Node, Link } from '../types';
 
 function makeChain(n: number): { nodes: Record<string, Node>; links: Record<string, Link> } {
   const nodes: Record<string, Node> = {};

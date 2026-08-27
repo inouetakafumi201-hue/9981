@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { DiagnosticHaltError, DiagnosticSink } from '../../safety/safety.js';
-import { FatalErrorBoundary, InMemoryEmergencySink } from '../../safety/fatal-boundary.js';
-import type { ArtifactFailurePoint } from '../index.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
+import { DiagnosticHaltError, DiagnosticSink } from '../../safety/safety';
+import { FatalErrorBoundary, InMemoryEmergencySink } from '../../safety/fatal-boundary';
+import type { ArtifactFailurePoint } from '../index';
+import { candidate, createHarness, validDocument } from './fixtures';
 
 describe('DiagnosticSink: fail-closed capacity and dedup', () => {
   it('halts instead of dropping diagnostics when capacity is exhausted', () => {

@@ -10,21 +10,21 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import Ajv from 'ajv';
 import { describe, expect, it } from 'vitest';
-import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 import {
   ClassCatalogContractError,
   parseClassJson,
   parseItemClassCatalog,
-} from '../catalog-loader.js';
+} from '../catalog-loader';
 import {
   findGameplayValueKeys,
   findPseudoSubtypes,
   findRuntimeStateDisguises,
   findUnclassifiedNumericLeaves,
   formatViolations,
-} from '../class-contract.js';
-import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract.js';
+} from '../class-contract';
+import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract';
 import {
   CLASS_ROOT,
   PLAY_PROFILE_ROOT,
@@ -38,7 +38,7 @@ import {
   readClassJson,
   readPlayProfile,
   readSchema,
-} from './catalog-fixtures.js';
+} from './catalog-fixtures';
 
 function sortedStrings(values: Iterable<string>): string[] {
   return [...values].sort((left, right) => left.localeCompare(right, 'en'));

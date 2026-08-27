@@ -13,14 +13,14 @@
  * facade 的只读边界——快照恢复只在决策前把 holder 状态重置到断言 setup，随后
  * 交给 facade.act（Action→Intent→Op 统一链路，唯一语义写入通道 OpRegistry.invoke）。
  */
-import type { PlayAiRuntime } from '../../../../play/ai-runtime.js';
-import { restoreFromSnapshot } from './snapshot.js';
-import type { WorldStateSnapshot } from './snapshot.js';
-import type { AssertionRunContext } from './assertions.js';
-import type { DecisionTrace } from './trace.js';
-import type { WorldState } from '../../state/world-state.js';
-import { createEntityShape, createItemShape } from '../../state/entity.js';
-import { createContainerShape, createNodeShape, createLinkShape } from '../../topology/types.js';
+import type { PlayAiRuntime } from '../../../../play/ai-runtime';
+import { restoreFromSnapshot } from './snapshot';
+import type { WorldStateSnapshot } from './snapshot';
+import type { AssertionRunContext } from './assertions';
+import type { DecisionTrace } from './trace';
+import type { WorldState } from '../../state/world-state';
+import { createEntityShape, createItemShape } from '../../state/entity';
+import { createContainerShape, createNodeShape, createLinkShape } from '../../topology/types';
 
 /**
  * 构造生产断言宿主：把断言世界快照真跑进一个 `play` 生产侧 AI runtime。
@@ -143,8 +143,8 @@ function normalizeWorld(world: WorldState): WorldState {
   const entities: WorldState['entities'] = {};
   for (const [id, e] of Object.entries(state.entities ?? {})) {
     const base = createEntityShape(id, e.def ?? 'd:entity');
-    const props: Record<string, import('../../state/value.js').Value> = {};
-    for (const [k, v] of Object.entries(e.props ?? {})) props[k] = v as import('../../state/value.js').Value;
+    const props: Record<string, import('../../state/value').Value> = {};
+    for (const [k, v] of Object.entries(e.props ?? {})) props[k] = v as import('../../state/value').Value;
     entities[id] = {
       ...base,
       def: e.def ?? base.def,
@@ -159,29 +159,29 @@ function normalizeWorld(world: WorldState): WorldState {
   const items: WorldState['items'] = {};
   for (const [id, i] of Object.entries(state.items ?? {})) {
     const base = createItemShape(id, i.def ?? 'd:item');
-    const props: Record<string, import('../../state/value.js').Value> = {};
-    for (const [k, v] of Object.entries(i.props ?? {})) props[k] = v as import('../../state/value.js').Value;
+    const props: Record<string, import('../../state/value').Value> = {};
+    for (const [k, v] of Object.entries(i.props ?? {})) props[k] = v as import('../../state/value').Value;
     items[id] = { ...base, def: i.def ?? base.def, props, tags: (i.tags ?? []).map((t) => String(t)), attachments: (i.attachments ?? []).map((a) => String(a)) };
   }
   const nodes: WorldState['nodes'] = {};
   for (const [id, n] of Object.entries(state.nodes ?? {})) {
     const base = createNodeShape(id, n.def ?? 'd:node');
-    const props: Record<string, import('../../state/value.js').Value> = {};
-    for (const [k, v] of Object.entries(n.props ?? {})) props[k] = v as import('../../state/value.js').Value;
+    const props: Record<string, import('../../state/value').Value> = {};
+    for (const [k, v] of Object.entries(n.props ?? {})) props[k] = v as import('../../state/value').Value;
     nodes[id] = { ...base, def: n.def ?? base.def, weight: n.weight ?? base.weight, props, tags: (n.tags ?? []).map((t) => String(t)), attachments: (n.attachments ?? []).map((a) => String(a)) };
   }
   const links: WorldState['links'] = {};
   for (const [id, l] of Object.entries(state.links ?? {})) {
     const base = createLinkShape(id, l.a ?? id, l.b ?? id);
-    const props: Record<string, import('../../state/value.js').Value> = {};
-    for (const [k, v] of Object.entries(l.props ?? {})) props[k] = v as import('../../state/value.js').Value;
+    const props: Record<string, import('../../state/value').Value> = {};
+    for (const [k, v] of Object.entries(l.props ?? {})) props[k] = v as import('../../state/value').Value;
     links[id] = { ...base, def: l.def ?? base.def, weight: l.weight ?? base.weight, props, tags: (l.tags ?? []).map((t) => String(t)), attachments: (l.attachments ?? []).map((a) => String(a)) };
   }
   const containers: WorldState['containers'] = {};
   for (const [id, c] of Object.entries(state.containers ?? {})) {
     const base = createContainerShape(id, c.owner ?? id, c.name ?? 'default', c.insert === 'shift' ? 'shift' : 'fixed');
-    const props: Record<string, import('../../state/value.js').Value> = {};
-    for (const [k, v] of Object.entries(c.props ?? {})) props[k] = v as import('../../state/value.js').Value;
+    const props: Record<string, import('../../state/value').Value> = {};
+    for (const [k, v] of Object.entries(c.props ?? {})) props[k] = v as import('../../state/value').Value;
     containers[id] = { ...base, owner: c.owner ?? base.owner, name: c.name ?? base.name, slots: [...(c.slots ?? [])] as never, props };
   }
   return { ...world, entities, items, nodes, links, containers };

@@ -2,10 +2,10 @@
  * L9 Schedule: 通用相位表声明。
  * Schedule 只描述离散时序，不包含 AP、体力、战斗或行动轮等玩法语义。
  */
-import type { Id } from '../state/ids.js';
-import type { Expr, Query } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
+import type { Id } from '../state/ids';
+import type { Expr, Query } from '../state/expr-types';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
 
 export type PhaseKind = 'normal' | 'submit' | 'resolve' | 'response';
 export type PhaseInput = 'none' | 'actor' | 'all';

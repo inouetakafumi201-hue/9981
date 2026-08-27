@@ -8,8 +8,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom } from '../../testing/generators.js';
+import { createHarness } from '../harness';
+import { requestFrom } from '../../testing/generators';
 
 /** 从报告取规范化 JSON：产物的 upstream payload 里保存了 canonical 文本（harness 约定）。 */
 function canonicalOf(harness: ReturnType<typeof createHarness>, text: string): { fingerprint: string | null; status: string } {

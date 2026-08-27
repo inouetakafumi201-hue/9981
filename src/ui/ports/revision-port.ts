@@ -9,7 +9,7 @@
  * "看起来正确"的判序结果，从而把陈旧投影当成新鲜投影。
  */
 
-import type { ConvergenceResult } from './convergence.js';
+import type { ConvergenceResult } from './convergence';
 
 export interface RevisionPort {
   /** 取当前语义状态的单调序号。上游未提供时返回汇合失败。 */

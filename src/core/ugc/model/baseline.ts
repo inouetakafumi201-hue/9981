@@ -4,8 +4,8 @@
  * 基线是"这次验证依据了哪一套上游事实"的不可变快照。提交前必须逐字段重新比较：任何一项变化都
  * 使产物过期，必须从原始候选完整重验，而不是局部更新产物（需求 13.6）。
  */
-import type { FingerprintField, StableFingerprintGateway } from './fingerprint.js';
-import { fingerprintFields } from './fingerprint.js';
+import type { FingerprintField, StableFingerprintGateway } from './fingerprint';
+import { fingerprintFields } from './fingerprint';
 
 export interface ValidationBaselineComponents {
   /** 目标定义注册表的版本令牌。 */

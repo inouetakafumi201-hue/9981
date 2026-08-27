@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbBoostCommitment } from './generators.js';
+import { arbBoostCommitment } from './generators';
 
 describe('Property 16: 强力骰体力守恒', () => {
   it('未分配 AP 时体力全额退还', () => {

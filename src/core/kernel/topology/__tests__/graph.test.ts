@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { linksTouching, connectedComponents, cascadeNodeDestroySet } from '../graph.js';
-import { createNodeShape, createLinkShape } from '../types.js';
-import type { Node, Link } from '../types.js';
+import { linksTouching, connectedComponents, cascadeNodeDestroySet } from '../graph';
+import { createNodeShape, createLinkShape } from '../types';
+import type { Node, Link } from '../types';
 
 describe('Node/Link 基本拓扑操作（需求7.1-7.6）', () => {
   it('linksTouching 找到全部以该节点为端点的 Link（需求7.5 级联销毁的输入）', () => {

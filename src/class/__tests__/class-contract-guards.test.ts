@@ -12,7 +12,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ClassCatalogContractError } from '../json-contract.js';
+import { ClassCatalogContractError } from '../json-contract';
 import {
   GAMEPLAY_VALUE_FIELD_NAMES,
   L1_MECHANISM_DECLARATION_KEYS,
@@ -27,9 +27,9 @@ import {
   parseSourceRecord,
   parseStructuralBound,
   sortViolations,
-} from '../class-contract.js';
-import { parseClassJson } from '../catalog-loader.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+} from '../class-contract';
+import { parseClassJson } from '../catalog-loader';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const CLASS_ROOT = resolve(TEST_DIR, '..');

@@ -7,8 +7,8 @@
  * - createEmptyWorldState 产生符合契约的初始状态
  */
 import { describe, it, expect } from 'vitest';
-import type { WorldState } from '../world-state.js';
-import { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from '../world-state.js';
+import type { WorldState } from '../world-state';
+import { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from '../world-state';
 
 describe('WorldState structure', () => {
   it('恰有6个顶层集合：world/defs/nodes/links/entities/items', () => {

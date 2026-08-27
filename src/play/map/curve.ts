@@ -8,7 +8,7 @@
  *
  * 全部函数对归一化坐标（[0,1]）工作，不含任何像素假设。
  */
-import type { Vec2 } from './types.js';
+import type { Vec2 } from './types';
 
 /** 两点距离。 */
 export function distance(a: Vec2, b: Vec2): number {

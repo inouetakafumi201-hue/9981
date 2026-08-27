@@ -18,7 +18,7 @@
  * 本函数不持任何写通道：所有状态写入仍经 `LoadedMatch.facade`（→ OpRegistry.invoke）完成，
  * 只读外壳 `match.shell` / `match.terminal`。
  */
-import type { LoadedMatch } from './types.js';
+import type { LoadedMatch } from './types';
 
 export interface DriveResult {
   /** 本轮回「推进阶段」成功次数（advance 返回 ok:true 的次数）。 */

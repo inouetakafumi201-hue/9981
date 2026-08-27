@@ -12,7 +12,31 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors,
+      colors: {
+        ...colors,
+        // 壳层语义色映射（对接 editor-shell/app/globals.css :root 变量）
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        panel: 'var(--panel)',
+        'panel-raised': 'var(--panel-raised)',
+        'panel-inset': 'var(--panel-inset)',
+        card: 'var(--card)',
+        'card-foreground': 'var(--card-foreground)',
+        border: 'var(--border)',
+        'border-strong': 'var(--border-strong)',
+        muted: 'var(--muted)',
+        'muted-foreground': 'var(--muted-foreground)',
+        primary: 'var(--primary)',
+        'primary-foreground': 'var(--primary-foreground)',
+        'primary-dim': 'var(--primary-dim)',
+        edge: 'var(--edge)',
+        'edge-selected': 'var(--edge-selected)',
+        'box-mask': 'var(--box-mask)',
+        'box-physics': 'var(--box-physics)',
+        transition: 'var(--transition)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+      },
       fontFamily: {
         pixel: ['"Press Start 2P"', 'monospace'],
       },

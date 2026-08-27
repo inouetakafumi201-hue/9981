@@ -16,18 +16,18 @@
  * 目录恒为七项：编号是稳定的追踪标识，关闭的项保留在册以便溯源，只是禁止面为空。
  */
 
-import type { DecisionId, HumanReadableText, JsonPath } from './ids.js';
-import type { SourceRecord } from './source.js';
-import type { ErrCode } from '../../core/kernel/state/error-codes.js';
+import type { DecisionId, HumanReadableText, JsonPath } from './ids';
+import type { SourceRecord } from './source';
+import type { ErrCode } from '../../core/kernel/state/error-codes';
 import type {
   DomainDiagnosticCategory,
   UnresolvedItemId,
-} from './space-items-diagnostic-categories.js';
-import { codeOf } from './space-items-diagnostic-categories.js';
-import { compareStrings } from './ordering.js';
-import { deepFreeze } from './immutable.js';
+} from './space-items-diagnostic-categories';
+import { codeOf } from './space-items-diagnostic-categories';
+import { compareStrings } from './ordering';
+import { deepFreeze } from './immutable';
 
-export type { UnresolvedItemId } from './space-items-diagnostic-categories.js';
+export type { UnresolvedItemId } from './space-items-diagnostic-categories';
 
 /** 未决项的冻结状态（要求 13、14.5）。 */
 export const UNRESOLVED_FREEZE_STATUSES = Object.freeze([

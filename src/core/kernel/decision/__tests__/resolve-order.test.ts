@@ -3,19 +3,19 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { registerIntentOps } from '../intent-ops.js';
-import type { IntentOpsDeps } from '../intent-ops.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { setPath } from '../../ops/path.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { Def } from '../../state/def.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import { Linter } from '../../safety/safety.js';
-import { ok } from '../../ops/result.js';
-import type { OpContext } from '../../ops/registry.js';
+import { registerIntentOps } from '../intent-ops';
+import type { IntentOpsDeps } from '../intent-ops';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { OpRegistry } from '../../ops/registry';
+import { setPath } from '../../ops/path';
+import type { ActionDef } from '../../actions/types';
+import type { Def } from '../../state/def';
+import type { ScheduleDef } from '../../schedule/types';
+import { Linter } from '../../safety/safety';
+import { ok } from '../../ops/result';
+import type { OpContext } from '../../ops/registry';
 
 describe('Intent resolveOrder', () => {
   let holder: WorldStateHolder;
@@ -28,6 +28,7 @@ describe('Intent resolveOrder', () => {
     require: true,
     cost: [],
     effects: [],
+    track: 'highlight',
   };
 
   const action2: ActionDef = {
@@ -37,6 +38,7 @@ describe('Intent resolveOrder', () => {
     require: true,
     cost: [],
     effects: [],
+    track: 'highlight',
   };
 
   const scheduleWithResolveOrder: ScheduleDef = {
@@ -170,6 +172,7 @@ describe('Intent resolveOrder', () => {
       require: { op: 'get', path: 'world.props.gate' },
       cost: [],
       effects: [],
+      track: 'highlight',
     };
 
     const changeAction: ActionDef = {
@@ -178,7 +181,8 @@ describe('Intent resolveOrder', () => {
       label: 'Change Action',
       require: true,
       cost: [],
-      effects: [{ op: 'prop.set', args: { path: 'world.props.gate' as unknown as import('../../state/expr-types.js').Expr, value: false } }],
+      effects: [{ op: 'prop.set', args: { path: 'world.props.gate' as unknown as import('../../state/expr-types').Expr, value: false } }],
+      track: 'highlight',
     };
 
     const deps = makeDeps([requireAction, changeAction, scheduleWithResolveOrder]);
@@ -275,6 +279,7 @@ describe('Intent resolveOrder', () => {
                 },
               },
             ],
+            track: 'highlight',
           };
 
           const deps2 = makeDeps([counterAction, scheduleWithResolveOrder]);

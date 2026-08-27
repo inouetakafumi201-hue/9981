@@ -2,15 +2,15 @@
  * L2 Expr: ExprEngine 表达式求值器（design.md 3.3节 / 需求12.1-12.8）。
  * 全函数：任意输入返回值或 null，永不抛异常。内置算子表是冻结的封闭集合，运行期不可扩展。
  */
-import type { Value } from '../state/value.js';
-import { isFiniteNumber } from '../state/value.js';
-import type { Ref } from '../state/ids.js';
-import { isRef } from '../state/ids.js';
-import type { Expr, Query } from '../state/expr-types.js';
-import type { DefRegistry } from '../state/def.js';
-import type { ExprStateAccess, TopologyOpOpts } from './state-access.js';
-import { asRef } from './state-access.js';
-import { hasTag as hasTagPure } from '../state/tag.js';
+import type { Value } from '../state/value';
+import { isFiniteNumber } from '../state/value';
+import type { Ref } from '../state/ids';
+import { isRef } from '../state/ids';
+import type { Expr, Query } from '../state/expr-types';
+import type { DefRegistry } from '../state/def';
+import type { ExprStateAccess, TopologyOpOpts } from './state-access';
+import { asRef } from './state-access';
+import { hasTag as hasTagPure } from '../state/tag';
 
 export interface EvalContext {
   self?: Ref;

@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import type { LegalAction } from '../../actions/types.js';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import type { LegalAction } from '../../actions/types';
 import type {
   AIReadScope,
   BeliefSlice,
   NPCActionRequest,
   ValidatedAIBehaviorBinding,
-} from '../types.js';
+} from '../types';
 
 const actionId = fc.string({ minLength: 1, maxLength: 8 }).map((suffix) => `a:${suffix}`);
 

@@ -1,15 +1,15 @@
 import fc from 'fast-check';
 
-import { deepFreeze, actionView, authority, scope } from './fixtures.js';
-import { INPUT_SOURCES, stableHash, type InputSource } from '../../model/intent.js';
-import { compareRevision, type RevisionComparison, type StateRevision } from '../../model/revision.js';
+import { deepFreeze, actionView, authority, scope } from './fixtures';
+import { INPUT_SOURCES, stableHash, type InputSource } from '../../model/intent';
+import { compareRevision, type RevisionComparison, type StateRevision } from '../../model/revision';
 import {
   createAuthorizedAgent,
   type AuthorizedAgent,
   type PresentationDescriptor,
   type ReadOnlySemanticProjection,
   type UiActionView,
-} from '../../model/view.js';
+} from '../../model/view';
 
 /** 所有跨 Agent、跨窗口与隐藏变体生成器共享的固定小标识池。 */
 export const ENTITY_ID_POOL = Object.freeze([
@@ -256,7 +256,7 @@ function descriptorFromSeeds(
     attachedActions: actions.filter((action) => action.costCategory === 'attached'),
     provenanceLabels: [],
     warnings: [],
-  }) as PresentationDescriptor;
+  }) as unknown as PresentationDescriptor;
 }
 
 export function arbDescriptor(): fc.Arbitrary<PresentationDescriptor> {

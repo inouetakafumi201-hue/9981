@@ -7,10 +7,10 @@
  * 以及 familyContract 内各族声明的 TypedReference。集中在此收集，避免各处遗漏。
  */
 
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
-import type { FamilyContract } from '../model/family-contracts.js';
-import type { TypedReference } from '../model/reference.js';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
+import type { FamilyContract } from '../model/family-contracts';
+import type { TypedReference } from '../model/reference';
 
 /** 一条收集到的引用及其宿主。 */
 export interface CollectedReference {

@@ -1,5 +1,5 @@
-import type { ErrCode } from '../state/error-codes.js';
-import type { DiagnosticArgument } from '../state/diagnostic.js';
+import type { ErrCode } from '../state/error-codes';
+import type { DiagnosticArgument } from '../state/diagnostic';
 
 /**
  * Creator-facing message catalogue.

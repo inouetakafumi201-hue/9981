@@ -20,7 +20,7 @@
  * 不报（该能力可能没有对应的 ECS 组件，属既有目录的合法空隙），只对"声明了却对不上"的情况报。
  */
 
-import type { CompositionKind } from './composition-registry.js';
+import type { CompositionKind } from './composition-registry';
 
 /** ECS `FamilyShape` 中本对齐校器实际读取的最小形态；与 `family-component-shapes` 的 `FamilyShape` 结构兼容。 */
 export interface AlignmentFamilyShape {

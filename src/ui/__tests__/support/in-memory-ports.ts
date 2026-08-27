@@ -8,11 +8,11 @@
  * 不是"约定回放期间别提交"。
  */
 
-import { uiOk, uiRejected, uiDiagnostic, UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import type { UiDiagnostic } from '../../model/diagnostic.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import type { StateRevision } from '../../model/revision.js';
-import type { ActionPort, SubmissionOutcome } from '../../ports/action-port.js';
+import { uiOk, uiRejected, uiDiagnostic, UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import type { UiDiagnostic } from '../../model/diagnostic';
+import type { InteractionIntent } from '../../model/intent';
+import type { StateRevision } from '../../model/revision';
+import type { ActionPort, SubmissionOutcome } from '../../ports/action-port';
 import type {
   ActionQueryPort,
   ActorRef,
@@ -21,22 +21,22 @@ import type {
   ScopedQueryOutcome,
   ScopedQuerySpec,
   ScopedRef,
-} from '../../ports/action-query-port.js';
+} from '../../ports/action-query-port';
 import type {
   EventPort,
   EventSubscription,
   RawEventSource,
   RawGatewayEvent,
-} from '../../ports/event-port.js';
+} from '../../ports/event-port';
 import type {
   DescriptorOutcome,
   DescriptorRequest,
   ProjectionOutcome,
   ProjectionPort,
   ProjectionRequest,
-} from '../../ports/projection-port.js';
-import type { RevisionPort } from '../../ports/revision-port.js';
-import { converged, pendingConvergence } from '../../ports/convergence.js';
+} from '../../ports/projection-port';
+import type { RevisionPort } from '../../ports/revision-port';
+import { converged, pendingConvergence } from '../../ports/convergence';
 import type {
   AiCapabilityPort,
   AiPublicActionState,
@@ -45,7 +45,7 @@ import type {
   PhaseSemanticProjection,
   SpaceItemsCapabilityPort,
   SpatialProjection,
-} from '../../ports/pending-contracts.js';
+} from '../../ports/pending-contracts';
 import {
   createAuthorizedAgent,
   type AuthorizedAgent,
@@ -55,13 +55,13 @@ import {
   type UiDecisionView,
   type UiResourceView,
   type UpstreamAgentAuthority,
-} from '../../model/view.js';
-import type { RuleEventProjection } from '../../model/event-projection.js';
+} from '../../model/view';
+import type { RuleEventProjection } from '../../model/event-projection';
 import {
   createDiagnosticSink,
   type DiagnosticSink,
-} from '../../diagnostics/sink.js';
-import { authority, descriptor, projection, revision, scope } from './fixtures.js';
+} from '../../diagnostics/sink';
+import { authority, descriptor, projection, revision, scope } from './fixtures';
 
 export interface InMemoryProjectionState {
   readonly projection: ReadOnlySemanticProjection;

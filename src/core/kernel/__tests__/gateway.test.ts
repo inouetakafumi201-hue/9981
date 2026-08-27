@@ -3,11 +3,11 @@
  * Verifies: no OpRegistry/Transaction in gateway exports.
  */
 import { describe, it, expect } from 'vitest';
-import { PresentationGateway } from '../gateway.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import { ActionCatalog } from '../actions/catalog.js';
-import { createEmptyWorldState } from '../state/world-state.js';
+import { PresentationGateway } from '../gateway';
+import { QueryEngine } from '../expr/query-engine';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import { ActionCatalog } from '../actions/catalog';
+import { createEmptyWorldState } from '../state/world-state';
 
 function makeGateway() {
   const state = createEmptyWorldState('sched:1');
@@ -68,7 +68,7 @@ describe('Task 42: PresentationGateway boundary tests', () => {
   });
 
   it('架构边界：gateway.ts 导出不包含 OpRegistry / Transaction / WorldStateHolder', async () => {
-    const mod = await import('../gateway.js');
+    const mod = await import('../gateway');
     const keys = Object.keys(mod);
     expect(keys).not.toContain('OpRegistry');
     expect(keys).not.toContain('Transaction');

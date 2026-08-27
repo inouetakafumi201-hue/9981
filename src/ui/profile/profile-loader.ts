@@ -5,11 +5,11 @@
  * 在任何 profile 语义校验前即被拒绝。随后执行闭合结构、来源、规则字段与显著性冲突校验。
  */
 
-import { JsonCodecError, StrictJsonCodec } from '../../core/kernel/spec-compiler/json-codec.js';
+import { JsonCodecError, StrictJsonCodec } from '../../core/kernel/spec-compiler/json-codec';
 import {
   DEFAULT_TECHNICAL_QUOTAS,
   type JsonValue,
-} from '../../core/kernel/spec-compiler/types.js';
+} from '../../core/kernel/spec-compiler/types';
 import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
@@ -17,7 +17,7 @@ import {
   uiRejected,
   type UiDiagnostic,
   type UiResult,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 import {
   CONFIRMED_DECISION_IDS,
   SALIENCE_TIERS,
@@ -25,8 +25,8 @@ import {
   type ConfirmedDecisionId,
   type PresentationProfile,
   type SalienceTier,
-} from '../model/profile.js';
-import { makeInternalMetric } from '../presentation/gameplay-value.js';
+} from '../model/profile';
+import { makeInternalMetric } from '../presentation/gameplay-value';
 
 export type ProfileRuleVisibility = 'public' | 'hidden';
 

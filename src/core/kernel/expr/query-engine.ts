@@ -1,12 +1,12 @@
 ﻿/**
  * L2 Query: 查询引擎（design.md 3.3节 / 需求14.1-14.5, 15.1-15.4）。
  */
-import type { Ref } from '../state/ids.js';
-import type { WorldState } from '../state/world-state.js';
-import type { Query, QueryFrom } from '../state/expr-types.js';
-import type { Value } from '../state/value.js';
-import { logEntryToValue } from '../state/event-log.js';
-import type { ExprEngine, EvalContext } from './engine.js';
+import type { Ref } from '../state/ids';
+import type { WorldState } from '../state/world-state';
+import type { Query, QueryFrom } from '../state/expr-types';
+import type { Value } from '../state/value';
+import { logEntryToValue } from '../state/event-log';
+import type { ExprEngine, EvalContext } from './engine';
 
 /** 数据源分发：把 WorldState 的六大集合 + attachments/agents/decisions/intents/log 映射为 Ref 数组。 */
 export function collectSourceRefs(state: WorldState, from: QueryFrom): Ref[] {

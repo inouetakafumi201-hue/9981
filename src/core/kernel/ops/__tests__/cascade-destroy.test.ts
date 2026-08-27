@@ -12,16 +12,16 @@
  * D. 被销毁对象与另一实体之间存在 Relation
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerStructuralOps, makeItemMove, createContainerForOwner } from '../structural-ops.js';
-import { registerRelationOps } from '../relation-ops.js';
-import { registerAttachOps } from '../../attachment/attach-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { resetIdCounters } from '../../state/ids.js';
-import type { Ref } from '../../state/ids.js';
-import type { Def } from '../../state/def.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerStructuralOps, makeItemMove, createContainerForOwner } from '../structural-ops';
+import { registerRelationOps } from '../relation-ops';
+import { registerAttachOps } from '../../attachment/attach-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { resetIdCounters } from '../../state/ids';
+import type { Ref } from '../../state/ids';
+import type { Def } from '../../state/def';
 
 const TEST_DEFS = new Map<string, Def>([
   ['d:human', { id: 'd:human', kind: 'entity' }],

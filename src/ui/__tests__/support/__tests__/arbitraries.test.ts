@@ -1,8 +1,8 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
-import { compareRevision } from '../../../model/revision.js';
-import { INPUT_SOURCES } from '../../../model/intent.js';
+import { compareRevision } from '../../../model/revision';
+import { INPUT_SOURCES } from '../../../model/intent';
 import {
   DAMAGED_DESCRIPTOR_FIELDS,
   ENTITY_ID_POOL,
@@ -15,7 +15,7 @@ import {
   arbReachableProjection,
   arbRevisionPair,
   replayReachableProjection,
-} from '../arbitraries.js';
+} from '../arbitraries';
 
 describe('固定小标识池被跨生成器复用', () => {
   it('池大小严格为 8，Agent、可达投影和隐藏变体只使用池内实体', () => {

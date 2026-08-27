@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbNumericOwnership } from './generators.js';
+import { arbNumericOwnership } from './generators';
 
 describe('Property 6: 数值归属校验', () => {
   it('数值字段缺失归属分类则拒绝装载', () => {

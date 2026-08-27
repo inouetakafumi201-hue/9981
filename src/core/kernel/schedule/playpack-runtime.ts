@@ -3,19 +3,19 @@
  * Definition publication, permanent-rule mounting, pool initialization, schedule selection, and entry
  * effects either all become active or are all restored to the pre-activation snapshot.
  */
-import type { RuleProvider } from '../events/rule-provider.js';
-import type { RuleDef } from '../events/types.js';
-import type { Effect } from '../events/effect-types.js';
-import type { OpContext, OpRegistry } from '../ops/registry.js';
-import type { Result } from '../ops/result.js';
-import { err, ok } from '../ops/result.js';
-import type { Def, DefRegistry } from '../state/def.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { ScheduleDef } from './types.js';
-import type { LoadResult, PlaypackDef } from './playpack.js';
-import { PlaypackLoader } from './playpack.js';
+import type { RuleProvider } from '../events/rule-provider';
+import type { RuleDef } from '../events/types';
+import type { Effect } from '../events/effect-types';
+import type { OpContext, OpRegistry } from '../ops/registry';
+import type { Result } from '../ops/result';
+import { err, ok } from '../ops/result';
+import type { Def, DefRegistry } from '../state/def';
+import type { Diagnostic } from '../state/diagnostic';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
+import type { ScheduleDef } from './types';
+import type { LoadResult, PlaypackDef } from './playpack';
+import { PlaypackLoader } from './playpack';
 
 export interface PlaypackActivateArgs {
   playpackId: Id;

@@ -1,12 +1,12 @@
 /**
  * L1 State: Def 声明与继承（design.md 3.1节 / 需求3.1-3.5）。
  */
-import type { Id } from './ids.js';
-import { isRef } from './ids.js';
-import type { Value } from './value.js';
-import type { Expr } from './expr-types.js';
-import { collectCallTargets } from './expr-types.js';
-import type { ErrCode } from './error-codes.js';
+import type { Id } from './ids';
+import { isRef } from './ids';
+import type { Value } from './value';
+import type { Expr } from './expr-types';
+import { collectCallTargets } from './expr-types';
+import type { ErrCode } from './error-codes';
 
 export type DefKind =
   | 'entity'
@@ -15,6 +15,7 @@ export type DefKind =
   | 'link'
   | 'attachment'
   | 'action'
+  | 'card-presentation'
   | 'rule'
   | 'playpack'
   | 'decision'

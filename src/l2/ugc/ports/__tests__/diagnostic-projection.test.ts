@@ -2,12 +2,12 @@
  * PT-02：诊断投影穷举性与 scope/severity 契约测试。
  */
 import { describe, expect, it } from 'vitest';
-import { ALL_DIAGNOSTIC_CODES, DIAGNOSTIC_CODES } from '../../../model/diagnostic-codes.js';
-import { errorDiagnostic, warningDiagnostic } from '../../../model/diagnostic-factory.js';
-import { L2_DIAGNOSTIC_SELECTORS, projectL2Diagnostic } from '../diagnostic-projection.js';
-import type { DiagnosticProjectionContext } from '../diagnostic-projection.js';
-import { createSourceIndex } from '../source-index.js';
-import { catalog, factory } from './fixtures.js';
+import { ALL_DIAGNOSTIC_CODES, DIAGNOSTIC_CODES } from '../../../model/diagnostic-codes';
+import { errorDiagnostic, warningDiagnostic } from '../../../model/diagnostic-factory';
+import { L2_DIAGNOSTIC_SELECTORS, projectL2Diagnostic } from '../diagnostic-projection';
+import type { DiagnosticProjectionContext } from '../diagnostic-projection';
+import { createSourceIndex } from '../source-index';
+import { catalog, factory } from './fixtures';
 
 function context(): DiagnosticProjectionContext {
   return {

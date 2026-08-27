@@ -14,12 +14,12 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import prand from 'pure-rand';
-import { createFullHarness, defaultSeedDefs } from '../testing/full-harness.js';
-import { runOpSequence, resetDriverRng } from '../testing/op-sequence-driver.js';
-import { opSequenceArb, type OpIntent } from '../testing/op-sequence-arbitrary.js';
-import { InvariantChecker } from '../ops/invariants.js';
-import { resetIdCounters } from '../state/ids.js';
-import { replay, InMemoryCheckpointStore, type CheckpointStore } from '../persistence/persistence.js';
+import { createFullHarness, defaultSeedDefs } from '../testing/full-harness';
+import { runOpSequence, resetDriverRng } from '../testing/op-sequence-driver';
+import { opSequenceArb, type OpIntent } from '../testing/op-sequence-arbitrary';
+import { InvariantChecker } from '../ops/invariants';
+import { resetIdCounters } from '../state/ids';
+import { replay, InMemoryCheckpointStore, type CheckpointStore } from '../persistence/persistence';
 
 const invariantChecker = new InvariantChecker();
 

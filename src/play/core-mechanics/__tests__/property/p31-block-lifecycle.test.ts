@@ -8,7 +8,7 @@ import {
   genActionRef,
   genStatusRef,
   genBlockSource
-} from './generators.js';
+} from './generators';
 
 /**
  * P31: 格挡生命周期

@@ -15,8 +15,8 @@ import type {
   QuotaUsageSnapshot,
   QuotaViolation,
   TrustedQuotaProfile,
-} from '../model/quota-types.js';
-import { QUOTA_KINDS } from '../model/quota-types.js';
+} from '../model/quota-types';
+import { QUOTA_KINDS } from '../model/quota-types';
 
 /**
  * 非法消耗量。这只可能来自 UGC 自身实现缺陷（消耗量恒由内部计数派生，不来自候选），

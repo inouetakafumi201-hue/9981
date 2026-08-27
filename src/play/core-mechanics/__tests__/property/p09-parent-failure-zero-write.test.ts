@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection, arbReachableState } from './generators.js';
+import { arbFailureInjection, arbReachableState } from './generators';
 
 describe('Property 9: 父动作失败的附着效果零写入', () => {
   it('父动作 require 不满足时附着动作不执行', () => {

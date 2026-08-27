@@ -4,17 +4,17 @@
  * 全部写入只走 `OpRegistry.invoke`，不直接改 WorldState。
  * 专项 B 的对局外壳只消费本模块与投影暴露的只读查询，不在此实现。
  */
-import type { OpRegistry } from '../../core/kernel/ops/registry.js';
-import type { Result } from '../../core/kernel/ops/result.js';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { WorldState } from '../../core/kernel/state/world-state.js';
-import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
-import type { ExprEngine } from '../../core/kernel/expr/engine.js';
-import type { EvalContext } from '../../core/kernel/expr/engine.js';
-import type { QueryEngine } from '../../core/kernel/expr/query-engine.js';
-import type { OutcomeDef } from '../../core/kernel/schedule/playpack.js';
-import { makeDefaultEvalContext } from '../../core/kernel/expr/engine.js';
-import { getPath } from '../../core/kernel/ops/path.js';
+import type { OpRegistry } from '../../core/kernel/ops/registry';
+import type { Result } from '../../core/kernel/ops/result';
+import type { Value } from '../../core/kernel/state/value';
+import type { WorldState } from '../../core/kernel/state/world-state';
+import type { WorldStateHolder } from '../../core/kernel/ops/transaction';
+import type { ExprEngine } from '../../core/kernel/expr/engine';
+import type { EvalContext } from '../../core/kernel/expr/engine';
+import type { QueryEngine } from '../../core/kernel/expr/query-engine';
+import type { OutcomeDef } from '../../core/kernel/schedule/playpack';
+import { makeDefaultEvalContext } from '../../core/kernel/expr/engine';
+import { getPath } from '../../core/kernel/ops/path';
 import {
   PATH_MATCH_END_DETAIL,
   PATH_MATCH_ENDED,
@@ -31,8 +31,8 @@ import {
   TAG_PERMANENT_EXIT,
   TAG_ROLL_PARTICIPANT,
   VITALITY_MAX,
-} from './defs/ids.js';
-import { CORE_OUTCOMES, TERMINAL_OUTCOME_NAMES } from './defs/outcomes.js';
+} from './defs/ids';
+import { CORE_OUTCOMES, TERMINAL_OUTCOME_NAMES } from './defs/outcomes';
 
 export interface MatchEndDetail {
   readonly outcome: string;
@@ -250,66 +250,63 @@ function evalOutcomeExpr(
   return deps.exprEngine.eval(when, baseCtx) === true;
 }
 
+function resolveOutcomePath(state: WorldState, path: string, self?: { readonly $: string }): Value | null {
+  const absolute = getPath(state, path);
+  if (absolute !== null || self === undefined || !path.startsWith('self.')) return absolute;
+  const id = self.$;
+  const host = id === 'w:0'
+    ? state.world
+    : state.entities[id]
+      ?? state.items[id]
+      ?? state.nodes[id]
+      ?? state.links[id]
+      ?? state.world.attachments[id]
+      ?? state.world.agents[id]
+      ?? state.world.decisions[id]
+      ?? state.world.intents[id]
+      ?? state.defs[id];
+  if (host === undefined) return null;
+  let current: unknown = host;
+  for (const part of path.slice('self.'.length).split('.')) {
+    if (current === null || typeof current !== 'object') return null;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return (current ?? null) as Value | null;
+}
+
 /** 构造绑定到当前状态的一次性只读求值上下文（`when` 是纯读 Expr，无随机/写入 Op）。 */
 function makeOutcomeEvalContext(deps: OutcomeEvalDeps): EvalContext {
   const state = deps.getState();
-  const baseCtx: EvalContext = makeDefaultEvalContext({
-    resolvePath: (path) => getPath(state, path),
+  const makeSelf = (self: { readonly $: string }): EvalContext => {
+    const context = makeDefaultEvalContext({
+      self,
+      vars: { self },
+      resolvePath: (path) => resolveOutcomePath(state, path, self),
+      runQuery: (query, ctx) => deps.queryEngine.run(state, query, {
+        exprEngine: deps.exprEngine,
+        baseCtx: ctx,
+        ctxForSelf: (ref) => makeSelf(ref),
+      }),
+      runQueryValues: (query, ctx) => deps.queryEngine.runValues(state, query, {
+        exprEngine: deps.exprEngine,
+        baseCtx: ctx,
+        ctxForSelf: (ref) => makeSelf(ref),
+      }),
+    });
+    return context;
+  };
+  return makeDefaultEvalContext({
+    resolvePath: (path) => resolveOutcomePath(state, path),
     runQuery: (query, ctx) => deps.queryEngine.run(state, query, {
       exprEngine: deps.exprEngine,
       baseCtx: ctx,
-      ctxForSelf: (ref) => {
-        const selfCtx = makeDefaultEvalContext({
-          self: ref,
-          vars: { self: ref },
-          resolvePath: (path) => getPath(state, path),
-          runQuery: (query, innerCtx) => deps.queryEngine.run(state, query, {
-            exprEngine: deps.exprEngine,
-            baseCtx: innerCtx,
-            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
-          }),
-          runQueryValues: (query, innerCtx) => deps.queryEngine.runValues(state, query, {
-            exprEngine: deps.exprEngine,
-            baseCtx: innerCtx,
-            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
-          }),
-        });
-        return selfCtx;
-      },
+      ctxForSelf: makeSelf,
     }),
     runQueryValues: (query, ctx) => deps.queryEngine.runValues(state, query, {
       exprEngine: deps.exprEngine,
       baseCtx: ctx,
-      ctxForSelf: (ref) => {
-        const selfCtx = makeDefaultEvalContext({
-          self: ref,
-          vars: { self: ref },
-          resolvePath: (path) => getPath(state, path),
-          runQuery: (query, innerCtx) => deps.queryEngine.run(state, query, {
-            exprEngine: deps.exprEngine,
-            baseCtx: innerCtx,
-            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
-          }),
-          runQueryValues: (query, innerCtx) => deps.queryEngine.runValues(state, query, {
-            exprEngine: deps.exprEngine,
-            baseCtx: innerCtx,
-            ctxForSelf: (innerRef) => makeOutcomeEvalContextSelf(deps, state, innerRef),
-          }),
-        });
-        return selfCtx;
-      },
+      ctxForSelf: makeSelf,
     }),
-  });
-  return baseCtx;
-}
-
-/** 嵌套 self 求值上下文（与顶层同源，只替换 self 绑定）。 */
-function makeOutcomeEvalContextSelf(deps: OutcomeEvalDeps, state: WorldState, self: { readonly $: string }): EvalContext {
-  const innerBase = makeOutcomeEvalContext(deps);
-  return makeDefaultEvalContext({
-    ...innerBase,
-    self,
-    vars: { ...innerBase.vars, self },
   });
 }
 

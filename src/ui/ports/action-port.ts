@@ -12,9 +12,9 @@
  * 每一个意图仍须经过完整的当前状态复校（§7.3）。
  */
 
-import type { UiStructuredRejection } from '../model/diagnostic.js';
-import type { InteractionIntent } from '../model/intent.js';
-import type { StateRevision } from '../model/revision.js';
+import type { UiStructuredRejection } from '../model/diagnostic';
+import type { InteractionIntent } from '../model/intent';
+import type { StateRevision } from '../model/revision';
 
 /**
  * 提交结果三分支。

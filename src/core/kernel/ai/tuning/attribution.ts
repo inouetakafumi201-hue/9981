@@ -10,8 +10,8 @@
  *  - 只返回 trace 里真实出现的费目（未观测不归因）。
  *  - 若某费目近 N 轮都被调过，降低其置信度（提示可能陷入局部）——由编排器注入最近记录。
  */
-import type { DecisionTrace, TraceCandidate } from './trace.js';
-import type { AssertionViolation, ScoreConstraint } from './assertions.js';
+import type { DecisionTrace, TraceCandidate } from './trace';
+import type { AssertionViolation, ScoreConstraint } from './assertions';
 
 /** 根因候选。 */
 export interface Cause {

@@ -10,7 +10,7 @@
  * - space-items 的验证规则输出
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
+import type { CandidateDefinition } from '../model/definition';
 
 /**
  * 空间与物品的投影条目。

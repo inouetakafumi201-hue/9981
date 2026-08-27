@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { QueryEngine, collectSourceRefs } from '../query-engine.js';
-import { ExprEngine, makeDefaultEvalContext } from '../engine.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { createEntityShape } from '../../state/entity.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { Ref } from '../../state/ids.js';
+import { QueryEngine, collectSourceRefs } from '../query-engine';
+import { ExprEngine, makeDefaultEvalContext } from '../engine';
+import { createEmptyWorldState } from '../../state/world-state';
+import { createEntityShape } from '../../state/entity';
+import type { WorldState } from '../../state/world-state';
+import type { Ref } from '../../state/ids';
 
 function makeStateWithEntities(hpValues: number[]): WorldState {
   let state = createEmptyWorldState('sched:1');

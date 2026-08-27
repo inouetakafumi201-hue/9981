@@ -1,12 +1,12 @@
-import type { SourceOwningLayer } from '../state/diagnostic.js';
-import { joinJsonPointer } from './json-codec.js';
+import type { SourceOwningLayer } from '../state/diagnostic';
+import { joinJsonPointer } from './json-codec';
 import type {
   BoundProvenance,
   DefinitionSchema,
   FieldRule,
   NumericOwnership,
   Report,
-} from './types.js';
+} from './types';
 
 /**
  * Player-visible values are constrained to 1-5 by the project constitution. Named constants keep the

@@ -8,14 +8,14 @@
  * 图与错误排序确定；不改变活动注册表。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic } from '../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import type { L1DefKind } from '../model/def-kind.js';
-import type { ExpectedReferenceType } from '../model/schema.js';
-import { collectReferences, type CollectedReference } from './reference-collector.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic } from '../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering';
+import type { DefinitionPackage } from '../model/definition';
+import type { L1DefKind } from '../model/def-kind';
+import type { ExpectedReferenceType } from '../model/schema';
+import { collectReferences, type CollectedReference } from './reference-collector';
 
 /** 已解析的目标定义摘要（可能来自候选或活动集）。 */
 export interface GraphNodeInfo {

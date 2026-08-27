@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { buildOptionSet, MAX_SIMULTANEOUS_OPTIONS } from '../../model/option-set.js';
-import { arbLegalActionSet } from '../support/arbitraries.js';
+import { buildOptionSet, MAX_SIMULTANEOUS_OPTIONS } from '../../model/option-set';
+import { arbLegalActionSet } from '../support/arbitraries';
 
 it('任意规模与导航位置同时呈现的动作和导航控件总数都不超过 5', () => {
   const cursor = fc.record({ path: fc.constantFrom<readonly string[]>([], ['paid'], ['attached'], ['paid', 'traversal'], ['attached', 'hostile-interaction']), page: fc.nat({ max: 30 }) });

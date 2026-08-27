@@ -11,8 +11,8 @@
  * - 缺失翻译自动降级为默认语言
  */
 
-import type { ErrCode } from './error-codes.js';
-import type { DiagnosticArgument } from './diagnostic.js';
+import type { ErrCode } from './error-codes';
+import type { DiagnosticArgument } from './diagnostic';
 
 /**
  * 单条创作者消息条目（标题 + 指导）

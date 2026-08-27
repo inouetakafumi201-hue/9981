@@ -11,9 +11,9 @@ import {
   DESIGN_CURRENCY_CHARGES,
   DesignCurrencyGateway,
   scoreDesignCurrency,
-} from '../design-currency.js';
-import type { Value } from '../../state/value.js';
-import type { BeliefSlice, KnownFact } from '../types.js';
+} from '../design-currency';
+import type { Value } from '../../state/value';
+import type { BeliefSlice, KnownFact } from '../types';
 
 function slice(overrides: {
   visibleFacts?: Record<string, Value>;

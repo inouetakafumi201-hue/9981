@@ -16,9 +16,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { parseClassJson } from '../../../class/catalog-loader.js';
-import { parseClassCatalog } from '../../../class/class-contract.js';
-import { CONNECTION_LIMIT, type SceneScale } from '../types.js';
+import { parseClassJson } from '../../../class/catalog-loader';
+import { parseClassCatalog } from '../../../class/class-contract';
+import { CONNECTION_LIMIT, type SceneScale } from '../types';
 
 const SCALES: readonly SceneScale[] = ['large', 'medium', 'small'];
 const CEILING_BOUND_ID = 'structural-bound.scene.connection_limit';

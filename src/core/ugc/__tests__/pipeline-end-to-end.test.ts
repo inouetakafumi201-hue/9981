@@ -10,11 +10,11 @@ import {
   handAuthoredAdapter,
   editorAdapter,
   naturalLanguageAdapter,
-} from '../adapter/adapters.js';
-import { createCandidateChangeRequest, createCandidateSource } from '../model/candidate.js';
-import type { CandidateChangeRequest, ChangeOperation, TargetOwnership } from '../model/candidate.js';
-import { createHarness } from './harness.js';
-import type { Harness } from './harness.js';
+} from '../adapter/adapters';
+import { createCandidateChangeRequest, createCandidateSource } from '../model/candidate';
+import type { CandidateChangeRequest, ChangeOperation, TargetOwnership } from '../model/candidate';
+import { createHarness } from './harness';
+import type { Harness } from './harness';
 
 const VALID_BASE = JSON.stringify({
   schemaVersion: '1.0.0',

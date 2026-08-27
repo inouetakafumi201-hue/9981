@@ -9,10 +9,10 @@
  */
 import { describe, it } from 'vitest';
 import fc from 'fast-check';
-import { BehaviorAssertionRegistry, loadAssertionsJson } from '../assertions.js';
-import { defaultDesignCurrencyConfig, parseDesignCurrencyConfig, toCompactCharge } from '../config-design-currency.js';
-import type { BehaviorAssertion } from '../assertions.js';
-import type { DesignCurrencyConfig } from '../config-design-currency.js';
+import { BehaviorAssertionRegistry, loadAssertionsJson } from '../assertions';
+import { defaultDesignCurrencyConfig, parseDesignCurrencyConfig, toCompactCharge } from '../config-design-currency';
+import type { BehaviorAssertion } from '../assertions';
+import type { DesignCurrencyConfig } from '../config-design-currency';
 
 /** 随机断言生成器。 */
 const arbitraryAssertion: fc.Arbitrary<BehaviorAssertion> = fc.record({

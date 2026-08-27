@@ -14,21 +14,21 @@
  * `inspectL2PortBundle` 校验。方向是「l2 实现端口，UGC 校验端口」，不是「l2 适配 UGC 的内部形状」。
  */
 
-import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway.js';
-import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint.js';
+import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway';
+import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint';
 import type {
   DefinitionRegistryGateway,
   DefinitionValidationGateway,
   ReferenceResolutionGateway,
-} from '../../../core/ugc/ports/definition-ports.js';
-import { TARGET_OWNERSHIPS, type TargetOwnership } from '../../../core/ugc/model/candidate.js';
-import { createL2DefinitionValidationGateway } from './validation-gateway.js';
-import { createL2ReferenceResolutionGateway } from './resolution-gateway.js';
-import { createL2DefinitionRegistryGateway, type L2DefinitionRegistryGateway } from './registry-gateway.js';
+} from '../../../core/ugc/ports/definition-ports';
+import { TARGET_OWNERSHIPS, type TargetOwnership } from '../../../core/ugc/model/candidate';
+import { createL2DefinitionValidationGateway } from './validation-gateway';
+import { createL2ReferenceResolutionGateway } from './resolution-gateway';
+import { createL2DefinitionRegistryGateway, type L2DefinitionRegistryGateway } from './registry-gateway';
 
 /**
  * l2 端口集合。形状刻意与 wakeup-ugc 的 `L2PortBundle` 一致（结构化对齐，无 import 耦合）。

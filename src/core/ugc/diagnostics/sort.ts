@@ -7,8 +7,8 @@
  *
  * 不依赖 Adapter 提交时间、对象键遍历顺序或哈希表迭代顺序。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import { compareCodePoints, compareNullableCodePoints } from '../model/fingerprint.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import { compareCodePoints, compareNullableCodePoints } from '../model/fingerprint';
 
 function nullableOffset(diagnostic: Diagnostic): number | null {
   return diagnostic.sourceSpan?.start.offset ?? null;

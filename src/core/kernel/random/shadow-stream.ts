@@ -6,8 +6,8 @@
  * All random Ops within the block that use the shadow stream name will draw
  * from the shadow stream rather than the main stream, keeping them isolated.
  */
-import type { OpContext } from '../ops/registry.js';
-import type { RngStreamState } from '../state/world-state.js';
+import type { OpContext } from '../ops/registry';
+import type { RngStreamState } from '../state/world-state';
 
 export interface ShadowStreamOpts {
   name: string;

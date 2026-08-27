@@ -11,14 +11,14 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { parseClassCatalog } from '../class-contract.js';
-import { parseClassJson } from '../catalog-loader.js';
+import { parseClassCatalog } from '../class-contract';
+import { parseClassJson } from '../catalog-loader';
 import {
   ClassCatalogContractError,
   type JsonObject,
-} from '../json-contract.js';
-import { findDanglingReferences, findPseudoSubtypes } from '../class-contract.js';
-import { catalogText } from './catalog-fixtures.js';
+} from '../json-contract';
+import { findDanglingReferences, findPseudoSubtypes } from '../class-contract';
+import { catalogText } from './catalog-fixtures';
 
 /** 用真实 'actions' 目录克隆一份可注入的文档，保持真实形状。 */
 function realActionsDocument(): { root: JsonObject; sourceText: string } {

@@ -7,22 +7,22 @@
  * 只有无 Error 的完整候选图可进入注册表；不存在"验证通过但引用未解析"的中间状态。
  */
 
-import type { Diagnostic } from '../model/diagnostic.js';
-import { hasError } from '../model/diagnostic.js';
-import { canonicalSort, compareDiagnostics } from '../model/ordering.js';
-import type { CandidateDefinition, ResolvedDefinition } from '../model/definition.js';
-import type { TypedReference } from '../model/reference.js';
-import type { CompiledSpecification } from '../compiler/types.js';
-import type { SemanticFamilyRegistration } from '../model/definition.js';
+import type { Diagnostic } from '../model/diagnostic';
+import { hasError } from '../model/diagnostic';
+import { canonicalSort, compareDiagnostics } from '../model/ordering';
+import type { CandidateDefinition, ResolvedDefinition } from '../model/definition';
+import type { TypedReference } from '../model/reference';
+import type { CompiledSpecification } from '../compiler/types';
+import type { SemanticFamilyRegistration } from '../model/definition';
 import {
   buildReferenceGraph,
   type GraphNodeInfo,
   type ReferenceGraph,
-} from '../resolution/reference-graph.js';
-import { resolveAll } from '../resolution/definition-resolver.js';
-import { revalidateDependents } from '../resolution/dependent-revalidation.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import { buildValidationContext, validatePackage } from './validator.js';
+} from '../resolution/reference-graph';
+import { resolveAll } from '../resolution/definition-resolver';
+import { revalidateDependents } from '../resolution/dependent-revalidation';
+import type { DefinitionPackage } from '../model/definition';
+import { buildValidationContext, validatePackage } from './validator';
 
 export interface PackageValidationInput {
   readonly package: DefinitionPackage;

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { RelationIndex } from '../relation.js';
-import type { Ref } from '../ids.js';
+import { RelationIndex } from '../relation';
+import type { Ref } from '../ids';
 
 function ref(id: string): Ref {
   return { $: id };

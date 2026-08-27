@@ -9,11 +9,11 @@
  * - `registry` scope 必须有 expected/actual 基线身份。
  * - 结构上不适用的定位字段一律显式 `null`，这依赖任务 1.3 对共享 `Diagnostic` 的可空扩展。
  */
-import type { CompilationStage, Diagnostic, SourceSpan } from '../../kernel/state/diagnostic.js';
-import type { Value } from '../../kernel/state/value.js';
-import type { ValidationStage } from '../model/stage.js';
-import type { DiagnosticCodeCatalog } from './code-catalog.js';
-import type { DiagnosticSelector } from './code-map.js';
+import type { CompilationStage, Diagnostic, SourceSpan } from '../../kernel/state/diagnostic';
+import type { Value } from '../../kernel/state/value';
+import type { ValidationStage } from '../model/stage';
+import type { DiagnosticCodeCatalog } from './code-catalog';
+import type { DiagnosticSelector } from './code-map';
 
 /** UGC 阶段 → 共享 `CompilationStage`。共享枚举粒度较粗，精确阶段另存于 `messageKey`。 */
 const STAGE_TO_COMPILATION_STAGE: Readonly<Record<ValidationStage, CompilationStage>> = {

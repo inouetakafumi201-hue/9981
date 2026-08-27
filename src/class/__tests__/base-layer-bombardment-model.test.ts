@@ -13,15 +13,15 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { parseClassCatalog } from '../class-contract.js';
-import { parseClassJson } from '../catalog-loader.js';
-import { ClassCatalogContractError } from '../json-contract.js';
-import { ALL_FAMILY_SHAPES, resolveFamilyComponentShape } from '../../l2/model/family-component-shapes.js';
+import { parseClassCatalog } from '../class-contract';
+import { parseClassJson } from '../catalog-loader';
+import { ClassCatalogContractError } from '../json-contract';
+import { ALL_FAMILY_SHAPES, resolveFamilyComponentShape } from '../../l2/model/family-component-shapes';
 import {
   CompositionRegistry,
   COMPOSITION_KINDS,
   compositionKindRank,
-} from '../../l2/model/composition-registry.js';
+} from '../../l2/model/composition-registry';
 
 describe('属性6：L2 规范模型与 class 护栏的同目录接受/拒绝结论兼容', () => {
   it('栏护接受的真实统一形状目录，composition-registry 与 L2 验证不产生阻断性错误', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { hasTag } from '../tag.js';
+import { hasTag } from '../tag';
 
 describe('Tag 机制（需求4.1-4.4）', () => {
   it('hasTag 正确判断标签存在性', () => {

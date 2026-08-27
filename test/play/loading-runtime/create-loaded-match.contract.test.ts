@@ -31,8 +31,6 @@ function loadedMatchRequest(extra?: {
   readonly npc?: boolean;
   readonly badConfig?: boolean;
 }) {
-  const seeded = seedWorld();
-  void seeded;
   const config = extra?.badConfig === true
     ? { ...productionConfig(), rollPolicy: { enableRandomRoll: true, baseTierPolicyRef: null, boostBoundaryPolicyRef: null } }
     : productionConfig();
@@ -45,7 +43,7 @@ function loadedMatchRequest(extra?: {
       { id: 'd:room', kind: 'node' },
       { id: 'd:door', kind: 'link' },
     ] as const,
-    initialWorld: seeded,
+    initialWorld: seedWorld(),
     ...(extra?.map === true ? { map: testMap() } : {}),
     ...(extra?.npc === true ? { npcBudget: () => npcBudgetFixture() } : {}),
   };

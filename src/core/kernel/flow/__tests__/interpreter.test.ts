@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { FlowInterpreter } from '../interpreter.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder, Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { DefRegistry } from '../../state/def.js';
-import type { OpContext } from '../../ops/registry.js';
-import type { Effect } from '../../events/effect-types.js';
+import { FlowInterpreter } from '../interpreter';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder, Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerPropOps } from '../../ops/prop-ops';
+import { DefRegistry } from '../../state/def';
+import type { OpContext } from '../../ops/registry';
+import type { Effect } from '../../events/effect-types';
 
 function setup() {
   const holder = new WorldStateHolder(createEmptyWorldState('sched:1'));

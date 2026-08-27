@@ -8,8 +8,8 @@
  * 而电瓶车的描述本身就把它讲成"蹲下 + 攻击"两步。两者已拆成序列，本文件钉住拆分结果。
  */
 import { describe, expect, it } from 'vitest';
-import { loadPlayProfiles, type PlayProfile } from '../profiles/catalog.js';
-import { auditActionCosts } from '../profiles/audit.js';
+import { loadPlayProfiles, type PlayProfile } from '../profiles/catalog';
+import { auditActionCosts } from '../profiles/audit';
 
 const profiles = loadPlayProfiles();
 

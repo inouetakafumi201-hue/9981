@@ -3,11 +3,11 @@
  * 对应要求 10（座位/货舱/门/邻接/锁定/驾驶/碰撞/损毁）。
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import type { CandidateDefinition } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context';
+import { defError } from './helpers';
 
 export const validateVehicleRules: DefinitionRule = (
   definition: CandidateDefinition,

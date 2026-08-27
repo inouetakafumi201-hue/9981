@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { StrictJsonCodec } from '../../spec-compiler/json-codec.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../../spec-compiler/types.js';
-import type { ParsedCandidateDocument } from '../../spec-compiler/types.js';
-import { decodePlaypack } from '../playpack-codec.js';
+import { StrictJsonCodec } from '../../spec-compiler/json-codec';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../spec-compiler/types';
+import type { ParsedCandidateDocument } from '../../spec-compiler/types';
+import { decodePlaypack } from '../playpack-codec';
 
 function parsed(value: unknown): ParsedCandidateDocument {
   return new StrictJsonCodec().parse({
@@ -53,6 +53,7 @@ function validPlaypack(): Record<string, unknown> {
         id: 'action:complete',
         kind: 'action',
         label: 'Complete action',
+        track: 'card',
         targets: [{
           name: 'target',
           query: { from: 'entities', visibleTo: { var: 'viewer' }, orderBy: { path: 'id' }, desc: false },
@@ -248,7 +249,7 @@ describe('pure JSON Playpack strict decoder', () => {
       id: 'pp:nested',
       kind: 'playpack',
       version: '1.0.0',
-      defs: [{ id: 'action:nested', kind: 'action', label: 'Nested', effects: [{ while: true, do: [] }] }],
+      defs: [{ id: 'action:nested', kind: 'action', label: 'Nested', track: 'card', effects: [{ while: true, do: [] }] }],
     }];
     const result = decodePlaypack(parsed(value));
     expect(result.ok).toBe(false);

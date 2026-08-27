@@ -10,12 +10,12 @@
  * 冻结、且提供了已审批投点策略后才被触发。因此其运行期一致性验证属于 U-001 解冻后的集成范围，
  * 不在本次交付的检查点内。这不是占位实现——算法逐条对应 5.4-5.8 与 D-037 档位裁剪。
  */
-import type { RuleDef } from '../../../core/kernel/events/types.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import type { NumericOwnershipRule } from '../ownership.js';
-import { constitutionalConstant, internalMetric, structuralBound } from '../ownership.js';
-import { playRule } from './rules.damage.js';
+import type { RuleDef } from '../../../core/kernel/events/types';
+import type { Effect } from '../../../core/kernel/events/effect-types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import type { NumericOwnershipRule } from '../ownership';
+import { constitutionalConstant, internalMetric, structuralBound } from '../ownership';
+import { playRule } from './rules.damage';
 import {
   addNum,
   and,
@@ -49,7 +49,7 @@ import {
   setRequestField,
   subNum,
   varOf,
-} from './expr.js';
+} from './expr';
 import {
   ATT_BOOST_COMMITMENT,
   DEATH_BAG_CONTAINER_NAME,
@@ -87,7 +87,7 @@ import {
   TAG_ROLL_PARTICIPANT,
   TIE_BREAK_SIDES,
   RNG_STREAM_TURN_ORDER_TIE,
-} from './ids.js';
+} from './ids';
 
 /**
  * 结算/体力授予/长眠规则里的数值归属。

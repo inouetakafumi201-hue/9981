@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { revision } from '../../__tests__/support/fixtures.js';
-import { classifyStaleness, isStale, requiresFullResync } from '../staleness.js';
+import { revision } from '../../__tests__/support/fixtures';
+import { classifyStaleness, isStale, requiresFullResync } from '../staleness';
 
 describe('陈旧判定四条路径（tasks.md 任务 3.2）', () => {
   const cached = revision(5, 'fp-5');

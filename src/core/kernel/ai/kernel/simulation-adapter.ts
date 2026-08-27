@@ -9,14 +9,14 @@
  * Presentation subscribers are silenced for the duration; rule outcomes and
  * failure diagnostics are never silenced.
  */
-import type { LegalAction } from '../../actions/types.js';
-import type { WorldStateHolder } from '../../ops/transaction.js';
-import type { CheckpointStore } from '../../persistence/persistence.js';
-import type { Ref } from '../../state/ids.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { CanonicalSubmissionAdapter } from '../commit-gateway.js';
-import type { CanonicalSimulationKernelAdapter, CanonicalSimulationSession } from '../simulation.js';
-import type { AIResult, NPCActionRequest, SimulationOutcome } from '../types.js';
+import type { LegalAction } from '../../actions/types';
+import type { WorldStateHolder } from '../../ops/transaction';
+import type { CheckpointStore } from '../../persistence/persistence';
+import type { Ref } from '../../state/ids';
+import type { WorldState } from '../../state/world-state';
+import type { CanonicalSubmissionAdapter } from '../commit-gateway';
+import type { CanonicalSimulationKernelAdapter, CanonicalSimulationSession } from '../simulation';
+import type { AIResult, NPCActionRequest, SimulationOutcome } from '../types';
 
 /** Presentation transport that can withhold delivery while AI explores. */
 export interface PresentationSilencer {

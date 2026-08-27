@@ -29,11 +29,11 @@
  * 调参器改完 JSON 后注入新配置，真实决策立即按新表打分。
  */
 
-import type { BeliefSlice, EvaluationGateway } from './types.js';
-import type { AIDecisionFacadeDependencies } from './facade.js';
-import { FiniteEvaluationGuard } from './evaluation.js';
-import { defaultDesignCurrencyConfig, type DesignCurrencyConfig } from './tuning/config-design-currency.js';
-import { scoreDesignCurrencyBreakdown } from './tuning/runtime.js';
+import type { BeliefSlice, EvaluationGateway } from './types';
+import type { AIDecisionFacadeDependencies } from './facade';
+import { FiniteEvaluationGuard } from './evaluation';
+import { defaultDesignCurrencyConfig, type DesignCurrencyConfig } from './tuning/config-design-currency';
+import { scoreDesignCurrencyBreakdown } from './tuning/runtime';
 
 /** 一次「透过信念切片」的评分，只消费当前可见/已知的事实字段。 */
 export interface DesignCurrencyEntry {

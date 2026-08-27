@@ -10,10 +10,10 @@
  *  - 置信度阈值：归因给出 <0.3 → 停止 low-confidence；
  *  - 到上限仍不通过 → 停止 max-iterations（交人裁决）。
  */
-import { BehaviorAssertionRegistry, AssertionRunner, type AssertionResult, type AssertionViolation } from './assertions.js';
-import { AttributionEngine } from './attribution.js';
-import { ParameterTuner, type ParameterTuningRecord } from './tuner.js';
-import type { DecisionTrace } from './trace.js';
+import { BehaviorAssertionRegistry, AssertionRunner, type AssertionResult, type AssertionViolation } from './assertions';
+import { AttributionEngine } from './attribution';
+import { ParameterTuner, type ParameterTuningRecord } from './tuner';
+import type { DecisionTrace } from './trace';
 
 /** 回归闸结果。 */
 export interface RegressionGateResult {

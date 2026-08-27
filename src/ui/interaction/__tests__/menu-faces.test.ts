@@ -3,10 +3,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { actionView } from '../../__tests__/support/fixtures.js';
-import { stripComments } from '../../__tests__/support/source-scan.js';
-import type { UiActionView } from '../../model/view.js';
-import { activeFaceActions, buildMenuFaces, toggleFace } from '../menu-faces.js';
+import { actionView } from '../../__tests__/support/fixtures';
+import { stripComments } from '../../__tests__/support/source-scan';
+import type { UiActionView } from '../../model/view';
+import { activeFaceActions, buildMenuFaces, toggleFace } from '../menu-faces';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 

@@ -5,8 +5,8 @@
  * 供属性 1/2/2b/3/10 复用。继承 cross-layer-regression 的 GARGE 思想并扩展，
  * 覆盖 requirements 10.2 列出的全部脏输入类别。
  */
-import type { OpRegistry } from '../ops/registry.js';
-import type { WorldStateHolder } from '../ops/transaction.js';
+import type { OpRegistry } from '../ops/registry';
+import type { WorldStateHolder } from '../ops/transaction';
 
 /**
  * 在 cross-layer-regression GARBAGE_ARGS 的 23 类基础上扩展：

@@ -12,10 +12,10 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { JsonCodecError } from '../../core/kernel/codec/strict-json-codec.js';
-import { parseClassJson, parseStrictDataJson } from '../catalog-loader.js';
-import { ClassCatalogContractError } from '../json-contract.js';
-import { catalogText } from './catalog-fixtures.js';
+import { JsonCodecError } from '../../core/kernel/codec/strict-json-codec';
+import { parseClassJson, parseStrictDataJson } from '../catalog-loader';
+import { ClassCatalogContractError } from '../json-contract';
+import { catalogText } from './catalog-fixtures';
 
 /** 判定一个错误是否为"已分类的结构性错误"（允许吞掉/拒绝畸形输入）。 */
 function isStructuredError(error: unknown): boolean {

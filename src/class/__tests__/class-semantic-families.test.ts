@@ -21,14 +21,14 @@ import {
   STATUS_DURATION_MODES,
   STATUS_STACK_MODES,
   TARGET_KINDS,
-} from '../../l2/model/family-contracts.js';
-import { AI_POLICY_CATEGORIES } from '../../l2/model/family-contracts.js';
-import { DIAGNOSTIC_CODES } from '../../l2/model/diagnostic-codes.js';
-import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness.js';
-import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract.js';
-import { parseClassCatalog } from '../class-contract.js';
-import { parseClassJson } from '../catalog-loader.js';
-import type { ClassCatalog } from '../class-contract.js';
+} from '../../l2/model/family-contracts';
+import { AI_POLICY_CATEGORIES } from '../../l2/model/family-contracts';
+import { DIAGNOSTIC_CODES } from '../../l2/model/diagnostic-codes';
+import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness';
+import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract';
+import { parseClassCatalog } from '../class-contract';
+import { parseClassJson } from '../catalog-loader';
+import type { ClassCatalog } from '../class-contract';
 import {
   CATALOG_DIRS,
   CATALOG_ID_FIELDS,
@@ -48,7 +48,7 @@ import {
   readCatalog,
   readPlayProfile,
   readSchema,
-} from './catalog-fixtures.js';
+} from './catalog-fixtures';
 
 const uniformCatalogs = new Map<string, ClassCatalog>(
   UNIFORM_CATALOG_DIRS.map((dir) => [

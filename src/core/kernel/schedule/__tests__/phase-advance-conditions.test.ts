@@ -8,12 +8,12 @@
  * Validates: Requirements 31.4-31.5
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerScheduleOps } from '../schedule-ops.js';
-import type { ScheduleDef, PhaseDef } from '../types.js';
-import { resetIdCounters } from '../../state/ids.js';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerScheduleOps } from '../schedule-ops';
+import type { ScheduleDef, PhaseDef } from '../types';
+import { resetIdCounters } from '../../state/ids';
 
 function makeTestSchedule(phases: PhaseDef[]): ScheduleDef {
   return {

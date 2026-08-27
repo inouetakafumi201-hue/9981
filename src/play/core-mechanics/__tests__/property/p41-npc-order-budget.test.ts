@@ -7,7 +7,7 @@ import {
   genEntityRef,
   genAPValue,
   genNPCPersonality
-} from './generators.js';
+} from './generators';
 
 /**
  * P41: NPC 顺序稳定且预算不从玩家投点推断

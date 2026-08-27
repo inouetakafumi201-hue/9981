@@ -1,9 +1,9 @@
-# 地图编辑器 UI 样图 · Image-2 提示词（v3 · 像素简笔研究台版 · 内嵌游戏）
+# 地图编辑器 UI 样图 · Image-2 提示词（v3 · 像素简笔造梦舱版 · 内嵌游戏）
 
 > 用途：把地图编辑器（`src/devboard/`）的 UI 要素编译成一张 1080p 高质感样图，供项目所有者过目、敲定后作为消费级前端美工的一比一实现底稿。
 > 依据：`src/devboard/app/EditorApp.tsx` + `CanvasView.tsx` + `src/design/tokens.ts`（唯一色板）+ `docs/运营系统/04 §3.4`（素材栏 7→70）+ `docs/创作系统/01`（§八工作台交互 + §九地图编辑器交互）+ `docs/表现系统/01`（画风基线）+ `04 §六`（质感指令）。
-> 世界观锚点：这是**内嵌在独立游戏里的 UI**，玩家从出租屋驻地的**研究台**（=筑梦工作台，`运营/03 §三`；电脑=地图编辑器入口）进入，是**主动「筑梦」的仪式化工具**。网页感（浏览器 chrome、登录条、SaaS 后台、仪表盘堆叠）是大忌。
-> 铁律（v3 修正）：**样图 = 设计目标，不是实现快照**——布局要素要齐（三栏/五工具/素材矩阵等），**文字不逐字**、由 Image-2 自排版；**质感 = 像素风 + 简笔画**（`01` 画风基线），**不是暗黑科技终端**。取色只取 tokens，俯视平面 2D。
+> 世界观锚点：这是**内嵌在独立游戏里的 UI**，玩家从出租屋驻地的**造梦舱**（`运营/03 §二`；卧式蛋形舱体+头部罩子+按摩椅造型，内置梦核多应用台，地图编辑器是默认应用）进入，是**主动「筑梦」的仪式化工具**。网页感（浏览器 chrome、登录条、SaaS 后台、仪表盘堆叠）是大忌。
+> 铁律（v3 修正）：**样图 = 设计目标，不是实现快照**——布局要素要齐（三栏/五工具/素材矩阵等），**文字不逐字**、由 Image-2 自排版；**质感 = 像素风 + 简笔画**（`01` 画风基线），**不是暗黑科技终端**。取色只取 tokens，正面俯视 2D。
 
 ---
 
@@ -16,7 +16,7 @@
 
 ### 质感指令（Image-2 必带）
 - **像素风 + 简笔画叠加**（`01` 画风基线）：交互组件/实体 = 高饱和像素（32–64px）；地图背景/环境 = 低饱和简笔画粗笔触；前景像素 + 背景草图分层渲染，层次清晰。
-- **俯视平面 2D、无 3D**：画布是俯视平面地图（平面轮廓+落地阴影，无前脸/侧脸/顶面/斜投影纵深）。
+- **正面俯视 2D、无 3D**：画布是正面俯视地图（平面轮廓+落地阴影，无前脸/侧脸/顶面/斜投影纵深）。
 - **半透明浮层**：UI 面板介于「操作台与画布」之间半透明，让底透一点（`04 §六-1`）。
 - **边缘发光交互**：可交互物 = 描边 + 内发光（`01` 视觉定律 2），不可交互 = 扁平淡线。
 - **克制、暗调、略冷**：同一画面主功能色 ≤3–4，其余灰阶承载（`04 §六-5`）；整体偏梦境/清醒对峙题材的暗雅，不是鲜艳卡通，也不是黑色科技。
@@ -30,7 +30,7 @@
 ┌────────────────────────────────────────────────────────────────────────────┐
 │ 顶栏（筑梦装置头）：青发光徽标 W「WakeUp 筑梦台 · 地图编辑」│ 地图名+id │ 撤销 重做 ＋ 蓝本新建 校验并导出 │
 ├───────────────┬──────────────────────────────────────────────┬──────────────┤
-│ 左栏（暗面板） │ 中央画布 = 正被构筑的梦境（俯视平面地图）       │ 右栏（暗面板） │
+│ 左栏（暗面板） │ 中央画布 = 正被构筑的梦境（正面俯视地图）       │ 右栏（暗面板） │
 │ 已加载地图     │  工具栏：V选择 N放置场景 E拉边 I取样 P测试运行   │ 检查器(场景/连线)│
 │ 图层           │  场景框 连线 视觉遮挡 物理遮挡 高地 洼地 过渡窗 │ 快捷素材库    │
 │ 图层注记/树    │  折点 描线 框选 网格 图例                      │ (7→70矩阵)   │
@@ -47,7 +47,7 @@
 > 布局三栏固定：顶栏 / 左栏 / 中央画布 / 右栏 / 底部诊断条。要素**位置与数量**必须齐（每个区块、每个控件、每个图元），文字是示意。
 
 ### 1. 顶栏（筑梦装置头）
-- 左：青发光方块徽标内白色字母 **W**；旁两行标题（粗） + 副标题（小字暗）。可写「WakeUp」+「地图编辑 · 研究台」。
+- 左：青发光方块徽标内白色字母 **W**；旁两行标题（粗） + 副标题（小字暗）。可写「WakeUp」+「地图编辑 · 造梦舱」。
 - 中：**地图名输入框**（暗底无边框、粗字）+ 右侧暗灰小字 id。
 - 右：**撤销**、**重做**、**＋**、**蓝本新建**、**校验并导出**（青色实心主钮，边缘透光）。
 
@@ -74,7 +74,7 @@
 
 ## 四、色彩板（唯一取色，暗调承载，主功能色收敛到 3–4 个）
 
-| 语义 | 色值 | 研究台用途 |
+| 语义 | 色值 | 造梦舱用途 |
 |---|---|---|
 | 青 social | `#06b6d4` | 唯一高饱和主操作：当前工具、连线、选中描边发光、主按钮、徽标 |
 | 蓝 stamina | `#3182ce` | 拖拽合法落点、描线预览、框选、取样高亮 |
@@ -97,7 +97,7 @@
 ## 五、Image-2 提示词（可直接投喂 · v3 短版）
 
 ```
-In-game UI mockup, 1920x1080, for a Chinese indie dream-builder game: the dream-shaping workbench (筑梦研究台) inside the player's apartment, a warm dim room at night. Pixel-art + sketchy lineart layered style: interactive items are chunky saturated pixel-art, background is low-saturation sketchy lineart, UI panels are semi-transparent over the scene. top-down plan view, 2D, no 3D. NOT a web app / SaaS / browser — no browser chrome, no cards dashboard. Cyan is the only saturated accent; dark muted palette, restrained, slightly cool. Edges glow for interactive items, flat thin lines for inactive. Simplified Chinese UI labels (accurate text not required, layout matters).
+In-game UI mockup, 1920x1080, for a Chinese indie dream-builder game: the dream-building station (造梦舱内嵌编辑器) inside the player's apartment, a warm dim room at night. Pixel-art + sketchy lineart layered style: interactive items are chunky saturated pixel-art, background is low-saturation sketchy lineart, UI panels are semi-transparent over the scene. top-down plan view, 2D, no 3D. NOT a web app / SaaS / browser — no browser chrome, no cards dashboard. Cyan is the only saturated accent; dark muted palette, restrained, slightly cool. Edges glow for interactive items, flat thin lines for inactive. Simplified Chinese UI labels (accurate text not required, layout matters).
 
 Layout: three columns between a top bar and a bottom bar.
 - Top bar: left a cyan glowing W badge + title「WakeUp 筑梦台」; center a map name (e.g. 卧铺车厢) + small id; right buttons undo / redo / + / 蓝本 / cyan primary 校验并导出.
@@ -121,6 +121,8 @@ Palette only: cyan, blue, yellow, red, orange, green, muted gray, near-black pan
 
 ## 附：相比 v2（研究台终端版）的更改
 
+> **2026-08-18 命名变更注**：v2/v3 历史标注中保留「研究台」称谓作为迭代锚点；当前权威命名见 `运营系统/03`——「造梦舱」（卧式蛋形舱+头部罩子+按摩椅造型，梦核多应用台）。文档主体的「地图编辑 · 造梦舱」是当前术语。
+
 | 项 | v2（黑色科技） | v3（本版 · 像素简笔研究台） |
 |---|---|---|
 | 气质 | 暗色近黑荧光的筑梦终端 | 暖灯出租屋里像素+简笔叠加的筑梦工作台 |
@@ -128,4 +130,4 @@ Palette only: cyan, blue, yellow, red, orange, green, muted gray, near-black pan
 | 文字 | 逐字穷举每个控件字样 | 只定布局与要素，Image-2 自排版 |
 | 素材栏 | 8 个样例 + 无筛选（迁就实现） | 7→70 矩阵 + 分类筛选 + 搜索（设计目标） |
 | 提示词 | 超长、不稳定 | 大幅缩短（正文提示词 + 简要布局） |
-| 铁律 | 无 | 像素+简笔 `01` 基线、俯视平面 2D、≤3–4 主功能色、无网页壳 |
+| 铁律 | 无 | 像素+简笔 `01` 基线、正面俯视 2D、≤3–4 主功能色、无网页壳 |

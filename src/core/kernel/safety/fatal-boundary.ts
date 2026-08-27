@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { CompilationStage } from '../state/diagnostic.js';
+import type { CompilationStage } from '../state/diagnostic';
 
 /** Fixed emergency codes do not share the ordinary Diagnostic allocation/formatting path. */
 export type EmergencyCode =

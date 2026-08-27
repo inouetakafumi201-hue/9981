@@ -15,15 +15,15 @@
  * 因此三档尺度的**类型身份来自必需能力**，而不是各自持有一个连接数。
  */
 
-import type { HumanReadableText } from './ids.js';
-import type { OwningLayer, SourceRecord } from './source.js';
+import type { HumanReadableText } from './ids';
+import type { OwningLayer, SourceRecord } from './source';
 import {
   GAMEPLAY_VALUE_RANGE,
   MICRO_SCENE_ATTACHMENT_SOURCE,
   NODE_CONNECTION_BOUND,
   NODE_CONNECTION_BOUND_SOURCE,
-} from './constitution.js';
-import { deepFreeze } from './immutable.js';
+} from './constitution';
+import { deepFreeze } from './immutable';
 
 /** 天然场景三档尺度。与 `./family-contracts.ts` 的 `SpaceItemsSceneScale` 同义、同取值。 */
 export const SPACE_ITEMS_SCENE_SCALES = Object.freeze(['large', 'medium', 'small'] as const);

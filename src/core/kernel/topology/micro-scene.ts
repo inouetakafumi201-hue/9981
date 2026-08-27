@@ -5,8 +5,8 @@
  * prefab.spawn/prefab.despawn 等 Op 的实现内部调用（design.md 写入通道情形b）——不注册为独立 Op，
  * 不对外暴露。占用者数量由现查 Query 得出，不维护派生计数字段（需求9.4）。
  */
-import type { Id, Ref } from '../state/ids.js';
-import type { Node } from './types.js';
+import type { Id, Ref } from '../state/ids';
+import type { Node } from './types';
 
 export interface MicroSceneSpec {
   capacity?: number;

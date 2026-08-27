@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { CanonicalSimulationAdapter, UnavailableSimulationAdapter } from '../simulation.js';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { CanonicalSimulationAdapter, UnavailableSimulationAdapter } from '../simulation';
 import type {
   AIDecisionRequest,
   AIReadScope,
@@ -13,7 +13,7 @@ import type {
   SearchSession,
   SimulationOutcome,
   ValidatedAIBehaviorBinding,
-} from '../types.js';
+} from '../types';
 
 function request(agent: string, actor: string, policy: string, correlationId: string): Extract<AIDecisionRequest, { readonly category: 'npc-behavior'; readonly mode: 'act' }> {
   return {

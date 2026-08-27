@@ -7,10 +7,10 @@
  * 导航控件**计入**同时可选项预算（J-13）：如果"下一页"不计数，实际同时可选项就是 6。
  */
 
-import { ACTION_COST_CATEGORIES, INTERACTION_INTENTS } from '../../l2/model/family-contracts.js';
-import { makeInternalMetric, type InternalMetric } from '../presentation/gameplay-value.js';
-import { bindingsKey } from './intent.js';
-import type { ActionCostCategory, UiActionView } from './view.js';
+import { ACTION_COST_CATEGORIES, INTERACTION_INTENTS } from '../../l2/model/family-contracts';
+import { makeInternalMetric, type InternalMetric } from '../presentation/gameplay-value';
+import { bindingsKey } from './intent';
+import type { ActionCostCategory, UiActionView } from './view';
 
 /** 任一时刻同时可选项上限（Requirement 10.10）。 */
 export const MAX_SIMULTANEOUS_OPTIONS = 5;

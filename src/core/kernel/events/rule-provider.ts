@@ -12,9 +12,9 @@
  * 三种挂载来源各自决定何时调用 add/remove，RuleProvider 本身不区分来源），并按事件类型
  * （RuleDef.on 是否包含该类型）现查出匹配的候选集合。
  */
-import type { OpContext } from '../ops/registry.js';
-import type { RuleDef } from './types.js';
-import type { HookCandidate } from './dispatcher.js';
+import type { OpContext } from '../ops/registry';
+import type { RuleDef } from './types';
+import type { HookCandidate } from './dispatcher';
 
 export type DynamicRuleResolver = (ctx: OpContext) => readonly RuleDef[];
 

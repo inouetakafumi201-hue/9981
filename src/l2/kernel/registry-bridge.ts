@@ -21,14 +21,14 @@
  *   由 `action-submitter` 门禁拒绝（`RUNTIME_HOOK_INTEGRATION_UNAVAILABLE`，零 invoke）。
  */
 
-import type { Def, DefKind } from '../../core/kernel/state/def.js';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { Result as L1Result } from '../../core/kernel/ops/result.js';
-import type { Ref } from '../../core/kernel/state/ids.js';
-import type { OpCause, RuntimeSemanticState } from '../model/projection.js';
-import { deepClonePlain, deepFreeze } from '../model/immutable.js';
-import type { KernelContract } from './kernel-contract.js';
-import { createKernelContractFromOpRegistry } from './op-registry-adapter.js';
+import type { Def, DefKind } from '../../core/kernel/state/def';
+import type { Value } from '../../core/kernel/state/value';
+import type { Result as L1Result } from '../../core/kernel/ops/result';
+import type { Ref } from '../../core/kernel/state/ids';
+import type { OpCause, RuntimeSemanticState } from '../model/projection';
+import { deepClonePlain, deepFreeze } from '../model/immutable';
+import type { KernelContract } from './kernel-contract';
+import { createKernelContractFromOpRegistry } from './op-registry-adapter';
 
 /** 桥对 L1 `OpRegistry` 的最小结构契约（与 `OpRegistryAdapterDeps.opRegistry` 同形）。 */
 export interface RegistryBridgeOpRegistry {

@@ -3,11 +3,11 @@
  * 对应要求 6（端点类型、方向、通行条件、阻挡、距离策略）。
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import type { CandidateDefinition } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context';
+import { defError } from './helpers';
 
 const VALID_ENDPOINT_TYPES = Object.freeze(['door', 'gate', 'opening', 'passage']);
 const VALID_DIRECTIONS = Object.freeze(['bidirectional', 'one-way', 'restricted']);

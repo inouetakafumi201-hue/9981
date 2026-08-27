@@ -7,7 +7,7 @@
  * 术语废用词清单来自 L0「一、术语铁律」与 Requirements 1.7。
  */
 
-import type { SourceRecord } from './source.js';
+import type { SourceRecord } from './source';
 
 /** L0 文档标识。 */
 export const L0_SOURCE_FILE = 'docs/L0_规范宪法.md';

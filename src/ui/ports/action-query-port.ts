@@ -10,9 +10,9 @@
  *    `src/l2/adapters/ui-adapter.ts` 中恒为空数组（C-6），而前者真实可用（J-24）。
  */
 
-import type { UiResult } from '../model/diagnostic.js';
-import type { ProjectedBindingValue } from '../model/intent.js';
-import type { ActionCostCategory, UiBinding } from '../model/view.js';
+import type { UiResult } from '../model/diagnostic';
+import type { ProjectedBindingValue } from '../model/intent';
+import type { ActionCostCategory, UiBinding } from '../model/view';
 
 export const SCOPED_QUERY_SOURCES = ['entity', 'node', 'attachment', 'log'] as const;
 export type ScopedQuerySource = (typeof SCOPED_QUERY_SOURCES)[number];

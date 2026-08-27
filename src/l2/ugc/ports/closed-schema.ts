@@ -36,14 +36,14 @@
  * 这不是妥协出来的特例，而是与 l2 解码器「哪几层是封闭字段集」的真实结构对齐。
  */
 
-import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids.js';
-import type { PackageId } from '../../model/ids.js';
-import type { SourceLocation } from '../../model/source.js';
-import { compareStrings } from '../../model/ordering.js';
-import { isErrorDiagnostic } from '../../model/diagnostic.js';
-import { scanJson, type JsonNode } from '../../codec/json-scanner.js';
-import { createDecodeContext } from '../../codec/decode.js';
-import { decodePackage } from '../../codec/definition-decoder.js';
+import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids';
+import type { PackageId } from '../../model/ids';
+import type { SourceLocation } from '../../model/source';
+import { compareStrings } from '../../model/ordering';
+import { isErrorDiagnostic } from '../../model/diagnostic';
+import { scanJson, type JsonNode } from '../../codec/json-scanner';
+import { createDecodeContext } from '../../codec/decode';
+import { decodePackage } from '../../codec/definition-decoder';
 
 /** 一处未声明成员。 */
 export interface UnknownMember {

@@ -6,8 +6,8 @@ import type {
   AIDiagnosticSeverity,
   AIPhase,
   PublicAIDiagnostic,
-} from './types.js';
-import type { Ref } from '../state/ids.js';
+} from './types';
+import type { Ref } from '../state/ids';
 
 export interface AIDiagnosticInput {
   readonly code: AIDiagnosticCode;

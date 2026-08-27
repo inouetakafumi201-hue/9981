@@ -11,15 +11,15 @@
  * 「让活体进槽」的写通道——结构上与 `item.move` 同构，唯一区别是对象从 `draft.items`
  * 改为 `draft.entities`，且目标必须是 `category:'carrier'` 承载面。
  */
-import type { OpImpl } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id } from '../state/ids.js';
-import { isCarrierSurface } from '../topology/carrier.js';
-import type { ContainerCarryingLiveSurface } from '../topology/carrier.js';
-import { findDefaultSlotIndex, setSlotHolds } from '../topology/container.js';
-import type { ExprEngine, EvalContext } from '../expr/engine.js';
-import type { WorldState } from '../state/world-state.js';
+import type { OpImpl } from './registry';
+import type { OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id } from '../state/ids';
+import { isCarrierSurface } from '../topology/carrier';
+import type { ContainerCarryingLiveSurface } from '../topology/carrier';
+import { findDefaultSlotIndex, setSlotHolds } from '../topology/container';
+import type { ExprEngine, EvalContext } from '../expr/engine';
+import type { WorldState } from '../state/world-state';
 
 // ---------- container.enter：把活体放进容器承载面内部槽 ----------
 

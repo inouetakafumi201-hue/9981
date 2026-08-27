@@ -1,13 +1,13 @@
-import type { ErrCode } from '../state/error-codes.js';
-import type { SourceRecord } from '../state/diagnostic.js';
-import { createSourceRecord, sourceSpanFromCharRange, utf8ByteLength } from '../state/source-record.js';
+import type { ErrCode } from '../state/error-codes';
+import type { SourceRecord } from '../state/diagnostic';
+import { createSourceRecord, sourceSpanFromCharRange, utf8ByteLength } from '../state/source-record';
 import type {
   CandidateDocumentInput,
   JsonValue,
   MutableJsonObject,
   ParsedCandidateDocument,
   TechnicalQuotas,
-} from './types.js';
+} from './types';
 
 export class JsonCodecError extends Error {
   constructor(

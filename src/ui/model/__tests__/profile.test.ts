@@ -3,8 +3,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { stripComments } from '../../__tests__/support/source-scan.js';
-import { makeInternalMetric } from '../../presentation/gameplay-value.js';
+import { stripComments } from '../../__tests__/support/source-scan';
+import { makeInternalMetric } from '../../presentation/gameplay-value';
 import {
   CONFIRMED_DECISION_IDS,
   SALIENCE_TIERS,
@@ -14,7 +14,7 @@ import {
   isSalienceTier,
   type PresentationProfile,
   type SalienceTierEntry,
-} from '../profile.js';
+} from '../profile';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 

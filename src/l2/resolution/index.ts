@@ -1,6 +1,6 @@
 /** L2 Resolution: 统一导出。 */
 
-export * from './reference-collector.js';
-export * from './reference-graph.js';
-export * from './definition-resolver.js';
-export * from './dependent-revalidation.js';
+export * from './reference-collector';
+export * from './reference-graph';
+export * from './definition-resolver';
+export * from './dependent-revalidation';

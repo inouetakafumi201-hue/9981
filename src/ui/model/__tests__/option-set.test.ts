@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { ACTION_COST_CATEGORIES, INTERACTION_INTENTS } from '../../../l2/model/family-contracts.js';
+import { ACTION_COST_CATEGORIES, INTERACTION_INTENTS } from '../../../l2/model/family-contracts';
 import {
   MAX_SIMULTANEOUS_OPTIONS,
   ROOT_OPTION_CURSOR,
   buildOptionSet,
   reachableActionSignatures,
   type OptionCursor,
-} from '../option-set.js';
-import type { UiActionView } from '../view.js';
+} from '../option-set';
+import type { UiActionView } from '../view';
 
 function action(index: number): UiActionView {
   const costCategory = ACTION_COST_CATEGORIES[index % ACTION_COST_CATEGORIES.length];
@@ -18,6 +18,7 @@ function action(index: number): UiActionView {
   return {
     actionId: `act.${String(index).padStart(3, '0')}`,
     costCategory,
+    track: 'highlight',
     ...(interactionIntent === undefined ? {} : { interactionIntent }),
     available: true,
     accessibleLabel: `动作 ${String(index)}`,

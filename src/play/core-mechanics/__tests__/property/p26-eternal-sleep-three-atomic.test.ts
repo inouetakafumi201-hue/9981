@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection } from './generators.js';
+import { arbFailureInjection } from './generators';
 
 describe('Property 26: 令其长眠三事原子性', () => {
   it('令其长眠包含三项原子操作', () => {

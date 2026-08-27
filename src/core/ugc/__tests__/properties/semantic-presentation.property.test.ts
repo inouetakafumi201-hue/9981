@@ -8,8 +8,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 function gap(jsonPath: string) {
   return {

@@ -10,11 +10,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { createFullHarness, defaultSeedDefs } from '../testing/full-harness.js';
-import { Transaction, WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { sweepAllOps } from './bombardment-fixtures.js';
-import { resetIdCounters } from '../state/ids.js';
+import { createFullHarness, defaultSeedDefs } from '../testing/full-harness';
+import { Transaction, WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { sweepAllOps } from './bombardment-fixtures';
+import { resetIdCounters } from '../state/ids';
 
 const SAVE_ACTIONS = ['begin', 'commit', 'rollback'] as const;
 

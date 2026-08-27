@@ -10,15 +10,15 @@
  * predicted by a policy. An AI actor without a validated behavior binding is a
  * contract gap and fails closed instead of being modelled with guesses.
  */
-import { ExprEngine } from '../../expr/engine.js';
-import type { QueryEngine } from '../../expr/query-engine.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Def } from '../../state/def.js';
-import type { Id, Ref } from '../../state/ids.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { AIResult } from '../types.js';
-import type { NextParticipant, NextParticipantResolver } from './search-session.js';
-import { makeStateEvalContext, runStateQuery } from './state-read.js';
+import { ExprEngine } from '../../expr/engine';
+import type { QueryEngine } from '../../expr/query-engine';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Def } from '../../state/def';
+import type { Id, Ref } from '../../state/ids';
+import type { WorldState } from '../../state/world-state';
+import type { AIResult } from '../types';
+import type { NextParticipant, NextParticipantResolver } from './search-session';
+import { makeStateEvalContext, runStateQuery } from './state-read';
 
 export interface SchedulePhaseParticipantDeps {
   getState: () => WorldState;

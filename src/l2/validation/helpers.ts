@@ -5,12 +5,12 @@
  * 使每条诊断都可定位、可修复（Requirements 13.2）。
  */
 
-import type { StableDiagnosticCode, HumanReadableText, JsonPath } from '../model/ids.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory.js';
-import type { CandidateDefinition } from '../model/definition.js';
-import type { ValidationContext } from './context.js';
-import type { SourceRecord } from '../model/source.js';
+import type { StableDiagnosticCode, HumanReadableText, JsonPath } from '../model/ids';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory';
+import type { CandidateDefinition } from '../model/definition';
+import type { ValidationContext } from './context';
+import type { SourceRecord } from '../model/source';
 
 export interface RuleDiagnosticInput {
   readonly code: StableDiagnosticCode;

@@ -3,12 +3,12 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { revision, viewBase } from '../../__tests__/support/fixtures.js';
-import { stripComments } from '../../__tests__/support/source-scan.js';
-import { makeInternalMetric } from '../../presentation/gameplay-value.js';
-import type { RuleEventProjection } from '../../model/event-projection.js';
-import type { StateRevision } from '../../model/revision.js';
-import { createReconciler, reduceView } from '../reconcile.js';
+import { revision, viewBase } from '../../__tests__/support/fixtures';
+import { stripComments } from '../../__tests__/support/source-scan';
+import { makeInternalMetric } from '../../presentation/gameplay-value';
+import type { RuleEventProjection } from '../../model/event-projection';
+import type { StateRevision } from '../../model/revision';
+import { createReconciler, reduceView } from '../reconcile';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 

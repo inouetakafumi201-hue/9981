@@ -9,10 +9,10 @@
  */
 import { describe, it } from 'vitest';
 import fc from 'fast-check';
-import { scoreBreakdown, scoreDesignCurrency } from '../../design-currency.js';
-import { observedNumber, scoreDesignCurrencyBreakdown } from '../runtime.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import type { BeliefSlice } from '../../types.js';
+import { scoreBreakdown, scoreDesignCurrency } from '../../design-currency';
+import { observedNumber, scoreDesignCurrencyBreakdown } from '../runtime';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import type { BeliefSlice } from '../../types';
 
 /** 随机信念切片生成器：0-5 个随机字段，值 0-10。 */
 const arbitrarySlice: fc.Arbitrary<BeliefSlice> = fc

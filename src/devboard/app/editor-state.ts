@@ -1,5 +1,5 @@
-import type { Directionality, MapData, MapEdge, MapNode, ObstructionSpec, SceneScale, TransitionWindowPoints, Vec2 } from '../ports/map-contracts.js';
-import { findSnapTarget, insertControlPoint, simplifyPath } from '../ports/map-contracts.js';
+import type { Directionality, MapData, MapEdge, MapNode, ObstructionSpec, SceneScale, TransitionWindowPoints, Vec2 } from '../ports/map-contracts';
+import { findSnapTarget, insertControlPoint, simplifyPath } from '../ports/map-contracts';
 
 export type EditorMode = 'select' | 'node' | 'edge' | 'sample' | 'playtest';
 

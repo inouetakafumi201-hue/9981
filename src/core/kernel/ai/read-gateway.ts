@@ -5,11 +5,11 @@
  * visibleTo, Knowledge and ActionCatalog. This module never accepts WorldState
  * and therefore cannot retain or expose an unfiltered world alias.
  */
-import type { LegalAction } from '../actions/types.js';
-import type { Query } from '../state/expr-types.js';
-import type { Ref } from '../state/ids.js';
-import { isValidValue } from '../state/value.js';
-import type { AIReadGateway, AIReadScope, AIResult, BeliefSlice, KnownFact } from './types.js';
+import type { LegalAction } from '../actions/types';
+import type { Query } from '../state/expr-types';
+import type { Ref } from '../state/ids';
+import { isValidValue } from '../state/value';
+import type { AIReadGateway, AIReadScope, AIResult, BeliefSlice, KnownFact } from './types';
 
 export interface ReadAuthority {
   readonly agent: Ref;

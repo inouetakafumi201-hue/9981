@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbStaminaGrantCase } from './generators.js';
+import { arbStaminaGrantCase } from './generators';
 
 describe('Property 15: 体力上限与过载', () => {
   it('体力上限恒为 5（D-007 宪法常量）', () => {

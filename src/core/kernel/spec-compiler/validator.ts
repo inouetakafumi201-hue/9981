@@ -1,21 +1,21 @@
-import type { DefKind } from '../state/def.js';
+import type { DefKind } from '../state/def';
 import type {
   Diagnostic, SourceNormativeStatus, SourceOwningLayer, SourceRecord,
-} from '../state/diagnostic.js';
-import type { FatalErrorBoundary } from '../safety/fatal-boundary.js';
-import { canonicalStringify, compareCodePoints, joinJsonPointer, jsonTypeOf } from './json-codec.js';
-import { DiagnosticFactory } from './diagnostic-factory.js';
-import type { CreatorMessageBundle } from './messages.js';
-import type { RegistrySnapshot } from './registries.js';
-import { enforceNumericClassification } from './numeric-classification.js';
-import { failedCriteria } from './semantic-family.js';
-import { readTypeIdentity, validateInheritanceIdentity } from './type-identity.js';
+} from '../state/diagnostic';
+import type { FatalErrorBoundary } from '../safety/fatal-boundary';
+import { canonicalStringify, compareCodePoints, joinJsonPointer, jsonTypeOf } from './json-codec';
+import { DiagnosticFactory } from './diagnostic-factory';
+import type { CreatorMessageBundle } from './messages';
+import type { RegistrySnapshot } from './registries';
+import { enforceNumericClassification } from './numeric-classification';
+import { failedCriteria } from './semantic-family';
+import { readTypeIdentity, validateInheritanceIdentity } from './type-identity';
 import {
   buildReferenceGraph,
   computeLineages,
   reportInheritanceCycles,
   resolveWorkingSet,
-} from './resolver.js';
+} from './resolver';
 import {
   buildWorkingSet,
   readPackageDeclaration,
@@ -23,8 +23,8 @@ import {
   reportRemovalDangling,
   toPackageRecord,
   validatePackageDependencies,
-} from './package-change.js';
-import type { PackageDeclaration } from './package-change.js';
+} from './package-change';
+import type { PackageDeclaration } from './package-change';
 import type {
   CandidateDefinition,
   CompiledModel,
@@ -43,9 +43,9 @@ import type {
   TechnicalQuotas,
   UnresolvedItem,
   ValidationBaseline,
-} from './types.js';
+} from './types';
 
-export { GAMEPLAY_VALUE_MAXIMUM, GAMEPLAY_VALUE_MINIMUM } from './numeric-classification.js';
+export { GAMEPLAY_VALUE_MAXIMUM, GAMEPLAY_VALUE_MINIMUM } from './numeric-classification';
 
 const BASE_DEFINITION_FIELDS = new Set([
   'id', 'kind', 'abstract', 'semanticFamily', 'extends', 'components', 'mergeRules', 'override',

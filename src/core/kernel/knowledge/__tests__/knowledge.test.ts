@@ -3,12 +3,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { WorldKnowledgeStore } from '../knowledge-store.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { setPath } from '../../ops/path.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import type { Value } from '../../state/value.js';
+import { WorldKnowledgeStore } from '../knowledge-store';
+import { createEmptyWorldState } from '../../state/world-state';
+import { setPath } from '../../ops/path';
+import { QueryEngine } from '../../expr/query-engine';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import type { Value } from '../../state/value';
 
 describe('L11 KnowledgeStore: getFacts / knows', () => {
   const store = new WorldKnowledgeStore();
@@ -101,8 +101,8 @@ describe('L11 KnowledgeStore: getFacts / knows', () => {
 
 describe('L11 visibleTo filter in QueryEngine', () => {
   it('visibleTo 过滤掉结果为 false 的 refs', async () => {
-    const { QueryEngine } = await import('../../expr/query-engine.js');
-    const { ExprEngine, makeDefaultEvalContext } = await import('../../expr/engine.js');
+    const { QueryEngine } = await import('../../expr/query-engine');
+    const { ExprEngine, makeDefaultEvalContext } = await import('../../expr/engine');
 
     let state = createEmptyWorldState('sched:1');
     // Add two intents: one hidden, one visible

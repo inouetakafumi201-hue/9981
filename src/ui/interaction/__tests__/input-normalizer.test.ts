@@ -6,7 +6,7 @@ import {
   buildBindingIndex,
   normalizeInput,
   type InputBinding,
-} from '../input-normalizer.js';
+} from '../input-normalizer';
 
 /** 六类物理来源各绑一个物理输入，全部指向同一稳定交互标识与同一控件。 */
 const SIX_SOURCE_BINDINGS: readonly InputBinding[] = Object.freeze(

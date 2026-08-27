@@ -9,11 +9,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
-import { rejectionFacts } from '../../testing/observer.js';
-import { handAuthoredAdapter } from '../../adapter/adapters.js';
-import { createCandidateChangeRequest, createCandidateSource } from '../../model/candidate.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
+import { rejectionFacts } from '../../testing/observer';
+import { handAuthoredAdapter } from '../../adapter/adapters';
+import { createCandidateChangeRequest, createCandidateSource } from '../../model/candidate';
 
 function replaceRequest(text: string, expectedTargetId?: string) {
   const document = handAuthoredAdapter.toCandidate(

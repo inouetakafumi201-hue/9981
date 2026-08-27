@@ -13,9 +13,9 @@
  *   玩家辅助策略不能赋给 NPC。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
 import type {
   AiBehaviorContract,
   AttachmentContract,
@@ -23,9 +23,9 @@ import type {
   MovementContract,
   SkillContract,
   StatusContract,
-} from '../model/family-contracts.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+} from '../model/family-contracts';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 export function validateDamage(
   definition: CandidateDefinition,

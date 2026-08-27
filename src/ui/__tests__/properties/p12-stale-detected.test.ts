@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { classifyStaleness } from '../../projection/staleness.js';
-import { arbRevisionPair } from '../support/arbitraries.js';
+import { classifyStaleness } from '../../projection/staleness';
+import { arbRevisionPair } from '../support/arbitraries';
 
 it('任意非同一修订都不会被判为 fresh，且不可比较必全量重同步', () => {
   fc.assert(fc.property(arbRevisionPair(), (pair) => {

@@ -9,14 +9,14 @@
  * 而是由 `class-contract.ts` 的纯函数提供，便于对人造反例单独运行。
  */
 
-import { StrictJsonCodec } from '../core/kernel/codec/index.js';
-import type { JsonValue } from '../core/kernel/spec-compiler/types.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../core/kernel/security/index.js';
-import { ClassCatalogContractError, deepFreeze } from './json-contract.js';
-import { type ClassCatalog, parseClassCatalog } from './class-contract.js';
-import type { ItemClassCatalog } from './items/item-types.js';
+import { StrictJsonCodec } from '../core/kernel/codec/index';
+import type { JsonValue } from '../core/kernel/spec-compiler/types';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../core/kernel/security/index';
+import { ClassCatalogContractError, deepFreeze } from './json-contract';
+import { type ClassCatalog, parseClassCatalog } from './class-contract';
+import type { ItemClassCatalog } from './items/item-types';
 
-export { ClassCatalogContractError } from './json-contract.js';
+export { ClassCatalogContractError } from './json-contract';
 
 /** 使用内核严格 JSON 解析器读取正式数据，拒绝重复成员、危险键和越额输入。 */
 export function parseStrictDataJson(

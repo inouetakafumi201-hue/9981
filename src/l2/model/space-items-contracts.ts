@@ -12,8 +12,8 @@
  *   Q-05 (Shield MVP Coverage未决)
  */
 
-import type { FieldName } from './ids.js';
-import type { TypedReference } from './reference.js';
+import type { FieldName } from './ids';
+import type { TypedReference } from './reference';
 
 // ───────────────────────────────────────────────────────────────────────────
 // 真缺口 A: Container_Family 契约（Requirements 7.1）

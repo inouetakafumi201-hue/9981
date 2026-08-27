@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { HookDispatcher } from '../dispatcher.js';
-import type { EffectRunner, HookCandidate, HookDiagnostic } from '../dispatcher.js';
-import { ok, err } from '../../ops/result.js';
-import { Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { OpContext } from '../../ops/registry.js';
-import type { RuleDef } from '../types.js';
+import { HookDispatcher } from '../dispatcher';
+import type { EffectRunner, HookCandidate, HookDiagnostic } from '../dispatcher';
+import { ok, err } from '../../ops/result';
+import { Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { OpContext } from '../../ops/registry';
+import type { RuleDef } from '../types';
 
 function makeCtx(): OpContext {
   const tx = new Transaction(createEmptyWorldState('sched:1'));

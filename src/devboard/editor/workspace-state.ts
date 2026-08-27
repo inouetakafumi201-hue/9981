@@ -4,8 +4,8 @@
  * 编辑平面（devboard 内部）与契约平面（`MapData` 落盘）分离：devboard 在此维护编辑态，
  * 只在映射回 `MapData` 时交给 ports 桶。开发板绝不把这些字段写进 `MapData.layers` 之外。
  */
-import type { MapData, MapNode } from '../ports/map-contracts.js';
-import type { MapLayer } from '../layers/layer-shapes.js';
+import type { MapData, MapNode } from '../ports/map-contracts';
+import type { MapLayer } from '../layers/layer-shapes';
 
 /** 贴纸编辑态：点「确定」后 locked=true → 不可再选（L.1/L.5）。 */
 export interface StickerEdit {
@@ -39,14 +39,24 @@ export function emptyLayer(id: string, name?: string): MapLayer {
 }
 
 /**
- * 把 devboard 编辑态（图层/贴纸）映射回 `MapData.layers` 形状（L.10 的 devboard 先行版）。
- * 契约扩展落地后可无缝承接；当前 layers 未进契约，因此不修改传入的 `map`，返回纯图层列表。
+ * 把 devboard 编辑态（图层/贴纸）列表作为 plain 图层列表透传（契约扩展后的 devboard 先行版）。
+ * canonical 落盘规范化由 `editor/map-io.ts` 负责，这里不做契约写入。
  */
 export function projectLayers(state: Pick<WorkspaceState, 'layers'>): readonly MapLayer[] {
   return state.layers;
 }
 
-/** 节点层归属：devboard 侧暂以 `MapNode['layerId']` shape 表达（契约扩展前用占位 map）。 */
+/**
+ * 把编辑态楼层编号映射回当前图层 id。editor 仍以 floor 作为内部编辑轴，
+ * 但导入 / 导出 / 预览消费都应通过这个桥读写 canonical layer id。
+ */
+export function layerIdForFloor(layers: readonly MapLayer[], floor: number): string | undefined {
+  if (layers.length === 0) return undefined;
+  const index = Math.max(0, Math.min(layers.length - 1, floor));
+  return layers[index]?.id;
+}
+
+/** 节点层归属：devboard 以 `MapNode['layerId']` shape 表达（契约扩展后的扩展位）。 */
 export function nodeLayerId(node: MapNode): string | undefined {
   return (node as { layerId?: string }).layerId;
 }

@@ -8,8 +8,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 describe('Feature: wakeup-ugc, Property 14: diagnostic completeness and determinism', () => {
   it('reports every independently discoverable error in one result', () => {

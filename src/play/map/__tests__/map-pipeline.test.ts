@@ -16,8 +16,8 @@ import {
   validateMapStructure,
   type MapClassIndex,
   type MapDiagnostic,
-} from '../validate.js';
-import { adjacencyOf, compileMap, connectedGroups } from '../compile.js';
+} from '../validate';
+import { adjacencyOf, compileMap, connectedGroups } from '../compile';
 import {
   distance,
   findSnapTarget,
@@ -26,9 +26,9 @@ import {
   perpendicularDistance,
   resamplePath,
   simplifyPath,
-} from '../curve.js';
-import type { MapData, MapEdge, MapNode, MapPlacement, Vec2 } from '../types.js';
-import { CONNECTION_LIMIT } from '../types.js';
+} from '../curve';
+import type { MapData, MapEdge, MapNode, MapPlacement, Vec2 } from '../types';
+import { CONNECTION_LIMIT } from '../types';
 
 // ---------------------------------------------------------------------------
 // 构造器

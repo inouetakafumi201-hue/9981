@@ -11,17 +11,17 @@
  * 所有异常都在这里被转换为 scope 正确的结构化诊断——公共边界不抛出未处理异常，也不返回半状态
  * （tasks.md 9.1、11.5）。
  */
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { CandidateChangeRequest } from '../model/candidate.js';
-import type { ActivationResult, ValidationReport } from '../model/report.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import { createValidationBaseline } from '../model/baseline.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import { createQuotaBudget } from '../quota/quota-budget.js';
-import type { TrustedQuotaProfile } from '../model/quota-types.js';
-import type { UGCValidationCoordinator } from '../validation/coordinator.js';
-import type { AtomicActivationCoordinator } from '../activation/atomic-activation-coordinator.js';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { CandidateChangeRequest } from '../model/candidate';
+import type { ActivationResult, ValidationReport } from '../model/report';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
+import type { ValidationBaseline } from '../model/baseline';
+import { createValidationBaseline } from '../model/baseline';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import { createQuotaBudget } from '../quota/quota-budget';
+import type { TrustedQuotaProfile } from '../model/quota-types';
+import type { UGCValidationCoordinator } from '../validation/coordinator';
+import type { AtomicActivationCoordinator } from '../activation/atomic-activation-coordinator';
 
 export interface UGCIngressFacade {
   validate(request: CandidateChangeRequest): ValidationReport;

@@ -11,9 +11,9 @@ import {
   applyMigration,
   compareVersions,
   LogStore,
-} from '../persistence.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { setPath } from '../../ops/path.js';
+} from '../persistence';
+import { createEmptyWorldState } from '../../state/world-state';
+import { setPath } from '../../ops/path';
 
 describe('L12 snapshot: Property 18 (immutability)', () => {
   it('takeSnapshot 返回的状态与原状态引用相同（结构共享）', () => {

@@ -2,17 +2,17 @@
  * L9 Schedule Ops: 通用、确定性的相位推进。
  * 相位边界 effect 与 turn 状态在同一个 Op 事务内完成；任何失败都会整体回滚。
  */
-import { err, ok } from '../ops/result.js';
-import type { OpContext, OpImpl, OpRegistry } from '../ops/registry.js';
-import type { Result } from '../ops/result.js';
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { ScheduleDef, PhaseDef } from './types.js';
-import type { WorldState } from '../state/world-state.js';
-import { checkInstantiable } from '../ops/def-guard.js';
+import { err, ok } from '../ops/result';
+import type { OpContext, OpImpl, OpRegistry } from '../ops/registry';
+import type { Result } from '../ops/result';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { ScheduleDef, PhaseDef } from './types';
+import type { WorldState } from '../state/world-state';
+import { checkInstantiable } from '../ops/def-guard';
 
 export interface ScheduleAdvanceArgs {
   scheduleId?: Id;

@@ -2,11 +2,11 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { createDiagnosticSink } from '../../diagnostics/sink.js';
-import { UI_DIAGNOSTIC_CODES, uiDiagnostic } from '../../model/diagnostic.js';
-import { createAuthorizedAgent } from '../../model/view.js';
-import { arbAgent } from '../support/arbitraries.js';
-import { authority } from '../support/fixtures.js';
+import { createDiagnosticSink } from '../../diagnostics/sink';
+import { UI_DIAGNOSTIC_CODES, uiDiagnostic } from '../../model/diagnostic';
+import { createAuthorizedAgent } from '../../model/view';
+import { arbAgent } from '../support/arbitraries';
+import { authority } from '../support/fixtures';
 
 it('任意本地调试设置都不能打开开发或全知面，只有上游令牌可授权附加字段', () => {
   fc.assert(fc.property(arbAgent(), (generated) => {

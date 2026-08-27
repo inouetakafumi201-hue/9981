@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbRollTierMultiset } from './generators.js';
+import { arbRollTierMultiset } from './generators';
 
 describe('Property 10: AP 差值分配算法', () => {
   it('单人得 2 AP（U-002 已裁决为 D-037）', () => {

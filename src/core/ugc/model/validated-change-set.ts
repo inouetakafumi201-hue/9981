@@ -9,11 +9,11 @@
  *
  * 工厂本身不从公共导出根暴露（见 `src/core/ugc/index.ts`）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { ChangeRequestBinding } from './binding.js';
-import type { TargetOwnership } from './candidate.js';
-import type { PresentationFallbackDecision } from './presentation.js';
-import type { UpstreamResolvedReferenceGraph, UpstreamValidatedCandidate } from './upstream.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { ChangeRequestBinding } from './binding';
+import type { TargetOwnership } from './candidate';
+import type { PresentationFallbackDecision } from './presentation';
+import type { UpstreamResolvedReferenceGraph, UpstreamValidatedCandidate } from './upstream';
 
 declare const validatedChangeSetBrand: unique symbol;
 

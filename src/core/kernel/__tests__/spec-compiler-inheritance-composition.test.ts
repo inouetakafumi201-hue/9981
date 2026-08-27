@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures.js';
-import type { CompilationResult, ResolvedDefinition } from '../spec-compiler/index.js';
+import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures';
+import type { CompilationResult, ResolvedDefinition } from '../spec-compiler/index';
 
 /**
  * Inheritance decides type, composition decides configuration.

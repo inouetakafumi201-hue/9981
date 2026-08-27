@@ -12,7 +12,7 @@ import { createContainerShape, createSlotShape, createNodeShape } from '../../..
 import { setPath } from '../../../src/core/kernel/ops/path.js';
 import { defaultCoreMechanicsConfig, type CoreMechanicsConfig } from '../../../src/play/core-mechanics/load.js';
 import { TAG_ROLL_PARTICIPANT } from '../../../src/play/core-mechanics/defs/ids.js';
-import type { MapData } from '../../../src/play/map/types.js';
+import type { MapDataDocument } from '../../../src/play/map/types.js';
 import type { NpcEntry } from '../../../src/play/ai-runtime.js';
 
 export const HERO = 'e:hero';
@@ -65,7 +65,7 @@ export function productionConfig(): CoreMechanicsConfig {
 }
 
 /** 最小合法地图：两个房间 + 一条双向门。 */
-export function testMap(): MapData {
+export function testMap(): MapDataDocument {
   return {
     schemaVersion: '1.0',
     id: 'map:test-room',

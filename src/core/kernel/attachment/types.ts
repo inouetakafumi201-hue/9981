@@ -1,10 +1,10 @@
 /**
  * L8 Attachment: AttachmentDef type (design.md 3.9节 / 需求30.1-30.10).
  */
-import type { Id } from '../state/ids.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
+import type { Id } from '../state/ids';
+import type { Expr } from '../state/expr-types';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
 
 export type AttachStackStrategy = 'unique' | 'refresh' | 'count' | 'independent';
 

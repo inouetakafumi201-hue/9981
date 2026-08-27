@@ -5,29 +5,29 @@
  * 分区暴露，使宿主能够替换回放端口而不改动表现模块。
  */
 
-import type { DiagnosticSink } from './diagnostics/sink.js';
-import type { InteractionIntent } from './model/intent.js';
-import { freezePresentationProfile, type PresentationProfile } from './model/profile.js';
-import type { ActionPort, SubmissionOutcome } from './ports/action-port.js';
+import type { DiagnosticSink } from './diagnostics/sink';
+import type { InteractionIntent } from './model/intent';
+import { freezePresentationProfile, type PresentationProfile } from './model/profile';
+import type { ActionPort, SubmissionOutcome } from './ports/action-port';
 import type {
   ActionQueryPort,
   ActorRef,
   LegalActionQueryOutcome,
   ScopedQueryOutcome,
   ScopedQuerySpec,
-} from './ports/action-query-port.js';
-import type { ConvergenceResult } from './ports/convergence.js';
-import type { EventPort, EventSubscription } from './ports/event-port.js';
-import type { PendingContractPorts } from './ports/pending-contracts.js';
+} from './ports/action-query-port';
+import type { ConvergenceResult } from './ports/convergence';
+import type { EventPort, EventSubscription } from './ports/event-port';
+import type { PendingContractPorts } from './ports/pending-contracts';
 import type {
   DescriptorOutcome,
   DescriptorRequest,
   ProjectionOutcome,
   ProjectionPort,
   ProjectionRequest,
-} from './ports/projection-port.js';
-import type { RevisionPort } from './ports/revision-port.js';
-import type { RuleEventProjection } from './model/event-projection.js';
+} from './ports/projection-port';
+import type { RevisionPort } from './ports/revision-port';
+import type { RuleEventProjection } from './model/event-projection';
 
 export interface UiSystemPorts {
   readonly projection: ProjectionPort;

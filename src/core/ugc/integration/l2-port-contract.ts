@@ -11,8 +11,8 @@ import type {
   DefinitionRegistryGateway,
   DefinitionValidationGateway,
   ReferenceResolutionGateway,
-} from '../ports/definition-ports.js';
-import type { TargetOwnership } from '../model/candidate.js';
+} from '../ports/definition-ports';
+import type { TargetOwnership } from '../model/candidate';
 
 /**
  * 基类层交付的端口集合。这里没有 JSON_Codec：解码与规范化属于 wakeup-ugc 自身，基类层从

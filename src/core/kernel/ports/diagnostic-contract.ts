@@ -13,7 +13,7 @@
  * - 不能删除现有 bundle entry
  */
 
-import type { SourceRecord, SourceSpan } from './json-codec-contract.js';
+import type { SourceRecord, SourceSpan } from './json-codec-contract';
 
 /**
  * 诊断严重性

@@ -4,12 +4,12 @@
  *  - 状态快照往返 + 稳定哈希（对应属性 3）。
  */
 import { describe, expect, it } from 'vitest';
-import { scoreBreakdown, scoreDesignCurrency, DESIGN_CURRENCY_PRINCIPLES } from '../../design-currency.js';
-import { observedNumber, scoreDesignCurrencyBreakdown } from '../runtime.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import { snapshotWorldState, restoreFromSnapshot, hashWorldState, cyrb53 } from '../snapshot.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { BeliefSlice } from '../../types.js';
+import { scoreBreakdown, scoreDesignCurrency, DESIGN_CURRENCY_PRINCIPLES } from '../../design-currency';
+import { observedNumber, scoreDesignCurrencyBreakdown } from '../runtime';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import { snapshotWorldState, restoreFromSnapshot, hashWorldState, cyrb53 } from '../snapshot';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { BeliefSlice } from '../../types';
 
 function slice(facts: Record<string, number>): BeliefSlice {
   return { agent: { $: 'g:agent' }, visibleFacts: { ...facts }, knownFacts: {}, visibleRefs: [], policyContext: {} };

@@ -11,29 +11,29 @@
  * 或 registry。除本文件外，`src/core/ugc/integration/` 不得再 import `src/l2/**`；对应静态守卫见
  * `integration/__tests__/l2-port-contract.test.ts`。
  */
-import { createL2PortBundle } from '../../../l2/ugc/ports/index.js';
-import type { BaselineSources } from '../baseline/baseline-factory.js';
-import type { CanonicalizationGateway } from '../canonical/canonicalizer.js';
-import type { ProhibitedConstructGate } from '../codec/prohibited-construct-gate.js';
-import type { StructuralJsonDecoder } from '../codec/strict-json-decoder.js';
-import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog.js';
-import type { DiagnosticCodeCatalog } from '../diagnostics/code-catalog.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { createUGCIngressFacade, type UGCIngressFacade } from '../facade/ugc-ingress-facade.js';
-import type { SchemaMigrationCoordinator } from '../migration/schema-migration-coordinator.js';
-import { TARGET_OWNERSHIPS, type TargetOwnership } from '../model/candidate.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import type { TrustedQuotaProfile } from '../model/quota-types.js';
-import type { UpstreamSchemaView } from '../model/upstream.js';
-import type { PresentationFallbackResolver } from '../presentation/fallback-resolver.js';
-import type { RuntimeCompatibilityGateway } from '../ports/definition-ports.js';
-import type { SchemaVersionCatalog } from '../ports/schema-ports.js';
-import { createAtomicActivationCoordinator } from '../activation/atomic-activation-coordinator.js';
-import { createValidationCoordinator } from '../validation/coordinator.js';
+import { createL2PortBundle } from '../../../l2/ugc/ports/index';
+import type { BaselineSources } from '../baseline/baseline-factory';
+import type { CanonicalizationGateway } from '../canonical/canonicalizer';
+import type { ProhibitedConstructGate } from '../codec/prohibited-construct-gate';
+import type { StructuralJsonDecoder } from '../codec/strict-json-decoder';
+import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog';
+import type { DiagnosticCodeCatalog } from '../diagnostics/code-catalog';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { createUGCIngressFacade, type UGCIngressFacade } from '../facade/ugc-ingress-facade';
+import type { SchemaMigrationCoordinator } from '../migration/schema-migration-coordinator';
+import { TARGET_OWNERSHIPS, type TargetOwnership } from '../model/candidate';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import type { TrustedQuotaProfile } from '../model/quota-types';
+import type { UpstreamSchemaView } from '../model/upstream';
+import type { PresentationFallbackResolver } from '../presentation/fallback-resolver';
+import type { RuntimeCompatibilityGateway } from '../ports/definition-ports';
+import type { SchemaVersionCatalog } from '../ports/schema-ports';
+import { createAtomicActivationCoordinator } from '../activation/atomic-activation-coordinator';
+import { createValidationCoordinator } from '../validation/coordinator';
 import {
   assertL2PortBundle,
   type L2PortBundle,
-} from './l2-port-contract.js';
+} from './l2-port-contract';
 
 /**
  * 非基类层端口依赖由可信宿主提供。适配器不为缺失依赖发明默认值，也不复制这些端口的语义。

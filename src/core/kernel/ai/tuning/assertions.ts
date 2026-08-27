@@ -5,8 +5,8 @@
  * AssertionRunner 从 setup 恢复世界 → 跑 facade.act → 取 DecisionTrace → 检查期望 → 产出违规清单。
  * golden 断言作为回归基准，供 RegressionGate 使用。
  */
-import type { DecisionTrace } from './trace.js';
-import type { WorldStateSnapshot } from './snapshot.js';
+import type { DecisionTrace } from './trace';
+import type { WorldStateSnapshot } from './snapshot';
 
 /** 断言期望条目。 */
 export interface ScoreConstraint {

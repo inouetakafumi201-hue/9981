@@ -7,8 +7,8 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadAssertionsJson } from '../assertions.js';
-import type { BehaviorAssertion } from '../assertions.js';
+import { loadAssertionsJson } from '../assertions';
+import type { BehaviorAssertion } from '../assertions';
 
 const here = dirname(fileURLToPath(import.meta.url));
 /** 造断言文件夹（与本测试同位于 tuning/，相对上一级即 tuning/）。 */

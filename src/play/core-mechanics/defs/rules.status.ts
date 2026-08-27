@@ -10,9 +10,9 @@
  *
  * 与 rules.damage.ts 共用 playRule 构造器，保证 priority 等数值归属分类一致。
  */
-import type { RuleDef } from '../../../core/kernel/events/types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import { playRule } from './rules.damage.js';
+import type { RuleDef } from '../../../core/kernel/events/types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import { playRule } from './rules.damage';
 import {
   and,
   atOf,
@@ -35,7 +35,7 @@ import {
   setRequestField,
   subNum,
   varOf,
-} from './expr.js';
+} from './expr';
 import {
   ATT_CONCEALED,
   EVENT_STATUS_APPLY,
@@ -55,7 +55,7 @@ import {
   RULE_STATUS_TICK_DEFAULT,
   TAG_CONCEALED,
   VITALITY_MIN_ALIVE,
-} from './ids.js';
+} from './ids';
 
 const statusTarget = requestField(PATH_REQ_STATUS, REQ_FIELD_TARGET);
 const statusDef = requestField(PATH_REQ_STATUS, REQ_FIELD_STATUS_DEF);

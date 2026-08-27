@@ -1,7 +1,7 @@
 /**
  * L1 State: Value 值域（design.md 3.1节 / 需求1.1、1.4）。
  */
-import { isRef, type Ref } from './ids.js';
+import { isRef, type Ref } from './ids';
 
 export type Value =
   | null

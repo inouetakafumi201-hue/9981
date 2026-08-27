@@ -6,10 +6,10 @@
  * filtered key by key, any published reference must be visible in the viewing
  * belief slice, and diagnostics are reduced to their public form.
  */
-import { toPublicDiagnostic } from './diagnostics.js';
-import type { CostSpec } from '../actions/types.js';
-import type { Ref } from '../state/ids.js';
-import type { AIDecisionResult, AIExplanationNode, AIExplanationProjection, BeliefSlice } from './types.js';
+import { toPublicDiagnostic } from './diagnostics';
+import type { CostSpec } from '../actions/types';
+import type { Ref } from '../state/ids';
+import type { AIDecisionResult, AIExplanationNode, AIExplanationProjection, BeliefSlice } from './types';
 
 /**
  * Play-declared disclosure policy. Omitting it publishes the action identifier

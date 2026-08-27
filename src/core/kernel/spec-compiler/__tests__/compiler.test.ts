@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { ERR_CODES } from '../../state/error-codes.js';
-import { HINT_TEMPLATES } from '../../safety/safety.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
-import type { CompilationRejection } from '../index.js';
+import { ERR_CODES } from '../../state/error-codes';
+import { HINT_TEMPLATES } from '../../safety/safety';
+import { candidate, createHarness, validDocument } from './fixtures';
+import type { CompilationRejection } from '../index';
 
 function rejection(result: Awaited<ReturnType<ReturnType<typeof createHarness>['compiler']['compileAndActivate']>>): CompilationRejection {
   if (result.ok) throw new Error('expected a rejection');

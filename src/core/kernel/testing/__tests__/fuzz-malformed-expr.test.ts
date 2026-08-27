@@ -9,17 +9,17 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import type { Expr } from '../../state/expr-types.js';
-import { DefRegistry } from '../../state/def.js';
-import { createFullHarness, defaultSeedDefs } from '../full-harness.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { createEntityShape } from '../../state/entity.js';
-import type { Ref } from '../../state/ids.js';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import type { Expr } from '../../state/expr-types';
+import { DefRegistry } from '../../state/def';
+import { createFullHarness, defaultSeedDefs } from '../full-harness';
+import { resetIdCounters } from '../../state/ids';
+import { registerPropOps } from '../../ops/prop-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { createEntityShape } from '../../state/entity';
+import type { Ref } from '../../state/ids';
 
 const engine = new ExprEngine();
 

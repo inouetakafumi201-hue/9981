@@ -3,8 +3,8 @@
  * insert:'fixed' 的删除留空洞（undefined）；insert:'shift' 的删除用 splice 语义前移。
  * 这些函数是 slot.add/slot.del/item.move 这些公开 Op 内部调用的纯函数 helper（写入通道情形b）。
  */
-import type { Ref } from '../state/ids.js';
-import type { Container, Slot } from './types.js';
+import type { Ref } from '../state/ids';
+import type { Container, Slot } from './types';
 
 /** 在 fixed 容器中插入槎位：追加到末尾，不移位既有槎位。 */
 export function insertSlotFixed(container: Container, slot: Slot): Container {

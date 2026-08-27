@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileFixture } from '../../__tests__/support/fixtures.js';
+import { profileFixture } from '../../__tests__/support/fixtures';
 import {
   DEFAULT_CEREMONIAL_ACTION_SEMANTICS,
   deriveDecorationVariant,
@@ -8,7 +8,7 @@ import {
   stableHash,
   visibleStableIdFromProjection,
   type CeremonialPresentationMode,
-} from '../ceremonial.js';
+} from '../ceremonial';
 
 const VISIBLE_ID = visibleStableIdFromProjection('visible:e1:event:42');
 

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { insertSlot, removeSlot, findDefaultSlotIndex, setSlotHolds } from '../container.js';
-import { createContainerShape, createSlotShape } from '../types.js';
-import type { Container } from '../types.js';
+import { insertSlot, removeSlot, findDefaultSlotIndex, setSlotHolds } from '../container';
+import { createContainerShape, createSlotShape } from '../types';
+import type { Container } from '../types';
 
 describe('Property 22: 容器索引的插入语义（需求10.4-10.5）', () => {
   it('fixed 容器插入不改变既有槎位索引', () => {

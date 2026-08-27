@@ -6,10 +6,10 @@
  * 以该文档为唯一事实来源；本文件不新增、不删改任何废案判定。
  */
 
-import type { DecisionId, SourceFileId } from '../model/ids.js';
-import type { HumanReadableText } from '../model/ids.js';
-import type { SourceLocation, SourceRecord } from '../model/source.js';
-import { GLOSSARY_FILE } from './decision-catalog.js';
+import type { DecisionId, SourceFileId } from '../model/ids';
+import type { HumanReadableText } from '../model/ids';
+import type { SourceLocation, SourceRecord } from '../model/source';
+import { GLOSSARY_FILE } from './decision-catalog';
 
 export const DEPRECATION_SOURCE_FILE: SourceFileId = GLOSSARY_FILE;
 

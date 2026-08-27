@@ -10,9 +10,9 @@
  * 没有任何"返回空映射"或"返回默认值"的分支。
  */
 
-import type { UiDecisionView, UiResourceView } from '../model/view.js';
-import type { ConvergenceResult } from './convergence.js';
-import type { LegalActionProjection } from './action-query-port.js';
+import type { UiDecisionView, UiResourceView } from '../model/view';
+import type { ConvergenceResult } from './convergence';
+import type { LegalActionProjection } from './action-query-port';
 
 /** 相位/流程语义的只读摘要。UI 只消费它，不复制相位推进规则。 */
 export interface PhaseSemanticProjection {

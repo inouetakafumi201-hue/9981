@@ -16,49 +16,49 @@
  * 纪律：UI 只读语义投影、只发意图，不持状态写入权（D-067 2.1）；`src/ui` 目录内不出现
  * `OpRegistry`/`WorldStateHolder` 标识符（本文件是宿主侧，可以持有它们，但不得把它们暴露进端口）。
  */
-import type { WorldState } from '../../core/kernel/state/world-state.js';
-import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
-import type { QueryEngine } from '../../core/kernel/expr/query-engine.js';
-import type { ExprEngine } from '../../core/kernel/expr/engine.js';
-import type { ActionCatalog } from '../../core/kernel/actions/catalog.js';
-import type { LegalAction } from '../../core/kernel/actions/types.js';
-import type { OpRegistry } from '../../core/kernel/ops/registry.js';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { DefRegistry } from '../../core/kernel/state/def.js';
-import type { CoreMechanicsConfig } from '../core-mechanics/load.js';
-import type { CoreMechanicsProjection } from '../core-mechanics/projection.js';
-import type { CoreMechanicsFacade } from '../core-mechanics/load.js';
-import type { CoreMechanicsRuntime } from '../core-mechanics/load.js';
-import type { TerminalQuery } from '../core-mechanics/match-lifecycle.js';
-import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
-import { makeGameplayValue } from '../../ui/presentation/gameplay-value.js';
+import type { WorldState } from '../../core/kernel/state/world-state';
+import type { WorldStateHolder } from '../../core/kernel/ops/transaction';
+import type { QueryEngine } from '../../core/kernel/expr/query-engine';
+import type { ExprEngine } from '../../core/kernel/expr/engine';
+import type { ActionCatalog } from '../../core/kernel/actions/catalog';
+import type { LegalAction } from '../../core/kernel/actions/types';
+import type { OpRegistry } from '../../core/kernel/ops/registry';
+import type { Value } from '../../core/kernel/state/value';
+import type { DefRegistry } from '../../core/kernel/state/def';
+import type { CoreMechanicsConfig } from '../core-mechanics/load';
+import type { CoreMechanicsProjection } from '../core-mechanics/projection';
+import type { CoreMechanicsFacade } from '../core-mechanics/load';
+import type { CoreMechanicsRuntime } from '../core-mechanics/load';
+import type { TerminalQuery } from '../core-mechanics/match-lifecycle';
+import type { Diagnostic } from '../../core/kernel/state/diagnostic';
+import { makeGameplayValue } from '../../ui/presentation/gameplay-value';
 
-import type { UiSystemPorts } from '../../ui/index.js';
-import type { ProjectionPort, ProjectionRequest, DescriptorRequest } from '../../ui/ports/projection-port.js';
-import type { ProjectionOutcome, DescriptorOutcome } from '../../ui/ports/projection-port.js';
-import type { ActionQueryPort, ActorRef, ScopedQuerySpec } from '../../ui/ports/action-query-port.js';
-import type { LegalActionQueryOutcome, ScopedQueryOutcome, LegalActionProjection } from '../../ui/ports/action-query-port.js';
-import type { EventPort, RawGatewayEvent } from '../../ui/ports/event-port.js';
-import type { RevisionPort } from '../../ui/ports/revision-port.js';
-import type { ActionPort, SubmissionOutcome } from '../../ui/ports/action-port.js';
-import type { PendingContractPorts, CoreCapabilityPort, SpaceItemsCapabilityPort, AiCapabilityPort } from '../../ui/ports/pending-contracts.js';
-import type { PhaseSemanticProjection } from '../../ui/ports/pending-contracts.js';
-import type { InteractionIntent } from '../../ui/model/intent.js';
-import type { StateRevision } from '../../ui/model/revision.js';
-import { makeRevision } from '../../ui/model/revision.js';
-import { uiOk, uiDiagnostic, UI_DIAGNOSTIC_CODES } from '../../ui/model/diagnostic.js';
-import { converged, pendingConvergence } from '../../ui/ports/convergence.js';
-import type { UiResourceView, UiDecisionView, UiBinding } from '../../ui/model/view.js';
-import type { ResourceSemanticRole, ActionCostCategory } from '../../l2/model/family-contracts.js';
-import type { RuntimeSemanticState, AuthorizationScope } from '../../l2/model/projection.js';
-import { createProjection as createL2Projection } from '../../l2/registry/read-only-projection.js';
-import type { KernelContract } from '../../l2/kernel/kernel-contract.js';
-import type { ActiveRegistry } from '../../l2/registry/definition-registry.js';
-import { submit as l2Submit } from '../../l2/registry/action-submitter.js';
-import { createScopedQueryRunner } from '../../ui/projection/scope-filter.js';
-import { createScopeFilteredEventPort } from '../../ui/projection/scope-filter.js';
-import { createDiagnosticSink } from '../../ui/diagnostics/sink.js';
-import { createAuthorizedAgent, type AuthorizedAgent } from '../../ui/model/view.js';
+import type { UiSystemPorts } from '../../ui/index';
+import type { ProjectionPort, ProjectionRequest, DescriptorRequest } from '../../ui/ports/projection-port';
+import type { ProjectionOutcome, DescriptorOutcome } from '../../ui/ports/projection-port';
+import type { ActionQueryPort, ActorRef, ScopedQuerySpec } from '../../ui/ports/action-query-port';
+import type { LegalActionQueryOutcome, ScopedQueryOutcome, LegalActionProjection } from '../../ui/ports/action-query-port';
+import type { EventPort, RawGatewayEvent } from '../../ui/ports/event-port';
+import type { RevisionPort } from '../../ui/ports/revision-port';
+import type { ActionPort, SubmissionOutcome } from '../../ui/ports/action-port';
+import type { PendingContractPorts, CoreCapabilityPort, SpaceItemsCapabilityPort, AiCapabilityPort } from '../../ui/ports/pending-contracts';
+import type { PhaseSemanticProjection } from '../../ui/ports/pending-contracts';
+import type { InteractionIntent } from '../../ui/model/intent';
+import type { StateRevision } from '../../ui/model/revision';
+import { makeRevision } from '../../ui/model/revision';
+import { uiOk, uiDiagnostic, UI_DIAGNOSTIC_CODES } from '../../ui/model/diagnostic';
+import { converged, pendingConvergence } from '../../ui/ports/convergence';
+import type { UiResourceView, UiDecisionView, UiBinding } from '../../ui/model/view';
+import type { ResourceSemanticRole, ActionCostCategory } from '../../l2/model/family-contracts';
+import type { RuntimeSemanticState, AuthorizationScope } from '../../l2/model/projection';
+import { createProjection as createL2Projection } from '../../l2/registry/read-only-projection';
+import type { KernelContract } from '../../l2/kernel/kernel-contract';
+import type { ActiveRegistry } from '../../l2/registry/definition-registry';
+import { submit as l2Submit } from '../../l2/registry/action-submitter';
+import { createScopedQueryRunner } from '../../ui/projection/scope-filter';
+import { createScopeFilteredEventPort } from '../../ui/projection/scope-filter';
+import { createDiagnosticSink } from '../../ui/diagnostics/sink';
+import { createAuthorizedAgent, type AuthorizedAgent } from '../../ui/model/view';
 
 /** 语义状态投影源：由组合根把真实 WorldState 投影为 L2 `RuntimeSemanticState`。 */
 export type RuntimeStateProjector = (state: WorldState) => RuntimeSemanticState;
@@ -82,8 +82,10 @@ export interface UiHostDeps {
   readonly playerEntityIds: readonly string[];
   /** 语义状态投影（L2 `RuntimeSemanticState` 形状；缺省投影为最小只读视图）。 */
   readonly projectRuntimeState: RuntimeStateProjector;
-  /** 事件广播：组合根在每次引擎事件到来时调用（type + payload）；宿主侧按 RawGatewayEvent 收窄。 */
-  readonly dispatchEvent: (type: string, payload: Record<string, Value>) => void;
+  /** 事件广播（可变封装）：组合根把外壳语义事件经 `eventSink.dispatch(type, payload)` 投递进来；
+   *  宿主侧把该实现替换为「先经 rawSource 收窄、再转发给 gateway」的包装（见下），使 UI 事件端口
+   *  与 broadcastShell 读到同一已转正出口。 */
+  readonly eventSink: { dispatch: (type: string, payload: Record<string, Value>) => void };
 }
 
 /** 阶段语义摘要（核心机制五阶段）。 */
@@ -126,10 +128,17 @@ function resourceViewsOf(
 function legalActionViews(actions: readonly LegalAction[]): readonly LegalActionProjection[] {
   const views: LegalActionProjection[] = [];
   for (const action of actions) {
-    const bindings: UiBinding[] = Object.entries(action.bindings).map(([key, value]) => ({
-      key,
-      value: typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string' ? value : String((value as { $?: unknown })?.$ ?? ''),
-    }));
+    const bindings: UiBinding[] = Object.entries(action.bindings).map(([key, value]) => {
+      // Ref 形式：{ $: 'n:map-a' } → 直接保留；否则用字面值
+      if (typeof value === 'object' && value !== null && !Array.isArray(value) && '$' in value) {
+        const ref = value as { $?: unknown }
+        return { key, value: { $: typeof ref.$ === 'string' ? ref.$ : String(ref.$ ?? '') } }
+      }
+      if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string') {
+        return { key, value }
+      }
+      return { key, value: String(value) }
+    });
     views.push({
       actionId: action.action,
       bindings,
@@ -212,21 +221,25 @@ export function createUiHostPorts(deps: UiHostDeps): UiSystemPorts {
         paidActions: paidActions.map((a) => ({
           actionId: a.action,
           costCategory: 'paid' as const,
+          // 双轨制 P3：装载运行时直接给 track/cardPresentation 兜底（P3 数据填充范围）。
+          track: 'card' as const,
           accessibleLabel: a.action,
           assetRefs: Object.freeze([]) as readonly string[],
-          targets: Object.freeze([]) as readonly import('../../l2/model/projection.js').TargetDescriptor[],
+          targets: Object.freeze([]) as readonly import('../../l2/model/projection').TargetDescriptor[],
           available: true,
         })),
         attachedActions: attachedActions.map((a) => ({
           actionId: a.action,
           costCategory: 'attached' as const,
+          // 双轨制 P3：附着动作与父付费动作同属卡片轨。
+          track: 'card' as const,
           accessibleLabel: a.action,
           assetRefs: Object.freeze([]) as readonly string[],
-          targets: Object.freeze([]) as readonly import('../../l2/model/projection.js').TargetDescriptor[],
+          targets: Object.freeze([]) as readonly import('../../l2/model/projection').TargetDescriptor[],
           available: true,
         })),
-        provenanceLabels: Object.freeze([]) as readonly import('../../l2/model/projection.js').ProvenanceLabel[],
-        warnings: Object.freeze([]) as readonly import('../../l2/model/diagnostic.js').Diagnostic[],
+        provenanceLabels: Object.freeze([]) as readonly import('../../l2/model/projection').ProvenanceLabel[],
+        warnings: Object.freeze([]) as readonly import('../../l2/model/diagnostic').Diagnostic[],
       });
       return uiOk(
         Object.freeze({ descriptor, revision: currentRevision() }),
@@ -236,10 +249,11 @@ export function createUiHostPorts(deps: UiHostDeps): UiSystemPorts {
   };
 
   // ---- events 端口：宿主事件广播 → 收窄为 RuleEventProjection ----
-  // 组合根把引擎事件（PresentationGateway 语义：subscribe('*') 收到全部 after:* 事件）经
-  // `deps.dispatchEvent` 转发进来；宿主侧把事件按 RawGatewayEvent 形状收窄后交给 scope-filter。
-  // `dispatchEvent` 的签名是 (type, payload)：这里把它适配为 RawEventSource.subscribe(listener)
-  // 的语义——订阅即登记一个回调，组合根在每次引擎事件到来时调用它（见下方 `dispatch`）。
+  // 组合根把引擎事件（外壳语义事件：match.round / match.ended）经 `eventSink.dispatch` 投递进来；
+  // 宿主侧把事件按 RawGatewayEvent 形状收窄后交给 scope-filter。事件的分配是订阅（listener 注册）
+  // 与投递（dispatch）解耦：UI 订阅者经 rawSource 收到事件；host 把 `eventSink.dispatch` 替换为
+  // 「先进入 rawSource（scope-filter 收窄后交给 UI 监听者），再转发给组合根的原始实现（gateway
+  // 订阅者照常收到）」。UI 事件端口因此订阅的是组合根唯一的事件出口，不是第二条投递路径。
   const rawSourceListeners = new Set<(event: RawGatewayEvent) => void>();
   const rawSource = {
     subscribe(listener: (event: RawGatewayEvent) => void): { unsubscribe: () => void } {
@@ -251,17 +265,15 @@ export function createUiHostPorts(deps: UiHostDeps): UiSystemPorts {
       };
     },
   };
-  const dispatch = (type: string, payload: Record<string, Value>): void => {
+  const upstreamDispatch = deps.eventSink.dispatch;
+  deps.eventSink.dispatch = (type: string, payload: Record<string, Value>): void => {
     const sequence = typeof (payload as Record<string, unknown>)['__seq'] === 'number'
       ? (payload as Record<string, unknown>)['__seq'] as number
       : deps.holder.getState().world.logSeq;
     const raw: RawGatewayEvent = { type, sequence, payload };
     for (const listener of [...rawSourceListeners]) listener(raw);
+    upstreamDispatch(type, payload);
   };
-  // 宿主事件广播转发：组合根把引擎事件接进 `dispatch`（`deps.dispatchEvent` 是只读的，这里
-  // 把组合根侧的事件投递动作与 UI 端口订阅解耦——组合根调用 `dispatch` 即完成一次事件投递）。
-  void deps.dispatchEvent;
-  void dispatch;
   const eventsPort: EventPort = createScopeFilteredEventPort(rawSource, {
     scope,
     rules: Object.freeze([]),
@@ -341,7 +353,7 @@ export function createUiHostPorts(deps: UiHostDeps): UiSystemPorts {
           actionId: request.actionId,
           actorId: request.actorId,
           targetIds: request.targetIds,
-          parameters: request.parameters as Record<string, import('../../l2/model/json.js').JsonValue>,
+          parameters: request.parameters as Record<string, import('../../l2/model/json').JsonValue>,
         },
         caller: {
           callerId: 'ui:host',
@@ -352,7 +364,7 @@ export function createUiHostPorts(deps: UiHostDeps): UiSystemPorts {
       if (submitted.rejected) {
         const rejection = {
           rejected: true as const,
-          diagnostics: Object.freeze(submitted.diagnostics.map((d: import('../../l2/model/diagnostic.js').Diagnostic) =>
+          diagnostics: Object.freeze(submitted.diagnostics.map((d: import('../../l2/model/diagnostic').Diagnostic) =>
             uiDiagnostic({
               code: (d.code as string) in UI_DIAGNOSTIC_CODES ? (d.code as keyof typeof UI_DIAGNOSTIC_CODES) : UI_DIAGNOSTIC_CODES.PRESENTATION_RESOURCE_FAILED,
               presentationLocation: 'ports/action-port',

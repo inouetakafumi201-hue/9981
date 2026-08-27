@@ -1,6 +1,6 @@
 /** Candidate planning constrained to a single AIReadScope. */
-import { FixedBudgetLedger } from './budget.js';
-import type { LegalAction } from '../actions/types.js';
+import { FixedBudgetLedger } from './budget';
+import type { LegalAction } from '../actions/types';
 import type {
   AIDecisionRequest,
   AIPlan,
@@ -11,7 +11,7 @@ import type {
   CandidateSeed,
   SemanticIntent,
   ValidatedAIBehaviorBinding,
-} from './types.js';
+} from './types';
 
 export type SemanticIntentOrganizer = (
   candidates: readonly LegalAction[],

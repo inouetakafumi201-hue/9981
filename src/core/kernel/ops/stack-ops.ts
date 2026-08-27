@@ -2,13 +2,13 @@
  * L3 Ops: stack.split / stack.merge 原子性（design.md 3.4节 / 需求17.1-17.5）。
  * 单事务内"扣减-创建-放置"三步，任一步失败整体回滚（不落地不吞掉）。
  */
-import type { OpImpl } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import { setSlotHolds } from '../topology/container.js';
-import type { ItemMoveArgs } from './structural-ops.js';
+import type { OpImpl } from './registry';
+import type { OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id } from '../state/ids';
+import { nextId } from '../state/ids';
+import { setSlotHolds } from '../topology/container';
+import type { ItemMoveArgs } from './structural-ops';
 
 export interface StackSplitArgs {
   id: Id;

@@ -11,8 +11,8 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createFullHarness } from '../../core/kernel/testing/full-harness.js';
-import { parseClassJson, parseStrictDataJson } from '../catalog-loader.js';
+import { createFullHarness } from '../../core/kernel/testing/full-harness';
+import { parseClassJson, parseStrictDataJson } from '../catalog-loader';
 import {
   CATALOG_DIRS,
   CLASS_ROOT,
@@ -20,13 +20,13 @@ import {
   catalogText,
   classJsonFiles,
   classSourceId,
-} from './catalog-fixtures.js';
+} from './catalog-fixtures';
 
 export {
   CATALOG_DIRS,
   UNIFORM_CATALOG_DIRS,
   classJsonFiles,
-} from './catalog-fixtures.js';
+} from './catalog-fixtures';
 
 /** 目录一个能力/类声明的 Op 名引用（规范化后，供机械比对）。 */
 export interface OpNameUse {

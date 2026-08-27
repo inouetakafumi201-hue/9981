@@ -8,10 +8,10 @@
  * 内核不对结局赋予语义，只忠实记录事实，由玩法包的 OutcomeDef.onReach Effect 或宿主运行时
  * 决定如何处理这个事实。详见本文件内 outcomeReach 函数上的判断记录。
  */
-import type { OpImpl, OpRegistry } from './registry.js';
-import { ok } from './result.js';
-import type { Ref } from '../state/ids.js';
-import type { Value } from '../state/value.js';
+import type { OpImpl, OpRegistry } from './registry';
+import { ok } from './result';
+import type { Ref } from '../state/ids';
+import type { Value } from '../state/value';
 
 export interface OutcomeReachArgs {
   outcomeName: string;
@@ -41,7 +41,7 @@ interface OutcomeReachRecord {
  */
 export const outcomeReach: OpImpl<OutcomeReachArgs, void> = (args, ctx) => {
   const draft = ctx.tx.getDraft();
-  const existingOutcomes = (draft.world.props['outcomes'] as Record<string, OutcomeReachRecord[]> | undefined) ?? {};
+  const existingOutcomes = (draft.world.props['outcomes'] as unknown as Record<string, OutcomeReachRecord[]> | undefined) ?? {};
   const existingList = existingOutcomes[args.outcomeName] ?? [];
 
   // 幂等：同一 scope 对同一 outcomeName 重复调用不追加第二条记录（不存在的静默重复没有意义，

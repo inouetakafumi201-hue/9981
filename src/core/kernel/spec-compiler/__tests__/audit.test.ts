@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { INFRASTRUCTURE_FATAL_CODES, isInfrastructureFatalCode } from '../../state/error-codes.js';
-import { sourcePointAtByteOffset, sourcePointAtCharIndex, validateSourceRecord, createSourceRecord } from '../../state/source-record.js';
-import { candidate, createHarness } from './fixtures.js';
+import { INFRASTRUCTURE_FATAL_CODES, isInfrastructureFatalCode } from '../../state/error-codes';
+import { sourcePointAtByteOffset, sourcePointAtCharIndex, validateSourceRecord, createSourceRecord } from '../../state/source-record';
+import { candidate, createHarness } from './fixtures';
 
 /**
  * Reverse audit: each case is an attempt to find a silent-pass hole, not a demonstration

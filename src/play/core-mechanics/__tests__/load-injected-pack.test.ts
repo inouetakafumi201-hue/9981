@@ -13,24 +13,24 @@
  * 都来自注入包，而不是源码特权的默认包。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { resetIdCounters } from '../../../core/kernel/state/ids.js';
-import { setPath } from '../../../core/kernel/ops/path.js';
-import { createEmptyWorldState, type WorldState } from '../../../core/kernel/state/world-state.js';
-import { createEntityShape } from '../../../core/kernel/state/entity.js';
-import { createAgentShape } from '../../../core/kernel/state/agent.js';
-import { createContainerShape, createSlotShape, createNodeShape } from '../../../core/kernel/topology/types.js';
-import { createFullHarness } from '../../../core/kernel/testing/full-harness.js';
-import { ActionCatalog } from '../../../core/kernel/actions/catalog.js';
-import type { ActionDef } from '../../../core/kernel/actions/types.js';
-import type { PlaypackDef } from '../../../core/kernel/schedule/playpack.js';
-import { loadCoreMechanics, CoreMechanicsFacade, type CoreMechanicsLoadOptions } from '../load.js';
-import { officialCoreMechanicsConfig, ATTACK_DAMAGE_VALUE } from './official-state-machine-config.js';
-import { createLoadedCoreMechanics } from './state-machine-load-driver.js';
-import { attackAction } from '../defs/actions.paid.js';
-import { phaseSettleRule } from '../defs/rules.phase.js';
-import { coreSchedule } from '../defs/schedule.js';
-import { CORE_ATTACHED_ACTIONS, CORE_ATTACHED_INVOKE_RULES } from '../defs/actions.attached.js';
-import { deathBagEntityDef } from '../defs/playpack.js';
+import { resetIdCounters } from '../../../core/kernel/state/ids';
+import { setPath } from '../../../core/kernel/ops/path';
+import { createEmptyWorldState, type WorldState } from '../../../core/kernel/state/world-state';
+import { createEntityShape } from '../../../core/kernel/state/entity';
+import { createAgentShape } from '../../../core/kernel/state/agent';
+import { createContainerShape, createSlotShape, createNodeShape } from '../../../core/kernel/topology/types';
+import { createFullHarness } from '../../../core/kernel/testing/full-harness';
+import { ActionCatalog } from '../../../core/kernel/actions/catalog';
+import type { ActionDef } from '../../../core/kernel/actions/types';
+import type { PlaypackDef } from '../../../core/kernel/schedule/playpack';
+import { loadCoreMechanics, CoreMechanicsFacade, type CoreMechanicsLoadOptions } from '../load';
+import { officialCoreMechanicsConfig, ATTACK_DAMAGE_VALUE } from './official-state-machine-config';
+import { createLoadedCoreMechanics } from './state-machine-load-driver';
+import { attackAction } from '../defs/actions.paid';
+import { phaseSettleRule } from '../defs/rules.phase';
+import { coreSchedule } from '../defs/schedule';
+import { CORE_ATTACHED_ACTIONS, CORE_ATTACHED_INVOKE_RULES } from '../defs/actions.attached';
+import { deathBagEntityDef } from '../defs/playpack';
 import {
   ACT_ATTACK,
   ACT_DROP_ITEM,
@@ -42,10 +42,8 @@ import {
   SCHEDULE_ID,
   STAMINA_MAX,
   TAG_ROLL_PARTICIPANT,
-} from '../defs/ids.js';
-import type { WorldStateHolder } from '../../../core/kernel/ops/transaction.js';
-import type { Value } from '../../../core/kernel/state/value.js';
-import type { EvalContext } from '../../../core/kernel/expr/engine.js';
+} from '../defs/ids';
+import type { WorldStateHolder } from '../../../core/kernel/ops/transaction';
 
 // ---------------------------------------------------------------------------
 // 注入包组装（只读使用 defs/*.ts 的导出，不改其内容）
@@ -90,9 +88,7 @@ function harnessRuntime(harness: ReturnType<typeof createFullHarness>): CoreMech
     getState: () => harness.holder.getState(),
     exprEngine: harness.exprEngine,
     queryEngine: harness.queryEngine,
-    ctxForActor: ((actor) => harness.ctxForSelf(actor)) as (
-      actor: { $: string }, bindings: Record<string, Value>,
-    ) => EvalContext,
+    ctxForActor: (actor, bindings) => harness.ctxForSelf(actor, bindings),
     listActionDefs: () => harness.defRegistry.allResolved()
       .filter((definition): definition is ActionDef => definition.kind === 'action') as ActionDef[],
   });

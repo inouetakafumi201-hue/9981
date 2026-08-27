@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { SourceRecord } from '../state/diagnostic.js';
+import type { SourceRecord } from '../state/diagnostic';
 import type {
   CandidateMigration,
   CanonicalSnapshot,
@@ -9,10 +9,10 @@ import type {
   ResolvedDefinition,
   SchemaVersion,
   ValidationBaseline,
-} from './types.js';
-import { canonicalStringify, compareCodePoints } from './json-codec.js';
-import { assertSchemaNumericContract } from './numeric-classification.js';
-import { modelToJson } from './model-json.js';
+} from './types';
+import { canonicalStringify, compareCodePoints } from './json-codec';
+import { assertSchemaNumericContract } from './numeric-classification';
+import { modelToJson } from './model-json';
 
 export class SchemaRegistry {
   private readonly versions = new Map<string, SchemaVersion>();

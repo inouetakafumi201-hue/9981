@@ -11,17 +11,17 @@
  * 提交只调用 `activateAtomically` **一次**。UGC 不执行 Op、不写 WorldState、不注册 Hook、
  * 不推进迁移、不写宿主持久化（需求 13.9）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { computeChangeRequestFingerprint } from '../model/binding.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import type { ActivationResult } from '../model/report.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
-import type { BaselineSources } from '../baseline/baseline-factory.js';
-import { recheckBaseline } from '../baseline/baseline-factory.js';
-import type { DefinitionRegistryGateway } from '../ports/definition-ports.js';
-import { isMintedValidatedChangeSet } from './validated-change-set.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { computeChangeRequestFingerprint } from '../model/binding';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import type { ActivationResult } from '../model/report';
+import type { ValidationBaseline } from '../model/baseline';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
+import type { BaselineSources } from '../baseline/baseline-factory';
+import { recheckBaseline } from '../baseline/baseline-factory';
+import type { DefinitionRegistryGateway } from '../ports/definition-ports';
+import { isMintedValidatedChangeSet } from './validated-change-set';
 
 const STAGE = 'activation-precheck' as const;
 

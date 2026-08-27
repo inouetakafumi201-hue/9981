@@ -2,13 +2,13 @@
  * 任务 3.1 验收测试：配额档案校验（无默认值）、单调预算、溢出安全、越界饱和、深度峰值计量。
  */
 import { describe, expect, it } from 'vitest';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import type { TrustedQuotaProfile } from '../../model/quota-types.js';
-import { inspectQuotaProfile, validateQuotaProfile } from '../quota-profile.js';
-import { DepthTracker, QuotaUsageError, createQuotaBudget } from '../quota-budget.js';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import type { TrustedQuotaProfile } from '../../model/quota-types';
+import { inspectQuotaProfile, validateQuotaProfile } from '../quota-profile';
+import { DepthTracker, QuotaUsageError, createQuotaBudget } from '../quota-budget';
 
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 

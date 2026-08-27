@@ -2,18 +2,18 @@
  * L8 Attachment Ops: attach.add / attach.del / attach.expire.
  * Four stack strategies and lifecycle effects execute inside the caller's transaction.
  */
-import type { OpContext, OpImpl, OpRegistry } from '../ops/registry.js';
-import type { Result } from '../ops/result.js';
-import { ok, err } from '../ops/result.js';
-import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Attachment } from '../state/attachment.js';
-import { cascadeRemovalSet } from '../state/attachment.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
-import type { AttachmentDef } from './types.js';
-import { checkInstantiable } from '../ops/def-guard.js';
+import type { OpContext, OpImpl, OpRegistry } from '../ops/registry';
+import type { Result } from '../ops/result';
+import { ok, err } from '../ops/result';
+import type { Id, Ref } from '../state/ids';
+import { nextId } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Attachment } from '../state/attachment';
+import { cascadeRemovalSet } from '../state/attachment';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
+import type { AttachmentDef } from './types';
+import { checkInstantiable } from '../ops/def-guard';
 
 export interface AttachAddArgs {
   def: Id;

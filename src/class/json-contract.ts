@@ -9,7 +9,7 @@
  * 也不允许静默降级或猜测缺失语义。
  */
 
-import type { JsonValue } from '../core/kernel/spec-compiler/types.js';
+import type { JsonValue } from '../core/kernel/spec-compiler/types';
 
 export class ClassCatalogContractError extends Error {
   constructor(

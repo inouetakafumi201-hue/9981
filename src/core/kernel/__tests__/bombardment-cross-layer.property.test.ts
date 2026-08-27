@@ -13,12 +13,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { createFullHarness, defaultSeedDefs } from '../testing/full-harness.js';
-import { runOpSequence } from '../testing/op-sequence-driver.js';
-import { opSequenceArb } from '../testing/op-sequence-arbitrary.js';
-import { InvariantChecker } from '../ops/invariants.js';
-import { resetIdCounters } from '../state/ids.js';
-import { sweepAllOps, GARBAGE_ARGS_EXT } from './bombardment-fixtures.js';
+import { createFullHarness, defaultSeedDefs } from '../testing/full-harness';
+import { runOpSequence } from '../testing/op-sequence-driver';
+import { opSequenceArb } from '../testing/op-sequence-arbitrary';
+import { InvariantChecker } from '../ops/invariants';
+import { resetIdCounters } from '../state/ids';
+import { sweepAllOps, GARBAGE_ARGS_EXT } from './bombardment-fixtures';
 
 const invariantChecker = new InvariantChecker();
 

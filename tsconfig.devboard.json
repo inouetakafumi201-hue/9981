@@ -4,6 +4,11 @@
   // 由 `npm run typecheck:devboard` 运行；不替代 tsconfig.json 的全域 typecheck。
   "extends": "./tsconfig.json",
   "compileOnSave": true,
+  // 开发板与 Vite 壳层使用与根项目一致的严格索引检查，避免独立门禁掩盖
+  // editor-shell 的数组/Map 可选值问题。壳层代码必须通过真实 guard 收敛 undefined。
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true
+  },
   "include": [
     "src/devboard",
     "src/play/map",

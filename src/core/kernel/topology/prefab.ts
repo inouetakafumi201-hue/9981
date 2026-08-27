@@ -3,9 +3,9 @@
  * prefab.spawn/prefab.despawn 作为公开 Op 在 L3 注册；本文件提供纯函数的 key 重映射与
  * 预制结构展开计算逻辑，供那两个 Op 的实现内部调用。
  */
-import type { Id } from '../state/ids.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
+import type { Id } from '../state/ids';
+import type { Expr } from '../state/expr-types';
+import type { Def } from '../state/def';
 
 export interface PrefabDef extends Def {
   readonly kind: 'prefab';

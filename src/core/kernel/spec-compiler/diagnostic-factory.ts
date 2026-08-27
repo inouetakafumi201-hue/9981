@@ -1,16 +1,16 @@
-import type { ErrCode } from '../state/error-codes.js';
-import { isInfrastructureFatalCode } from '../state/error-codes.js';
+import type { ErrCode } from '../state/error-codes';
+import { isInfrastructureFatalCode } from '../state/error-codes';
 import type {
   CompilationStage,
   Diagnostic,
   DiagnosticArgument,
   SourceRecord,
-} from '../state/diagnostic.js';
-import { validateSourceRecord } from '../state/source-record.js';
-import type { FatalErrorBoundary } from '../safety/fatal-boundary.js';
-import { compareCodePoints } from './json-codec.js';
-import { ZH_CN_CREATOR_BUNDLE, renderCreatorMessage, renderGuidance } from './messages.js';
-import type { CreatorMessageBundle } from './messages.js';
+} from '../state/diagnostic';
+import { validateSourceRecord } from '../state/source-record';
+import type { FatalErrorBoundary } from '../safety/fatal-boundary';
+import { compareCodePoints } from './json-codec';
+import { ZH_CN_CREATOR_BUNDLE, renderCreatorMessage, renderGuidance } from './messages';
+import type { CreatorMessageBundle } from './messages';
 
 export interface DiagnosticBuildInput {
   readonly code: ErrCode;

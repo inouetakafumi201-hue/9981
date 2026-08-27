@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "motionRecipes": {
+    "motion.standard-hop": { "durationMs": 600, "arcHeightRatio": 0.25, "rotationAmplitude": 30, "squashOnImpact": 0.35, "returnOvershoot": 0.15, "easing": "easeOutCubic", "footLiftOffRatio": 0.12, "dustParticleCount": 4, "dustOpacity": 0.4, "frameSwitchThreshold": 15, "frameIn": "07-jump_forward", "frameOut": "08-jump_backward", "fallback": "animation:move:procedural-hop" },
+    "motion.heavy-hop": { "durationMs": 960, "arcHeightRatio": 0.15, "rotationAmplitude": 20, "squashOnImpact": 0.45, "returnOvershoot": 0.2, "easing": "easeOutBackoffCubic", "footLiftOffRatio": 0.05, "peakSquatRatio": 0.94, "dustParticleCount": 6, "dustOpacity": 0.6, "frameSwitchThreshold": 15, "frameIn": "03-lean-fwd-tired", "fallback": "animation:move:heavy-hop" },
+    "motion.light-hop": { "durationMs": 420, "arcHeightRatio": 0.35, "rotationAmplitude": 35, "squashOnImpact": 0.3, "returnOvershoot": 0.12, "easing": "easeOutCubic", "dustParticleCount": 8, "frameSwitchThreshold": 15, "frameIn": "07-jump_forward", "fallback": "animation:move:dash-hop" },
+    "motion.stumble-hop": { "durationMs": 750, "arcHeightRatio": 0.1, "rotationAmplitude": 10, "squashOnImpact": 0.25, "easing": "easeInOutBack", "frameSwitchThreshold": 15, "frameIn": "05-weak-lean-fwd", "fallback": "animation:move:stumble-hop" },
+    "motion.crouch-toggle": { "durationMs": 180, "scaleY": 0.7, "frame": "10-crouch", "fallback": "scaleY-0.7" },
+    "motion.hit-recoil": { "durationMs": 400, "aftermathDist": 12, "frame": "09-hit_recoil", "squashOnImpact": 0.35, "fallback": "animation:hit:recoil" },
+    "motion.squash-only": { "durationMs": 150, "squashRatio": 0.6, "returnRatio": 0.35, "fallback": "scaleY" },
+    "motion.crawl": { "durationMs": 600, "arcHeightRatio": 0.05, "dragParticle": true, "dragParticleCount": 3, "frameA": "13-crawl_extend", "frameB": "14-crawl_compress", "bounceSpeed": 2, "fallback": "animation:move:crawl" },
+    "motion.fall-down": { "durationMs": 600, "arcHeightRatio": 0.3, "rotationAmplitude": 90, "frameIn": "12-falling", "frameOut": "11-prone", "dustParticleCount": 10, "easing": "easeInCubic", "fallback": "animation:move:fall-down" },
+    "hit.feedback": { "durationMs": 250, "squashOnImpact": 0.35, "aftermathDist": 12, "aftermathDur": 400, "frameIn": "09-hit_recoil", "blinkDuration": 200, "blinkColor": "#FF4444", "blinkCount": 1, "particleType": "hit-particel", "particleCount": 1, "fallback": "animation:hit:recoil" },
+    "hit.stagger": { "durationMs": 400, "rotationAmplitude": -15, "squashOnImpact": 0.15, "frameIn": "09-hit_recoil", "fallback": "animation:hit:stagger" },
+    "pose.crouch": { "durationMs": 200, "scaleY": 0.7, "frameIn": "10-crouch", "frameOut": "02-idle", "abortMode": "clear-progress-on-hit", "fallback": "scaleY-0.7" },
+    "pose.getUp": { "durationMs": 600, "frameIn": "16-get_up_mid", "frameOut": "02-idle", "easing": "easeOutBack", "fallback": "translateY-0" },
+    "pose.sleep": { "durationMs": null, "frameId": "15-sleep", "headBobAmplitude": 3, "headBobFrequency": 0.5, "zIconVisible": true, "fallback": "static-sleep-icon" },
+    "combat.melee-attack": { "durationMs": 800, "rushDurationMs": 300, "rushArcRatio": 0.3, "attackAngle": -10, "weaponSwingType": "hammer", "hitFrame": "09-hit_recoil", "particle": "hit-particle", "particleCount": 1, "recoveryDuration": 200, "frameIn": "jump_forward", "recoveryFrame": "lean-fwd-tired", "fullSwingCurve": "easeInOutBack", "fallback": "combat:melee" },
+    "combat.melee-puncture": { "durationMs": 600, "extensionRatio": 0.25, "retractionRatio": 0.25, "frameIn": "none", "fallback": "translateX" },
+    "combat.melee-sweep": { "durationMs": 900, "arcAngle": 60, "frameIn": "none", "particle": "hit-particle", "fallback": "rotationZ" },
+    "ranged.recoil-handgun": { "durationMs": 150, "recoilDistance": 5, "recoilAmplitude": 5, "fireParticle": "muzzle-flame", "fireParticleCount": 1, "weaponShake": 2, "frameIn": "none", "fallback": "translateY+opacity" },
+    "ranged.recoil-rifle": { "durationMs": 300, "recoilAmplitude": 8, "fireParticleCount": 3, "weaponShake": 4, "frameIn": "none", "fallback": "translateY+opacity" },
+    "ranged.scattergun": { "durationMs": 200, "particleScatter": true, "particleShape": "sector", "particleAngle": 60, "particleCount": 15, "fallback": "circle-particle" },
+    "ranged.burst": { "durationMs": 500, "recoilOscillate": 3, "fireParticlePattern": "line", "hitParticleChain": true, "frameIn": "none", "fallback": "translateY" },
+    "interaction.pickup": { "durationMs": 200, "itemLiftHeight": 0.2, "itemScale": 1.1, "itemDropDust": true, "frameIn": "lean-fwd-tired", "fallback": "translateY" },
+    "interaction.throw": { "durationMs": 300, "trajectoryType": "parabola", "rotationCount": 2, "impactSquash": 0.3, "dustParticleCount": 3, "fallback": "translate" },
+    "interaction.use-consumable": { "durationMs": 400, "scaleTo": 0, "duration": 0.4, "easing": "easeInCubic", "glowOnUse": true, "glowColor": "#00FF00", "fallback": "opacity -> 0" },
+    "interaction.reload": { "durationMs": 300, "barrelTilt": -30, "shakeCount": 2, "shakeAmplitude": 5, "magazineFly": true, "magazineFlyDistance": 30, "frameIn": "none", "fallback": "rotate + opacity" },
+    "interaction.lock-pick": { "durationMs": 1800, "lockSwingAmplitude": 2, "lockSwingFrequency": 2, "progressBarColor": "#FFA500", "successFlash": true, "interruptReturn": "easeOutQuad", "fallback": "rotate" },
+    "interaction.open-door": { "durationMs": 400, "rotationAxis": "y", "rotationEnd": 90, "handleShake": true, "easing": "easeOutCubic", "fallback": "rotateY" }
+  },
+  "frameThresholdDegrees": 15,
+  "frameMap": { "move.jump-forward": "07-jump_forward", "move.jump-backward": "08-jump_backward", "crouch": "10-crouch", "hit": "09-hit_recoil", "prone": "11-prone", "falling": "12-falling" },
+  "policies": {
+    "reduced-motion": { "durationMultiplier": 0.3, "skipLandingSquash": true, "removeParticles": true, "removeShake": true, "removeGlow": true, "easingOverride": "linear" },
+    "low-performance": { "disableParticles": true, "disableGlow": true, "disableShake": true, "disableDust": true, "maxParticleCount": 0, "budgetCheckInterval": 16, "fpsWarningThreshold": 55, "fpsCriticalThreshold": 45, "degradationOrder": ["decorations", "distant-breathing", "non-critical-transitions"] },
+    "visibility": { "screenOffPause": true, "offscreenUpdate": false, "backgroundUpdate": false, "pauseZIndex": -1 }
+  }
+}

@@ -66,10 +66,10 @@ function importedModules(text: string): string[] {
 
 /** UGC 允许从内核导入的模块白名单。全部是零运行时逻辑的**纯类型/纯数据**模块。 */
 const ALLOWED_KERNEL_IMPORTS: readonly string[] = [
-  '../../kernel/state/diagnostic.js',
-  '../../kernel/state/error-codes.js',
-  '../../kernel/state/value.js',
-  '../../kernel/safety/safety.js',
+  '../../kernel/state/diagnostic',
+  '../../kernel/state/error-codes',
+  '../../kernel/state/value',
+  '../../kernel/safety/safety',
 ];
 
 const FORBIDDEN_KERNEL_SEGMENTS: readonly string[] = [

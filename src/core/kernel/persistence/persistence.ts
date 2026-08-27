@@ -5,10 +5,10 @@
  * These are NOT Ops (write channel case d: persistence services).
  * They operate directly on WorldState outside the Op pipeline.
  */
-import type { WorldState } from '../state/world-state.js';
-import type { JournalEntry } from '../ops/transaction.js';
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
+import type { WorldState } from '../state/world-state';
+import type { JournalEntry } from '../ops/transaction';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
 
 // ---------------------------------------------------------------------------
 // Snapshot (Property 18: snapshot immutability)

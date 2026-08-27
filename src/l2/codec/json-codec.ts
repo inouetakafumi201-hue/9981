@@ -6,21 +6,21 @@
  * 语义字段永不补造，表现字段损坏降级为 Warning。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { isWarningDiagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic } from '../model/diagnostic-factory.js';
-import { structuredRejection } from '../model/diagnostic-factory.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { canonicalSort, compareDiagnostics } from '../model/ordering.js';
-import type { PackageId } from '../model/ids.js';
-import { ROOT_JSON_PATH } from '../model/ids.js';
-import type { SourceLocation } from '../model/source.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import { scanJson, type JsonNode } from './json-scanner.js';
-import { detectProhibitedConstructs } from './prohibited-constructs.js';
-import { createDecodeContext, decodePackage } from './definition-decoder.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { isWarningDiagnostic } from '../model/diagnostic';
+import { errorDiagnostic } from '../model/diagnostic-factory';
+import { structuredRejection } from '../model/diagnostic-factory';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { canonicalSort, compareDiagnostics } from '../model/ordering';
+import type { PackageId } from '../model/ids';
+import { ROOT_JSON_PATH } from '../model/ids';
+import type { SourceLocation } from '../model/source';
+import type { DefinitionPackage } from '../model/definition';
+import { scanJson, type JsonNode } from './json-scanner';
+import { detectProhibitedConstructs } from './prohibited-constructs';
+import { createDecodeContext, decodePackage } from './definition-decoder';
 
 /** 支持的声明式 JSON Schema 版本。 */
 export const SUPPORTED_SCHEMA_VERSIONS: ReadonlySet<string> = Object.freeze(new Set(['l2-declarative/1']));

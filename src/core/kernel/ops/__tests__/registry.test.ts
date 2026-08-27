@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { ok, err } from '../result.js';
-import type { OpImpl } from '../registry.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { ok, err } from '../result';
+import type { OpImpl } from '../registry';
 
 describe('OpRegistry: 永不抛异常与事务包裹（需求16.1-16.4, 21.1-21.4）', () => {
   it('未注册的 Op 返回 ok:false 而不是抛异常', () => {

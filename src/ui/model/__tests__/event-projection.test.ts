@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isSafeProjectedValue, projectSafePayload } from '../event-projection.js';
+import { isSafeProjectedValue, projectSafePayload } from '../event-projection';
 
 describe('Rule_Event_Projection 白名单投影', () => {
   it('未登记的键一律丢弃，且诊断条数等于被丢弃键数', () => {

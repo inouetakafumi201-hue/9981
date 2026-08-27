@@ -11,22 +11,22 @@
  * - L2 不实现本地 Hook 分发、事务或 Expr 求值：这些错误由 KernelContract 透传。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory';
 import type {
   ActionRequest,
   CallerContext,
   OpCause,
   OpResult,
   ValidatedOpRequest,
-} from '../model/projection.js';
-import type { JsonValue } from '../model/json.js';
-import type { ActionContract } from '../model/family-contracts.js';
-import type { KernelContract } from '../kernel/kernel-contract.js';
-import type { ActiveRegistry } from './definition-registry.js';
-import { query } from './definition-registry.js';
+} from '../model/projection';
+import type { JsonValue } from '../model/json';
+import type { ActionContract } from '../model/family-contracts';
+import type { KernelContract } from '../kernel/kernel-contract';
+import type { ActiveRegistry } from './definition-registry';
+import { query } from './definition-registry';
 
 /** 把已解析动作与请求映射为结构化 Op 请求。 */
 function mapToOpRequest(
@@ -38,7 +38,7 @@ function mapToOpRequest(
   if (action.opMapping === undefined) {
     return undefined;
   }
-  const args: Record<string, JsonValue> = {};
+  const args: Record<string, JsonValue | { $: string } | Record<string, JsonValue | { $: string }>> = {};
   for (const mapping of action.opMapping.argumentMapping) {
     switch (mapping.source) {
       case 'actor':

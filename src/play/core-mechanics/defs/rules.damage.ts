@@ -14,11 +14,11 @@
  * 因此 before 规则把否决理由写入请求记录的 veto 字段，default/after 规则用 when 检查 veto 为空
  * 才执行；发起动作在 emit 之后紧跟 vetoGuard 兑现整体回滚。
  */
-import type { RuleDef, HookPhase } from '../../../core/kernel/events/types.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import type { NumericOwnershipRule } from '../ownership.js';
-import { buildNumericOwnership, internalMetric, playExt, structuralBound } from '../ownership.js';
+import type { RuleDef, HookPhase } from '../../../core/kernel/events/types';
+import type { Effect } from '../../../core/kernel/events/effect-types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import type { NumericOwnershipRule } from '../ownership';
+import { buildNumericOwnership, internalMetric, playExt, structuralBound } from '../ownership';
 import {
   addNum,
   and,
@@ -45,7 +45,7 @@ import {
   setRequestField,
   subNum,
   varOf,
-} from './expr.js';
+} from './expr';
 import {
   ATT_BLOCKING,
   ATT_DOWNED_ZERO,
@@ -73,7 +73,7 @@ import {
   TAG_PRECISE_IN_PROGRESS,
   VITALITY_MAX,
   VITALITY_MIN_ALIVE,
-} from './ids.js';
+} from './ids';
 
 /** 规则里出现的数值只有 priority（结算次序）与少量结构阈值。 */
 const RULE_OWNERSHIP_RULES: readonly NumericOwnershipRule[] = [

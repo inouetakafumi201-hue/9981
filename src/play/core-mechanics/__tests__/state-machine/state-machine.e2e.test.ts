@@ -35,17 +35,17 @@
  *     这条唯一 drain 入口清空，测试不再直接改 WorldState。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { setPath } from '../../../../core/kernel/ops/path.js';
-import { resetIdCounters } from '../../../../core/kernel/state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../../../core/kernel/state/world-state.js';
-import { createEntityShape } from '../../../../core/kernel/state/entity.js';
-import { createAgentShape } from '../../../../core/kernel/state/agent.js';
-import { createContainerShape, createSlotShape, createNodeShape } from '../../../../core/kernel/topology/types.js';
-import { CoreMechanicsFacade } from '../../load.js';
-import { createLoadedCoreMechanics } from '../state-machine-load-driver.js';
-import { ATT_OVERLOADED, STAMINA_MAX, TAG_ROLL_PARTICIPANT } from '../../defs/ids.js';
-import type { WorldStateHolder } from '../../../../core/kernel/ops/transaction.js';
-import type { OpRegistry } from '../../../../core/kernel/ops/registry.js';
+import { setPath } from '../../../../core/kernel/ops/path';
+import { resetIdCounters } from '../../../../core/kernel/state/ids';
+import { createEmptyWorldState, type WorldState } from '../../../../core/kernel/state/world-state';
+import { createEntityShape } from '../../../../core/kernel/state/entity';
+import { createAgentShape } from '../../../../core/kernel/state/agent';
+import { createContainerShape, createSlotShape, createNodeShape } from '../../../../core/kernel/topology/types';
+import { CoreMechanicsFacade } from '../../load';
+import { createLoadedCoreMechanics } from '../state-machine-load-driver';
+import { ATT_OVERLOADED, STAMINA_MAX, TAG_ROLL_PARTICIPANT } from '../../defs/ids';
+import type { WorldStateHolder } from '../../../../core/kernel/ops/transaction';
+import type { OpRegistry } from '../../../../core/kernel/ops/registry';
 
 // ---------------------------------------------------------------------------
 // 世界里的英雄/敌人/节点/容器标识；四段相位名

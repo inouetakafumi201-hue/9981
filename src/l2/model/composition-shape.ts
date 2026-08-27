@@ -10,8 +10,8 @@
  * 让既有 `family-contracts.ts` 的 13 个语义族可以以组件形状面世，且不破坏其既有能力指纹。
  */
 
-import type { SemanticFamilyId } from './ids.js';
-import type { CompositionKind, ComponentContract } from './composition-registry.js';
+import type { SemanticFamilyId } from './ids';
+import type { CompositionKind, ComponentContract } from './composition-registry';
 
 /**
  * Composition_Shape：一个语义族对原语能力组件形状的既定声明。

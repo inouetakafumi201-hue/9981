@@ -24,15 +24,15 @@ import {
   type DistinguishableEntry,
   type NamedEntry,
   type TypedReferenceUse,
-} from '../class-contract.js';
+} from '../class-contract';
 import {
   expectArray,
   expectObject,
   expectString,
   visitJson,
   type JsonObject,
-} from '../json-contract.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+} from '../json-contract';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 import {
   CATALOG_DIRS,
   SCHEMA_ROOT,
@@ -42,7 +42,7 @@ import {
   jsonFilesUnder,
   readCatalog,
   readClassJson,
-} from './catalog-fixtures.js';
+} from './catalog-fixtures';
 
 /** 各目录中承载"语义类"的字段名。token 型目录不在此列，另行声明。 */
 const CLASS_ENTRY_FIELDS: ReadonlyMap<string, readonly string[]> = Object.freeze(

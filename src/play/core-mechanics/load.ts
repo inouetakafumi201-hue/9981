@@ -13,28 +13,28 @@
  * 这与 Requirement 2.8「玩法层不自建组合根」一致：本文件**不** import `wireHooksIntoRegistry`，
  * 也不构造 Hook/Flow——运行时由调用方（当前只有测试组合根）接线后传入。
  */
-import type { OpRegistry } from '../../core/kernel/ops/registry.js';
-import type { DefRegistry } from '../../core/kernel/state/def.js';
-import type { Def } from '../../core/kernel/state/def.js';
-import type { RuleProvider } from '../../core/kernel/events/rule-provider.js';
-import type { PlaypackDef, PlaypackLoader, OutcomeDef } from '../../core/kernel/schedule/playpack.js';
-import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
-import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
-import type { ErrCode } from '../../core/kernel/state/error-codes.js';
-import type { Result } from '../../core/kernel/ops/result.js';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { ActionDef, CostSpec } from '../../core/kernel/actions/types.js';
-import type { AttachmentDef } from '../../core/kernel/attachment/types.js';
-import type { RuleDef } from '../../core/kernel/events/types.js';
-import type { LegalAction } from '../../core/kernel/actions/types.js';
-import { createProjection } from './projection.js';
-import { createTerminalQuery, consumePlayerQueue as consumePlayerQueueOp } from './match-lifecycle.js';
-import type { TerminalQuery } from './match-lifecycle.js';
+import type { OpRegistry } from '../../core/kernel/ops/registry';
+import type { DefRegistry } from '../../core/kernel/state/def';
+import type { Def } from '../../core/kernel/state/def';
+import type { RuleProvider } from '../../core/kernel/events/rule-provider';
+import type { PlaypackDef, PlaypackLoader, OutcomeDef } from '../../core/kernel/schedule/playpack';
+import type { WorldStateHolder } from '../../core/kernel/ops/transaction';
+import type { Diagnostic } from '../../core/kernel/state/diagnostic';
+import type { ErrCode } from '../../core/kernel/state/error-codes';
+import type { Result } from '../../core/kernel/ops/result';
+import type { Value } from '../../core/kernel/state/value';
+import type { ActionDef, CostSpec } from '../../core/kernel/actions/types';
+import type { AttachmentDef } from '../../core/kernel/attachment/types';
+import type { RuleDef } from '../../core/kernel/events/types';
+import type { LegalAction } from '../../core/kernel/actions/types';
+import { createProjection } from './projection';
+import { createTerminalQuery, consumePlayerQueue as consumePlayerQueueOp } from './match-lifecycle';
+import type { TerminalQuery } from './match-lifecycle';
 import type {
   BlockedCapability,
   BlockedCapabilityConfig,
   PlayDefExtension,
-} from './ownership.js';
+} from './ownership';
 import {
   collectBlockedCapabilities,
   playExtensionOf,
@@ -45,8 +45,8 @@ import {
   validateProvenance,
   validateTerminology,
   validateUnresolvedGuards,
-} from './ownership.js';
-import { CoreMechanicsPlaypack, CORE_MECHANICS_RULES } from './defs/playpack.js';
+} from './ownership';
+import { CoreMechanicsPlaypack } from './defs/playpack';
 import {
   ATT_BLOCKING,
   MAX_PARALLEL_OPTIONS,
@@ -55,8 +55,8 @@ import {
   PATH_ROLL_POLICY_READY,
   PATH_TURN_ORDER,
   POOL_AP,
-} from './defs/ids.js';
-import { FORBIDDEN_STACK_STRATEGY } from './defs/attachments.js';
+} from './defs/ids';
+import { FORBIDDEN_STACK_STRATEGY } from './defs/attachments';
 
 // ---------------------------------------------------------------------------
 // 配置（design.md 3.1）
@@ -498,12 +498,10 @@ export function loadCoreMechanics(opts: CoreMechanicsLoadOptions): CoreMechanics
     return { ok: false, diagnostics, projection: null, blocked, outcomes: playpack.outcomes ?? [] };
   }
 
-  // Step 4：常驻规则挂进同一 Hook 管道。规则集合同样随注入包派生：官方包经
-  // CORE_MECHANICS_RULES 提供，注入包从自己的 `rules` 引用解析（与 PlaypackActivator 同语义，
-  // 见 playpack-runtime.ts 的 mountPermanentRules）。注入包未声明 rules 时不挂任何规则。
-  const mountedRuleIds = playpack === CoreMechanicsPlaypack
-    ? CORE_MECHANICS_RULES.map((rule) => rule.id)
-    : playpack.rules ?? [];
+  // Step 4：常驻规则挂进同一 Hook 管道。规则集合随注入包派生（P4 契约）：官方包与 UGC 包
+  // 都从自己的 `rules` 引用解析（与 PlaypackActivator 的 mountPermanentRules 同语义，
+  // 见 playpack-runtime.ts），不再有源码特权分支。未声明 rules 的包不挂任何规则。
+  const mountedRuleIds = playpack.rules ?? [];
   for (const ruleId of mountedRuleIds) {
     const definition = runtime.defRegistry.resolve(ruleId);
     if (definition === null || definition.kind !== 'rule') {

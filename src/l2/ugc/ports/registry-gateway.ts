@@ -18,24 +18,24 @@
  * 那层外壳是端口边界的语义，l2 的纯函数 `activate` 本身没有、也不该有「当前状态」这个概念。
  */
 
-import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic.js';
-import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway.js';
-import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint.js';
-import type { DefinitionRegistryGateway } from '../../../core/ugc/ports/definition-ports.js';
-import type { TargetOwnership } from '../../../core/ugc/model/candidate.js';
-import type { ValidationBaseline } from '../../../core/ugc/model/baseline.js';
-import type { ActivationResult } from '../../../core/ugc/model/report.js';
-import type { ValidatedChangeSet } from '../../../core/ugc/model/validated-change-set.js';
-import type { DefinitionRegistryReadSnapshot } from '../../../core/ugc/model/upstream.js';
-import { activate } from '../../registry/definition-registry.js';
-import type { ActiveRegistry } from '../../registry/definition-registry.js';
-import { emptyRegistry } from '../../registry/definition-registry.js';
-import { createSourceIndex } from './source-index.js';
-import { projectL2Diagnostics, type DiagnosticProjectionContext } from './diagnostic-projection.js';
+import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic';
+import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway';
+import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint';
+import type { DefinitionRegistryGateway } from '../../../core/ugc/ports/definition-ports';
+import type { TargetOwnership } from '../../../core/ugc/model/candidate';
+import type { ValidationBaseline } from '../../../core/ugc/model/baseline';
+import type { ActivationResult } from '../../../core/ugc/model/report';
+import type { ValidatedChangeSet } from '../../../core/ugc/model/validated-change-set';
+import type { DefinitionRegistryReadSnapshot } from '../../../core/ugc/model/upstream';
+import { activate } from '../../registry/definition-registry';
+import type { ActiveRegistry } from '../../registry/definition-registry';
+import { emptyRegistry } from '../../registry/definition-registry';
+import { createSourceIndex } from './source-index';
+import { projectL2Diagnostics, type DiagnosticProjectionContext } from './diagnostic-projection';
 import {
   L2_PORT_PROVIDER_ID,
   L2_PORT_VERSION,
@@ -43,7 +43,7 @@ import {
   registryVersionToken,
   readValidatedPayload,
   type L2SnapshotPayload,
-} from './port-common.js';
+} from './port-common';
 
 const REGISTRY_STAGE = 'activation-precheck' as const;
 

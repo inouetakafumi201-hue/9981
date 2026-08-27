@@ -4,7 +4,7 @@
  * 对应 Requirements 5.1、12.1–12.2 与 model/schema.ts、model/reference.ts。
  */
 
-import { joinJsonPath } from '../model/ids.js';
+import { joinJsonPath } from '../model/ids';
 import {
   DECLARED_TYPES,
   PARAMETER_CLASSIFICATIONS,
@@ -16,12 +16,12 @@ import {
   type InternalMetricSchema,
   type ParameterField,
   type ParameterSchema,
-} from '../model/schema.js';
-import { isL1DefKind, type L1DefKind } from '../model/def-kind.js';
-import type { JsonValue } from '../model/json.js';
-import { isJsonValue } from '../model/json.js';
-import { REFERENCE_ROLES, type ReferenceRole, type TypedReference } from '../model/reference.js';
-import type { DecodeContext } from './decode.js';
+} from '../model/schema';
+import { isL1DefKind, type L1DefKind } from '../model/def-kind';
+import type { JsonValue } from '../model/json';
+import { isJsonValue } from '../model/json';
+import { REFERENCE_ROLES, type ReferenceRole, type TypedReference } from '../model/reference';
+import type { DecodeContext } from './decode';
 import {
   optionalArray,
   optionalBoolean,
@@ -33,7 +33,7 @@ import {
   requireEnum,
   requireObject,
   requireString,
-} from './decode.js';
+} from './decode';
 
 function decodeRange(ctx: DecodeContext, value: unknown, path: string): DeclaredRange | undefined {
   const object = optionalObject(ctx, value, path);

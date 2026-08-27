@@ -14,7 +14,7 @@
  * 那是 UGC 侧的交接项，不是基类层能单方面解决的（见本目录 README 段落与回流记录）。
  */
 
-import type { SourcePoint, SourceSpan } from '../../../core/kernel/state/diagnostic.js';
+import type { SourcePoint, SourceSpan } from '../../../core/kernel/state/diagnostic';
 
 const utf8Encoder = new TextEncoder();
 

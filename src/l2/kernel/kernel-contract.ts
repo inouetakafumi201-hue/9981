@@ -11,8 +11,8 @@
  *   `op-registry-adapter.ts` 包装真实 `OpRegistry`，两条路径共用同一契约。
  */
 
-import type { JsonValue } from '../model/json.js';
-import type { OpCause, RuntimeSemanticState } from '../model/projection.js';
+import type { JsonValue } from '../model/json';
+import type { OpCause, RuntimeSemanticState } from '../model/projection';
 
 /** 内核调用成功结果。 */
 export interface KernelInvokeOk {
@@ -69,7 +69,7 @@ export interface KernelContract {
    */
   invoke(
     opId: string,
-    args: Readonly<Record<string, JsonValue>>,
+    args: Readonly<Record<string, JsonValue | { readonly $: string }>>,
     cause: OpCause,
   ): KernelInvokeResult;
 

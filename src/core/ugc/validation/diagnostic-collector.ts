@@ -7,13 +7,13 @@
  * 2. **跳过检查必须关联根诊断**。依赖已失败数据的检查不猜测输入，而是记录 checkId + 阻断它的
  *    根诊断 ID，使报告能解释"为什么这项没跑"（需求 14.7）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { sortDiagnostics } from '../diagnostics/sort.js';
-import type { QuotaBudget } from '../model/quota-types.js';
-import { isBlockingDiagnostic } from '../model/result.js';
-import type { SkippedCheck, ValidationStage } from '../model/stage.js';
-import { compareSkippedChecks, createSkippedCheck } from '../model/stage.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { sortDiagnostics } from '../diagnostics/sort';
+import type { QuotaBudget } from '../model/quota-types';
+import { isBlockingDiagnostic } from '../model/result';
+import type { SkippedCheck, ValidationStage } from '../model/stage';
+import { compareSkippedChecks, createSkippedCheck } from '../model/stage';
 
 export class DiagnosticCollector {
   private readonly collected: Diagnostic[] = [];

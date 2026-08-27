@@ -4,39 +4,39 @@
  * store, the real ActionCatalog, and the real Action -> Intent -> Op pipeline.
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { setPath } from '../../ops/path.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { createAgentShape } from '../../state/agent.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEntityShape } from '../../state/entity.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { AISearchPolicyBridge } from '../kernel/policy-bridge.js';
-import { ReferenceCountedPresentationSilencer } from '../kernel/presentation-silencer.js';
-import { KernelAIReadAdapter } from '../kernel/read-adapter.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
-import type { PolicyDef } from '../../schedule/policy.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { Def } from '../../state/def.js';
-import type { NPCActionRequest, NPCRecommendationRequest } from '../types.js';
+import { ActionCatalog } from '../../actions/catalog';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { OpRegistry } from '../../ops/registry';
+import { registerPropOps } from '../../ops/prop-ops';
+import { setPath } from '../../ops/path';
+import { WorldStateHolder } from '../../ops/transaction';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { createAgentShape } from '../../state/agent';
+import { DefRegistry } from '../../state/def';
+import { createEntityShape } from '../../state/entity';
+import { resetIdCounters } from '../../state/ids';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { AISearchPolicyBridge } from '../kernel/policy-bridge';
+import { ReferenceCountedPresentationSilencer } from '../kernel/presentation-silencer';
+import { KernelAIReadAdapter } from '../kernel/read-adapter';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
+import type { PolicyDef } from '../../schedule/policy';
+import type { ActionDef } from '../../actions/types';
+import type { Expr } from '../../state/expr-types';
+import type { Def } from '../../state/def';
+import type { NPCActionRequest, NPCRecommendationRequest } from '../types';
 
 const HIDDEN = 'e:hidden-scout';
 
@@ -50,6 +50,7 @@ const guardAction: ActionDef = {
   id: 'a:hold-position',
   kind: 'action',
   label: 'Hold position',
+  track: 'highlight',
   require: true,
   cost: [],
   effects: [{ emit: 'ai.acted' }],
@@ -59,6 +60,7 @@ const gatedAction: ActionDef = {
   id: 'a:advance',
   kind: 'action',
   label: 'Advance',
+  track: 'highlight',
   require: { path: 'world.props.advanceAllowed' },
   cost: [],
   effects: [{ emit: 'ai.acted' }],

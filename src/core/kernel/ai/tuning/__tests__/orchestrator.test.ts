@@ -6,17 +6,17 @@
  *  - 精确构造一个「该选 heal 却选 hunt」的可修复断言，验证编排器跨迭代把它调绿且 golden 保持绿。
  */
 import { describe, expect, it } from 'vitest';
-import { BehaviorAssertionRegistry, AssertionRunner } from '../assertions.js';
-import { AttributionEngine } from '../attribution.js';
-import { ParameterTuner } from '../tuner.js';
-import { TuningOrchestrator, saveCheckpoint } from '../orchestrator.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import { buildDecisionTrace } from '../build-trace.js';
-import { scoreBreakdown } from '../../design-currency.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { DecisionTrace } from '../trace.js';
-import type { BehaviorAssertion } from '../assertions.js';
-import type { BeliefSlice } from '../../types.js';
+import { BehaviorAssertionRegistry, AssertionRunner } from '../assertions';
+import { AttributionEngine } from '../attribution';
+import { ParameterTuner } from '../tuner';
+import { TuningOrchestrator, saveCheckpoint } from '../orchestrator';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import { buildDecisionTrace } from '../build-trace';
+import { scoreBreakdown } from '../../design-currency';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { DecisionTrace } from '../trace';
+import type { BehaviorAssertion } from '../assertions';
+import type { BeliefSlice } from '../../types';
 
 const world = createEmptyWorldState('sched:round');
 

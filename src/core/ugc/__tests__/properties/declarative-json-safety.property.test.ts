@@ -8,10 +8,10 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { arbitraryBytes, candidateForPattern, requestFrom } from '../../testing/generators.js';
-import { rejectionFacts } from '../../testing/observer.js';
-import { createCandidateChangeRequest, createCandidateDocument, createCandidateSource } from '../../model/candidate.js';
+import { createHarness } from '../harness';
+import { arbitraryBytes, candidateForPattern, requestFrom } from '../../testing/generators';
+import { rejectionFacts } from '../../testing/observer';
+import { createCandidateChangeRequest, createCandidateDocument, createCandidateSource } from '../../model/candidate';
 
 const source = createCandidateSource({
   kind: 'hand-authored',

@@ -8,14 +8,14 @@
  * Boundary contract: NO OpRegistry or Transaction in gateway exports.
  * The gateway is purely read + subscribe — it never triggers writes.
  */
-import type { WorldState } from './state/world-state.js';
-import type { Ref } from './state/ids.js';
-import type { Value } from './state/value.js';
-import type { Query } from './state/expr-types.js';
-import type { LegalAction } from './actions/types.js';
-import type { ActionCatalog, QueryMode } from './actions/catalog.js';
-import type { QueryEngine } from './expr/query-engine.js';
-import type { ExprEngine, EvalContext } from './expr/engine.js';
+import type { WorldState } from './state/world-state';
+import type { Ref } from './state/ids';
+import type { Value } from './state/value';
+import type { Query } from './state/expr-types';
+import type { LegalAction } from './actions/types';
+import type { ActionCatalog, QueryMode } from './actions/catalog';
+import type { QueryEngine } from './expr/query-engine';
+import type { ExprEngine, EvalContext } from './expr/engine';
 
 // ---------------------------------------------------------------------------
 // Subscriber protocol (event subscription — no OpRegistry/Transaction)

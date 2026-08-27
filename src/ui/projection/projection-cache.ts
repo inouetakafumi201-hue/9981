@@ -18,14 +18,14 @@ import {
   type UiDiagnostic,
   type UiResult,
   type UiStructuredRejection,
-} from '../model/diagnostic.js';
-import type { StateRevision } from '../model/revision.js';
+} from '../model/diagnostic';
+import type { StateRevision } from '../model/revision';
 import {
   agentScopeCacheKey,
   type PresentationDescriptor,
   type ReadOnlySemanticProjection,
   type UpstreamAgentAuthority,
-} from '../model/view.js';
+} from '../model/view';
 
 /** 已通过边界断言的投影与描述符配对。 */
 export interface AcceptedProjection {

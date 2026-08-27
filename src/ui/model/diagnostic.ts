@@ -12,8 +12,8 @@
  * 原样透传，不在此处重命名。
  */
 
-import { DIAGNOSTIC_CODES } from '../../l2/model/diagnostic-codes.js';
-import type { StateRevision } from './revision.js';
+import { DIAGNOSTIC_CODES } from '../../l2/model/diagnostic-codes';
+import type { StateRevision } from './revision';
 
 /** 诊断严重度。UI 最重的诊断是 `error`，其后果始终是"省略某个呈现或交互"。 */
 export type UiDiagnosticSeverity = 'fatal' | 'error' | 'warn' | 'info';

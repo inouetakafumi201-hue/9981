@@ -1,6 +1,6 @@
 /** Category-aware policy-to-planner registry. */
-import type { AIPolicyCategory, AIResult, CandidatePlanner, PlannerRegistry } from './types.js';
-import type { Ref } from '../state/ids.js';
+import type { AIPolicyCategory, AIResult, CandidatePlanner, PlannerRegistry } from './types';
+import type { Ref } from '../state/ids';
 
 export interface PlannerRegistration {
   readonly policy: Ref;

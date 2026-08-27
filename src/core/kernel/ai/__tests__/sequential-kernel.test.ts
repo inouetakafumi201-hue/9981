@@ -6,42 +6,42 @@
  * branch is restored so only the finally chosen root action is committed.
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { setPath } from '../../ops/path.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { createAgentShape } from '../../state/agent.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEntityShape } from '../../state/entity.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { SchedulePhaseParticipants } from '../kernel/participant-order.js';
-import { ReferenceCountedPresentationSilencer } from '../kernel/presentation-silencer.js';
-import { KernelAIReadAdapter } from '../kernel/read-adapter.js';
-import { KernelSearchSessionGateway } from '../kernel/search-session.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Def } from '../../state/def.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { NPCActionRequest, ValidatedAIBehaviorBinding } from '../types.js';
+import { ActionCatalog } from '../../actions/catalog';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { setPath } from '../../ops/path';
+import { registerPropOps } from '../../ops/prop-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { createAgentShape } from '../../state/agent';
+import { DefRegistry } from '../../state/def';
+import { createEntityShape } from '../../state/entity';
+import { resetIdCounters } from '../../state/ids';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { SchedulePhaseParticipants } from '../kernel/participant-order';
+import { ReferenceCountedPresentationSilencer } from '../kernel/presentation-silencer';
+import { KernelAIReadAdapter } from '../kernel/read-adapter';
+import { KernelSearchSessionGateway } from '../kernel/search-session';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
+import type { ActionDef } from '../../actions/types';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Def } from '../../state/def';
+import type { Expr } from '../../state/expr-types';
+import type { NPCActionRequest, ValidatedAIBehaviorBinding } from '../types';
 
 const PARTICIPANTS = [
   { agent: 'g:one', entity: 'e:one', policy: 'd:policy-one', binding: 'd:bind-one', initiative: 3 },
@@ -56,10 +56,10 @@ const VISIBLE_TO: Expr = {
 
 /** Two zero-cost legal actions so every participant has a real branching choice. */
 const holdAction: ActionDef = {
-  id: 'a:hold', kind: 'action', label: 'Hold', require: true, cost: [], effects: [{ emit: 'ai.acted' }],
+  id: 'a:hold', kind: 'action', label: 'Hold', require: true, cost: [], effects: [{ emit: 'ai.acted' }], track: 'highlight',
 };
 const pushAction: ActionDef = {
-  id: 'a:push', kind: 'action', label: 'Push', require: true, cost: [], effects: [{ emit: 'ai.acted' }],
+  id: 'a:push', kind: 'action', label: 'Push', require: true, cost: [], effects: [{ emit: 'ai.acted' }], track: 'highlight',
 };
 
 /**

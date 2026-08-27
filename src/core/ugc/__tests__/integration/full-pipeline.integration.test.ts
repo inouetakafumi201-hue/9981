@@ -6,25 +6,25 @@
  * 只调用 `facade.validate` / `facade.activate`，从不直接调用 validator、resolver 或 registry 写入口。
  */
 import { describe, expect, it } from 'vitest';
-import type { SourceRecord } from '../../../kernel/state/diagnostic.js';
-import { ALL_ADAPTERS, handAuthoredAdapter } from '../../adapter/adapters.js';
-import { createCanonicalizationGateway } from '../../canonical/canonicalizer.js';
+import type { SourceRecord } from '../../../kernel/state/diagnostic';
+import { ALL_ADAPTERS, handAuthoredAdapter } from '../../adapter/adapters';
+import { createCanonicalizationGateway } from '../../canonical/canonicalizer';
 import {
   createProhibitedConstructGate,
   type EffectContractView,
   type MemberVerdict,
-} from '../../codec/prohibited-construct-gate.js';
-import { createStrictJsonDecoder } from '../../codec/strict-json-decoder.js';
-import { createIntegrationContractCatalog } from '../../contracts/integration-contract-catalog.js';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
+} from '../../codec/prohibited-construct-gate';
+import { createStrictJsonDecoder } from '../../codec/strict-json-decoder';
+import { createIntegrationContractCatalog } from '../../contracts/integration-contract-catalog';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
 import {
   assembleL2UGCIntegration,
   createL2UGCIntegration,
   type L2UGCHostDependencies,
-} from '../../integration/l2-adapter.js';
-import type { L2PortBundle } from '../../integration/l2-port-contract.js';
-import { createSchemaMigrationCoordinator } from '../../migration/schema-migration-coordinator.js';
+} from '../../integration/l2-adapter';
+import type { L2PortBundle } from '../../integration/l2-port-contract';
+import { createSchemaMigrationCoordinator } from '../../migration/schema-migration-coordinator';
 import {
   CANDIDATE_SOURCE_KINDS,
   createCandidateChangeRequest,
@@ -33,23 +33,23 @@ import {
   type CandidateChangeRequest,
   type ChangeOperation,
   type TargetOwnership,
-} from '../../model/candidate.js';
-import type { JsonAst } from '../../model/json-ast.js';
-import { compareCodePoints } from '../../model/fingerprint.js';
-import type { ValidationReport } from '../../model/report.js';
-import { QUOTA_KINDS, type TrustedQuotaProfile } from '../../model/quota-types.js';
-import { ugcOk } from '../../model/result.js';
-import type { PresentationGap, UpstreamSchemaView } from '../../model/upstream.js';
-import { createPresentationFallbackResolver } from '../../presentation/fallback-resolver.js';
-import type { RuntimeCompatibilityGateway } from '../../ports/definition-ports.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
+} from '../../model/candidate';
+import type { JsonAst } from '../../model/json-ast';
+import { compareCodePoints } from '../../model/fingerprint';
+import type { ValidationReport } from '../../model/report';
+import { QUOTA_KINDS, type TrustedQuotaProfile } from '../../model/quota-types';
+import { ugcOk } from '../../model/result';
+import type { PresentationGap, UpstreamSchemaView } from '../../model/upstream';
+import { createPresentationFallbackResolver } from '../../presentation/fallback-resolver';
+import type { RuntimeCompatibilityGateway } from '../../ports/definition-ports';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
 import type {
   CanonicalizationSchemaView,
   SchemaMigrationGateway,
   SchemaVersionCatalog,
   TrustedSchemaMigration,
-} from '../../ports/schema-ports.js';
-import { createL2PortBundle, type AssembledL2Ports } from '../../../../l2/ugc/ports/index.js';
+} from '../../ports/schema-ports';
+import { createL2PortBundle, type AssembledL2Ports } from '../../../../l2/ugc/ports/index';
 
 const SOURCE_RECORD = Object.freeze({
   sourceFile: 'docs/L2_基类层/基类层定义.md',

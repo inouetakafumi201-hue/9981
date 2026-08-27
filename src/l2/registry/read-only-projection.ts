@@ -10,9 +10,9 @@
  * - 投影不是活动对象的可写别名：所有内容都经深拷贝 + deepFreeze。
  */
 
-import { deepClonePlain, deepFreeze } from '../model/immutable.js';
-import { fingerprint } from '../model/ordering.js';
-import { compareStrings } from '../model/ordering.js';
+import { deepClonePlain, deepFreeze } from '../model/immutable';
+import { fingerprint } from '../model/ordering';
+import { compareStrings } from '../model/ordering';
 import type {
   AuthorizationScope,
   BeliefSlice,
@@ -20,9 +20,9 @@ import type {
   RuntimeSemanticState,
   SemanticStateEntry,
   VisibilityEntry,
-} from '../model/projection.js';
-import type { ReadOnlyResolvedDefinition } from '../model/definition.js';
-import type { ActiveRegistry } from './definition-registry.js';
+} from '../model/projection';
+import type { ReadOnlyResolvedDefinition } from '../model/definition';
+import type { ActiveRegistry } from './definition-registry';
 
 function projectEntities(
   state: RuntimeSemanticState,

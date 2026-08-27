@@ -14,34 +14,34 @@
  * 也不存在「为了让 UGC 放行而虚报能力」的动机。
  */
 
-import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic.js';
-import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway.js';
-import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint.js';
+import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic';
+import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway';
+import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint';
 import type {
   DefinitionValidationContext,
   DefinitionValidationGateway,
   ValidationCapability,
   ValidationStageResult,
-} from '../../../core/ugc/ports/definition-ports.js';
-import { MANDATORY_VALIDATION_CAPABILITIES } from '../../../core/ugc/ports/definition-ports.js';
-import type { CanonicalizedChangeRequest } from '../../../core/ugc/model/canonical-types.js';
-import type { QuotaBudget } from '../../../core/ugc/model/quota-types.js';
-import type { UpstreamValidatedCandidate } from '../../../core/ugc/model/upstream.js';
-import { compareStrings } from '../../model/ordering.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids.js';
-import type { DefinitionPackage } from '../../model/definition.js';
-import { validateFullPackage } from '../../validation/package-validation.js';
-import { DEFINITION_RULES } from '../../validation/validator.js';
-import { activeReferenceMap, emptyRegistry } from '../../registry/definition-registry.js';
-import type { ActiveRegistry } from '../../registry/definition-registry.js';
-import { createSourceIndex, type SourceIndex } from './source-index.js';
-import { projectL2Diagnostics, type DiagnosticProjectionContext } from './diagnostic-projection.js';
-import { definitionAnchorsOf, mapCandidatePackage } from './package-mapping.js';
-import { scanUnknownMembers } from './closed-schema.js';
+} from '../../../core/ugc/ports/definition-ports';
+import { MANDATORY_VALIDATION_CAPABILITIES } from '../../../core/ugc/ports/definition-ports';
+import type { CanonicalizedChangeRequest } from '../../../core/ugc/model/canonical-types';
+import type { QuotaBudget } from '../../../core/ugc/model/quota-types';
+import type { UpstreamValidatedCandidate } from '../../../core/ugc/model/upstream';
+import { compareStrings } from '../../model/ordering';
+import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids';
+import type { DefinitionPackage } from '../../model/definition';
+import { validateFullPackage } from '../../validation/package-validation';
+import { DEFINITION_RULES } from '../../validation/validator';
+import { activeReferenceMap, emptyRegistry } from '../../registry/definition-registry';
+import type { ActiveRegistry } from '../../registry/definition-registry';
+import { createSourceIndex, type SourceIndex } from './source-index';
+import { projectL2Diagnostics, type DiagnosticProjectionContext } from './diagnostic-projection';
+import { definitionAnchorsOf, mapCandidatePackage } from './package-mapping';
+import { scanUnknownMembers } from './closed-schema';
 import {
   L2_PORT_PROVIDER_ID,
   L2_PORT_VERSION,
@@ -51,7 +51,7 @@ import {
   readSnapshotPayload,
   type L2ValidatedPayload,
   type PortDiagnosticEnvelope,
-} from './port-common.js';
+} from './port-common';
 
 const VALIDATION_STAGE = 'definition-validation' as const;
 

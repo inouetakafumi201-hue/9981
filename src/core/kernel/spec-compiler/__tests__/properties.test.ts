@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import type { Diagnostic } from '../../state/diagnostic.js';
-import { validateSourceRecord } from '../../state/source-record.js';
-import { canonicalStringify, compareCodePoints } from '../json-codec.js';
-import { sortDiagnostics } from '../diagnostic-factory.js';
-import { checkDiagnosticClosure } from '../closure.js';
-import type { JsonValue } from '../index.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
+import type { Diagnostic } from '../../state/diagnostic';
+import { validateSourceRecord } from '../../state/source-record';
+import { canonicalStringify, compareCodePoints } from '../json-codec';
+import { sortDiagnostics } from '../diagnostic-factory';
+import { checkDiagnosticClosure } from '../closure';
+import type { JsonValue } from '../index';
+import { candidate, createHarness, validDocument } from './fixtures';
 
 /**
  * Property tests for the compiler surface a UGC creator can reach.

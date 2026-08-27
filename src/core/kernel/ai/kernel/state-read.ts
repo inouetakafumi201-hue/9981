@@ -5,16 +5,15 @@
  * WorldState, but they only ever return filtered, immutable projections. The
  * AI contracts in `../types.js` never receive a WorldState alias.
  */
-import { createHash } from 'node:crypto';
-import { makeDefaultEvalContext, type EvalContext } from '../../expr/engine.js';
-import type { QueryEngine } from '../../expr/query-engine.js';
-import { makeExprStateAccess } from '../../expr/state-access.js';
-import type { ExprEngine } from '../../expr/engine.js';
-import type { DefRegistry } from '../../state/def.js';
-import type { Query } from '../../state/expr-types.js';
-import type { Ref } from '../../state/ids.js';
-import type { Value } from '../../state/value.js';
-import type { WorldState } from '../../state/world-state.js';
+import { makeDefaultEvalContext, type EvalContext } from '../../expr/engine';
+import type { QueryEngine } from '../../expr/query-engine';
+import { makeExprStateAccess } from '../../expr/state-access';
+import type { ExprEngine } from '../../expr/engine';
+import type { DefRegistry } from '../../state/def';
+import type { Query } from '../../state/expr-types';
+import type { Ref } from '../../state/ids';
+import type { Value } from '../../state/value';
+import type { WorldState } from '../../state/world-state';
 
 export type StateQueryEngine = Pick<QueryEngine, 'run' | 'runValues'>;
 export type StateExprEngine = ExprEngine;
@@ -113,12 +112,14 @@ export function canonicalize(value: unknown): string {
 }
 
 /**
- * SHA-256 over the canonical form. A cryptographic digest is used rather than a
- * short checksum so a version token can never collide in practice: a collision
- * would make changed readable information look unchanged.
+ * SHA-256 over the canonical form.
+ *
+ * Uses a browser-safe hash shim so the V0 shell can compile client-side.
  */
 export function fingerprint(prefix: string, value: unknown): string {
-  return `${prefix}:${createHash('sha256').update(canonicalize(value), 'utf8').digest('hex')}`;
+  const canon = canonicalize(value);
+  const h = canonicalize(value).split('').reduce((hash, ch) => ((hash << 5) - hash + ch.charCodeAt(0)) | 0, 0).toString(16).padStart(16, '0');
+  return `${prefix}:${h}`;
 }
 
 /**

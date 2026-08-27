@@ -4,13 +4,13 @@
  * 同一份实现同时服务 UI 菜单、AI 着法生成、网络协议校验、模糊测试采样（需求25.3）：
  * mode 参数只影响 TargetSpec.range/count 的展开粒度，不存在两套着法生成代码。
  */
-import type { Ref } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import { ExprEngine } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
-import type { QueryEngine } from '../expr/query-engine.js';
-import type { WorldState } from '../state/world-state.js';
-import type { ActionDef, LegalAction, TargetSpec } from './types.js';
+import type { Ref } from '../state/ids';
+import type { Value } from '../state/value';
+import { ExprEngine } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
+import type { QueryEngine } from '../expr/query-engine';
+import type { WorldState } from '../state/world-state';
+import type { ActionDef, LegalAction, TargetSpec } from './types';
 
 export type QueryMode = 'ui' | 'ai';
 

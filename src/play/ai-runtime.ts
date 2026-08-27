@@ -14,68 +14,69 @@
  * `intent.submit → intent.resolve`。这样 play 的 NPC 行动阶段首次有了真实的 AI 决策来源。
  */
 
-import { ActionCatalog, type QueryMode } from '../core/kernel/actions/catalog.js';
-import type { LegalAction } from '../core/kernel/actions/types.js';
-import { makeItemMove } from '../core/kernel/ops/structural-ops.js';
-import { ExprEngine, makeDefaultEvalContext, type EvalContext } from '../core/kernel/expr/engine.js';
-import { QueryEngine } from '../core/kernel/expr/query-engine.js';
-import { makeExprStateAccess } from '../core/kernel/expr/state-access.js';
-import type { RuleProvider } from '../core/kernel/events/rule-provider.js';
-import { OpRegistry } from '../core/kernel/ops/registry.js';
-import { WorldStateHolder } from '../core/kernel/ops/transaction.js';
-import { setPath } from '../core/kernel/ops/path.js';
-import { InMemoryCheckpointStore } from '../core/kernel/persistence/persistence.js';
-import { DefRegistry, type Def } from '../core/kernel/state/def.js';
-import { createEmptyWorldState, type WorldState } from '../core/kernel/state/world-state.js';
-import type { Id, Ref } from '../core/kernel/state/ids.js';
-import { createAgentShape } from '../core/kernel/state/agent.js';
-import { createEntityShape } from '../core/kernel/state/entity.js';
-import { createNodeShape } from '../core/kernel/topology/types.js';
-import { wireHooksIntoRegistry } from '../core/kernel/wire-hooks.js';
-import { registerPropOps } from '../core/kernel/ops/prop-ops.js';
-import { registerStructuralOps } from '../core/kernel/ops/structural-ops.js';
-import { registerCarrierOps, makeContainerExit } from '../core/kernel/ops/carrier-ops.js';
-import { registerStackOps } from '../core/kernel/ops/stack-ops.js';
-import { registerRelationOps } from '../core/kernel/ops/relation-ops.js';
-import { registerTransformOps } from '../core/kernel/ops/transform-ops.js';
-import { registerAgentOps } from '../core/kernel/ops/agent-ops.js';
-import { registerOutcomeOps } from '../core/kernel/ops/outcome-ops.js';
-import { registerPrefabOps } from '../core/kernel/ops/prefab-ops.js';
-import { registerDecisionOps, makeProcessDecisionTimeouts } from '../core/kernel/decision/decision-ops.js';
-import { registerIntentOps } from '../core/kernel/decision/intent-ops.js';
-import { registerPoolOps } from '../core/kernel/actions/pool-ops.js';
-import { registerAttachOps } from '../core/kernel/attachment/attach-ops.js';
-import { registerScheduleOps } from '../core/kernel/schedule/schedule-ops.js';
-import { PlaypackLoader } from '../core/kernel/schedule/playpack.js';
-import { PlaypackActivator, registerPlaypackRuntimeOps } from '../core/kernel/schedule/playpack-runtime.js';
-import { registerRandomOps } from '../core/kernel/random/random-ops.js';
-import { nextId } from '../core/kernel/state/ids.js';
-import { getPath } from '../core/kernel/ops/path.js';
-import type { Value } from '../core/kernel/state/value.js';
-import type { PoolDef } from '../core/kernel/schedule/playpack.js';
-import type { ActionDef } from '../core/kernel/actions/types.js';
-import type { ScheduleDef } from '../core/kernel/schedule/types.js';
+import { ActionCatalog, type QueryMode } from '../core/kernel/actions/catalog';
+import type { LegalAction } from '../core/kernel/actions/types';
+import { makeItemMove } from '../core/kernel/ops/structural-ops';
+import { ExprEngine, makeDefaultEvalContext, type EvalContext } from '../core/kernel/expr/engine';
+import { QueryEngine } from '../core/kernel/expr/query-engine';
+import { makeExprStateAccess } from '../core/kernel/expr/state-access';
+import type { RuleProvider } from '../core/kernel/events/rule-provider';
+import { OpRegistry } from '../core/kernel/ops/registry';
+import { WorldStateHolder } from '../core/kernel/ops/transaction';
+import { setPath } from '../core/kernel/ops/path';
+import { InMemoryCheckpointStore } from '../core/kernel/persistence/persistence';
+import { DefRegistry, type Def } from '../core/kernel/state/def';
+import { createEmptyWorldState, type WorldState } from '../core/kernel/state/world-state';
+import type { Id, Ref } from '../core/kernel/state/ids';
+import { createAgentShape } from '../core/kernel/state/agent';
+import { createEntityShape } from '../core/kernel/state/entity';
+import { createNodeShape } from '../core/kernel/topology/types';
+import { wireHooksIntoRegistry } from '../core/kernel/wire-hooks';
+import { registerPropOps } from '../core/kernel/ops/prop-ops';
+import { registerStructuralOps } from '../core/kernel/ops/structural-ops';
+import { registerCarrierOps, makeContainerExit } from '../core/kernel/ops/carrier-ops';
+import { registerStackOps } from '../core/kernel/ops/stack-ops';
+import { registerRelationOps } from '../core/kernel/ops/relation-ops';
+import { registerTransformOps } from '../core/kernel/ops/transform-ops';
+import { registerAgentOps } from '../core/kernel/ops/agent-ops';
+import { registerOutcomeOps } from '../core/kernel/ops/outcome-ops';
+import { registerPrefabOps } from '../core/kernel/ops/prefab-ops';
+import { registerDecisionOps, makeProcessDecisionTimeouts } from '../core/kernel/decision/decision-ops';
+import { registerIntentOps } from '../core/kernel/decision/intent-ops';
+import { registerPoolOps } from '../core/kernel/actions/pool-ops';
+import { registerAttachOps } from '../core/kernel/attachment/attach-ops';
+import { registerScheduleOps } from '../core/kernel/schedule/schedule-ops';
+import { PlaypackLoader } from '../core/kernel/schedule/playpack';
+import type { PlaypackDef } from '../core/kernel/schedule/playpack';
+import { PlaypackActivator, registerPlaypackRuntimeOps } from '../core/kernel/schedule/playpack-runtime';
+import { registerRandomOps } from '../core/kernel/random/random-ops';
+import { nextId } from '../core/kernel/state/ids';
+import { getPath } from '../core/kernel/ops/path';
+import type { Value } from '../core/kernel/state/value';
+import type { PoolDef } from '../core/kernel/schedule/playpack';
+import type { ActionDef } from '../core/kernel/actions/types';
+import type { ScheduleDef } from '../core/kernel/schedule/types';
 
-import { DesignCurrencyGateway } from '../core/kernel/ai/design-currency.js';
-import type { DesignCurrencyConfig } from '../core/kernel/ai/tuning/config-design-currency.js';
-import { ValidatedBehaviorGateway } from '../core/kernel/ai/behavior-validation.js';
-import { ScopedCandidatePlanner } from '../core/kernel/ai/candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../core/kernel/ai/commit-gateway.js';
-import { FiniteEvaluationGuard } from '../core/kernel/ai/evaluation.js';
-import { BoundedAIDecisionFacade } from '../core/kernel/ai/facade.js';
-import { StaticPlannerRegistry, type PlannerRegistration } from '../core/kernel/ai/planner-registry.js';
-import { RestrictedAIReadGateway } from '../core/kernel/ai/read-gateway.js';
-import { SequentialSearchPlanner } from '../core/kernel/ai/sequential-search.js';
-import { CanonicalSimulationAdapter } from '../core/kernel/ai/simulation.js';
-import type { AICandidate, AIResult, NPCActionRequest } from '../core/kernel/ai/types.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../core/kernel/ai/kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../core/kernel/ai/kernel/commit-adapter.js';
-import { SchedulePhaseParticipants } from '../core/kernel/ai/kernel/participant-order.js';
-import { KernelAIReadAdapter, type LegalActionSource } from '../core/kernel/ai/kernel/read-adapter.js';
-import { KernelSearchSessionGateway } from '../core/kernel/ai/kernel/search-session.js';
-import { KernelSimulationAdapter } from '../core/kernel/ai/kernel/simulation-adapter.js';
+import { DesignCurrencyGateway } from '../core/kernel/ai/design-currency';
+import type { DesignCurrencyConfig } from '../core/kernel/ai/tuning/config-design-currency';
+import { ValidatedBehaviorGateway } from '../core/kernel/ai/behavior-validation';
+import { ScopedCandidatePlanner } from '../core/kernel/ai/candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../core/kernel/ai/commit-gateway';
+import { FiniteEvaluationGuard } from '../core/kernel/ai/evaluation';
+import { BoundedAIDecisionFacade } from '../core/kernel/ai/facade';
+import { StaticPlannerRegistry, type PlannerRegistration } from '../core/kernel/ai/planner-registry';
+import { RestrictedAIReadGateway } from '../core/kernel/ai/read-gateway';
+import { SequentialSearchPlanner } from '../core/kernel/ai/sequential-search';
+import { CanonicalSimulationAdapter } from '../core/kernel/ai/simulation';
+import type { AICandidate, AIResult, NPCActionRequest } from '../core/kernel/ai/types';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../core/kernel/ai/kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../core/kernel/ai/kernel/commit-adapter';
+import { SchedulePhaseParticipants } from '../core/kernel/ai/kernel/participant-order';
+import { KernelAIReadAdapter, type LegalActionSource } from '../core/kernel/ai/kernel/read-adapter';
+import { KernelSearchSessionGateway } from '../core/kernel/ai/kernel/search-session';
+import { KernelSimulationAdapter } from '../core/kernel/ai/kernel/simulation-adapter';
 
-import { PATH_NPC_QUEUE } from './core-mechanics/defs/ids.js';
+import { PATH_NPC_QUEUE } from './core-mechanics/defs/ids';
 
 // ---------------------------------------------------------------------------
 // 类型：play 生产侧 AI runtime 的受控边界
@@ -139,7 +140,7 @@ export interface PlayAiRuntimeOptions {
   /** 可选：预置一批 Def（playpack 装载前）。 */
   readonly seedDefs?: readonly Def[];
   /** 可选：备选 schedule/actor 查询的可见性谓词（默认全部可见）。 */
-  readonly visibleTo?: import('../core/kernel/state/expr-types.js').Expr;
+  readonly visibleTo?: import('../core/kernel/state/expr-types').Expr;
   /** 可选：设计货币费目配置。不传用默认表（既有语义，回归红线）；调参后注入新配置即让真实决策生效。 */
   readonly designCurrencyConfig?: DesignCurrencyConfig;
 }
@@ -158,7 +159,7 @@ const NPC_FAMILY: AIBehaviorFamilySchema = {
 };
 
 /** 默认可见性：没有被 hiddenRefs 列入的都可见（owner 提供的 predicate 缺省时用）。 */
-const DEFAULT_VISIBLE_TO: import('../core/kernel/state/expr-types.js').Expr = {
+const DEFAULT_VISIBLE_TO: import('../core/kernel/state/expr-types').Expr = {
   op: 'not',
   args: [{ op: 'includes', args: [{ path: 'world.props.hiddenRefs' }, { var: 'self' }] }],
 };
@@ -227,7 +228,7 @@ export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntim
       }),
     });
 
-  const hookDiagnostics: import('../core/kernel/events/dispatcher.js').HookDiagnostic[] = [];
+  const hookDiagnostics: import('../core/kernel/events/dispatcher').HookDiagnostic[] = [];
   const { registry, ruleProvider, flowInterpreter } = wireHooksIntoRegistry({
     holder,
     onDiagnostic: (diagnostic) => hookDiagnostics.push(diagnostic),
@@ -258,10 +259,10 @@ export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntim
     runEffects: (
       effects: unknown[],
       decision: { ctx: Record<string, Value>; answers: Record<string, Value>; id: string },
-      ctx: import('../core/kernel/ops/registry.js').OpContext,
+      ctx: import('../core/kernel/ops/registry').OpContext,
     ) => {
       flowInterpreter.run(
-        effects as import('../core/kernel/events/effect-types.js').Effect[],
+        effects as import('../core/kernel/events/effect-types').Effect[],
         ctx,
         undefined,
         { decision: { $: decision.id }, ctx: decision.ctx, answers: decision.answers },
@@ -417,6 +418,21 @@ export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntim
         `entities.${npc.entry.controlledEntity.$}.props.npcNumber`,
         number,
       ) as WorldState);
+      // The AI runtime owns a decision snapshot separate from the match holder. Paid core actions
+      // still consume the same AP budget, so seed both pool views before the first submission.
+      // 关键：canonical intent.submit 的代价作用域是**受控实体**（commit-adapter 把 `agent: actor.$`
+      // 传给 intent.submit，freezeCost 按该 scopeId 读 `pools.ap.<scopeId>.available`），不是 AI agent
+      // 编号。因此 AP 必须落在受控实体作用域下，否则仿真分支一进 intent.submit 就 E_COST_INSUFFICIENT。
+      holder.setState(setPath(
+        holder.getState(),
+        `world.props.pools.ap.${npc.entry.controlledEntity.$}.available`,
+        npc.ap,
+      ) as WorldState);
+      holder.setState(setPath(
+        holder.getState(),
+        `world.props.pools.ap.${npc.entry.controlledEntity.$}.real`,
+        npc.ap,
+      ) as WorldState);
       queued.push(npc.entry.controlledEntity.$);
     }
     const setResult = registry.invoke('prop.set', { path: PATH_NPC_QUEUE, value: queued.map((id) => ({ $: id })) satisfies unknown });
@@ -443,7 +459,7 @@ export function createPlayAiRuntime(options: PlayAiRuntimeOptions): PlayAiRuntim
           controlledEntity: entry.entry.controlledEntity,
       policy: entry.entry.policy,
       behaviorBinding: entry.entry.behaviorBinding,
-      tier: 'exact',
+      tier: 'coarse',
       budget: { decisionPoints: 40, simulations: 60, evaluationCalls: 120 },
       correlationId: 'corr-play-npc',
     };

@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerStructuralOps, makeItemMove } from '../structural-ops.js';
-import { registerTransformOps } from '../transform-ops.js';
-import { registerRelationOps } from '../relation-ops.js';
-import { registerPropOps } from '../prop-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { nextId } from '../../state/ids.js';
-import { DefRegistry } from '../../state/def.js';
-import type { Ref } from '../../state/ids.js';
-import type { Def } from '../../state/def.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerStructuralOps, makeItemMove } from '../structural-ops';
+import { registerTransformOps } from '../transform-ops';
+import { registerRelationOps } from '../relation-ops';
+import { registerPropOps } from '../prop-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { nextId } from '../../state/ids';
+import { DefRegistry } from '../../state/def';
+import type { Ref } from '../../state/ids';
+import type { Def } from '../../state/def';
 
 const TEST_DEFS = new Map<string, Def>([
   ['d:human', { id: 'd:human', kind: 'entity' }],

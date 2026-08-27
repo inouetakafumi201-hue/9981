@@ -8,24 +8,24 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
 import {
   createUnavailableDefinitionRegistryGateway,
   createUnavailableDefinitionValidationGateway,
   createUnavailableReferenceResolutionGateway,
-} from '../../ports/unavailable.js';
+} from '../../ports/unavailable';
 import {
   L2PortBundleContractError,
   assertL2PortBundle,
   inspectL2PortBundle,
   isL2PortBundleReady,
-} from '../l2-port-contract.js';
+} from '../l2-port-contract';
 
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 const INTEGRATION_DIR = dirname(fileURLToPath(import.meta.url)).replace(/__tests__$/, '');
-const STABLE_L2_IMPORT = '../../../l2/ugc/ports/index.js';
+const STABLE_L2_IMPORT = '../../../l2/ugc/ports/index';
 
 function completeBundle() {
   return {

@@ -12,9 +12,9 @@
  * 失败语义只有两种（design.md 3.8）：显式失败效果，或无效果；失败原因走 Diagnostic.reason，
  * 不新建错误模型。
  */
-import type { RuleDef } from '../../../core/kernel/events/types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import { playRule } from './rules.damage.js';
+import type { RuleDef } from '../../../core/kernel/events/types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import { playRule } from './rules.damage';
 import {
   eq,
   ifEffect,
@@ -22,7 +22,7 @@ import {
   or,
   requestField,
   setRequestField,
-} from './expr.js';
+} from './expr';
 import {
   EVENT_GATEWAY_EVALUATE,
   GATEWAY_KIND_CHECK,
@@ -33,7 +33,7 @@ import {
   REQ_FIELD_VETO,
   RULE_GATEWAY_BEFORE,
   RULE_GATEWAY_DEFAULT,
-} from './ids.js';
+} from './ids';
 
 /** 网关类型（design.md 3.8 的 GatewayKind）。 */
 export type GatewayKind = 'resourceConversion' | 'check' | 'condition';

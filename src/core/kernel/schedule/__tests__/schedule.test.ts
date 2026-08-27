@@ -3,19 +3,19 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { registerScheduleOps } from '../schedule-ops.js';
-import { PlaypackLoader } from '../playpack.js';
-import { PolicyEvaluator } from '../policy.js';
-import type { ScheduleDef } from '../types.js';
-import type { PlaypackDef } from '../playpack.js';
-import type { PolicyDef } from '../policy.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { DefRegistry } from '../../state/def.js';
-import type { Def } from '../../state/def.js';
-import { err, ok } from '../../ops/result.js';
+import { registerScheduleOps } from '../schedule-ops';
+import { PlaypackLoader } from '../playpack';
+import { PolicyEvaluator } from '../policy';
+import type { ScheduleDef } from '../types';
+import type { PlaypackDef } from '../playpack';
+import type { PolicyDef } from '../policy';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { DefRegistry } from '../../state/def';
+import type { Def } from '../../state/def';
+import { err, ok } from '../../ops/result';
 
 const simpleSchedule: ScheduleDef = {
   id: 's:sched1',

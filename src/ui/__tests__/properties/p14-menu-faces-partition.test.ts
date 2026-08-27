@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { buildMenuFaces } from '../../interaction/menu-faces.js';
-import { arbLegalActionSet } from '../support/arbitraries.js';
+import { buildMenuFaces } from '../../interaction/menu-faces';
+import { arbLegalActionSet } from '../support/arbitraries';
 
 it('任意合法动作集的两个菜单面互斥、并集完整且零费面恒可用', () => {
   fc.assert(fc.property(fc.integer({ min: 0, max: 60 }).chain(arbLegalActionSet), (actions) => {

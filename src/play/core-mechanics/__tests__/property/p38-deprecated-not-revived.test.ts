@@ -6,7 +6,7 @@ import * as fc from 'fast-check';
 import {
   genActionRef,
   genMechanicName
-} from './generators.js';
+} from './generators';
 
 /**
  * P38: 已否决机制不得复活

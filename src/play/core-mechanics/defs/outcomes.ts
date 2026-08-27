@@ -7,8 +7,8 @@
  *
  * 具体模式的胜负平衡数值不在此默认化（Requirement 20.13 / 21.4）。
  */
-import type { OutcomeDef } from '../../../core/kernel/schedule/playpack.js';
-import { and, eq, gt, includesOf, isNull, lenOf, not, notNull, or, pathOf } from './expr.js';
+import type { OutcomeDef } from '../../../core/kernel/schedule/playpack';
+import { and, eq, gt, includesOf, isNull, lenOf, not, notNull, or, pathOf } from './expr';
 import {
   PATH_MATCH_ENDED,
   PATH_ROUND,
@@ -17,7 +17,7 @@ import {
   TAG_DOWNED_ZERO,
   TAG_PERMANENT_EXIT,
   TAG_ROLL_PARTICIPANT,
-} from './ids.js';
+} from './ids';
 
 /** 仍具备投点资格、仍存活、未永久退出的参与者。 */
 const LIVING_PARTICIPANT_WHERE = and(

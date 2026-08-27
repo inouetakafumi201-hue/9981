@@ -1,0 +1,70 @@
+{
+  "manifestId": "wakeup-prompt-pack-reference-assets",
+  "version": "1.0.0",
+  "purpose": "Directly attachable visual and prompt references for frontend AI generation; source provenance remains non-AI-readable.",
+  "sourcePolicy": {
+    "sourceDirectory": "../source",
+    "directToAi": false,
+    "role": "provenance-only",
+    "legacyPolicy": "Historical material is migration evidence only and cannot restore superseded UI decisions."
+  },
+  "assets": [
+    {
+      "assetId": "A-201",
+      "fileName": "A-201-hud-refined2.png",
+      "path": "A-201-hud-refined2.png",
+      "source": "hud-visual-baseline / registered HUD refined2 reference",
+      "page": "hud-main",
+      "batch": "B2",
+      "kind": "image/png",
+      "status": "ready",
+      "directToAi": true,
+      "description": "Primary HUD spatial and hierarchy reference. It is visual guidance only and does not encode rules or live data."
+    },
+    {
+      "assetId": "A-202",
+      "fileName": "A-202-hud-refined.png",
+      "path": "A-202-hud-refined.png",
+      "source": "hud-visual-baseline / registered HUD refined supporting reference",
+      "page": "hud-main",
+      "batch": "B2",
+      "kind": "image/png",
+      "status": "ready",
+      "directToAi": true,
+      "description": "Supporting HUD composition reference for comparing spatial grouping, status bars and action surface."
+    },
+    {
+      "assetId": "A-203",
+      "fileName": "A-203-hud-v3-legacy-tier-reference.png",
+      "path": "A-203-hud-v3-legacy-tier-reference.png",
+      "source": "hud-legacy-v3 / historical HUD tier reference",
+      "page": "hud-main",
+      "batch": "B2",
+      "kind": "image/png",
+      "status": "legacy-reference",
+      "directToAi": true,
+      "description": "Historical comparison only. Do not restore the old four-tier burst model; +3 remains disabled/non-selectable while selection and trigger effects remain."
+    },
+    {
+      "assetId": "A-301",
+      "fileName": "A-301-menu-title-text-prompt.md",
+      "path": "A-301-menu-title-text-prompt.md",
+      "source": "title-screen-prompt / title screen text prompt",
+      "page": "menu-title",
+      "batch": "B1",
+      "kind": "prompt-text",
+      "status": "pending",
+      "directToAi": true,
+      "description": "Text prompt attachment for title-screen visual direction. The real title PNG is not present yet; do not present this markdown as an image or claim that a title screenshot exists."
+    }
+  ],
+  "rules": {
+    "visualAssetsMayBeUsed": true,
+    "zeroMaterialFramingForbidden": true,
+    "maxSimultaneousChoices": 5,
+    "deferredBurstTierSelectableInMvp": false,
+    "requiredBurstEffects": ["selection", "trigger"],
+    "excludedInternalUi": ["editor", "research-bench", "material-library", "computer"],
+    "sourceCopiesAreNotDirectAiAttachments": true
+  }
+}

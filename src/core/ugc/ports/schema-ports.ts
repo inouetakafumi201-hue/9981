@@ -4,8 +4,8 @@
  * 铁律：迁移**转换函数由可信宿主提供**，候选 JSON 永远不能声明转换函数或注册新的迁移边。
  * 文档 Schema 迁移（本文件）与运行时状态迁移（引擎层 `MigrationDef`）是两条不可互通的路径。
  */
-import type { JsonAst } from '../model/json-ast.js';
-import type { UgcResult } from '../model/result.js';
+import type { JsonAst } from '../model/json-ast';
+import type { UgcResult } from '../model/result';
 
 export interface SchemaVersionCatalog {
   readonly providerId: string;

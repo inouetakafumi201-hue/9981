@@ -16,9 +16,9 @@ import {
   sampleMap,
   setNodeFloor,
   updateEdge,
-} from './editor-state.js';
-import { validateMapStructure } from '../ports/map-contracts.js';
-import { distance } from '../ports/map-contracts.js';
+} from './editor-state';
+import { validateMapStructure } from '../ports/map-contracts';
+import { distance } from '../ports/map-contracts';
 
 /** 任意一张合法地图：一组随机节点 + 一组尽量不越界的随机边。 */
 function anyMap(): fc.Arbitrary<any> {

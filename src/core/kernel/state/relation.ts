@@ -4,8 +4,8 @@
  * RelationIndex 只保留 relOut/relIn 两个纯读方法；relation.set/relation.del 作为公开 Op 在 L3 注册，
  * 这里提供的 update* 函数是那两个 Op 内部调用的私有 helper（写入通道情形b），不对外暴露。
  */
-import type { Ref } from './ids.js';
-import type { Value } from './value.js';
+import type { Ref } from './ids';
+import type { Value } from './value';
 
 export interface Relation {
   readonly kind: string;

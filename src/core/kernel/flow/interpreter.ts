@@ -3,18 +3,18 @@
  * 十种 Effect 形态：op/let/if/forEach/while/emit/after/at/try/abort。
  * 不提供函数定义、递归、闭包（需求22.3）；每条 Effect（含每次迭代）计入 step 预算。
  */
-import type { Effect } from '../events/effect-types.js';
-import type { Result } from '../ops/result.js';
-import { ok, err } from '../ops/result.js';
-import type { OpContext } from '../ops/registry.js';
-import type { OpRegistry } from '../ops/registry.js';
-import type { Value } from '../state/value.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import type { Query } from '../state/expr-types.js';
-import type { DefRegistry } from '../state/def.js';
-import type { Ref } from '../state/ids.js';
+import type { Effect } from '../events/effect-types';
+import type { Result } from '../ops/result';
+import { ok, err } from '../ops/result';
+import type { OpContext } from '../ops/registry';
+import type { OpRegistry } from '../ops/registry';
+import type { Value } from '../state/value';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
+import { QueryEngine } from '../expr/query-engine';
+import type { Query } from '../state/expr-types';
+import type { DefRegistry } from '../state/def';
+import type { Ref } from '../state/ids';
 
 export interface FlowRunResult {
   result: Result<void>;
@@ -46,7 +46,7 @@ export class FlowInterpreter {
   }
 
   /** 使用与 Flow 相同的完整上下文求值，供 Hook when 复用 Query/具名表达式/refGet。 */
-  evaluate(expr: import('../state/expr-types.js').Expr, ctx: OpContext, vars: Record<string, Value>): Value | null {
+  evaluate(expr: import('../state/expr-types').Expr, ctx: OpContext, vars: Record<string, Value>): Value | null {
     return this.exprEngine.eval(expr, this.evalCtx(vars, ctx));
   }
 
@@ -102,7 +102,7 @@ export class FlowInterpreter {
         const body = def['body'];
         return body === undefined ? null : {
           params: Array.isArray(def['params']) ? def['params'] as string[] : undefined,
-          body: body as import('../state/expr-types.js').Expr,
+          body: body as import('../state/expr-types').Expr,
         };
       },
       runQuery: (query: Query) => this.queryEngine.run(ctx.tx.getDraft(), query, {

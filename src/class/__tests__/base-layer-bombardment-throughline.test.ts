@@ -22,15 +22,15 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { createFullHarness } from '../../core/kernel/testing/full-harness.js';
-import { parseClassCatalog } from '../class-contract.js';
-import { parseClassJson, parseStrictDataJson } from '../catalog-loader.js';
-import { CATALOG_DIRS, UNIFORM_CATALOG_DIRS, catalogText } from './catalog-fixtures.js';
+import { createFullHarness } from '../../core/kernel/testing/full-harness';
+import { parseClassCatalog } from '../class-contract';
+import { parseClassJson, parseStrictDataJson } from '../catalog-loader';
+import { CATALOG_DIRS, UNIFORM_CATALOG_DIRS, catalogText } from './catalog-fixtures';
 import {
   buildOpReferenceReport,
   buildRealOpNameSet,
   collectAllCatalogOpUses,
-} from './base-layer-bombardment-harness.js';
+} from './base-layer-bombardment-harness';
 
 const UNIFORM_SET: ReadonlySet<string> = new Set(UNIFORM_CATALOG_DIRS);
 

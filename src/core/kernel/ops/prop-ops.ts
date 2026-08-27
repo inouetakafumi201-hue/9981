@@ -2,13 +2,13 @@
  * L3 Ops: 属性类 Op（design.md 3.4节 / 需求16.5）。
  * prop.set / prop.del / prop.add（尊重 clamp） / list.insert / list.remove / tag.add / tag.del
  */
-import type { OpImpl, OpContext } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import type { Value } from '../state/value.js';
-import { validateValue } from '../state/value.js';
-import { ok, err } from './result.js';
-import { getPath, setPath, deletePath, isWritablePropsPath } from './path.js';
-import type { Def } from '../state/def.js';
+import type { OpImpl, OpContext } from './registry';
+import type { OpRegistry } from './registry';
+import type { Value } from '../state/value';
+import { validateValue } from '../state/value';
+import { ok, err } from './result';
+import { getPath, setPath, deletePath, isWritablePropsPath } from './path';
+import type { Def } from '../state/def';
 
 export interface PropSetArgs {
   path: string;

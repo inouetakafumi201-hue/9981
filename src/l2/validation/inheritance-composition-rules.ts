@@ -11,12 +11,12 @@
  * （谱系环、跨定义字段合并、嵌套组件先解析等在 resolution 阶段做，本处做定义级静态检查。）
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath } from '../model/ids.js';
-import { typeIdentityDiffers } from '../model/reference.js';
-import type { CandidateDefinition } from '../model/definition.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath } from '../model/ids';
+import { typeIdentityDiffers } from '../model/reference';
+import type { CandidateDefinition } from '../model/definition';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 function findDefinition(context: ValidationContext, id: string): CandidateDefinition | undefined {
   return context.candidateDefinitions.find((definition) => definition.id === id);

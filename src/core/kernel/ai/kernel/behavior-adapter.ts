@@ -7,12 +7,12 @@
  * and produces a `ValidatedAIBehaviorBinding`. It never invents a parameter, a
  * state machine, a patrol route or a threshold.
  */
-import type { DefRegistry } from '../../state/def.js';
-import type { Def } from '../../state/def.js';
-import type { Id, Ref } from '../../state/ids.js';
-import type { Value } from '../../state/value.js';
-import type { AIPolicyCategory, AIResult, ValidatedAIBehaviorBinding, ValidatedAIParameter } from '../types.js';
-import { resolveStatePath } from './state-read.js';
+import type { DefRegistry } from '../../state/def';
+import type { Def } from '../../state/def';
+import type { Id, Ref } from '../../state/ids';
+import type { Value } from '../../state/value';
+import type { AIPolicyCategory, AIResult, ValidatedAIBehaviorBinding, ValidatedAIParameter } from '../types';
+import { resolveStatePath } from './state-read';
 
 export interface AIBehaviorParameterSchema {
   /** Read path inside the binding definition, e.g. `props.alertLevel`. */

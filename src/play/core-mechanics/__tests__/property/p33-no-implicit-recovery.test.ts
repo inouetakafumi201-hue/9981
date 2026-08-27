@@ -7,7 +7,7 @@ import {
   genEntityRef,
   genHealthValue,
   genAPValue
-} from './generators.js';
+} from './generators';
 
 /**
  * P33: 无隐式恢复，增量必可归因

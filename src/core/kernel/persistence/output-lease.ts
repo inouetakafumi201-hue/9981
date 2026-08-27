@@ -11,8 +11,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { ArtifactStore, ArtifactManifest } from './artifact-store.js';
-import { hashBytes } from './artifact-store.js';
+import type { ArtifactStore, ArtifactManifest } from './artifact-store';
+import { hashBytes } from './artifact-store';
 
 export type OutputLeaseState = 'open' | 'revoked' | 'published';
 

@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbPaidAction } from './generators.js';
+import { arbPaidAction } from './generators';
 
 describe('Property 7: 付费动作 1 AP 约束', () => {
   it('合法付费动作：cost 恰好一项，pool=ap，amount=1', () => {

@@ -11,25 +11,25 @@
  * before:item.move 规则 + 禁存清单实现（见 rules.phase.ts 的 DEVIATION-09），不复用尸体系统、
  * 不复用死者原背包实体（Requirement 12.7）。
  */
-import type { PlaypackDef, PoolDef } from '../../../core/kernel/schedule/playpack.js';
-import type { Def } from '../../../core/kernel/state/def.js';
+import type { PlaypackDef, PoolDef } from '../../../core/kernel/schedule/playpack';
+import type { Def } from '../../../core/kernel/state/def';
 import {
   buildNumericOwnership,
   constitutionalConstant,
   internalMetric,
   playExt,
   structuralBound,
-} from '../ownership.js';
-import { CORE_ATTACHMENT_DEFS } from './attachments.js';
-import { CORE_PAID_ACTIONS } from './actions.paid.js';
-import { CORE_ATTACHED_ACTIONS, CORE_ATTACHED_INVOKE_RULES, CORE_ATTACHED_REQUIRE_EXPRS } from './actions.attached.js';
-import { CORE_DAMAGE_RULES } from './rules.damage.js';
-import { CORE_STATUS_RULES, CORE_STATUS_EXPRS } from './rules.status.js';
-import { CORE_GATEWAY_RULES } from './rules.gateway.js';
-import { CORE_PHASE_RULES } from './rules.phase.js';
-import { CORE_MATCH_RULES } from './rules.match.js';
-import { CORE_OUTCOMES } from './outcomes.js';
-import { coreSchedule } from './schedule.js';
+} from '../ownership';
+import { CORE_ATTACHMENT_DEFS } from './attachments';
+import { CORE_PAID_ACTIONS } from './actions.paid';
+import { CORE_ATTACHED_ACTIONS, CORE_ATTACHED_INVOKE_RULES, CORE_ATTACHED_REQUIRE_EXPRS } from './actions.attached';
+import { CORE_DAMAGE_RULES } from './rules.damage';
+import { CORE_STATUS_RULES, CORE_STATUS_EXPRS } from './rules.status';
+import { CORE_GATEWAY_RULES } from './rules.gateway';
+import { CORE_PHASE_RULES } from './rules.phase';
+import { CORE_MATCH_RULES } from './rules.match';
+import { CORE_OUTCOMES } from './outcomes';
+import { coreSchedule } from './schedule';
 import {
   DEATH_BAG_CONTAINER_NAME,
   ENTITY_DEATH_BAG,
@@ -38,7 +38,7 @@ import {
   POOL_STAMINA,
   SCHEDULE_ID,
   STAMINA_MAX,
-} from './ids.js';
+} from './ids';
 
 /**
  * 死亡背包实体定义。容器 insert:'fixed'（灌注时逐个 slot.add，见 design.md 3.11）。
@@ -88,6 +88,16 @@ const playpackBody = {
   ],
 };
 
+/** 挂进 Hook 管道的全部 RuleDef（经 CoreMechanicsPlaypack.rules 引用挂载，与 UGC 包同一装载语义）。 */
+export const CORE_MECHANICS_RULES = [
+  ...CORE_ATTACHED_INVOKE_RULES,
+  ...CORE_DAMAGE_RULES,
+  ...CORE_STATUS_RULES,
+  ...CORE_GATEWAY_RULES,
+  ...CORE_PHASE_RULES,
+  ...CORE_MATCH_RULES,
+];
+
 /**
  * CoreMechanicsPlaypack。
  *
@@ -96,6 +106,7 @@ const playpackBody = {
  */
 export const CoreMechanicsPlaypack: PlaypackDef = {
   ...playpackBody,
+  rules: [...CORE_MECHANICS_RULES.map((rule) => rule.id)],
   play: playExt({
     // 只对 Playpack 自身的数值（池的 min/max）分类；`defs` 数组里子定义的数值各自分类，
     // 因此从归属计算的输入里剔除 defs（buildNumericOwnership 的遍历不受根级排除影响）。
@@ -115,13 +126,3 @@ export const CoreMechanicsPlaypack: PlaypackDef = {
 
 /** 本玩法包注册进注册表的全部定义（供装载入口逐个 register）。 */
 export const CORE_MECHANICS_DEFS: readonly Def[] = playpackBody.defs;
-
-/** 挂进 Hook 管道的全部 RuleDef（供装载入口交给 RuleProvider）。 */
-export const CORE_MECHANICS_RULES = [
-  ...CORE_ATTACHED_INVOKE_RULES,
-  ...CORE_DAMAGE_RULES,
-  ...CORE_STATUS_RULES,
-  ...CORE_GATEWAY_RULES,
-  ...CORE_PHASE_RULES,
-  ...CORE_MATCH_RULES,
-];

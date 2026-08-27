@@ -9,9 +9,9 @@
  * `ActionPort` 的意图仍须经过完整的当前状态复校。
  */
 
-import { compareRevision, type StateRevision } from '../model/revision.js';
-import type { InteractionIntent } from '../model/intent.js';
-import type { SubmissionOutcome } from '../ports/action-port.js';
+import { compareRevision, type StateRevision } from '../model/revision';
+import type { InteractionIntent } from '../model/intent';
+import type { SubmissionOutcome } from '../ports/action-port';
 
 export type RegisterOutcome =
   | { readonly kind: 'registered'; readonly intentId: string }

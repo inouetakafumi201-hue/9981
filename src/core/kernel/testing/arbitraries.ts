@@ -7,10 +7,10 @@
  * 这里先给出 Value 的生成器（跨层复用）与一个可扩展的 WorldState 骨架生成器。
  */
 import fc from 'fast-check';
-import type { Value } from '../state/value.js';
-import type { WorldState } from '../state/world-state.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { WORLD_REF } from '../state/ids.js';
+import type { Value } from '../state/value';
+import type { WorldState } from '../state/world-state';
+import { createEmptyWorldState } from '../state/world-state';
+import { WORLD_REF } from '../state/ids';
 
 /** 任意合法 Value 的生成器，跨层测试复用（需求1.1、4.2 的属性测试基础设施）。 */
 export const valueArb: fc.Arbitrary<Value> = fc.letrec<{ value: Value }>((tie) => ({

@@ -15,9 +15,9 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from '../model/diagnostic.js';
-import type { PresentationProfile } from '../model/profile.js';
-import { PENDING_CONVERGENCE_CODE, convergenceDiagnostic } from '../ports/convergence.js';
+} from '../model/diagnostic';
+import type { PresentationProfile } from '../model/profile';
+import { PENDING_CONVERGENCE_CODE, convergenceDiagnostic } from '../ports/convergence';
 
 /** 通用不可用文案。它不含任何规则条件，因此对任何观察者都安全。 */
 export const GENERIC_UNAVAILABILITY_TEXT = '当前不可用';

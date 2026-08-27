@@ -1,11 +1,11 @@
 /**
  * L7 Decision/Intent: DecisionDef 结构（design.md 3.8节 / 需求27.1-27.7）。
  */
-import type { Id, Ref } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
+import type { Id, Ref } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Expr } from '../state/expr-types';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
 
 export interface DecisionDef extends Def {
   readonly kind: 'decision';

@@ -5,7 +5,7 @@
  * 也不改变任何规则状态。集合外语义以及招架的静默失效分支均返回空输出。
  */
 
-import type { PresentationProfile } from '../model/profile.js';
+import type { PresentationProfile } from '../model/profile';
 
 export const DEFAULT_CEREMONIAL_ACTION_SEMANTICS = [
   'vault-window',

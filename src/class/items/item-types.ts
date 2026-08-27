@@ -14,7 +14,7 @@ import type {
   ClassCatalogCapability,
   ClassCatalogClassEntry,
   ClassCatalogParameter,
-} from '../class-contract.js';
+} from '../class-contract';
 
 /** 可序列化、可扩展的能力配置。 */
 export type ItemConfiguration = Readonly<Record<string, unknown>>;

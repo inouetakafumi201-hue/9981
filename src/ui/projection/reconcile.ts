@@ -13,9 +13,9 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from '../model/diagnostic.js';
-import type { RuleEventProjection } from '../model/event-projection.js';
-import { compareRevision, type StateRevision } from '../model/revision.js';
+} from '../model/diagnostic';
+import type { RuleEventProjection } from '../model/event-projection';
+import { compareRevision, type StateRevision } from '../model/revision';
 import {
   entityViewToken,
   type UiActionView,
@@ -23,9 +23,9 @@ import {
   type UiEntityView,
   type UiTurnOrderEntry,
   type UiView,
-} from '../model/view.js';
-import type { InternalMetric } from '../presentation/gameplay-value.js';
-import { classifyStaleness } from './staleness.js';
+} from '../model/view';
+import type { InternalMetric } from '../presentation/gameplay-value';
+import { classifyStaleness } from './staleness';
 
 /** 由已验证全量投影 + 已验证描述符组装出的归约输入。 */
 export interface ProjectedViewBase {

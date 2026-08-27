@@ -4,7 +4,7 @@
  * `01` §九「全局输入」：空格+拖 / 中键拖平移（走 SVG viewBox，不走浏览器滚动）、
  * 滚轮以光标为中心缩放。`01` §九「校验反馈」：点击诊断 → 摄像机飞到问题元素。
  */
-import type { Vec2 } from '../ports/map-contracts.js';
+import type { Vec2 } from '../ports/map-contracts';
 
 /** 归一化画布上的 viewBox（用户空间矩形）。scale 越大视野越窄（越放大）。 */
 export interface Camera {

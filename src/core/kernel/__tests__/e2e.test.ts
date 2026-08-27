@@ -4,31 +4,31 @@
  * 2. AI/human decision consistency: queryActions + PolicyDef mode:'search' skeleton
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OpRegistry } from '../ops/registry.js';
-import { WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { resetIdCounters } from '../state/ids.js';
-import { DefRegistry } from '../state/def.js';
-import { registerDecisionOps } from '../decision/decision-ops.js';
-import { registerIntentOps } from '../decision/intent-ops.js';
-import { registerAttachOps } from '../attachment/attach-ops.js';
-import { registerScheduleOps } from '../schedule/schedule-ops.js';
-import { registerRandomOps } from '../random/random-ops.js';
-import { PlaypackLoader } from '../schedule/playpack.js';
-import { PolicyEvaluator } from '../schedule/policy.js';
-import { DiagnosticSink } from '../safety/safety.js';
-import { PresentationGateway } from '../gateway.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import { ActionCatalog } from '../actions/catalog.js';
-import { takeSnapshot, InMemoryCheckpointStore } from '../persistence/persistence.js';
-import type { PlaypackDef } from '../schedule/playpack.js';
-import type { PolicyDef } from '../schedule/policy.js';
-import type { DecisionDef } from '../decision/types.js';
-import type { ScheduleDef } from '../schedule/types.js';
-import type { ActionDef } from '../actions/types.js';
-import type { AttachmentDef } from '../attachment/types.js';
-import type { Def } from '../state/def.js';
+import { OpRegistry } from '../ops/registry';
+import { WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { resetIdCounters } from '../state/ids';
+import { DefRegistry } from '../state/def';
+import { registerDecisionOps } from '../decision/decision-ops';
+import { registerIntentOps } from '../decision/intent-ops';
+import { registerAttachOps } from '../attachment/attach-ops';
+import { registerScheduleOps } from '../schedule/schedule-ops';
+import { registerRandomOps } from '../random/random-ops';
+import { PlaypackLoader } from '../schedule/playpack';
+import { PolicyEvaluator } from '../schedule/policy';
+import { DiagnosticSink } from '../safety/safety';
+import { PresentationGateway } from '../gateway';
+import { QueryEngine } from '../expr/query-engine';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import { ActionCatalog } from '../actions/catalog';
+import { takeSnapshot, InMemoryCheckpointStore } from '../persistence/persistence';
+import type { PlaypackDef } from '../schedule/playpack';
+import type { PolicyDef } from '../schedule/policy';
+import type { DecisionDef } from '../decision/types';
+import type { ScheduleDef } from '../schedule/types';
+import type { ActionDef } from '../actions/types';
+import type { AttachmentDef } from '../attachment/types';
+import type { Def } from '../state/def';
 
 const exprEngine = new ExprEngine();
 
@@ -97,7 +97,7 @@ describe('E2E 1: Nested-depth invariance (requirement 43)', () => {
     };
     const actionDef: ActionDef = {
       id: 'a:cast_vote', kind: 'action', label: 'Cast Vote',
-      require: true, cost: [], effects: [],
+      require: true, cost: [], effects: [], track: 'highlight',
     };
     const attachDef: AttachmentDef = {
       id: 'att:voted', kind: 'attachment', stackStrategy: 'unique',
@@ -139,7 +139,7 @@ describe('E2E 2: AI/human decision consistency (requirement 44)', () => {
 
     const actionDef: ActionDef = {
       id: 'a:move', kind: 'action', label: 'Move',
-      require: true, cost: [], effects: [],
+      require: true, cost: [], effects: [], track: 'highlight',
     };
 
     const catalog = new ActionCatalog({
@@ -231,7 +231,7 @@ describe('E2E 2: AI/human decision consistency (requirement 44)', () => {
       onTimeout: 'void', onResolve: [],
     };
     const actDef: ActionDef = {
-      id: 'a:move', kind: 'action', label: 'Move', require: true, cost: [], effects: [],
+      id: 'a:move', kind: 'action', label: 'Move', require: true, cost: [], effects: [], track: 'highlight',
     };
 
     const defs = new Map<string, Def>([

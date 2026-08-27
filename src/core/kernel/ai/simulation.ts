@@ -5,15 +5,15 @@
  * silence, and the canonical Action -> Decision/Intent -> Op transaction path.
  * This module manages lifecycle ordering but has no state or random access.
  */
-import type { LegalAction } from '../actions/types.js';
-import type { Ref } from '../state/ids.js';
+import type { LegalAction } from '../actions/types';
+import type { Ref } from '../state/ids';
 import type {
   AIResult,
   NPCActionRequest,
   SimulationAdapter,
   SimulationHandle,
   SimulationOutcome,
-} from './types.js';
+} from './types';
 
 export interface CanonicalSimulationSession {
   attemptCanonical(actor: Ref, candidate: LegalAction): AIResult<SimulationOutcome>;

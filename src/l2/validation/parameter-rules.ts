@@ -7,14 +7,14 @@
  * 结构边界/宪法常量必须带来源；内部度量走自身 Schema；L2 不得内嵌玩法平衡表。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { GAMEPLAY_VALUE_RANGE, GAMEPLAY_VALUE_RANGE_SOURCE } from '../model/constitution.js';
-import { NUMERIC_DECLARED_TYPES, type ParameterField, type ParameterSchema } from '../model/schema.js';
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
-import type { SourceRecord } from '../model/source.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { GAMEPLAY_VALUE_RANGE, GAMEPLAY_VALUE_RANGE_SOURCE } from '../model/constitution';
+import { NUMERIC_DECLARED_TYPES, type ParameterField, type ParameterSchema } from '../model/schema';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
+import type { SourceRecord } from '../model/source';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 function GAMEPLAY_VALUE_RANGE_SOURCE_REF(): SourceRecord {
   return GAMEPLAY_VALUE_RANGE_SOURCE;

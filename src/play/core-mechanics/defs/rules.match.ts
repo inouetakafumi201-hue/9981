@@ -5,9 +5,9 @@
  * 终局写入不挂 `after:outcome.reach`（after 阶段写入会被 HookDispatcher 回滚），
  * 而是消费 `play.outcome.reached` 的 default 阶段。
  */
-import type { RuleDef } from '../../../core/kernel/events/types.js';
-import { playRule, RULE_OWNERSHIP_RULES } from './rules.damage.js';
-import { internalMetric } from '../ownership.js';
+import type { RuleDef } from '../../../core/kernel/events/types';
+import { playRule, RULE_OWNERSHIP_RULES } from './rules.damage';
+import { internalMetric } from '../ownership';
 import {
   and,
   concatStr,
@@ -28,7 +28,7 @@ import {
   refGet,
   refId,
   varOf,
-} from './expr.js';
+} from './expr';
 import {
   ATT_OVERLOADED,
   EVENT_OUTCOME_REACHED,
@@ -48,7 +48,7 @@ import {
   RULE_ROUND_INCREMENT,
   RULE_SPAWN_DEFAULT,
   TAG_OVERLOADED,
-} from './ids.js';
+} from './ids';
 
 const MATCH_OWNERSHIP_RULES = [
   ...RULE_OWNERSHIP_RULES,

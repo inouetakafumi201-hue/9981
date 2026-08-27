@@ -17,7 +17,7 @@
  * `docs/访谈决策记录.md` 中确实标记为已确认。
  */
 
-import type { InternalMetric } from '../presentation/gameplay-value.js';
+import type { InternalMetric } from '../presentation/gameplay-value';
 
 /**
  * 显著性分层。三档闭合枚举，语义分别是：

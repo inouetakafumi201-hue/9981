@@ -7,10 +7,10 @@
  * 引用图节点/边排序，来源记录排序。等价活动状态 → 相同指纹。
  */
 
-import { canonicalSort, compareStrings, fingerprint, stableStringify } from '../model/ordering.js';
-import { compareSourceRecords } from '../model/ordering.js';
-import type { ResolvedDefinition } from '../model/definition.js';
-import type { SourceRecord } from '../model/source.js';
+import { canonicalSort, compareStrings, fingerprint, stableStringify } from '../model/ordering';
+import { compareSourceRecords } from '../model/ordering';
+import type { ResolvedDefinition } from '../model/definition';
+import type { SourceRecord } from '../model/source';
 import type {
   CanonicalReferenceEdge,
   CanonicalReferenceGraph,
@@ -18,9 +18,9 @@ import type {
   CanonicalSnapshot,
   PackageSnapshot,
   ResolvedDefinitionSnapshot,
-} from '../model/snapshot.js';
-import type { ReferenceGraph } from '../resolution/reference-graph.js';
-import type { ActivatedPackageRecord } from './definition-registry.js';
+} from '../model/snapshot';
+import type { ReferenceGraph } from '../resolution/reference-graph';
+import type { ActivatedPackageRecord } from './definition-registry';
 
 /** 定义的规范化 JSON 投影：只含语义字段，排除位置等非语义信息。 */
 function canonicalDefinitionProjection(definition: ResolvedDefinition): unknown {

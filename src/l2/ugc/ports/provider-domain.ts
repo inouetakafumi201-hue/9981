@@ -17,8 +17,8 @@
  * 导出的 Def kind 清单里，说明这条引用越过领域边界使用了未导出的身份 → `provider-contract`。
  */
 
-import type { IntegrationContractSnapshot, IntegrationDomain } from '../../../core/ugc/model/contract-types.js';
-import { compareStrings } from '../../model/ordering.js';
+import type { IntegrationContractSnapshot, IntegrationDomain } from '../../../core/ugc/model/contract-types';
+import { compareStrings } from '../../model/ordering';
 
 /** 某个身份（Def kind 或语义族）的导出方集合。 */
 export interface ProviderIndex {

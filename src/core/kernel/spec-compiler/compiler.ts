@@ -22,24 +22,24 @@
  * 联系：若需绕过冻结，请在架构评审会上讨论修订 D-061。
  */
 
-import type { CompilationStage, Diagnostic, DiagnosticArgument, SourceRecord } from '../state/diagnostic.js';
-import type { ErrCode } from '../state/error-codes.js';
-import { CompilationHaltedError, FatalErrorBoundary } from '../safety/fatal-boundary.js';
-import type { EmergencyCode, EmergencySink } from '../safety/fatal-boundary.js';
-import { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory.js';
-import { JsonCodecError, StrictJsonCodec, canonicalStringify, compareCodePoints } from './json-codec.js';
-import { CandidateMigrationRegistry, InMemorySpecificationRegistry, SchemaRegistry } from './registries.js';
-import type { RegistrySnapshot } from './registries.js';
-import { OutputLease, OutputLeaseError, hashBytes } from './output-lease.js';
-import type { ArtifactStore } from './output-lease.js';
-import { SpecificationValidator } from './validator.js';
-import { checkDiagnosticClosure } from './closure.js';
-import { findSemanticFieldDamage } from './integrity.js';
-import { modelToJson, provenanceToJson } from './model-json.js';
-import { ZH_CN_CREATOR_BUNDLE, bundleEntry, interpolate } from './messages.js';
-import type { CreatorMessageBundle } from './messages.js';
-import { createSourceRecord } from '../state/source-record.js';
-import { DEFAULT_TECHNICAL_QUOTAS, validateTechnicalQuotas } from './types.js';
+import type { CompilationStage, Diagnostic, DiagnosticArgument, SourceRecord } from '../state/diagnostic';
+import type { ErrCode } from '../state/error-codes';
+import { CompilationHaltedError, FatalErrorBoundary } from '../safety/fatal-boundary';
+import type { EmergencyCode, EmergencySink } from '../safety/fatal-boundary';
+import { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory';
+import { JsonCodecError, StrictJsonCodec, canonicalStringify, compareCodePoints } from './json-codec';
+import { CandidateMigrationRegistry, InMemorySpecificationRegistry, SchemaRegistry } from './registries';
+import type { RegistrySnapshot } from './registries';
+import { OutputLease, OutputLeaseError, hashBytes } from './output-lease';
+import type { ArtifactStore } from './output-lease';
+import { SpecificationValidator } from './validator';
+import { checkDiagnosticClosure } from './closure';
+import { findSemanticFieldDamage } from './integrity';
+import { modelToJson, provenanceToJson } from './model-json';
+import { ZH_CN_CREATOR_BUNDLE, bundleEntry, interpolate } from './messages';
+import type { CreatorMessageBundle } from './messages';
+import { createSourceRecord } from '../state/source-record';
+import { DEFAULT_TECHNICAL_QUOTAS, validateTechnicalQuotas } from './types';
 import type {
   CandidateDocumentInput,
   CompilationRejection,
@@ -51,7 +51,7 @@ import type {
   SchemaVersion,
   TechnicalQuotas,
   ValidationBaseline,
-} from './types.js';
+} from './types';
 
 export interface CompilerHostOptions {
   readonly schemaRegistry: SchemaRegistry;

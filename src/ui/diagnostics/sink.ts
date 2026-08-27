@@ -5,9 +5,9 @@
  * 实体集合；本地设置不能授予开发面或全知范围。重复项按稳定键折叠，不使用本地时钟。
  */
 
-import type { UiDiagnostic, UiDiagnosticCode, UiDiagnosticSeverity } from '../model/diagnostic.js';
-import type { StateRevision } from '../model/revision.js';
-import type { AuthorizedAgent } from '../model/view.js';
+import type { UiDiagnostic, UiDiagnosticCode, UiDiagnosticSeverity } from '../model/diagnostic';
+import type { StateRevision } from '../model/revision';
+import type { AuthorizedAgent } from '../model/view';
 
 export const DIAGNOSTIC_CATEGORIES = [
   'descriptor-rejection',

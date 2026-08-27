@@ -11,15 +11,19 @@
  *  4. 计算复杂度评分
  *  5. 汇总诊断
  */
-import { parseStrictDataJson } from '../../class/catalog-loader.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
-import { auditNumericValues, type Finding } from '../profiles/audit.js';
-import type { PlayProfile } from '../profiles/catalog.js';
-import { auditNumericOwnership, type NumericFinding } from '../types/numeric-classification.js';
-import { compileMap } from '../map/compile.js';
-import { validateMapStructure, type MapDiagnostic } from '../map/validate.js';
-import type { MapData } from '../map/types.js';
-import { calculateComplexityScore } from './complexity.js';
+import { parseStrictDataJson } from '../../class/catalog-loader';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
+import { StrictJsonCodec } from '../../core/kernel/spec-compiler/json-codec';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../core/kernel/spec-compiler/types';
+import { decodePlaypack } from '../../core/kernel/schedule/playpack-codec';
+import type { PlaypackDef } from '../../core/kernel/schedule/playpack';
+import { auditNumericValues, type Finding } from '../profiles/audit';
+import type { PlayProfile } from '../profiles/catalog';
+import { auditNumericOwnership, type NumericFinding } from '../types/numeric-classification';
+import { compileMap } from '../map/compile';
+import { validateMapStructure, type MapDiagnostic } from '../map/validate';
+import type { MapData } from '../map/types';
+import { calculateComplexityScore } from './complexity';
 import type {
   CompileOptions,
   CompiledPlaypack,
@@ -29,7 +33,7 @@ import type {
   PlaypackDiagnostic,
   PlaypackInput,
   PlaypackSource,
-} from './types.js';
+} from './types';
 
 /**
  * 编译并验证一个玩法包。
@@ -69,13 +73,66 @@ export async function compile(
     return { ok: false, diagnostics };
   }
 
-  // ---- 阶段 2：分类 profile 与地图 ----
+  // ---- 阶段 2：分类 playpack 清单、profile 与地图 ----
+  // playpack 清单（根目录 playpack.json / manifest.json，或顶层 kind:'playpack' 的文档）是
+  // 完整规则包（defs/rules/schedule/actions）的承载清单（D-081 / L0 第十四条：玩法包可携带
+  // 规则与逻辑）。用引擎严格解码链（StrictJsonCodec → decodePlaypack）校验，失败即拒。
   const profiles: ParsedProfile[] = [];
   const maps: ParsedMap[] = [];
+  let playpackDef: PlaypackDef | null = null;
 
   for (const [path, document] of parsedManifests) {
     // 推断类型：路径前缀或顶层字段
-    if (isProfilePath(path) || isProfileDocument(document)) {
+    if (isPlaypackManifestPath(path) || isPlaypackDocument(document)) {
+      if (playpackDef !== null) {
+        diagnostics.push({
+          code: 'PLAYPACK_MULTIPLE_MANIFESTS',
+          severity: 'error',
+          file: path,
+          message: '玩法包 zip 内只能有一个 playpack 清单（playpack.json / manifest.json / kind:playpack）',
+          correction: '把多个规则清单合并为一个 playpack.json，其余内容按 profile/地图 分类',
+          autoFixable: false,
+        });
+        continue;
+      }
+      const recordDoc = asRecord(document);
+      if (recordDoc === null) {
+        diagnostics.push({
+          code: 'PLAYPACK_INVALID_PLAYPACK_SHAPE',
+          severity: 'error',
+          file: path,
+          message: 'playpack 清单必须是一个对象',
+          correction: '确保文件是一个 JSON 对象',
+          autoFixable: false,
+        });
+        continue;
+      }
+      const sourceText = input.manifests.get(path) ?? '';
+      const parsed = new StrictJsonCodec().parse({
+        sourceId: path,
+        documentUri: `file:///playpack/${path}`,
+        sourcePackage: input.id,
+        sourceText,
+        precedence: 100,
+        owningLayer: '玩法层',
+        normativeStatus: 'normative',
+      }, DEFAULT_TECHNICAL_QUOTAS);
+      const decoded = decodePlaypack(parsed);
+      if (!decoded.ok) {
+        for (const diag of decoded.diagnostics) {
+          diagnostics.push({
+            code: 'PLAYPACK_MANIFEST_DECODE_ERROR',
+            severity: 'error',
+            file: path,
+            message: `playpack 清单解码失败：${diag.code} ${diag.message ?? ''}`,
+            correction: '修正清单中的声明（引用、重复 id、字段形状）后重新上传',
+            autoFixable: false,
+          });
+        }
+        continue;
+      }
+      playpackDef = decoded.value;
+    } else if (isProfilePath(path) || isProfileDocument(document)) {
       const category = inferProfileCategory(path, document);
       if (category === null) {
         diagnostics.push({
@@ -185,10 +242,11 @@ export async function compile(
   }
 
   // ---- 阶段 4：计算复杂度评分 ----
+  // 自定义规则数：playpack 清单（若有）里的 rule/action def 数；无清单时为 0（不再硬编码）。
   const complexityScore = calculateComplexityScore({
     profileCount: profiles.length,
     mapCount: compiledMaps.length,
-    customRuleCount: 0, // 暂未实现规则系统
+    customRuleCount: playpackDef !== null ? countPlaypackDefs(playpackDef) : 0,
   });
 
   // ---- 阶段 5：收集引用的基类 id（供审核系统使用） ----
@@ -237,6 +295,8 @@ export async function compile(
       // L-07/D-079 上传两态辨形：无地图→可插拔普通包（态一）；带地图→按地图切口子（态二）。
       // 判定看编译产物地图数量，不看来源声明（来源不带特权）。
       deliveryForm: deliveryFormOf(input.source, compiledMaps.length),
+      // D-081 / L0 第十四条：完整规则包清单（若有）。装配桥据此合并出最终 PlaypackDef。
+      playpackDef: playpackDef ?? undefined,
     },
   };
 }
@@ -266,6 +326,25 @@ function isProfilePath(path: string): boolean {
   if (segments.length < 2) return false;
   const category = segments[0];
   return ['items', 'npcs', 'statuses', 'vehicles', 'weapons'].includes(category ?? '');
+}
+
+/** playpack 清单的标准文件名（包根目录，一级路径）。 */
+function isPlaypackManifestPath(path: string): boolean {
+  const segments = path.split('/');
+  if (segments.length !== 1) return false;
+  return segments[0] === 'playpack.json' || segments[0] === 'manifest.json';
+}
+
+/** 顶层声明 kind:'playpack' 的文档（无论文件名）。 */
+function isPlaypackDocument(doc: JsonValue): boolean {
+  const record = asRecord(doc);
+  if (record === null) return false;
+  return record['kind'] === 'playpack';
+}
+
+/** playpack 清单里 rule/action def 的数量（复杂度评分的 customRuleCount 输入）。 */
+function countPlaypackDefs(playpack: PlaypackDef): number {
+  return playpack.defs.filter((def) => def.kind === 'rule' || def.kind === 'action').length;
 }
 
 function isProfileDocument(doc: JsonValue): boolean {

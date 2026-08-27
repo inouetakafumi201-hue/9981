@@ -2,11 +2,11 @@
  * PT-02：解析端口与注册表端口（CAS）行为测试。
  */
 import { describe, expect, it } from 'vitest';
-import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../../../core/ugc/ports/definition-ports.js';
-import type { ValidationBaseline } from '../../../../core/ugc/model/baseline.js';
-import type { ValidatedChangeSet } from '../../../../core/ugc/model/validated-change-set.js';
-import { createL2PortBundle } from '../port-bundle.js';
-import { budget, contractsSnapshot, makeRequest, makeValidationContext, validPackageJson } from './fixtures.js';
+import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../../../core/ugc/ports/definition-ports';
+import type { ValidationBaseline } from '../../../../core/ugc/model/baseline';
+import type { ValidatedChangeSet } from '../../../../core/ugc/model/validated-change-set';
+import { createL2PortBundle } from '../port-bundle';
+import { budget, contractsSnapshot, makeRequest, makeValidationContext, validPackageJson } from './fixtures';
 
 /** 跑一遍 validate 拿到 UpstreamValidatedCandidate。 */
 function validate(bundle: ReturnType<typeof createL2PortBundle>, json: string) {
@@ -99,7 +99,7 @@ describe('PT-02: DefinitionRegistryGateway CAS 行为', () => {
 
 /** 构造携带真实上游产物的 ValidatedChangeSet（测试用；生产由 UGC 铸造工厂产生）。 */
 function makeChangeSet(
-  validated: import('../../../../core/ugc/model/upstream.js').UpstreamValidatedCandidate,
+  validated: import('../../../../core/ugc/model/upstream').UpstreamValidatedCandidate,
   registryVersion: string,
   targetOwnership: 'base-layer' | 'play-layer' = 'base-layer',
 ): ValidatedChangeSet {

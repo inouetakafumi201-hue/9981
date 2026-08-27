@@ -12,8 +12,8 @@
  *   分类的定义旁边，缺一条即拒绝装载（design.md 2.6 第 2 条要求"无分类即拒绝，不得推断"）。
  * 两者服务不同的输入（profile 文档 / `Def` 对象）与不同的失败时点，不互相替代。
  */
-import type { Def } from '../../core/kernel/state/def.js';
-import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
+import type { Def } from '../../core/kernel/state/def';
+import type { Diagnostic } from '../../core/kernel/state/diagnostic';
 
 // ---------------------------------------------------------------------------
 // 归属分类（design.md 2.6 的四分法，术语取自基类层 Spec，不新造第五类）

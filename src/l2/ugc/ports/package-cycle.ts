@@ -14,12 +14,12 @@
  * 这是纯粹的补充能力，不与 l2 现有职责重叠：l2 从不建包级依赖图。
  */
 
-import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes.js';
-import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic.js';
-import { errorDiagnostic } from '../../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics, compareStrings } from '../../model/ordering.js';
-import type { DefinitionPackage } from '../../model/definition.js';
-import type { ActivatedPackageRecord } from '../../registry/definition-registry.js';
+import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes';
+import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic';
+import { errorDiagnostic } from '../../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics, compareStrings } from '../../model/ordering';
+import type { DefinitionPackage } from '../../model/definition';
+import type { ActivatedPackageRecord } from '../../registry/definition-registry';
 
 export interface PackageCycleInput {
   readonly candidate: DefinitionPackage;

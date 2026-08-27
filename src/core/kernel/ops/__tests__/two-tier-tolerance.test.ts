@@ -11,13 +11,13 @@
  * 这正是"两种容忍度"边界本身，不是测试装载或测试运行期各自的正确性（那些已在别处覆盖）。
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DefRegistry } from '../../state/def.js';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { registerStructuralOps, makeItemMove } from '../structural-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
+import { DefRegistry } from '../../state/def';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { registerStructuralOps, makeItemMove } from '../structural-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
 
 describe('两种容忍度边界：装载期模糊兼容 vs 运行期零容忍', () => {
   beforeEach(() => resetIdCounters());

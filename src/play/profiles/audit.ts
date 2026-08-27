@@ -10,15 +10,15 @@
  *  - `.kiro/specs/l2-base-layer-spec/requirements.md` 需求 6.2/6.4（Paid_Action 单 AP、多步序列）
  *  - 同上 需求 12.1-12.4（引用在装载前必须全部解析且类型匹配）
  */
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CAS_FIELD_GAP_CODE, caSFieldMatches } from '../../l2/model/cas-field-alignment.js';
-import { alignCapabilityToComponentContract } from '../../l2/model/component-alignment.js';
+import { CAS_FIELD_GAP_CODE, caSFieldMatches } from '../../l2/model/cas-field-alignment';
+import { alignCapabilityToComponentContract } from '../../l2/model/component-alignment';
 import {
   COMPOSITION_REGISTRY,
   compileFamilyComponentShapeIndex,
-} from '../../l2/model/family-component-shapes.js';
+} from '../../l2/model/family-component-shapes';
 import {
   CLASS_ROOT,
   familyFor,
@@ -27,8 +27,8 @@ import {
   type ClassLayerIndex,
   type ParameterSpec,
   type PlayProfile,
-} from './catalog.js';
-import { auditNumericOwnership, type NumericFinding } from '../types/numeric-classification.js';
+} from './catalog';
+import { auditNumericOwnership, type NumericFinding } from '../types/numeric-classification';
 
 /** 一条审计诊断。 */
 export interface Finding {

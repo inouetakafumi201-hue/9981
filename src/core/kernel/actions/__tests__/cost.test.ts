@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { freezeCost, settleCost, refundCost } from '../cost.js';
-import type { CostSettleDeps } from '../cost.js';
-import { Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { getPath, setPath } from '../../ops/path.js';
-import { ok } from '../../ops/result.js';
-import type { OpContext } from '../../ops/registry.js';
-import type { CostSpec } from '../types.js';
+import { freezeCost, settleCost, refundCost } from '../cost';
+import type { CostSettleDeps } from '../cost';
+import { Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { getPath, setPath } from '../../ops/path';
+import { ok } from '../../ops/result';
+import type { OpContext } from '../../ops/registry';
+import type { CostSpec } from '../types';
 
 /** Pool 结算从不触及 invokeInline/runEffects，用一个"若被调用即失败"的守卫确认这一点。 */
 const poolSettleDeps: CostSettleDeps = {

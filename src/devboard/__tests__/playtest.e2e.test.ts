@@ -3,9 +3,9 @@
  * 复用 `map-pipeline` 的样例地图（d:scene/yard 等），走 校验→编译→冒烟 全链路。
  */
 import { describe, expect, it } from 'vitest';
-import { playtestSmoke, compileIntoPrefab, structureDiagnostics } from '../verify/playtest.js';
-import { blueprintCopy } from '../editor/map-io.js';
-import type { MapData, MapClassIndex } from '../ports/map-contracts.js';
+import { playtestSmoke, compileIntoPrefab, structureDiagnostics } from '../verify/playtest';
+import { blueprintCopy } from '../editor/map-io';
+import type { MapData, MapClassIndex } from '../ports/map-contracts';
 
 function sleeperMap(): MapData {
   return {

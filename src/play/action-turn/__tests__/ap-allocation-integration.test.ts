@@ -17,9 +17,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createFullHarness, type FullHarness } from '../../../core/kernel/testing/full-harness.js';
-import { resetIdCounters } from '../../../core/kernel/state/ids.js';
-import type { PlaypackDef } from '../../../core/kernel/schedule/playpack.js';
+import { createFullHarness, type FullHarness } from '../../../core/kernel/testing/full-harness';
+import { resetIdCounters } from '../../../core/kernel/state/ids';
+import type { PlaypackDef } from '../../../core/kernel/schedule/playpack';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PLAYPACK_PATH = join(HERE, '..', 'playpack.json');

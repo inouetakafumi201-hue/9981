@@ -1,7 +1,7 @@
 /**
  * UGC 模型层导出根。只包含不可变值类型、纯函数与稳定编码；不含任何 I/O、注册表或运行时写入能力。
  */
-export type { UgcOk, UgcRejected, UgcResult } from './result.js';
+export type { UgcOk, UgcRejected, UgcResult } from './result';
 export {
   diagnosticIntegrityFailure,
   hasBlockingDiagnostic,
@@ -10,16 +10,16 @@ export {
   ugcOk,
   ugcReject,
   unwrap,
-} from './result.js';
+} from './result';
 
-export type { FingerprintField, StableFingerprintGateway } from './fingerprint.js';
+export type { FingerprintField, StableFingerprintGateway } from './fingerprint';
 export {
   compareCodePoints,
   compareNullableCodePoints,
   encodeFingerprintPayload,
   fingerprintFields,
   utf8ByteLength,
-} from './fingerprint.js';
+} from './fingerprint';
 
 export type {
   CandidateChangeRequest,
@@ -29,7 +29,7 @@ export type {
   ChangeOperation,
   TargetOwnership,
   UGCAdapter,
-} from './candidate.js';
+} from './candidate';
 export {
   CANDIDATE_SOURCE_KINDS,
   CHANGE_OPERATIONS,
@@ -43,9 +43,9 @@ export {
   isChangeOperation,
   isStableIdentity,
   isTargetOwnership,
-} from './candidate.js';
+} from './candidate';
 
-export type { BindingFieldMismatch, ChangeRequestBinding, ChangeRequestBindingField } from './binding.js';
+export type { BindingFieldMismatch, ChangeRequestBinding, ChangeRequestBindingField } from './binding';
 export {
   CHANGE_REQUEST_BINDING_FIELDS,
   CHANGE_REQUEST_DOMAIN,
@@ -53,7 +53,7 @@ export {
   createChangeRequestBinding,
   diffChangeRequestBindings,
   encodeChangeRequestBindingFields,
-} from './binding.js';
+} from './binding';
 
 export type {
   BaselineComparisonField,
@@ -61,7 +61,7 @@ export type {
   BaselineFieldMismatch,
   ValidationBaseline,
   ValidationBaselineComponents,
-} from './baseline.js';
+} from './baseline';
 export {
   BASELINE_COMPARISON_FIELDS,
   BASELINE_COMPONENT_FIELDS,
@@ -70,7 +70,7 @@ export {
   createValidationBaseline,
   diffValidationBaselines,
   encodeBaselineFields,
-} from './baseline.js';
+} from './baseline';
 
 export type {
   QuotaBudget,
@@ -80,8 +80,8 @@ export type {
   QuotaUsageSnapshot,
   QuotaViolation,
   TrustedQuotaProfile,
-} from './quota-types.js';
-export { QUOTA_KINDS, isQuotaKind } from './quota-types.js';
+} from './quota-types';
+export { QUOTA_KINDS, isQuotaKind } from './quota-types';
 
 export type {
   JsonAst,
@@ -89,13 +89,13 @@ export type {
   JsonMember,
   MigratedCandidateDocument,
   ParsedCandidateDocument,
-} from './json-ast.js';
-export { astSpan } from './json-ast.js';
+} from './json-ast';
+export { astSpan } from './json-ast';
 
-export type { CanonicalCandidate, CanonicalizedChangeRequest } from './canonical-types.js';
+export type { CanonicalCandidate, CanonicalizedChangeRequest } from './canonical-types';
 
-export type { SkippedCheck, ValidationStage } from './stage.js';
-export { VALIDATION_STAGES, compareSkippedChecks, createSkippedCheck, stageIndex } from './stage.js';
+export type { SkippedCheck, ValidationStage } from './stage';
+export { VALIDATION_STAGES, compareSkippedChecks, createSkippedCheck, stageIndex } from './stage';
 
 export type {
   DefinitionRegistryReadSnapshot,
@@ -106,17 +106,17 @@ export type {
   UpstreamResolvedReferenceGraph,
   UpstreamSchemaView,
   UpstreamValidatedCandidate,
-} from './upstream.js';
-export { FIELD_CLASSIFICATIONS } from './upstream.js';
+} from './upstream';
+export { FIELD_CLASSIFICATIONS } from './upstream';
 
-export type { PresentationFallbackDecision } from './presentation.js';
+export type { PresentationFallbackDecision } from './presentation';
 export {
   comparePresentationDecisions,
   createPresentationFallbackDecision,
   isSemanticsPreserving,
-} from './presentation.js';
+} from './presentation';
 
-export type { ValidatedChangeSet } from './validated-change-set.js';
+export type { ValidatedChangeSet } from './validated-change-set';
 
-export type { ActivationResult, ActivationStatus, ValidationReport, ValidationStatus } from './report.js';
-export { isValidatedReport } from './report.js';
+export type { ActivationResult, ActivationStatus, ValidationReport, ValidationStatus } from './report';
+export { isValidatedReport } from './report';

@@ -1,14 +1,14 @@
 /** Canonical candidate revalidation and injected Action/Decision/Intent/Op submission. */
-import { sameLegalAction } from './candidate-planner.js';
-import type { LegalAction } from '../actions/types.js';
-import type { Ref } from '../state/ids.js';
+import { sameLegalAction } from './candidate-planner';
+import type { LegalAction } from '../actions/types';
+import type { Ref } from '../state/ids';
 import type {
   AICandidate,
   AIReadScope,
   AIResult,
   CanonicalCommitResult,
   CandidateCommitGateway,
-} from './types.js';
+} from './types';
 
 /**
  * This adapter is owned by the kernel integration point. submitCanonical must

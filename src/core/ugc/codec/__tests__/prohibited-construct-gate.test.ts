@@ -7,18 +7,18 @@
  *   都必须通过。这是初稿关键字黑名单被作废的直接原因。
  */
 import { describe, expect, it, vi } from 'vitest';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { candidateFromText, createCandidateSource } from '../../model/candidate.js';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import type { TrustedQuotaProfile } from '../../model/quota-types.js';
-import type { ParsedCandidateDocument } from '../../model/json-ast.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { UNAVAILABLE_PROVIDER_ID } from '../../ports/availability.js';
-import { createQuotaBudget } from '../../quota/quota-budget.js';
-import { createStrictJsonDecoder } from '../strict-json-decoder.js';
-import { createProhibitedConstructGate } from '../prohibited-construct-gate.js';
-import type { EffectContractView, MemberVerdict } from '../prohibited-construct-gate.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { candidateFromText, createCandidateSource } from '../../model/candidate';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import type { TrustedQuotaProfile } from '../../model/quota-types';
+import type { ParsedCandidateDocument } from '../../model/json-ast';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { UNAVAILABLE_PROVIDER_ID } from '../../ports/availability';
+import { createQuotaBudget } from '../../quota/quota-budget';
+import { createStrictJsonDecoder } from '../strict-json-decoder';
+import { createProhibitedConstructGate } from '../prohibited-construct-gate';
+import type { EffectContractView, MemberVerdict } from '../prohibited-construct-gate';
 
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 const decoder = createStrictJsonDecoder(factory);

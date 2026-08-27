@@ -9,12 +9,12 @@
  * 目录以 (decisionId, sourceFile) 为键区分变体，**绝不按编号合并**（Requirements 1.10–1.12）。
  */
 
-import type { DecisionId, SourceFileId } from '../model/ids.js';
+import type { DecisionId, SourceFileId } from '../model/ids';
 import type {
   OwningLayer,
   SourceClassificationKind,
   SourcePrecedence,
-} from '../model/source.js';
+} from '../model/source';
 
 export const L0_FILE: SourceFileId = 'docs/L0_规范宪法.md';
 export const INTERVIEW_FILE: SourceFileId = 'docs/访谈决策记录.md';

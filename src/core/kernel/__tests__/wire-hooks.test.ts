@@ -8,17 +8,17 @@
  * veto 判断 + effects 真实执行 + after 的只读回滚"三者的相互作用。
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { wireHooksIntoRegistry } from '../wire-hooks.js';
-import { WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { resetIdCounters } from '../state/ids.js';
-import { registerStructuralOps, makeItemMove } from '../ops/structural-ops.js';
-import { registerPropOps } from '../ops/prop-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import { DefRegistry } from '../state/def.js';
-import type { RuleDef } from '../events/types.js';
-import type { Ref } from '../state/ids.js';
-import type { Def } from '../state/def.js';
+import { wireHooksIntoRegistry } from '../wire-hooks';
+import { WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { resetIdCounters } from '../state/ids';
+import { registerStructuralOps, makeItemMove } from '../ops/structural-ops';
+import { registerPropOps } from '../ops/prop-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import { DefRegistry } from '../state/def';
+import type { RuleDef } from '../events/types';
+import type { Ref } from '../state/ids';
+import type { Def } from '../state/def';
 
 const TEST_DEFS = new Map<string, Def>([
   ['d:human', { id: 'd:human', kind: 'entity' }],

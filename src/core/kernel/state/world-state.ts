@@ -6,13 +6,13 @@
  * 但它不计入"顶层集合数恒为6"的计数，因为它不是需求1.8 列举的六个集合之一，
  * 只是 Entity/Item.containers[name] -> Id 索引所指向的辅助表。
  */
-import type { Id } from './ids.js';
-import type { Value } from './value.js';
-import type { Def } from './def.js';
-import type { Entity, Item } from './entity.js';
-import type { Agent } from './agent.js';
-import type { Attachment } from './attachment.js';
-import type { Node, Link, Container } from '../topology/types.js';
+import type { Id } from './ids';
+import type { Value } from './value';
+import type { Def } from './def';
+import type { Entity, Item } from './entity';
+import type { Agent } from './agent';
+import type { Attachment } from './attachment';
+import type { Node, Link, Container } from '../topology/types';
 
 export interface TurnState {
   readonly scheduleId: Id;

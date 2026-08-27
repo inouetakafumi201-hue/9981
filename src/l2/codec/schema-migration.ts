@@ -8,7 +8,7 @@
  * 设计约束：不得携带迁移执行逻辑（executor 由宿主实现）
  */
 
-import { compareCodePoints } from '../../core/kernel/codec/index.js';
+import { compareCodePoints } from '../../core/kernel/codec/index';
 
 /**
  * 单条迁移边的定义

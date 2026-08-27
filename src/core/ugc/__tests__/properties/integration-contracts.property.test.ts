@@ -8,13 +8,13 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { INTEGRATION_DOMAINS } from '../../model/contract-types.js';
-import type { IntegrationContract, IntegrationDomain } from '../../model/contract-types.js';
-import { createIntegrationContractCatalog } from '../../contracts/integration-contract-catalog.js';
-import type { SourceRecord } from '../../../kernel/state/diagnostic.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { INTEGRATION_DOMAINS } from '../../model/contract-types';
+import type { IntegrationContract, IntegrationDomain } from '../../model/contract-types';
+import { createIntegrationContractCatalog } from '../../contracts/integration-contract-catalog';
+import type { SourceRecord } from '../../../kernel/state/diagnostic';
 
 const fingerprint = sha256FingerprintGateway;
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(fingerprint));

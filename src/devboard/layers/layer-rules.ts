@@ -5,7 +5,7 @@
  * 规则来源：L.1 空画布+贴纸锁定、L.2 height 可空+去重、L.4 当前图层可见性、
  * L.8 障碍物落透明淡显、L.9 跨层过渡垂直态/双向判定。
  */
-import type { MapLayer } from './layer-shapes.js';
+import type { MapLayer } from './layer-shapes';
 
 export interface LayerTreeInput {
   readonly layers: readonly MapLayer[];

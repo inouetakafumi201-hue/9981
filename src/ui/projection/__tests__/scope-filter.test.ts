@@ -1,25 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
-import { revision, scope } from '../../__tests__/support/fixtures.js';
-import { uiOk } from '../../model/diagnostic.js';
-import type { RuleEventProjection } from '../../model/event-projection.js';
-import type { UiDiagnostic } from '../../model/diagnostic.js';
+import { revision, scope } from '../../__tests__/support/fixtures';
+import { uiOk } from '../../model/diagnostic';
+import type { RuleEventProjection } from '../../model/event-projection';
+import type { UiDiagnostic } from '../../model/diagnostic';
 import type {
   ActionQueryPort,
   LegalActionQueryOutcome,
   ScopedQueryOutcome,
   ScopedQuerySpec,
   ScopedRef,
-} from '../../ports/action-query-port.js';
-import type { EventSubscription, RawEventSource, RawGatewayEvent } from '../../ports/event-port.js';
+} from '../../ports/action-query-port';
+import type { EventSubscription, RawEventSource, RawGatewayEvent } from '../../ports/event-port';
 import {
   createScopeFilteredEventPort,
   createScopedQueryRunner,
   narrowRawEvent,
   safeFieldRulesFromProfile,
   type SafeFieldRule,
-} from '../scope-filter.js';
-import { profileFixture } from '../../__tests__/support/fixtures.js';
+} from '../scope-filter';
+import { profileFixture } from '../../__tests__/support/fixtures';
 
 const SCOPE = scope({ visibleEntityIds: ['e1', 'e2'], visibleNodeIds: ['n1'] });
 const CURRENT = revision(3, 'fp-3');

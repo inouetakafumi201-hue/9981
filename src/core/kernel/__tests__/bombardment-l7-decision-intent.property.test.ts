@@ -14,18 +14,18 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { registerDecisionOps, makeProcessDecisionTimeouts, type DecisionAnswerDeps } from '../decision/decision-ops.js';
-import { registerIntentOps, type IntentOpsDeps } from '../decision/intent-ops.js';
-import { queryPendingIntentsFor, queryAllPendingIntents } from '../decision/response-phase.js';
-import { OpRegistry, type OpContext } from '../ops/registry.js';
-import { WorldStateHolder, Transaction } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { resetIdCounters } from '../state/ids.js';
-import type { Def } from '../state/def.js';
-import type { DecisionDef } from '../decision/types.js';
-import type { ScheduleDef } from '../schedule/types.js';
-import type { ActionDef } from '../actions/types.js';
-import type { WorldState, IntentState } from '../state/world-state.js';
+import { registerDecisionOps, makeProcessDecisionTimeouts, type DecisionAnswerDeps } from '../decision/decision-ops';
+import { registerIntentOps, type IntentOpsDeps } from '../decision/intent-ops';
+import { queryPendingIntentsFor, queryAllPendingIntents } from '../decision/response-phase';
+import { OpRegistry, type OpContext } from '../ops/registry';
+import { WorldStateHolder, Transaction } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { resetIdCounters } from '../state/ids';
+import type { Def } from '../state/def';
+import type { DecisionDef } from '../decision/types';
+import type { ScheduleDef } from '../schedule/types';
+import type { ActionDef } from '../actions/types';
+import type { WorldState, IntentState } from '../state/world-state';
 
 const sched: ScheduleDef = { id: 's:sched', kind: 'schedule', phases: [{ id: 'p:0' }], loop: true };
 
@@ -42,7 +42,7 @@ function decisionDef(id: string, over: Partial<DecisionDef> = {}): DecisionDef {
 }
 
 function makeActionDef(id: string): ActionDef {
-  return { id, kind: 'action', label: 'Act', require: true, cost: [], effects: [] };
+  return { id, kind: 'action', label: 'Act', require: true, cost: [], effects: [], track: 'highlight' };
 }
 
 interface L7Harness {

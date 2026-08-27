@@ -2,10 +2,10 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { buildAccessibleOutputs } from '../../presentation/accessibility.js';
-import { reduceView } from '../../projection/reconcile.js';
-import { arbHiddenVariantPair } from '../support/arbitraries.js';
-import { entityView, revision, viewBase } from '../support/fixtures.js';
+import { buildAccessibleOutputs } from '../../presentation/accessibility';
+import { reduceView } from '../../projection/reconcile';
+import { arbHiddenVariantPair } from '../support/arbitraries';
+import { entityView, revision, viewBase } from '../support/fixtures';
 
 function renderVisible(world: { readonly visibleProjection: { readonly entities: readonly { readonly entityId: string }[]; readonly semanticStateFingerprint: string } }) {
   const base = viewBase({ revision: revision(1, world.visibleProjection.semanticStateFingerprint), entityIds: [] });

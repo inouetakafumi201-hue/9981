@@ -4,14 +4,14 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { registerRandomOps } from '../random-ops.js';
-import { withShadowStream } from '../shadow-stream.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder, Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import type { OpContext } from '../../ops/registry.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
+import { registerRandomOps } from '../random-ops';
+import { withShadowStream } from '../shadow-stream';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder, Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import type { OpContext } from '../../ops/registry';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
 
 function makeRegistry(): { registry: OpRegistry; holder: WorldStateHolder } {
   const holder = new WorldStateHolder(createEmptyWorldState('sched:1'));

@@ -6,14 +6,14 @@
  * - Diagnostic/source-mapping/determinism/output failures halt the session and revoke the output lease.
  * - Only explicitly optional presentation fields may degrade, and only through a warning.
  */
-export { SpecificationCompiler } from './compiler.js';
-export type { CompilerHostOptions } from './compiler.js';
-export { StrictJsonCodec, JsonCodecError, canonicalStringify } from './json-codec.js';
-export { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory.js';
-export { SpecificationValidator } from './validator.js';
-export type { ValidationContext, ModelValidationResult } from './validator.js';
-export { checkDiagnosticClosure } from './closure.js';
-export type { ClosureIssue } from './closure.js';
+export { SpecificationCompiler } from './compiler';
+export type { CompilerHostOptions } from './compiler';
+export { StrictJsonCodec, JsonCodecError, canonicalStringify } from './json-codec';
+export { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory';
+export { SpecificationValidator } from './validator';
+export type { ValidationContext, ModelValidationResult } from './validator';
+export { checkDiagnosticClosure } from './closure';
+export type { ClosureIssue } from './closure';
 export {
   KNOWN_SEMANTIC_FAMILIES,
   SemanticFamilyError,
@@ -21,7 +21,7 @@ export {
   createSemanticFamilyRegistry,
   failedCriteria,
   satisfiesClassLayerCriteria,
-} from './semantic-family.js';
+} from './semantic-family';
 export {
   GAMEPLAY_VALUE_MAXIMUM,
   GAMEPLAY_VALUE_MINIMUM,
@@ -31,53 +31,53 @@ export {
   collectNumericSchemaIssues,
   declaresInternalMetricSchema,
   requiresBoundProvenance,
-} from './numeric-classification.js';
+} from './numeric-classification';
 export {
   composedTypeIdentity,
   differingFieldNames,
   isEmptyTypeIdentity,
   typeIdentityKey,
   unionTypeIdentity,
-} from './type-identity.js';
+} from './type-identity';
 export {
   buildReferenceGraph,
   computeAncestors,
   lineageOf,
   readMergeRules,
   resolveWorkingSet,
-} from './resolver.js';
-export type { ReferenceGraph, ResolutionOutcome } from './resolver.js';
+} from './resolver';
+export type { ReferenceGraph, ResolutionOutcome } from './resolver';
 export {
   buildWorkingSet,
   readPackageDeclaration,
   toPackageRecord,
   validatePackageDependencies,
-} from './package-change.js';
-export type { PackageDeclaration } from './package-change.js';
-export { modelToJson, provenanceToJson } from './model-json.js';
+} from './package-change';
+export type { PackageDeclaration } from './package-change';
+export { modelToJson, provenanceToJson } from './model-json';
 export {
   SchemaRegistry,
   CandidateMigrationRegistry,
   InMemorySpecificationRegistry,
   hashText,
-} from './registries.js';
-export type { RegistrySnapshot, MigrationPathResult } from './registries.js';
+} from './registries';
+export type { RegistrySnapshot, MigrationPathResult } from './registries';
 export {
   OutputLease,
   OutputLeaseError,
   InMemoryArtifactStore,
   hashBytes,
-} from './output-lease.js';
-export { FileSystemArtifactStore, ArtifactChainError, hashUtf8 } from './filesystem-artifact-store.js';
+} from './output-lease';
+export { FileSystemArtifactStore, ArtifactChainError, hashUtf8 } from './filesystem-artifact-store';
 export type {
   ArtifactStore,
   ArtifactManifest,
   ArtifactManifestEntry,
   ArtifactFailurePoint,
   OutputLeaseState,
-} from './output-lease.js';
-export { DEFAULT_TECHNICAL_QUOTAS, TechnicalQuotaError, validateTechnicalQuotas } from './types.js';
-export { EMPTY_TYPE_IDENTITY } from './types.js';
+} from './output-lease';
+export { DEFAULT_TECHNICAL_QUOTAS, TechnicalQuotaError, validateTechnicalQuotas } from './types';
+export { EMPTY_TYPE_IDENTITY } from './types';
 export type {
   BoundProvenance,
   CandidateDefinition,
@@ -109,7 +109,7 @@ export type {
   TypeIdentity,
   UnresolvedItem,
   ValidationBaseline,
-} from './types.js';
+} from './types';
 
 export {
   COMPILER_EMITTED_CODES,
@@ -121,5 +121,5 @@ export {
   renderCreatorMessage,
   renderGuidance,
   unresolvedPlaceholders,
-} from './messages.js';
-export type { CreatorMessageBundle, CreatorMessageEntry } from './messages.js';
+} from './messages';
+export type { CreatorMessageBundle, CreatorMessageEntry } from './messages';

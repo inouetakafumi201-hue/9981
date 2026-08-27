@@ -5,8 +5,8 @@
  * 动画完成回调只收到不可变的事件标识信息，不能获得任何提交能力。
  */
 
-import type { RuleEventProjection } from '../model/event-projection.js';
-import { compareRevision, revisionSortKey, type StateRevision } from '../model/revision.js';
+import type { RuleEventProjection } from '../model/event-projection';
+import { compareRevision, revisionSortKey, type StateRevision } from '../model/revision';
 
 export const PRESENTATION_COMMAND_KINDS = [
   'play',

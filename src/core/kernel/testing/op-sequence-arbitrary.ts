@@ -10,7 +10,7 @@
  * E_REF_MISSING 而不是内部异常或状态污染。
  */
 import fc from 'fast-check';
-import type { Id } from '../state/ids.js';
+import type { Id } from '../state/ids';
 
 export interface OpCall {
   op: string;

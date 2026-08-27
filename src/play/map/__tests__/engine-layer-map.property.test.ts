@@ -8,8 +8,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { compile, suggestPriceTier } from '../../playpack-compiler/index.js';
-import * as mapping from '../anchor.js';
+import { compile, suggestPriceTier } from '../../playpack-compiler/index';
+import * as mapping from '../anchor';
 
 const {
   createEmptyMapAnchorRegistry,

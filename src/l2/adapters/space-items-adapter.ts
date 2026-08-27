@@ -10,9 +10,9 @@
  * - L1 kernel contract 的运行时语义
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
-import type { ContainerDomainContract, ShieldDomainContract } from '../model/space-items-contracts.js';
-import type { TypedReference } from '../model/reference.js';
+import type { CandidateDefinition } from '../model/definition';
+import type { ContainerDomainContract, ShieldDomainContract } from '../model/space-items-contracts';
+import type { TypedReference } from '../model/reference';
 
 /**
  * 容器运行时配置（从 ContainerDomainContract 转换而来）。

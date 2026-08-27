@@ -1,4 +1,4 @@
-import type { Ref } from '../../core/kernel/state/ids.js';
+import type { Ref } from '../../core/kernel/state/ids';
 
 /**
  * 载具运行时状态的只读视图。所有变更必须由动作提交器解析后经 OpRegistry.invoke 完成。

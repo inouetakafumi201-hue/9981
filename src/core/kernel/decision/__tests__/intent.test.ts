@@ -3,16 +3,16 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { registerIntentOps } from '../intent-ops.js';
-import type { IntentOpsDeps } from '../intent-ops.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { getPath, setPath } from '../../ops/path.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { Def } from '../../state/def.js';
-import { err, ok } from '../../ops/result.js';
+import { registerIntentOps } from '../intent-ops';
+import type { IntentOpsDeps } from '../intent-ops';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { OpRegistry } from '../../ops/registry';
+import { getPath, setPath } from '../../ops/path';
+import type { ActionDef } from '../../actions/types';
+import type { Def } from '../../state/def';
+import { err, ok } from '../../ops/result';
 
 const goodAction: ActionDef = {
   id: 'a:action1',
@@ -21,6 +21,7 @@ const goodAction: ActionDef = {
   require: true,
   cost: [],
   effects: [],
+  track: 'highlight',
 };
 
 const failAction: ActionDef = {
@@ -30,6 +31,7 @@ const failAction: ActionDef = {
   require: false,
   cost: [],
   effects: [],
+  track: 'highlight',
 };
 
 const costAction: ActionDef = {
@@ -39,6 +41,7 @@ const costAction: ActionDef = {
   require: true,
   cost: [{ pool: 'ap', amount: 3 }],
   effects: [],
+  track: 'highlight',
 };
 
 function makeDeps(actions: ActionDef[]): IntentOpsDeps {
@@ -150,6 +153,7 @@ describe('L7 Intent: Property 9 (require recheck before resolve)', () => {
       require: { path: 'world.props.canAct' },
       cost: [{ pool: 'ap', amount: 2 }],
       effects: [],
+      track: 'highlight',
     };
     let state = createEmptyWorldState('sched:1');
     state = setPath(state, 'world.props.canAct', true);
@@ -281,6 +285,7 @@ describe('L7 Intent: Property 9 (require recheck before resolve)', () => {
           require: { path: 'world.props.gate' },
           cost: [],
           effects: [],
+          track: 'highlight',
         };
         let s = createEmptyWorldState('sched:1');
         s = setPath(s, 'world.props.gate', true);

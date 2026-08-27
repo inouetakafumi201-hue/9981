@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from '../prefab.js';
-import type { PrefabDef } from '../prefab.js';
+import { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from '../prefab';
+import type { PrefabDef } from '../prefab';
 
 function makePrefab(): PrefabDef {
   return {

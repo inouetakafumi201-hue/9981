@@ -8,12 +8,12 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createSchemaMigrationCoordinator } from '../../migration/schema-migration-coordinator.js';
-import { budget, edge, migrationGateway, parse, versionCatalog } from '../../migration/__tests__/fixtures.js';
-import { ugcOk } from '../../model/result.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createSchemaMigrationCoordinator } from '../../migration/schema-migration-coordinator';
+import { budget, edge, migrationGateway, parse, versionCatalog } from '../../migration/__tests__/fixtures';
+import { ugcOk } from '../../model/result';
 
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 

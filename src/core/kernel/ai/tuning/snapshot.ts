@@ -5,8 +5,8 @@
  * 键序漂移的 `stateHash`；restoreFromSnapshot 从快照还原结构等价状态。property
  * 保证：restore(snapshot(s)) 结构等于 s，再次 snapshot 得相同 hash。
  */
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { WorldState } from '../../state/world-state.js';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { WorldState } from '../../state/world-state';
 
 /** 世界状态快照：序列化 + 稳定哈希。 */
 export interface WorldStateSnapshot {

@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -13,9 +14,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // devboard 内部用短路径引用，避免相对导入地狱。
-      '@devboard': new URL('./src/devboard', import.meta.url).pathname,
-      '@map': new URL('./src/play/map', import.meta.url).pathname,
+      '@': fileURLToPath(new URL('./src/devboard/editor-shell', import.meta.url)),
+      '@map': fileURLToPath(new URL('./src/play/map', import.meta.url)),
     },
   },
   server: {

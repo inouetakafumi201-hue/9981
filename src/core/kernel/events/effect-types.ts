@@ -8,7 +8,7 @@
  * L5（kernel/flow）的 FlowInterpreter 从这里 import 类型（L5 import L4，方向合法），
  * 不需要像 Expr/Query/ErrCode 那样下沉到 L1。
  */
-import type { Expr } from '../state/expr-types.js';
+import type { Expr } from '../state/expr-types';
 
 export type Effect =
   | { readonly op: string; readonly args: Record<string, Expr>; readonly result?: string }

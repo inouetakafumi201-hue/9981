@@ -2,8 +2,8 @@
  * L1 State: Attachment 结构（design.md 3.1/3.9节 / 需求2.5-2.7）。
  * 本文件只定义数据结构与级联移除的纯函数版本；attach.add/attach.del 作为 Op 在 L3 实现。
  */
-import type { Id, Ref } from './ids.js';
-import type { Value } from './value.js';
+import type { Id, Ref } from './ids';
+import type { Value } from './value';
 
 export interface Attachment {
   readonly id: Id;

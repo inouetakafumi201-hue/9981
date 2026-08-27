@@ -3,9 +3,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import type { ErrCode } from '../../state/error-codes.js';
-import { ERR_CODES } from '../../state/error-codes.js';
-import type { Diagnostic } from '../../state/diagnostic.js';
+import type { ErrCode } from '../../state/error-codes';
+import { ERR_CODES } from '../../state/error-codes';
+import type { Diagnostic } from '../../state/diagnostic';
 import {
   COMPILER_EMITTED_CODES,
   GUIDANCE_ARGUMENT_CONTRACT,
@@ -16,10 +16,10 @@ import {
   renderCreatorMessage,
   renderGuidance,
   unresolvedPlaceholders,
-} from '../index.js';
-import type { CreatorMessageBundle } from '../index.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
-import { collectDiagnostics } from './diagnostic-corpus.js';
+} from '../index';
+import type { CreatorMessageBundle } from '../index';
+import { candidate, createHarness, validDocument } from './fixtures';
+import { collectDiagnostics } from './diagnostic-corpus';
 
 const COMPILER_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ALL_ERR_CODES: readonly string[] = Object.entries(ERR_CODES)

@@ -6,13 +6,13 @@
  *  - 近几轮被反复调的费目降置信（局部化提示）。
  */
 import { describe, expect, it } from 'vitest';
-import { AttributionEngine, type Cause } from '../attribution.js';
-import { buildDecisionTrace } from '../build-trace.js';
-import { scoreBreakdown } from '../../design-currency.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { AssertionViolation } from '../assertions.js';
-import type { DecisionTrace } from '../trace.js';
-import type { BeliefSlice } from '../../types.js';
+import { AttributionEngine, type Cause } from '../attribution';
+import { buildDecisionTrace } from '../build-trace';
+import { scoreBreakdown } from '../../design-currency';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { AssertionViolation } from '../assertions';
+import type { DecisionTrace } from '../trace';
+import type { BeliefSlice } from '../../types';
 
 function slice(facts: Record<string, number>): BeliefSlice {
   return { agent: { $: 'g:agent' }, visibleFacts: { ...facts }, knownFacts: {}, visibleRefs: [], policyContext: {} };

@@ -3,10 +3,10 @@
  * search mode delegates to an injected SearchPolicyResolver (the AI search bridge, backed by the
  * L12 checkpoint/restore machinery). This module keeps no dependency on any decision subsystem.
  */
-import type { Id } from '../state/ids.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from '../events/effect-types.js';
+import type { Id } from '../state/ids';
+import type { Expr } from '../state/expr-types';
+import type { Def } from '../state/def';
+import type { Effect } from '../events/effect-types';
 
 export interface PolicyRuleEntry {
   readonly condition: Expr;

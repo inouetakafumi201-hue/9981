@@ -91,7 +91,7 @@ describe('D-061: No old import guard', () => {
 
       // 示例允许的模式：
       // /* for characterization only */
-      // import { SpecificationCompiler } from '../../spec-compiler/compiler.js';
+      // import { SpecificationCompiler } from '../../spec-compiler/compiler';
     });
 
     it('test imports are marked with intent comments', () => {

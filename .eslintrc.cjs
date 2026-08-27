@@ -59,7 +59,7 @@ module.exports = {
     ecmaVersion: 2022,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'react-hooks'],
   extends: ['eslint:recommended'],
   env: { es2022: true, node: true },
   rules: {
@@ -81,6 +81,17 @@ module.exports = {
       rules: {
         // React.createElement / JSX.IntrinsicElements 走 types 声明，归 TS 管，不由 no-undef 管。
         'no-undef': 'off',
+      },
+    },
+    {
+      // V0 壳层（editor-shell）：按 V0 原样保留，不做风格化 lint 清洗。
+      // 这里保留 `react-hooks/exhaustive-deps` 的关闭态，确保壳层自带的内联
+      // disable 注释与根 lint 规则表一致。
+      files: ['src/devboard/editor-shell/**/*.{ts,tsx}'],
+      rules: {
+        'no-undef': 'off',
+        'no-empty': 'off',
+        'react-hooks/exhaustive-deps': 'off',
       },
     },
     {

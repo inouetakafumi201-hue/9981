@@ -2,14 +2,14 @@
  * L9 PlaypackDef + PlaypackLoader: 5-step loading algorithm
  * (design.md 3.10节 / 需求32.1-32.8, Property 19, 23).
  */
-import type { Id } from '../state/ids.js';
-import type { Def } from '../state/def.js';
-import type { DefRegistry } from '../state/def.js';
-import type { ErrCode } from '../state/error-codes.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Effect } from '../events/effect-types.js';
-import { Linter } from '../safety/safety.js';
+import type { Id } from '../state/ids';
+import type { Def } from '../state/def';
+import type { DefRegistry } from '../state/def';
+import type { ErrCode } from '../state/error-codes';
+import type { Diagnostic } from '../state/diagnostic';
+import type { Expr } from '../state/expr-types';
+import type { Effect } from '../events/effect-types';
+import { Linter } from '../safety/safety';
 
 export interface PoolDef {
   readonly name: string;

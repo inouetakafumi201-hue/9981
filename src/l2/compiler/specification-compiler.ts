@@ -12,14 +12,14 @@
  * 铁律：低优先级示例不会生成基类层默认值；Q-01~Q-05 保持未决；D-009/D-010 编号复用不合并。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { warningDiagnostic } from '../model/diagnostic-factory.js';
-import type { SemanticFamilyRegistration } from '../model/definition.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { structuredRejection } from '../model/diagnostic-factory.js';
-import { isErrorDiagnostic, isWarningDiagnostic } from '../model/diagnostic.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { warningDiagnostic } from '../model/diagnostic-factory';
+import type { SemanticFamilyRegistration } from '../model/definition';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { structuredRejection } from '../model/diagnostic-factory';
+import { isErrorDiagnostic, isWarningDiagnostic } from '../model/diagnostic';
 import type {
   HistoricalExampleEntry,
   L3ProfileEntry,
@@ -27,7 +27,7 @@ import type {
   SourceRecord,
   SourceStatement,
   UnresolvedItem,
-} from '../model/source.js';
+} from '../model/source';
 import {
   canonicalSort,
   compareDiagnostics,
@@ -35,10 +35,10 @@ import {
   compareSourceStatements,
   compareStrings,
   fingerprint,
-} from '../model/ordering.js';
-import { classifyStatement } from './source-classifier.js';
-import { decisionIdentifierReuseDiagnostics, resolveConflict } from './conflict-resolver.js';
-import { isUnresolvedOutcome, type CompiledSpecification, type SourceClassificationOutcome } from './types.js';
+} from '../model/ordering';
+import { classifyStatement } from './source-classifier';
+import { decisionIdentifierReuseDiagnostics, resolveConflict } from './conflict-resolver';
+import { isUnresolvedOutcome, type CompiledSpecification, type SourceClassificationOutcome } from './types';
 
 /** 按语义主张键分组，组内按规范化顺序排列。 */
 export function groupByClaimKey(

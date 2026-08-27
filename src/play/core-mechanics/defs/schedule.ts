@@ -12,9 +12,9 @@
  * 推进失败不是异常：守卫 `abort` 使 `schedule.advance` 返回 `ok:false` 并整体回滚，
  * 阶段索引不变（design.md 7.4 / Requirement 7.10）。
  */
-import type { ScheduleDef, PhaseDef } from '../../../core/kernel/schedule/types.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
-import { buildNumericOwnership, gameplayValue, playExt, structuralBound } from '../ownership.js';
+import type { ScheduleDef, PhaseDef } from '../../../core/kernel/schedule/types';
+import type { Effect } from '../../../core/kernel/events/effect-types';
+import { buildNumericOwnership, gameplayValue, playExt, structuralBound } from '../ownership';
 import {
   and,
   candidateProp,
@@ -33,7 +33,7 @@ import {
   setRequestField,
   varOf,
   vetoGuard,
-} from './expr.js';
+} from './expr';
 import {
   EVENT_OVERLOAD_TICK,
   EVENT_PHASE_SETTLE,
@@ -64,7 +64,7 @@ import {
   REQ_FIELD_VETO,
   SCHEDULE_ID,
   TAG_OVERLOADED,
-} from './ids.js';
+} from './ids';
 
 /** 五阶段名（design.md 3.5 的 `CorePhaseName`）。 */
 export type CorePhaseName = 'roll' | 'settle' | 'playerAction' | 'npcAction' | 'cleanup';

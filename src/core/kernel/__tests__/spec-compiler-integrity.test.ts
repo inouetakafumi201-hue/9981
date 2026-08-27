@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { findSemanticFieldDamage } from '../spec-compiler/integrity.js';
-import type { CompiledModel, JsonValue } from '../spec-compiler/index.js';
-import { buildSchemaVersion, candidate, createHarness } from '../spec-compiler/__tests__/fixtures.js';
+import { findSemanticFieldDamage } from '../spec-compiler/integrity';
+import type { CompiledModel, JsonValue } from '../spec-compiler/index';
+import { buildSchemaVersion, candidate, createHarness } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * The pipeline's self-check.

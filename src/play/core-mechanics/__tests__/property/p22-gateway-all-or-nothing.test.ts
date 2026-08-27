@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection } from './generators.js';
+import { arbFailureInjection } from './generators';
 
 describe('Property 22: 网关全成或全不成', () => {
   it('资源转换：输入不足时拒绝且不扣除任何资源', () => {

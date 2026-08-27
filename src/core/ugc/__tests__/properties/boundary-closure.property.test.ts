@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { rejectionFacts } from '../../testing/observer.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { createHarness } from '../harness';
+import { rejectionFacts } from '../../testing/observer';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 /** 请求引擎层原语的候选形状。上游验证器会把它们判为层级越权。 */
 const ENGINE_PRIMITIVE_REQUESTS = [

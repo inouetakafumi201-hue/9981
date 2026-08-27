@@ -6,12 +6,12 @@
  * 但此前实现只有 state/agent.ts 的 Agent 数据结构与 createAgentShape 工厂函数，从未注册
  * 这两个 Op，导致 Agent.controls 字段在整套实现里从未被真正的写入路径改写过。
  */
-import type { OpImpl, OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import type { Agent, AgentKind } from '../state/agent.js';
-import { createAgentShape } from '../state/agent.js';
+import type { OpImpl, OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id, Ref } from '../state/ids';
+import { nextId } from '../state/ids';
+import type { Agent, AgentKind } from '../state/agent';
+import { createAgentShape } from '../state/agent';
 
 export interface AgentCreateArgs {
   kind: AgentKind;

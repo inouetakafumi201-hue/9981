@@ -8,16 +8,16 @@ import {
   makeDecisionAnswer,
   checkQuorum,
   registerDecisionOps,
-} from '../decision-ops.js';
-import type { DecisionDefLookup, DecisionAnswerDeps } from '../decision-ops.js';
-import { Transaction } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import type { OpContext } from '../../ops/registry.js';
-import type { DecisionDef } from '../types.js';
-import type { DecisionState } from '../../state/world-state.js';
+} from '../decision-ops';
+import type { DecisionDefLookup, DecisionAnswerDeps } from '../decision-ops';
+import { Transaction } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import type { OpContext } from '../../ops/registry';
+import type { DecisionDef } from '../types';
+import type { DecisionState } from '../../state/world-state';
 
 function makeCtx(): OpContext {
   const tx = new Transaction(createEmptyWorldState('sched:1'));

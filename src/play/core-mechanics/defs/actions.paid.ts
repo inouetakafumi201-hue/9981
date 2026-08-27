@@ -23,11 +23,11 @@
  * 出现在 `intent.resolve` 而不是 `queryActions` 的灰显阶段：动作会出现在菜单里但执行时被拒。
  * `require` 仍然承担全部**可在其上下文内表达**的守卫（标记、目标存在性、目标字段比较）。
  */
-import type { ActionDef, CostSpec } from '../../../core/kernel/actions/types.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import type { PlayDefExtension } from '../ownership.js';
-import { buildNumericOwnership, constitutionalConstant, playExt, structuralBound } from '../ownership.js';
+import type { ActionDef, CostSpec } from '../../../core/kernel/actions/types';
+import type { Effect } from '../../../core/kernel/events/effect-types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import type { PlayDefExtension } from '../ownership';
+import { buildNumericOwnership, constitutionalConstant, playExt, structuralBound } from '../ownership';
 import {
   and,
   atOf,
@@ -49,7 +49,7 @@ import {
   setRequestField,
   varOf,
   vetoGuard,
-} from './expr.js';
+} from './expr';
 import {
   ACT_ATTACK,
   ACT_BOARD_VEHICLE,
@@ -104,7 +104,7 @@ import {
   TAG_PRECISE_IN_PROGRESS,
   TAG_SLEEPING,
   TAG_TRANSIT_IN_PROGRESS,
-} from './ids.js';
+} from './ids';
 
 /**
  * 付费动作的成本恒等式：`cost` 数组恰好一项，`pool` 为 AP，`amount` 是字面量 `1`。
@@ -207,6 +207,8 @@ function paidAction(input: {
     ...(input.targets === undefined ? {} : { targets: input.targets }),
     require: input.extraRequire === undefined ? baseRequire : and(baseRequire, input.extraRequire),
     cost: [...PAID_ACTION_COST],
+    // 双轨制 P3：付费动作进卡片轨，由玩家在发牌器里管理 1 AP 消耗策略。
+    track: 'card' as const,
     effects: [
       ...attachedInvocationBlock(TRIGGER_BEFORE_PARENT),
       ...input.effects,

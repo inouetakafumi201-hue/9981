@@ -7,7 +7,7 @@ import {
   genActionRef,
   genItemRef,
   genStatusRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P39: 层级归属、来源状态与冲突保留

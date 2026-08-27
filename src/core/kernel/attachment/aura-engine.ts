@@ -5,15 +5,15 @@
  * and recomputes aura props for affected targets. In tests, callers trigger it directly.
  * In production, it would be wired to entity.place/prop.set after-hooks.
  */
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
-import type { WorldState } from '../state/world-state.js';
-import type { Attachment } from '../state/attachment.js';
-import type { Def } from '../state/def.js';
-import type { AttachmentDef } from './types.js';
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import { setPath } from '../ops/path.js';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
+import type { WorldState } from '../state/world-state';
+import type { Attachment } from '../state/attachment';
+import type { Def } from '../state/def';
+import type { AttachmentDef } from './types';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
+import { setPath } from '../ops/path';
 
 export interface AuraComputeResult {
   targetId: Id;

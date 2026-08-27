@@ -1,8 +1,8 @@
-import type { Diagnostic } from '../state/diagnostic.js';
-import { ERR_CODES, isFatalCode, isInfrastructureFatalCode } from '../state/error-codes.js';
-import { validateSourceRecord } from '../state/source-record.js';
-import { HINT_TEMPLATES } from '../safety/safety.js';
-import { sortDiagnostics } from './diagnostic-factory.js';
+import type { Diagnostic } from '../state/diagnostic';
+import { ERR_CODES, isFatalCode, isInfrastructureFatalCode } from '../state/error-codes';
+import { validateSourceRecord } from '../state/source-record';
+import { HINT_TEMPLATES } from '../safety/safety';
+import { sortDiagnostics } from './diagnostic-factory';
 
 const KNOWN_CODES: ReadonlySet<string> = new Set(
   Object.entries(ERR_CODES).flatMap(([prefix, suffixes]) => suffixes.map((suffix) => `${prefix}_${suffix}`)),

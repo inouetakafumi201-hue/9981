@@ -5,7 +5,7 @@ import {
   resolveFallback,
   retainedChannelsAfterFailure,
   type DeclaredFallback,
-} from '../fallback.js';
+} from '../fallback';
 
 const GENERIC_ICON: DeclaredFallback = Object.freeze({
   kind: 'icon',

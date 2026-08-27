@@ -2,11 +2,11 @@
  * L3 Ops: InvariantChecker（design.md 3.4节 / 需求20.1-20.17）。
  * 16 条不变量各对应一个独立检查函数，注册在数组里顺序执行，任一失败即整体拒绝提交。
  */
-import type { WorldState } from '../state/world-state.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import type { Id } from '../state/ids.js';
-import { isRef } from '../state/ids.js';
-import { cascadeRemovalSet } from '../state/attachment.js';
+import type { WorldState } from '../state/world-state';
+import type { Diagnostic } from '../state/diagnostic';
+import type { Id } from '../state/ids';
+import { isRef } from '../state/ids';
+import { cascadeRemovalSet } from '../state/attachment';
 
 type CheckFn = (state: WorldState) => Diagnostic[];
 

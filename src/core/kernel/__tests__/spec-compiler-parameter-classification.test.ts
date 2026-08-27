@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import type { DefKind } from '../state/def.js';
+import type { DefKind } from '../state/def';
 import {
   DEFAULT_TECHNICAL_QUOTAS,
   SchemaContractError,
   SchemaRegistry,
   assertSchemaNumericContract,
   collectNumericSchemaIssues,
-} from '../spec-compiler/index.js';
-import type { DefinitionSchema, FieldRule, SchemaVersion } from '../spec-compiler/index.js';
-import { buildSchemaVersion, candidate, createHarness, familySource } from '../spec-compiler/__tests__/fixtures.js';
+} from '../spec-compiler/index';
+import type { DefinitionSchema, FieldRule, SchemaVersion } from '../spec-compiler/index';
+import { buildSchemaVersion, candidate, createHarness, familySource } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * Parameter_Field classification.

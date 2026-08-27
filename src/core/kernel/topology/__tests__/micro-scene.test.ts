@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity } from '../micro-scene.js';
-import { createNodeShape } from '../types.js';
+import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity } from '../micro-scene';
+import { createNodeShape } from '../types';
 
 describe('Property 21: 微型场景生命周期的占用者驱动（需求9.3-9.5）', () => {
   it('ensureMicroScene 不存在时创建，存在时直接返回', () => {

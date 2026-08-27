@@ -12,19 +12,19 @@
  * - ✅ 消息 i18n 集成（renderGuidance + renderCreatorMessage）
  */
 
-import type { ErrCode } from './error-codes.js';
-import { isInfrastructureFatalCode } from './error-codes.js';
+import type { ErrCode } from './error-codes';
+import { isInfrastructureFatalCode } from './error-codes';
 import type {
   CompilationStage,
   Diagnostic,
   DiagnosticArgument,
   SourceRecord,
-} from './diagnostic.js';
-import { validateSourceRecord } from './source-record.js';
-import type { FatalErrorBoundary } from '../safety/fatal-boundary.js';
-import { compareCodePoints } from '../codec/index.js';
-import { renderCreatorMessage, renderGuidance } from './message-bundles.js';
-import type { CreatorMessageBundle } from './message-bundles.js';
+} from './diagnostic';
+import { validateSourceRecord } from './source-record';
+import type { FatalErrorBoundary } from '../safety/fatal-boundary';
+import { compareCodePoints } from '../codec/index';
+import { renderCreatorMessage, renderGuidance } from './message-bundles';
+import type { CreatorMessageBundle } from './message-bundles';
 
 /**
  * 诊断构造输入

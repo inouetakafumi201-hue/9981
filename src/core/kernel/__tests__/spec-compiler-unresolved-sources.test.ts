@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures.js';
+import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * Equally authoritative sources that disagree are preserved, never arbitrated.

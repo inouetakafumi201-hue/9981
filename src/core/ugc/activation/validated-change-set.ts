@@ -12,17 +12,17 @@
  * 另一条容易被绕过的路：调用方自己算一个 `changeRequestFingerprint` 递进来。这里不信任传入摘要——
  * 工厂**从封存的绑定重新计算**并逐字段核对（需求 13.12）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { ChangeRequestBinding } from '../model/binding.js';
-import { computeChangeRequestFingerprint, diffChangeRequestBindings } from '../model/binding.js';
-import type { CanonicalizedChangeRequest } from '../model/canonical-types.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import type { PresentationFallbackDecision } from '../model/presentation.js';
-import { isSemanticsPreserving } from '../model/presentation.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import { isBlockingDiagnostic } from '../model/result.js';
-import type { UpstreamResolvedReferenceGraph, UpstreamValidatedCandidate } from '../model/upstream.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { ChangeRequestBinding } from '../model/binding';
+import { computeChangeRequestFingerprint, diffChangeRequestBindings } from '../model/binding';
+import type { CanonicalizedChangeRequest } from '../model/canonical-types';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import type { PresentationFallbackDecision } from '../model/presentation';
+import { isSemanticsPreserving } from '../model/presentation';
+import type { ValidationBaseline } from '../model/baseline';
+import { isBlockingDiagnostic } from '../model/result';
+import type { UpstreamResolvedReferenceGraph, UpstreamValidatedCandidate } from '../model/upstream';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
 
 /** 模块私有铸造登记表。WeakSet 不阻止回收，也无法从外部枚举或写入。 */
 const minted = new WeakSet<object>();

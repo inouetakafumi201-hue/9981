@@ -3,15 +3,15 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { stripComments } from '../../__tests__/support/source-scan.js';
-import type { UiBinding } from '../../model/view.js';
+import { stripComments } from '../../__tests__/support/source-scan';
+import type { UiBinding } from '../../model/view';
 import {
   isSupportedDescriptorVersion,
   validateActionDescriptor,
   validatePresentationDescriptor,
   validateResourceDescriptor,
   validateTargetDescriptor,
-} from '../descriptor-validator.js';
+} from '../descriptor-validator';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BINDINGS: readonly UiBinding[] = Object.freeze([{ key: 'to', value: 'n1' }]);
@@ -20,6 +20,8 @@ function rawAction(overrides: Readonly<Record<string, unknown>> = {}): Readonly<
   return {
     actionId: 'act.move',
     costCategory: 'paid',
+    // 双轨制 P2：track 为必填闭合域；全部测试 fixture 进卡片轨。
+    track: 'card',
     interactionIntent: 'traversal',
     available: true,
     accessibleLabel: '移动',
@@ -48,7 +50,7 @@ describe('动作描述符语义字段校验（tasks.md 任务 4.1）', () => {
   });
 
   it('逐个删除必填语义字段都导致拒绝', () => {
-    for (const field of ['actionId', 'costCategory', 'available', 'assetRefs', 'targets']) {
+    for (const field of ['actionId', 'costCategory', 'track', 'available', 'assetRefs', 'targets']) {
       const result = validate({ [field]: undefined });
       expect(result.ok, field).toBe(false);
       expect(result.diagnostics.some((diagnostic) => diagnostic.severity === 'error'), field).toBe(true);

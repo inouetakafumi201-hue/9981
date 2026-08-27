@@ -8,7 +8,7 @@ import {
   genHealthValue,
   genAPValue,
   genStatusRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P34: 睡眠两步流程与起床回满

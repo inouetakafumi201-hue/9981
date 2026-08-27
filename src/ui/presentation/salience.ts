@@ -20,9 +20,9 @@ import {
   uiRejected,
   type UiDiagnostic,
   type UiResult,
-} from '../model/diagnostic.js';
-import { findSalienceTierEntry, type PresentationProfile, type SalienceTier } from '../model/profile.js';
-import type { UiSalientStateView } from '../model/view.js';
+} from '../model/diagnostic';
+import { findSalienceTierEntry, type PresentationProfile, type SalienceTier } from '../model/profile';
+import type { UiSalientStateView } from '../model/view';
 
 /** 规则层可见性分类。由上游投影给出，不由表现层判定。 */
 export const RULE_VISIBILITY_CLASSES = ['public', 'hidden'] as const;

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { InvariantChecker } from '../invariants.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { createEntityShape } from '../../state/entity.js';
-import { createItemShape } from '../../state/entity.js';
-import { createContainerShape, createSlotShape } from '../../topology/types.js';
+import { InvariantChecker } from '../invariants';
+import { createEmptyWorldState } from '../../state/world-state';
+import { createEntityShape } from '../../state/entity';
+import { createItemShape } from '../../state/entity';
+import { createContainerShape, createSlotShape } from '../../topology/types';
 
 describe('InvariantChecker: 16 条不变量（需求20.1-20.16）', () => {
   it('空状态没有任何不变量违反', () => {

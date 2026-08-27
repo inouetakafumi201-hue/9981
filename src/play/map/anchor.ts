@@ -13,8 +13,8 @@
  * `MapAnchorRegistry` 是一个独立的只读状态表（`occupiedSlots: Map<key, mapId>`），挂在
  * 玩法包装载流程之外、供地图位判定使用。它不是第七个顶层集合，不进入 WorldState 计数。
  */
-import type { Result } from '../../core/kernel/ops/result.js';
-import { ok, err } from '../../core/kernel/ops/result.js';
+import type { Result } from '../../core/kernel/ops/result';
+import { ok, err } from '../../core/kernel/ops/result';
 
 /** 地图装载位状态。按 ID 区分，异 key 互不排。 */
 export type MapAnchorResult =

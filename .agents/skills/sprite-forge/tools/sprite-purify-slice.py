@@ -18,7 +18,7 @@ sprite-purify-slice.py — 素材回收管线：AI 4×4 sheet → 品红纯化 �
 
 参数定案（2026-08-16，与 PLT-01 一致）：
   --threshold   背景纯化距离阈值（默认 90；AI 残边越明显可调大）
-  --colors      像素化色彩数量（默认 32；细节丢太多可调大）
+  --colors      像素化色彩数量（默认 64；32 颗粒感明显，64 起步过渡更平）
   --cell        输出帧统一尺寸（默认 128×128）
   --grid        网格行列数（默认 4×4）
 
@@ -123,26 +123,29 @@ def slice_grid(img: Image.Image, rows: list[tuple[int, int]], cols: list[tuple[i
 
 # ---------------------------------------------------------------- 像素化 ----
 
-def pixelate_frame(img: Image.Image, colors: int = 32) -> Image.Image:
-    """放大到 1024×1024 居中 → proper-pixel-art 网格重建 → 返回像素化帧。
+def pixelate_frame(img: Image.Image, colors: int = 64) -> Image.Image:
+    """放大到 1024×1024 居中 → median3 降噪 → proper-pixel-art 网格重建 → 返回像素化帧。
 
-    放大用最近邻（保持像素风）；proper-pixel-art 用 -s 1 保留检测到的原生网格。
+    median3 前置降噪消除 AI 直出图的色块内颗粒感（grainy -99%）。
     """
+    from PIL import ImageFilter
     w, h = img.size
     scale = 1024 / max(w, h)
     nw, nh = max(1, int(w * scale)), max(1, int(h * scale))
     up = img.convert("RGBA").resize((nw, nh), Image.NEAREST)
     canvas = Image.new("RGBA", (1024, 1024), (*MAGENTA, 255))
     canvas.paste(up, ((1024 - nw) // 2, (1024 - nh) // 2), up)
+    # median3 降噪
+    denoised = canvas.filter(ImageFilter.MedianFilter(3))
 
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / "in.png"
         dst = Path(tmp) / "out.png"
-        canvas.save(src)
+        denoised.save(src)
         result = subprocess.run(
             [sys.executable, "-m", "proper_pixel_art.cli", str(src), "-o", str(dst),
-             "--colors", str(colors), "-s", "1"],
+             "--colors", str(colors), "-s", "1", "-u", "10"],
             capture_output=True, text=True,
         )
         if result.returncode != 0:
@@ -157,7 +160,7 @@ def process_sheet(
     out_dir: Path,
     *,
     threshold: int = 90,
-    colors: int = 32,
+    colors: int = 64,
     cell: int = 128,
     index: int = 1,
 ) -> dict:
@@ -222,7 +225,7 @@ def main() -> None:
     parser.add_argument("inputs", nargs="+", type=Path, help="AI 生成的 4×4 raw sheet（近品红背景）")
     parser.add_argument("--out", required=True, type=Path, help="输出目录")
     parser.add_argument("--threshold", type=int, default=90, help="背景纯化距离阈值（默认 90）")
-    parser.add_argument("--colors", type=int, default=32, help="像素化色彩数量（默认 32）")
+    parser.add_argument("--colors", type=int, default=64, help="像素化色彩数量（默认 64，32 颗粒感明显）")
     parser.add_argument("--cell", type=int, default=128, help="contact 帧统一尺寸（默认 128）")
     args = parser.parse_args()
 

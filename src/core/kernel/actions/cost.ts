@@ -20,18 +20,18 @@
  * 关系（等价于销毁重造，破坏引用完整性）。延迟到 settle 消耗、失败则整个 intent.resolve 事务回滚，
  * 天然满足原子性且不产生悬空引用。
  */
-import type { OpContext } from '../ops/registry.js';
-import type { Result } from '../ops/result.js';
-import { ok, err } from '../ops/result.js';
-import type { CostSpec } from './types.js';
-import type { Id, Ref } from '../state/ids.js';
-import { isRef } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Attachment } from '../state/attachment.js';
-import type { Effect } from '../events/effect-types.js';
-import { getPath, setPath } from '../ops/path.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
+import type { OpContext } from '../ops/registry';
+import type { Result } from '../ops/result';
+import { ok, err } from '../ops/result';
+import type { CostSpec } from './types';
+import type { Id, Ref } from '../state/ids';
+import { isRef } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Attachment } from '../state/attachment';
+import type { Effect } from '../events/effect-types';
+import { getPath, setPath } from '../ops/path';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
 
 export type FrozenCostEntry =
   | { readonly kind: 'pool'; readonly pool: string; readonly scopeId: Id; readonly amount: number }

@@ -13,18 +13,18 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { parseClassCatalog } from '../class-contract.js';
-import { parseClassJson } from '../catalog-loader.js';
-import type { CompilationResult, CandidateDocumentInput } from '../../core/kernel/spec-compiler/index.js';
+import { parseClassCatalog } from '../class-contract';
+import { parseClassJson } from '../catalog-loader';
+import type { CompilationResult, CandidateDocumentInput } from '../../core/kernel/spec-compiler/index';
 import {
   CATALOG_COMPILER_SCHEMA_VERSION,
   activateCatalogs,
   buildCatalogDocument,
   catalogDocumentInput,
   createCatalogCompilerHost,
-} from '../catalog-activation.js';
-import type { ClassCatalog } from '../class-contract.js';
-import { UNIFORM_CATALOG_DIRS, catalogText } from './catalog-fixtures.js';
+} from '../catalog-activation';
+import type { ClassCatalog } from '../class-contract';
+import { UNIFORM_CATALOG_DIRS, catalogText } from './catalog-fixtures';
 
 const UNIFORM_CATALOGS: readonly ClassCatalog[] = UNIFORM_CATALOG_DIRS.map((dir) =>
   parseClassCatalog(parseClassJson(catalogText(dir), `${dir}/index.json`), `${dir}/index.json`),

@@ -4,9 +4,9 @@ import {
   readdirSync, renameSync, rmSync, statSync, lstatSync, existsSync,
 } from 'node:fs';
 import { join, resolve, sep, dirname } from 'node:path';
-import type { ArtifactManifest, ArtifactStore } from './output-lease.js';
-import { hashBytes } from './output-lease.js';
-import { compareCodePoints } from './json-codec.js';
+import type { ArtifactManifest, ArtifactStore } from './output-lease';
+import { hashBytes } from './output-lease';
+import { compareCodePoints } from './json-codec';
 
 /**
  * Durable {@link ArtifactStore} backed by the real filesystem.

@@ -5,9 +5,9 @@
  * 固化逻辑：仅当目标断言 passed && golden 全绿，才把该断言 source 标为 tuning-derived
  * 并入断言集，校验不破坏 JSON schema。
  */
-import type { ParameterTuningRecord } from './tuner.js';
-import type { BehaviorAssertion, BehaviorAssertionRegistry } from './assertions.js';
-import { readableFieldName } from './trace.js';
+import type { ParameterTuningRecord } from './tuner';
+import type { BehaviorAssertion, BehaviorAssertionRegistry } from './assertions';
+import { readableFieldName } from './trace';
 
 /** 五段式报告。 */
 export interface TuningReport {

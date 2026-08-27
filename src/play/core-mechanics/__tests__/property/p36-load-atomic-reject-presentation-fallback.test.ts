@@ -7,7 +7,7 @@ import {
   genActionRef,
   genItemRef,
   genStatusRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P36: 装载的原子拒绝与表现字段降级边界

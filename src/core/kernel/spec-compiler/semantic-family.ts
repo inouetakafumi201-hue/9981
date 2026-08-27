@@ -1,7 +1,7 @@
-import type { DefKind } from '../state/def.js';
-import type { SourceRecord } from '../state/diagnostic.js';
-import { compareCodePoints } from './json-codec.js';
-import type { SemanticFamilyCriteria, SemanticFamilyRegistration } from './types.js';
+import type { DefKind } from '../state/def';
+import type { SourceRecord } from '../state/diagnostic';
+import { compareCodePoints } from './json-codec';
+import type { SemanticFamilyCriteria, SemanticFamilyRegistration } from './types';
 
 /** Host misconfiguration. A candidate can never reach this path; only a host register call can. */
 export class SemanticFamilyError extends Error {

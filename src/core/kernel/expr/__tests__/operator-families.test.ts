@@ -8,16 +8,16 @@
  * 需求12.7 明确要求的 isA 也只是 ExprEngine 的一个实例方法，没进算子表，`{op:'isA'}` 恒为 null。
  */
 import { describe, expect, it } from 'vitest';
-import { ExprEngine, makeDefaultEvalContext } from '../engine.js';
-import type { EvalContext } from '../engine.js';
-import { makeExprStateAccess } from '../state-access.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { WorldState } from '../../state/world-state.js';
-import { createEntityShape, createItemShape } from '../../state/entity.js';
-import { createLinkShape, createNodeShape } from '../../topology/types.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { Value } from '../../state/value.js';
+import { ExprEngine, makeDefaultEvalContext } from '../engine';
+import type { EvalContext } from '../engine';
+import { makeExprStateAccess } from '../state-access';
+import { DefRegistry } from '../../state/def';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { WorldState } from '../../state/world-state';
+import { createEntityShape, createItemShape } from '../../state/entity';
+import { createLinkShape, createNodeShape } from '../../topology/types';
+import type { Expr } from '../../state/expr-types';
+import type { Value } from '../../state/value';
 
 /**
  * 一条三节点直链 n:a -(w=1)- n:b -(w=2)- n:c，外加一个孤立节点 n:island。

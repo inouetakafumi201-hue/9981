@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerStructuralOps, makeItemMove } from '../structural-ops.js';
-import { registerPrefabOps } from '../prefab-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { resetIdCounters } from '../../state/ids.js';
-import type { Ref } from '../../state/ids.js';
-import type { PrefabDef, PrefabHandle } from '../../topology/prefab.js';
-import type { Def } from '../../state/def.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerStructuralOps, makeItemMove } from '../structural-ops';
+import { registerPrefabOps } from '../prefab-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { resetIdCounters } from '../../state/ids';
+import type { Ref } from '../../state/ids';
+import type { PrefabDef, PrefabHandle } from '../../topology/prefab';
+import type { Def } from '../../state/def';
 
 const BASE_TEST_DEFS = new Map<string, Def>([
   ['d:human', { id: 'd:human', kind: 'entity' }],

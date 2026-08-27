@@ -12,17 +12,17 @@
  * 额外：把官方 config 的 damageAmountSources[0].amountRef 数值注入 `world.props.play.damageAmountRef`
  * （attack 守卫读它），并预置一个已解析的"伤害数值来源 def"，使守卫 notNull 放行。
  */
-import type { CoreMechanicsConfig } from '../load.js';
-import { loadCoreMechanics } from '../load.js';
-import { createFullHarness } from '../../../core/kernel/testing/full-harness.js';
-import { ActionCatalog } from '../../../core/kernel/actions/catalog.js';
-import type { ActionDef } from '../../../core/kernel/actions/types.js';
-import { setPath } from '../../../core/kernel/ops/path.js';
-import type { WorldState } from '../../../core/kernel/state/world-state.js';
+import type { CoreMechanicsConfig } from '../load';
+import { loadCoreMechanics } from '../load';
+import { createFullHarness } from '../../../core/kernel/testing/full-harness';
+import { ActionCatalog } from '../../../core/kernel/actions/catalog';
+import type { ActionDef } from '../../../core/kernel/actions/types';
+import { setPath } from '../../../core/kernel/ops/path';
+import type { WorldState } from '../../../core/kernel/state/world-state';
 import {
   ATTACK_DAMAGE_VALUE,
   officialCoreMechanicsConfig,
-} from './official-state-machine-config.js';
+} from './official-state-machine-config';
 
 /** 构造已接齐 Hook/Op 的装载 runtime，并预置 config 的装载期世界状态。 */
 export function createLoadedCoreMechanics(): {
@@ -47,11 +47,9 @@ export function createLoadedCoreMechanics(): {
     getState: () => harness.holder.getState(),
     exprEngine: harness.exprEngine,
     queryEngine: harness.queryEngine,
-    // harness.ctxForSelf 声明为单参 (ref)，闭包实现确实忽略第二参 vars 的初值（bindings 由
-    // ActionCatalog 展开后传入）；这里按 (actor, bindings) 签名窄化，仅传给单参 ctxForSelf。
-    ctxForActor: ((actor) => harness.ctxForSelf(actor)) as (
-      actor: { $: string }, bindings: Record<string, import('../../../core/kernel/state/value.js').Value>,
-    ) => import('../../../core/kernel/expr/engine.js').EvalContext,
+    // harness.ctxForSelf 接受 (ref, vars)：把 ActionCatalog 展开的 target/node 绑定透传，
+    // 否则带目标绑定的动作 require 会在未绑定 var 上求值出 null，攻击/移动永远不可见。
+    ctxForActor: (actor, bindings) => harness.ctxForSelf(actor, bindings),
     listActionDefs: () => harness.defRegistry.allResolved()
       .filter((definition): definition is ActionDef => definition.kind === 'action') as ActionDef[],
   });

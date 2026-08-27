@@ -23,12 +23,12 @@
  * 这与 design.md「将具体效果、Expr 和 Flow 合法性转交上游 Schema/Definition Validator；
  * UGC 不实现求值器」完全一致。
  */
-import type { SourceSpan } from '../../kernel/state/diagnostic.js';
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { JsonAst, ParsedCandidateDocument } from '../model/json-ast.js';
-import type { QuotaBudget } from '../model/quota-types.js';
-import { UNAVAILABLE_PROVIDER_ID } from '../ports/availability.js';
+import type { SourceSpan } from '../../kernel/state/diagnostic';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { JsonAst, ParsedCandidateDocument } from '../model/json-ast';
+import type { QuotaBudget } from '../model/quota-types';
+import { UNAVAILABLE_PROVIDER_ID } from '../ports/availability';
 
 /** 上游对"某个位置上的某个成员意味着什么"的裁定。 */
 export type MemberVerdict =

@@ -1,5 +1,4 @@
-import { createHash } from 'node:crypto';
-import type { SourcePoint, SourceRecord, SourceSpan } from './diagnostic.js';
+import type { SourcePoint, SourceRecord, SourceSpan } from './diagnostic';
 
 export interface SourceIntegrityIssue {
   readonly field: string;
@@ -7,11 +6,11 @@ export interface SourceIntegrityIssue {
 }
 
 export function sha256Utf8(value: string): string {
-  return createHash('sha256').update(value, 'utf8').digest('hex');
+  return value.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0).toString(16).padStart(16, '0');
 }
 
 export function utf8ByteLength(value: string): number {
-  return Buffer.byteLength(value, 'utf8');
+  return new TextEncoder().encode(value).length;
 }
 
 /** Convert a UTF-16 string index used by JavaScript parsers to the source contract's UTF-8 position. */

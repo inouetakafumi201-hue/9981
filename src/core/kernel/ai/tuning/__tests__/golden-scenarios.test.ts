@@ -9,13 +9,13 @@
  * 本文件是「黄金场景基座」的落地：构造 ≥10 条 golden 断言、用真实决策跑通并全绿。
  */
 import { describe, expect, it } from 'vitest';
-import { BehaviorAssertionRegistry } from '../assertions.js';
-import { goldenSpecsToAssertions, type GoldenSpec } from '../golden-scenarios.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import { loadAssertionsJson } from '../assertions.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { WorldState } from '../../../state/world-state.js';
-import { snapshotWorldState } from '../snapshot.js';
+import { BehaviorAssertionRegistry } from '../assertions';
+import { goldenSpecsToAssertions, type GoldenSpec } from '../golden-scenarios';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import { loadAssertionsJson } from '../assertions';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { WorldState } from '../../../state/world-state';
+import { snapshotWorldState } from '../snapshot';
 
 describe('黄金场景断言基座（Task7）', () => {
   it('goldenSpecsToAssertions 构造了 ≥10 条 golden 断言且每条都带期望', () => {

@@ -5,9 +5,9 @@
  * 零后续非法调用、旧快照保持。故障注入是在**已登记端口**上做依赖注入，不是在生产代码里加分支。
  */
 import { describe, expect, it } from 'vitest';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
-import { activationUnchanged } from '../../testing/observer.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
+import { activationUnchanged } from '../../testing/observer';
 
 describe('Feature: wakeup-ugc, Task 11.5: failure injection at every stage', () => {
   it('decode failure: stops the pipeline and records skipped downstream checks', () => {

@@ -21,18 +21,18 @@
  *    由 wireHooksIntoRegistry 返回的 `onCommitted` 回调完成，调用方（本文件的
  *    createWiredOpRegistry）负责在 invoke 成功后调用它。
  */
-import { OpRegistry } from './ops/registry.js';
-import type { OpContext } from './ops/registry.js';
-import { WorldStateHolder } from './ops/transaction.js';
-import { HookDispatcher } from './events/dispatcher.js';
-import type { EffectRunner, HookDiagnostic } from './events/dispatcher.js';
-import { RuleProvider } from './events/rule-provider.js';
-import { FlowInterpreter } from './flow/interpreter.js';
-import type { FlowInterpreterDeps } from './flow/interpreter.js';
-import { AuraEngine } from './attachment/aura-engine.js';
-import type { Value } from './state/value.js';
-import type { Def } from './state/def.js';
-import type { RuleDef } from './events/types.js';
+import { OpRegistry } from './ops/registry';
+import type { OpContext } from './ops/registry';
+import { WorldStateHolder } from './ops/transaction';
+import { HookDispatcher } from './events/dispatcher';
+import type { EffectRunner, HookDiagnostic } from './events/dispatcher';
+import { RuleProvider } from './events/rule-provider';
+import { FlowInterpreter } from './flow/interpreter';
+import type { FlowInterpreterDeps } from './flow/interpreter';
+import { AuraEngine } from './attachment/aura-engine';
+import type { Value } from './state/value';
+import type { Def } from './state/def';
+import type { RuleDef } from './events/types';
 
 /**
  * WiredOpRegistry 是 OpRegistry 的一个真子类（不是重新实现的结构兼容对象）：这样它能被

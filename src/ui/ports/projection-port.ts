@@ -9,14 +9,14 @@
  * `Object.isFrozen` 断言，因为端口契约靠文档保证，边界断言靠代码保证。
  */
 
-import type { UiResult } from '../model/diagnostic.js';
-import type { StateRevision } from '../model/revision.js';
+import type { UiResult } from '../model/diagnostic';
+import type { StateRevision } from '../model/revision';
 import type {
   AuthorizationScope,
   PresentationDescriptor,
   ReadOnlySemanticProjection,
   UpstreamAgentAuthority,
-} from '../model/view.js';
+} from '../model/view';
 
 export interface ProjectionRequest {
   readonly agentId: string;

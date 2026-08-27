@@ -5,7 +5,7 @@
  * core mechanics 的动作/规则/数值语义、space-items 的拓扑/容器/物品/转移机制、AI 的查询/策略/搜索/
  * 可见性/决策机制一律留在各自领域（需求 15.6-15.8）。
  */
-import type { SourceRecord } from '../../kernel/state/diagnostic.js';
+import type { SourceRecord } from '../../kernel/state/diagnostic';
 
 export const INTEGRATION_DOMAINS = ['core-mechanics', 'space-items', 'ai'] as const;
 export type IntegrationDomain = (typeof INTEGRATION_DOMAINS)[number];

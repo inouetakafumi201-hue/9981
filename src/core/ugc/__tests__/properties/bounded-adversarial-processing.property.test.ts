@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { arbitraryBomb, requestFrom } from '../../testing/generators.js';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
+import { createHarness } from '../harness';
+import { arbitraryBomb, requestFrom } from '../../testing/generators';
+import { QUOTA_KINDS } from '../../model/quota-types';
 
 const QUOTA_CODES = new Set([
   'E_QUOTA_INPUT_BYTES',

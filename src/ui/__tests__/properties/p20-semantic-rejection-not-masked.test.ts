@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import { validatePresentationDescriptor } from '../../presentation/descriptor-validator.js';
-import { arbDamagedDescriptor } from '../support/arbitraries.js';
+import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import { validatePresentationDescriptor } from '../../presentation/descriptor-validator';
+import { arbDamagedDescriptor } from '../support/arbitraries';
 
 const SEMANTIC_FIELDS = ['actionId', 'costCategory', 'available', 'assetRefs', 'targets'] as const;
 

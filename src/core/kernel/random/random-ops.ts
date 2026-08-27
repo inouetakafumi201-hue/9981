@@ -4,10 +4,10 @@
  * Property 16 (deterministic replay), Property 17 (shadow stream isolation),
  * Property 30 (random ops not in Expr path).
  */
-import type { OpImpl, OpRegistry, OpContext } from '../ops/registry.js';
-import { ok, err } from '../ops/result.js';
-import type { Value } from '../state/value.js';
-import type { RngStreamState } from '../state/world-state.js';
+import type { OpImpl, OpRegistry, OpContext } from '../ops/registry';
+import { ok, err } from '../ops/result';
+import type { Value } from '../state/value';
+import type { RngStreamState } from '../state/world-state';
 
 // ---------------------------------------------------------------------------
 // Simple deterministic LCG (linear congruential generator) for reproducibility

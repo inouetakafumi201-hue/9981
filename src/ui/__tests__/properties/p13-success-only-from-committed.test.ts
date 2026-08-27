@@ -2,11 +2,11 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { createPendingRegistry } from '../../interaction/pending-registry.js';
-import { createSubmitFlow } from '../../interaction/submit.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { createInMemoryActionPort } from '../support/in-memory-ports.js';
-import { revision } from '../support/fixtures.js';
+import { createPendingRegistry } from '../../interaction/pending-registry';
+import { createSubmitFlow } from '../../interaction/submit';
+import type { InteractionIntent } from '../../model/intent';
+import { createInMemoryActionPort } from '../support/in-memory-ports';
+import { revision } from '../support/fixtures';
 
 it('任意 accepted 提交在目标修订到达前均未完成，到达后才完成', () => {
   fc.assert(fc.property(fc.nat({ max: 1000 }), (sequence) => {

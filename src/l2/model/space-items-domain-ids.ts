@@ -5,9 +5,9 @@
  * 不携带玩法数值、具体玩法规则或具名实例。
  */
 
-import type { DefinitionId, JsonPath } from './ids.js';
-import { isWellFormedId, joinJsonPath } from './ids.js';
-import { deepFreeze } from './immutable.js';
+import type { DefinitionId, JsonPath } from './ids';
+import { isWellFormedId, joinJsonPath } from './ids';
+import { deepFreeze } from './immutable';
 
 /** requirements 涉及的十二个语义族。 */
 export const SPACE_ITEMS_FAMILY_IDS = Object.freeze([

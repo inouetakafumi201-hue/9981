@@ -2,9 +2,9 @@
  * L11 KnowledgeStore: pure-read getFacts/knows (design.md 3.12节 / 需求34.1-34.5).
  * Write goes through prop.set (existing path ops). visibleTo wired in QueryEngine.
  */
-import type { WorldState } from '../state/world-state.js';
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
+import type { WorldState } from '../state/world-state';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
 
 function cloneAndFreezeValue(value: Value): Value {
   if (value === null || typeof value !== 'object') return value;

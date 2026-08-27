@@ -7,9 +7,9 @@
  * 它不暴露任何可写活动对象 —— 所有字段都是规范化后的纯数据。
  */
 
-import type { DefinitionId, JsonPath, PackageId, SemanticFamilyId } from './ids.js';
-import type { SourceRecord } from './source.js';
-import type { L1DefKind } from './def-kind.js';
+import type { DefinitionId, JsonPath, PackageId, SemanticFamilyId } from './ids';
+import type { SourceRecord } from './source';
+import type { L1DefKind } from './def-kind';
 
 /** 包级快照。 */
 export interface PackageSnapshot {

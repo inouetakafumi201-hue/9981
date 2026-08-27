@@ -9,15 +9,15 @@
  * 消费前先核对；不匹配即失败关闭。
  */
 
-import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { ValidationStage } from '../../../core/ugc/model/stage.js';
-import type { QuotaViolation } from '../../../core/ugc/model/quota-types.js';
-import { SUPPORTED_SCHEMA_VERSIONS } from '../../codec/json-codec.js';
-import { compareStrings } from '../../model/ordering.js';
-import type { DefinitionPackage } from '../../model/definition.js';
-import type { ReferenceGraph } from '../../resolution/reference-graph.js';
-import type { ActiveRegistry } from '../../registry/definition-registry.js';
+import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { ValidationStage } from '../../../core/ugc/model/stage';
+import type { QuotaViolation } from '../../../core/ugc/model/quota-types';
+import { SUPPORTED_SCHEMA_VERSIONS } from '../../codec/json-codec';
+import { compareStrings } from '../../model/ordering';
+import type { DefinitionPackage } from '../../model/definition';
+import type { ReferenceGraph } from '../../resolution/reference-graph';
+import type { ActiveRegistry } from '../../registry/definition-registry';
 
 /** 基类层作为上游提供方的稳定标识。进入诊断与产物，是可观察输出的一部分。 */
 export const L2_PORT_PROVIDER_ID = 'l2-base-layer';

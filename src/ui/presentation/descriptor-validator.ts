@@ -12,10 +12,12 @@
  */
 
 import {
+  ACTION_CARD_COLOR_THEMES,
   ACTION_COST_CATEGORIES,
+  CARD_INTERACTION_MODES,
   INTERACTION_INTENTS,
   RESOURCE_SEMANTIC_ROLES,
-} from '../../l2/model/family-contracts.js';
+} from '../../l2/model/family-contracts';
 import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
@@ -24,18 +26,21 @@ import {
   type UiDiagnostic,
   type UiDiagnosticCode,
   type UiResult,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 import type {
+  ActionCardColorTheme,
   ActionCostCategory,
+  CardInteractionMode,
   InteractionIntent,
   ResourceSemanticRole,
   UiActionView,
   UiBinding,
+  UiCardPresentation,
   UiResourceView,
   UiTargetView,
-} from '../model/view.js';
-import { resolveAccessibleLabel } from './accessibility.js';
-import { makeGameplayValue } from './gameplay-value.js';
+} from '../model/view';
+import { resolveAccessibleLabel } from './accessibility';
+import { makeGameplayValue } from './gameplay-value';
 
 /** 当前受支持的描述符版本。缺省视为该版本（上游尚未声明版本，§14.4 第 4 项）。 */
 export const SUPPORTED_DESCRIPTOR_VERSIONS = ['1'] as const;
@@ -126,6 +131,60 @@ export function validateTargetDescriptor(raw: unknown, location: string): UiResu
       accessibleLabel: label.text,
     }),
     label.diagnostics,
+  );
+}
+
+/**
+ * 校验卡片元数据对象（双轨制 P2）。
+ * 全部字段可缺省（缺省 → 使用前端默认基线值）；但若出现则必须符合类型约束。
+ */
+export function validateCardPresentation(
+  raw: unknown,
+  location: string,
+): UiResult<UiCardPresentation> {
+  const record = readRecord(raw);
+  if (record === null || record === undefined) {
+    return uiRejected([damaged(location, 'cardPresentation')]);
+  }
+  const problems: UiDiagnostic[] = [];
+
+  const iconRef = record['iconRef'];
+  if (iconRef !== undefined && typeof iconRef !== 'string') {
+    problems.push(damaged(`${location}.iconRef`, 'iconRef'));
+  }
+
+  const colorTheme = record['colorTheme'];
+  if (
+    colorTheme !== undefined &&
+    (typeof colorTheme !== 'string' || !(ACTION_CARD_COLOR_THEMES as readonly string[]).includes(colorTheme))
+  ) {
+    problems.push(damaged(`${location}.colorTheme`, 'colorTheme'));
+  }
+
+  const effectText = record['effectText'];
+  if (effectText !== undefined && typeof effectText !== 'string') {
+    problems.push(damaged(`${location}.effectText`, 'effectText'));
+  }
+
+  const interactionMode = record['interactionMode'];
+  if (
+    interactionMode !== undefined &&
+    (typeof interactionMode !== 'string' ||
+      !(CARD_INTERACTION_MODES as readonly string[]).includes(interactionMode))
+  ) {
+    problems.push(damaged(`${location}.interactionMode`, 'interactionMode'));
+  }
+
+  if (problems.length > 0) return uiRejected(problems);
+
+  return uiOk(
+    Object.freeze({
+      iconRef: (iconRef as string | undefined) ?? '',
+      colorTheme: (colorTheme as ActionCardColorTheme | undefined) ?? 'neutral',
+      effectText: (effectText as string | undefined) ?? '',
+      interactionMode: (interactionMode as CardInteractionMode | undefined) ?? 'instant',
+    }),
+    [],
   );
 }
 
@@ -224,6 +283,26 @@ export function validateActionDescriptor(
     problems.push(damaged(location, 'costCategory'));
   }
 
+  // 双轨制 P2：track 字段为闭合域（'highlight' | 'card'）。
+  const track = record?.['track'];
+  if (track === undefined) {
+    problems.push(missing(location, 'track'));
+  } else if (typeof track !== 'string' || (track !== 'highlight' && track !== 'card')) {
+    problems.push(damaged(location, 'track'));
+  }
+
+  // 双轨制 P2：cardPresentation 嵌套对象，仅在 track === 'card' 时应当存在；缺省为合法（用前端默认基线值）。
+  const rawCardPresentation = record?.['cardPresentation'];
+  let cardPresentation: UiCardPresentation | undefined;
+  if (rawCardPresentation !== undefined) {
+    const validatedCard = validateCardPresentation(rawCardPresentation, `${location}#cardPresentation`);
+    if (!validatedCard.ok) {
+      problems.push(...validatedCard.diagnostics);
+    } else {
+      cardPresentation = validatedCard.value;
+    }
+  }
+
   const available = record?.['available'];
   if (typeof available !== 'boolean') problems.push(missing(location, 'available'));
 
@@ -292,6 +371,7 @@ export function validateActionDescriptor(
     Object.freeze({
       actionId: actionId as string,
       costCategory: costCategory as ActionCostCategory,
+      track: track as 'highlight' | 'card',
       ...(interactionIntent === undefined
         ? {}
         : { interactionIntent: interactionIntent as InteractionIntent }),
@@ -304,6 +384,7 @@ export function validateActionDescriptor(
       assetRefs: Object.freeze([...(rawAssetRefs as readonly string[])]),
       bindings: Object.freeze([...(context.bindings ?? [])]),
       targets: Object.freeze(targets),
+      ...(cardPresentation === undefined ? {} : { cardPresentation }),
     }),
     warnings,
   );

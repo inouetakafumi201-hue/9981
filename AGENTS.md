@@ -398,7 +398,7 @@ After context compaction, re-confirm your current position in multi-step tasks b
    `python .agents/skills/sprite-forge/tools/sprite-component.py --type <类型> --desc <描述> --states <状态> --out run/assets/<名>`
    - 类型：`weapon-melee` / `weapon-ranged` / `weapon-firearm` / `item-consumable` / `item-tool` / `item-equipment` / `device` / `environment`
    - 单帧不传 `--states`；多帧（如箱子 closed,open,broken）逗号分隔
-   - **语境铁律**：默认 `map` = 地图实体，强制**俯视平面视图**（top-down plan view：平面轮廓 + 可读剪影 + 落地阴影，无前脸/侧脸/顶面/斜投影纵深，非 isometric）；
+   - **语境铁律**：默认 `map` = 地图实体，强制**正面俯视视图**（top-down plan view：平面轮廓 + 可读剪影 + 落地阴影，无前脸/侧脸/顶面/斜投影纵深，非 isometric）；
      只有背包/UI 图标才传 `--context ui`
    - 风格锁定在脚本内（硬边 64×64 + 左上光源 + 语义色 + 品红底），
      **调用方只传参数，取够格的成品帧 + manifest.json 挂载，不用盯贴图**；

@@ -10,8 +10,6 @@
  * 求值语义仍由 design-currency 消费（见 scoreDesignCurrency 的配置注入改造）。
  */
 /** 与 value.ts 解耦的顶层可序列化 Value 视图（配置里只用得到 number/string/boolean 谓词表达式，实际谓词由代码解释）。 */
-import fs from 'node:fs';
-import path from 'node:path';
 
 /** 分水岭修正的来源键（与 design-currency.ts 的 adjustment.when 语义对应，这里以字符串谓词承载）。 */
 export type PivotKind = 'lethalWindow' | 'exhaustionAnchor' | 'defeated';
@@ -163,27 +161,13 @@ function parseDefeated(raw: unknown, index: number): DesignCurrencyChargeConfig[
 
 /** 从磁盘加载并校验配置。缺文件/损坏抛带路径错误。 */
 export function loadDesignCurrencyConfig(filePath: string): DesignCurrencyConfig {
-  const text = fs.readFileSync(filePath, 'utf8');
-  if (text.trim().length === 0) throw new Error(`DesignCurrencyConfig file is empty: ${filePath}`);
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch (error) {
-    throw new Error(`DesignCurrencyConfig JSON parse failed at ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  return parseDesignCurrencyConfig(parsed);
+  // 在浏览器运行期，配置由组合根注入，不走磁盘加载。
+  throw new Error(`loadDesignCurrencyConfig is not available in browser runtime: ${filePath}`);
 }
 
 /** 把配置写回磁盘（紧凑 JSON，保留版本）。 */
-export function saveDesignCurrencyConfig(filePath: string, config: DesignCurrencyConfig): void {
-  const dir = path.dirname(filePath);
-  fs.mkdirSync(dir, { recursive: true });
-  const payload = {
-    version: config.version,
-    principles: { ...config.principles },
-    charges: config.charges.map((charge) => toCompactCharge(charge)),
-  };
-  fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+export function saveDesignCurrencyConfig(_filePath: string, _config: DesignCurrencyConfig): void {
+  throw new Error('saveDesignCurrencyConfig is not available in browser runtime');
 }
 
 /**

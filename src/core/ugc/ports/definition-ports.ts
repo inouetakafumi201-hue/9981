@@ -9,20 +9,20 @@
  * `integration/l2-adapter.ts` 作为唯一生产装配缝消费；运行时兼容端口仍由可信宿主注入。禁止在任何
  * 真实端口缺失时用 `DefRegistry.register` 或 `Linter.run` 近似代替，缺失路径必须继续失败关闭。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { CanonicalizedChangeRequest } from '../model/canonical-types.js';
-import type { QuotaBudget } from '../model/quota-types.js';
-import type { TargetOwnership } from '../model/candidate.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import type { ActivationResult } from '../model/report.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { CanonicalizedChangeRequest } from '../model/canonical-types';
+import type { QuotaBudget } from '../model/quota-types';
+import type { TargetOwnership } from '../model/candidate';
+import type { ValidationBaseline } from '../model/baseline';
+import type { ActivationResult } from '../model/report';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
 import type {
   DefinitionRegistryReadSnapshot,
   UpstreamResolvedReferenceGraph,
   UpstreamSchemaView,
   UpstreamValidatedCandidate,
-} from '../model/upstream.js';
-import type { IntegrationContractSnapshot } from '../model/contract-types.js';
+} from '../model/upstream';
+import type { IntegrationContractSnapshot } from '../model/contract-types';
 
 /**
  * 上游必须自证覆盖的强制能力。缺任何一项，UGC 拒绝启动验证——

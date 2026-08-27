@@ -1,10 +1,11 @@
-import type { Effect } from '../events/effect-types.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import type { Def, DefKind } from '../state/def.js';
-import type { ErrCode } from '../state/error-codes.js';
-import type { Expr, Query } from '../state/expr-types.js';
-import type { JsonValue, ParsedCandidateDocument } from '../spec-compiler/types.js';
-import type { PlaypackDef } from './playpack.js';
+import type { Effect } from '../events/effect-types';
+import type { Diagnostic } from '../state/diagnostic';
+import type { Def, DefKind } from '../state/def';
+import type { ErrCode } from '../state/error-codes';
+import type { Expr, Query } from '../state/expr-types';
+import type { JsonValue, ParsedCandidateDocument } from '../spec-compiler/types';
+import type { PlayDefExtension } from '../../../play/core-mechanics/ownership';
+import type { PlaypackDef } from './playpack';
 
 export type PlaypackDecodeResult =
   | { readonly ok: true; readonly value: PlaypackDef }
@@ -38,7 +39,7 @@ const PLAY_EXTENSION_FIELDS = new Set([
 const PLAYPACK_FIELDS = new Set([
   ...COMMON_DEF_FIELDS, 'version', 'schedule', 'pools', 'conflicts',
   'visibility', 'logRetention', 'outcomes', 'evaluate', 'policies',
-  'entry', 'requires', 'defs', 'hookOrder', 'overrides', 'linter',
+  'entry', 'requires', 'defs', 'hookOrder', 'overrides', 'rules', 'linter',
 ]);
 
 interface OpEffectWithResult {
@@ -103,6 +104,9 @@ class Validator {
     this.optionalStringArray(value, 'policies', path);
     this.optionalStringArray(value, 'requires', path);
     this.optionalStringArray(value, 'hookOrder', path);
+    // 常驻规则引用（D-081 / L0 第十四条 14.2：官方包与 UGC 包都经 playpack.rules 挂常驻规则，
+    // 与 PlaypackActivator.mountPermanentRules 同语义）。与 Def 基类的 rules 同名同形：string 数组。
+    this.optionalStringArray(value, 'rules', path);
 
     const pools = this.optionalArray(value, 'pools', path);
     pools?.forEach((pool, index) => this.pool(pool, `${this.child(path, 'pools')}/${index}`));
@@ -302,12 +306,16 @@ class Validator {
   }
 
   private actionDef(value: JsonObject, path: string): void {
-    this.knownFields(value, this.withCommon(['label', 'targets', 'require', 'visible', 'reason', 'cost', 'group', 'effects']), path);
+    this.knownFields(value, this.withCommon(['label', 'targets', 'require', 'visible', 'reason', 'cost', 'group', 'track', 'cardPresentation', 'effects']), path);
     this.requiredExpr(value, 'label', path);
     for (const key of ['require', 'visible', 'reason'] as const) {
       if (value[key] !== undefined) this.expr(value[key], this.child(path, key));
     }
     this.optionalString(value, 'group', path);
+    // 双轨制 P3：track 为必填闭合域（'highlight' | 'card'），约束在装载期机械判定。
+    this.requiredEnum(value, 'track', path, ['highlight', 'card']);
+    // cardPresentation 为可选 Id 引用（指向 CardPresentationDef）。
+    this.optionalString(value, 'cardPresentation', path);
     const effects = this.requiredArray(value, 'effects', path);
     if (effects) this.effectArray(effects, this.child(path, 'effects'));
 

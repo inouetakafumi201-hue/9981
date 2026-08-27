@@ -6,17 +6,17 @@
  * （buildKeyToIdMap/remapLinks/resolveAttachToRoot），从未注册为真正可调用的 Op——
  * 意味着需求8.1-8.7（子图批量实例化与回收）此前完全没有端到端路径可测。这里补齐。
  */
-import type { OpImpl, OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import type { Def } from '../state/def.js';
-import type { PrefabDef, PrefabHandle } from '../topology/prefab.js';
-import { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from '../topology/prefab.js';
-import { createNodeShape, createLinkShape } from '../topology/types.js';
-import { createEntityShape } from '../state/entity.js';
-import { linksTouching, cascadeNodeDestroySet } from '../topology/graph.js';
-import { checkInstantiable } from './def-guard.js';
+import type { OpImpl, OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id } from '../state/ids';
+import { nextId } from '../state/ids';
+import type { Def } from '../state/def';
+import type { PrefabDef, PrefabHandle } from '../topology/prefab';
+import { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from '../topology/prefab';
+import { createNodeShape, createLinkShape } from '../topology/types';
+import { createEntityShape } from '../state/entity';
+import { linksTouching, cascadeNodeDestroySet } from '../topology/graph';
+import { checkInstantiable } from './def-guard';
 
 export interface PrefabSpawnArgs {
   def: Id;

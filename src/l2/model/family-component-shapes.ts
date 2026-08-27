@@ -22,10 +22,10 @@ import {
   CompositionRegistry,
   type ComponentContract,
   EMPTY_WRITE_CHANNEL_CONTRACT,
-} from './composition-registry.js';
-import { CompositionShapeRegistry, type FamilyShape } from './composition-shape.js';
-import type { FieldName, OpId, SemanticFamilyId } from './ids.js';
-import type { ParameterField } from './schema.js';
+} from './composition-registry';
+import { CompositionShapeRegistry, type FamilyShape } from './composition-shape';
+import type { FieldName, OpId, SemanticFamilyId } from './ids';
+import type { ParameterField } from './schema';
 
 // ---------------------------------------------------------------------------
 // 组件形状建造辅助

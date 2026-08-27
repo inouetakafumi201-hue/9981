@@ -13,8 +13,8 @@ import {
   registeredNumericKeys,
   visitNumericSites,
   type NumericSite,
-} from '../types/numeric-classification.js';
-import { loadPlayProfiles } from '../profiles/catalog.js';
+} from '../types/numeric-classification';
+import { loadPlayProfiles } from '../profiles/catalog';
 
 function site(overrides: Partial<NumericSite> & Pick<NumericSite, 'key' | 'value'>): NumericSite {
   return { parent: undefined, path: `/${overrides.key}`, ...overrides };

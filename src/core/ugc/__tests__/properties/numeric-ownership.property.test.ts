@@ -8,10 +8,10 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import { inspectQuotaProfile } from '../../quota/quota-profile.js';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import { inspectQuotaProfile } from '../../quota/quota-profile';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 function profileWith(overrides: Record<string, unknown>): Record<string, unknown> {
   const base: Record<string, unknown> = { profileId: 'p', version: 'v' };

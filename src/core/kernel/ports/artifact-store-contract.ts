@@ -11,7 +11,7 @@
  * - 不能删除恢复能力
  */
 
-import type { Sha256Hash } from './hash-contract.js';
+import type { Sha256Hash } from './hash-contract';
 
 /**
  * 制品清单条目（每个 generation 一条）

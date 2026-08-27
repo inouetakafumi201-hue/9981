@@ -25,18 +25,18 @@ import type {
   PackageId,
   SemanticFamilyId,
   TagId,
-} from './ids.js';
-import type { L1DefKind, L1ExclusiveMechanism } from './def-kind.js';
-import type { GameplayValueAssignment, ParameterField, ParameterSchema } from './schema.js';
-import type { FamilyEligibilityEvidence, SourceLocation, SourceRecord } from './source.js';
+} from './ids';
+import type { L1DefKind, L1ExclusiveMechanism } from './def-kind';
+import type { GameplayValueAssignment, ParameterField, ParameterSchema } from './schema';
+import type { FamilyEligibilityEvidence, SourceLocation, SourceRecord } from './source';
 import type {
   CompositionComponent,
   DefinitionReference,
   FieldMergeRule,
   TypeIdentity,
   TypedReference,
-} from './reference.js';
-import type { FamilyContract } from './family-contracts.js';
+} from './reference';
+import type { FamilyContract } from './family-contracts';
 
 /** 语义族登记体：新族必须保存三判据分类理由与来源（Requirements 4.3）。 */
 export interface SemanticFamilyRegistration {

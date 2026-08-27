@@ -10,10 +10,10 @@
  * 该顺序是可观察结果的一部分，不得更改。
  */
 
-import type { Diagnostic } from './diagnostic.js';
-import type { JsonValue } from './json.js';
-import type { SourceLocation, SourceRecord, SourceStatement } from './source.js';
-import { precedenceRank } from './source.js';
+import type { Diagnostic } from './diagnostic';
+import type { JsonValue } from './json';
+import type { SourceLocation, SourceRecord, SourceStatement } from './source';
+import { precedenceRank } from './source';
 
 /**
  * 确定性字符串比较：按 UTF-16 码元序，不使用 `localeCompare`

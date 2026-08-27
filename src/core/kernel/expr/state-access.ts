@@ -10,14 +10,14 @@
  * 1. ExprEngine 仍然是全函数且无状态：accessor 缺失时相关算子一律返回 null，不抛异常（需求12.1）。
  * 2. 分层方向不被破坏：L2 不反向依赖 L3 的写入能力，只消费一个由调用方构造的只读视图。
  */
-import type { Id, Ref } from '../state/ids.js';
-import { isRef } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { WorldState } from '../state/world-state.js';
-import type { DefRegistry } from '../state/def.js';
-import type { Attachment } from '../state/attachment.js';
-import { dist, radius, shortestPath, spread } from '../topology/metrics.js';
-import type { DistOpts } from '../topology/metrics.js';
+import type { Id, Ref } from '../state/ids';
+import { isRef } from '../state/ids';
+import type { Value } from '../state/value';
+import type { WorldState } from '../state/world-state';
+import type { DefRegistry } from '../state/def';
+import type { Attachment } from '../state/attachment';
+import { dist, radius, shortestPath, spread } from '../topology/metrics';
+import type { DistOpts } from '../topology/metrics';
 
 /** 拓扑算子的可选修饰：via 只支持"边必须带某个 tag"这一种闭包无关的过滤形式，见下方说明。 */
 export interface TopologyOpOpts {

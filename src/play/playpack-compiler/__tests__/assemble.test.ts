@@ -6,12 +6,12 @@
  * 文档显式 kind 优先于类别推导、无 id 的 profile 跳过、装配产物可被 PlaypackLoader 装载。
  */
 import { describe, expect, it } from 'vitest';
-import { compile, type PlaypackInput } from '../index.js';
-import { compileToPlaypackDef } from '../assemble.js';
-import type { CompiledPlaypack } from '../types.js';
-import type { PlaypackDef } from '../../../core/kernel/schedule/playpack.js';
-import { PlaypackLoader } from '../../../core/kernel/schedule/playpack.js';
-import { DefRegistry } from '../../../core/kernel/state/def.js';
+import { compile, type PlaypackInput } from '../index';
+import { compileToPlaypackDef } from '../assemble';
+import type { CompiledPlaypack } from '../types';
+import type { PlaypackDef } from '../../../core/kernel/schedule/playpack';
+import { PlaypackLoader } from '../../../core/kernel/schedule/playpack';
+import { DefRegistry } from '../../../core/kernel/state/def';
 
 function makeInput(overrides?: Partial<PlaypackInput>): PlaypackInput {
   return {

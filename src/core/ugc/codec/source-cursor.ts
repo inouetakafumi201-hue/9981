@@ -6,8 +6,8 @@
  * 尤其列号用 code point 计数：BMP 外字符（如 emoji）占两个 code unit，按 code unit 计列会让创作者看到
  * 与编辑器不一致的列号。
  */
-import type { SourcePoint, SourceSpan } from '../../kernel/state/diagnostic.js';
-import { utf8LengthOfCodePoint } from './utf8.js';
+import type { SourcePoint, SourceSpan } from '../../kernel/state/diagnostic';
+import { utf8LengthOfCodePoint } from './utf8';
 
 export class SourceCursor {
   /** UTF-16 code unit 索引，用于字符串取值。 */

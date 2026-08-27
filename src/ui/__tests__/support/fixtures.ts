@@ -5,9 +5,9 @@
  * 要求上游交付深冻结结构，如果夹具交出可变结构，那条断言就永远只在失败路径被测到。
  */
 
-import { makeRevision, type StateRevision } from '../../model/revision.js';
-import { makeInternalMetric } from '../../presentation/gameplay-value.js';
-import type { PresentationProfile } from '../../model/profile.js';
+import { makeRevision, type StateRevision } from '../../model/revision';
+import { makeInternalMetric } from '../../presentation/gameplay-value';
+import type { PresentationProfile } from '../../model/profile';
 import {
   entityViewToken,
   type ActionCostCategory,
@@ -22,8 +22,8 @@ import {
   type UiTurnOrderEntry,
   type UiView,
   type UpstreamAgentAuthority,
-} from '../../model/view.js';
-import { reduceView, type ProjectedViewBase } from '../../projection/reconcile.js';
+} from '../../model/view';
+import { reduceView, type ProjectedViewBase } from '../../projection/reconcile';
 
 /** 递归冻结。夹具专用，产品代码不做就地冻结。 */
 export function deepFreeze<T>(value: T): T {
@@ -118,6 +118,7 @@ export function actionView(options: ActionOptions = {}): UiActionView {
   return deepFreeze({
     actionId: options.actionId ?? 'act.move',
     costCategory: options.costCategory ?? ('paid' as const),
+    track: 'card' as const,
     ...(options.interactionIntent === undefined
       ? { interactionIntent: 'traversal' as const }
       : { interactionIntent: options.interactionIntent }),
@@ -126,7 +127,7 @@ export function actionView(options: ActionOptions = {}): UiActionView {
     assetRefs: [],
     bindings: [...(options.bindings ?? [{ key: 'to', value: 'n1' }])],
     targets: [],
-  }) as UiActionView;
+  }) as unknown as UiActionView;
 }
 
 export function entityView(entityId: string, remembered = false): UiEntityView {
@@ -227,6 +228,22 @@ export function profileFixture(overrides: Partial<PresentationProfile> = {}): Pr
     eventBufferTimeout: makeInternalMetric(2_000, 'ms'),
     ...overrides,
   }) as PresentationProfile;
+}
+
+/**
+ * 测试用 Presentation_Profile（带安全字段白名单）。
+ *
+ * 与 `profileFixture` 同构，但 `safeFieldWhitelist` 非空——供整合层事件出口契约测试验证
+ * 「UI 事件端口经 scope-filter 收窄」：白名单字段（如 `outcome`）被投影进 `safePayload`，
+ * 而范围外标识（如 `round` 的数值）不进入表现层。这是 profile 声明白名单的消费路径。
+ */
+export function profileFixtureWithSafeFields(
+  overrides: Partial<PresentationProfile> = {},
+): PresentationProfile {
+  return profileFixture({
+    safeFieldWhitelist: Object.freeze(['outcome']),
+    ...overrides,
+  });
 }
 
 /** 构造一个已归约的 `UiView`。走 `reduceView` 而不是手搓字面量，避免夹具与产品代码分叉。 */

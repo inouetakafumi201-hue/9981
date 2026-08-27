@@ -8,16 +8,16 @@
  * aura 前缀 prop 而非走 Op，因此不重新触发 after 分发、无环。
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { wireHooksIntoRegistry } from '../../wire-hooks.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { DefRegistry } from '../../state/def.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { registerStructuralOps, makeItemMove } from '../../ops/structural-ops.js';
-import { registerAttachOps } from '../attach-ops.js';
-import { ExprEngine } from '../../expr/engine.js';
-import type { Def } from '../../state/def.js';
+import { wireHooksIntoRegistry } from '../../wire-hooks';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { DefRegistry } from '../../state/def';
+import { resetIdCounters } from '../../state/ids';
+import { registerPropOps } from '../../ops/prop-ops';
+import { registerStructuralOps, makeItemMove } from '../../ops/structural-ops';
+import { registerAttachOps } from '../attach-ops';
+import { ExprEngine } from '../../expr/engine';
+import type { Def } from '../../state/def';
 
 function setup() {
   const holder = new WorldStateHolder(createEmptyWorldState('s:sched'));

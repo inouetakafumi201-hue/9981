@@ -5,12 +5,12 @@
  * DesignCurrencyGateway 提供）、选中动作、提交流程结果。这里把这些拼成完整 DecisionTrace，
  * 并给 trace 加决策时世界快照的 stateHash（抗漂移）。
  */
-import type { BeliefSlice } from '../types.js';
-import type { AIDecisionResult } from '../types.js';
-import { extractObservedFacts, type DecisionTrace, type TraceCandidate, type TraceSubmission } from './trace.js';
-import { hashWorldState } from './snapshot.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { ScoreBreakdownInstance } from '../design-currency.js';
+import type { BeliefSlice } from '../types';
+import type { AIDecisionResult } from '../types';
+import { extractObservedFacts, type DecisionTrace, type TraceCandidate, type TraceSubmission } from './trace';
+import { hashWorldState } from './snapshot';
+import type { WorldState } from '../../state/world-state';
+import type { ScoreBreakdownInstance } from '../design-currency';
 
 /** 由 facade 调用方传入的「当前世界快照」—— 供生成 stateHash。 */
 export interface TraceCandidateInput {

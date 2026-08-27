@@ -12,13 +12,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import { makeExprStateAccess } from '../expr/state-access.js';
-import { checkPure } from '../expr/named-expr.js';
-import type { Expr } from '../state/expr-types.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { getPath } from '../ops/path.js';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import { QueryEngine } from '../expr/query-engine';
+import { makeExprStateAccess } from '../expr/state-access';
+import { checkPure } from '../expr/named-expr';
+import type { Expr } from '../state/expr-types';
+import { createEmptyWorldState } from '../state/world-state';
+import { getPath } from '../ops/path';
 
 /** 结构随机的 Expr（有限深度递归，避免 letrec 在该 fast-check 版本不可用）：字面量、path、var、op（含未知/随机/写入算子）、call、q、嵌套数组/对象。 */
 function exprArbOf(maxDepth: number): fc.Arbitrary<Expr> {

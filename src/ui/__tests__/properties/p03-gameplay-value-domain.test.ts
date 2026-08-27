@@ -2,7 +2,7 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { discreteSegments, makeGameplayValue } from '../../presentation/gameplay-value.js';
+import { discreteSegments, makeGameplayValue } from '../../presentation/gameplay-value';
 
 it('任意输入只有 1—5 整数能进入离散玩法数值呈现', () => {
   const raw = fc.oneof(fc.double({ noNaN: false, noDefaultInfinity: false }), fc.integer(), fc.string(), fc.constant(null));

@@ -9,18 +9,18 @@
  *    因此 `1.0`、`1e0`、`1` 归一为同一字节序列，而结果在任何机器上相同。
  * 4. 输出中**不注入**时间戳、随机 ID、宿主路径、Adapter 信息或 locale 相关数字（需求 11.5）。
  */
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { documentAnchorSpan } from '../diagnostics/factory.js';
-import type { CanonicalCandidate } from '../model/canonical-types.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import { compareCodePoints } from '../model/fingerprint.js';
-import type { JsonAst, MigratedCandidateDocument } from '../model/json-ast.js';
-import type { QuotaBudget } from '../model/quota-types.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
-import type { CanonicalizationSchemaView } from '../ports/schema-ports.js';
-import { isPortUnavailable } from '../ports/availability.js';
-import { SCHEMA_CATALOG_EVIDENCE, unresolvedContractDiagnostic } from '../ports/unavailable.js';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { documentAnchorSpan } from '../diagnostics/factory';
+import type { CanonicalCandidate } from '../model/canonical-types';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import { compareCodePoints } from '../model/fingerprint';
+import type { JsonAst, MigratedCandidateDocument } from '../model/json-ast';
+import type { QuotaBudget } from '../model/quota-types';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
+import type { CanonicalizationSchemaView } from '../ports/schema-ports';
+import { isPortUnavailable } from '../ports/availability';
+import { SCHEMA_CATALOG_EVIDENCE, unresolvedContractDiagnostic } from '../ports/unavailable';
 
 const STAGE = 'canonicalize' as const;
 

@@ -2,16 +2,16 @@
  * L7 Decision: decision.open / decision.answer 两个公开 Op（design.md 3.8节 / 需求27.1-27.7, 16.1）。
  * 必须注册进 OpRegistry，不得包成独立组件对外暴露 openDecision/answer 方法。
  */
-import type { OpImpl, OpContext } from '../ops/registry.js';
-import type { OpRegistry } from '../ops/registry.js';
-import { ok, err } from '../ops/result.js';
-import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import type { DecisionState } from '../state/world-state.js';
-import type { DecisionDef, DecisionOpenArgs, DecisionAnswerArgs } from './types.js';
-import type { Value } from '../state/value.js';
-import type { Def } from '../state/def.js';
-import { checkInstantiable } from '../ops/def-guard.js';
+import type { OpImpl, OpContext } from '../ops/registry';
+import type { OpRegistry } from '../ops/registry';
+import { ok, err } from '../ops/result';
+import type { Id, Ref } from '../state/ids';
+import { nextId } from '../state/ids';
+import type { DecisionState } from '../state/world-state';
+import type { DecisionDef, DecisionOpenArgs, DecisionAnswerArgs } from './types';
+import type { Value } from '../state/value';
+import type { Def } from '../state/def';
+import { checkInstantiable } from '../ops/def-guard';
 
 /**
  * DecisionDefLookup（修正记录于 决策与风险记录.md）：早前签名是 `resolve(id): DecisionDef | null`，

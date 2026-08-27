@@ -8,17 +8,17 @@
  * 不能直接修改 Semantic_State，也不能绕过 Validator / Resolver / Registry / OpRegistry。
  */
 
-import type { Result } from '../model/result.js';
-import type { CanonicalSnapshot } from '../model/snapshot.js';
-import type { KernelContract, KernelInvokeResult } from '../kernel/kernel-contract.js';
-import type { ActionRequest, CallerContext, OpCause, OpResult, RuntimeSemanticState } from '../model/projection.js';
-import type { JsonValue } from '../model/json.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import { parsePackage, type ParseOptions } from '../codec/json-codec.js';
-import { canonicalize, parseCanonical } from '../codec/json-canonicalizer.js';
-import { fromUgc, type UgcInput } from '../ugc/ugc-adapter.js';
-import { activate, type ActiveRegistry, type ActivationSuccess } from '../registry/definition-registry.js';
-import { submit } from '../registry/action-submitter.js';
+import type { Result } from '../model/result';
+import type { CanonicalSnapshot } from '../model/snapshot';
+import type { KernelContract, KernelInvokeResult } from '../kernel/kernel-contract';
+import type { ActionRequest, CallerContext, OpCause, OpResult, RuntimeSemanticState } from '../model/projection';
+import type { JsonValue } from '../model/json';
+import type { DefinitionPackage } from '../model/definition';
+import { parsePackage, type ParseOptions } from '../codec/json-codec';
+import { canonicalize, parseCanonical } from '../codec/json-canonicalizer';
+import { fromUgc, type UgcInput } from '../ugc/ugc-adapter';
+import { activate, type ActiveRegistry, type ActivationSuccess } from '../registry/definition-registry';
+import { submit } from '../registry/action-submitter';
 
 /** 可观察操作的种类。 */
 export const OBSERVABLE_OPERATIONS = [

@@ -9,7 +9,7 @@ import {
   validateSourceSpan,
   mergeSourceSpans,
   type SourceSpan,
-} from '../../model/source.js';
+} from '../../model/source';
 
 describe('validateSourceSpan', () => {
   it('accepts valid span', () => {

@@ -12,7 +12,7 @@
  * - 不能删除现有字段
  */
 
-import type { TechnicalQuotas } from './json-codec-contract.js';
+import type { TechnicalQuotas } from './json-codec-contract';
 
 /**
  * 配额验证错误

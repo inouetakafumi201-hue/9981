@@ -5,18 +5,18 @@
  * deliberately exports no WorldState-taking search, arbitrary action callback,
  * direct state writer, or legacy slice/tiering API.
  */
-export * from './types.js';
-export * from './budget.js';
-export * from './diagnostics.js';
-export * from './read-gateway.js';
-export * from './behavior-validation.js';
-export * from './candidate-planner.js';
-export * from './evaluation.js';
-export * from './design-currency.js';
-export * from './commit-gateway.js';
-export * from './planner-registry.js';
-export * from './simulation.js';
-export * from './sequential-search.js';
-export * from './explanation.js';
-export * from './ugc.js';
-export * from './facade.js';
+export * from './types';
+export * from './budget';
+export * from './diagnostics';
+export * from './read-gateway';
+export * from './behavior-validation';
+export * from './candidate-planner';
+export * from './evaluation';
+export * from './design-currency';
+export * from './commit-gateway';
+export * from './planner-registry';
+export * from './simulation';
+export * from './sequential-search';
+export * from './explanation';
+export * from './ugc';
+export * from './facade';

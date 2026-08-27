@@ -1,12 +1,12 @@
-import { canonicalStringify, compareCodePoints, joinJsonPointer } from './json-codec.js';
-import { EMPTY_TYPE_IDENTITY } from './types.js';
+import { canonicalStringify, compareCodePoints, joinJsonPointer } from './json-codec';
+import { EMPTY_TYPE_IDENTITY } from './types';
 import type {
   CandidateDefinition,
   DefinitionSchema,
   JsonValue,
   Report,
   TypeIdentity,
-} from './types.js';
+} from './types';
 
 const IDENTITY_DIMENSIONS = ['requiredCapabilities', 'legalRelations', 'invariants', 'substitutes'] as const;
 

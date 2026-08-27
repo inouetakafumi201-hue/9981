@@ -5,11 +5,11 @@
  *
  * 这是模糊测试的执行核心：每一步都记录 Op 名、参数、Result，供事后断言复核。
  */
-import type { FullHarness } from './full-harness.js';
-import type { OpIntent } from './op-sequence-arbitrary.js';
-import type { Result } from '../ops/result.js';
-import type { Id } from '../state/ids.js';
-import type { PrefabHandle } from '../topology/prefab.js';
+import type { FullHarness } from './full-harness';
+import type { OpIntent } from './op-sequence-arbitrary';
+import type { Result } from '../ops/result';
+import type { Id } from '../state/ids';
+import type { PrefabHandle } from '../topology/prefab';
 
 export interface StepLog {
   intent: OpIntent;

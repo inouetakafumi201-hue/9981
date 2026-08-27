@@ -6,8 +6,8 @@
  * 后者只拥有对这些类型求值/查询的运行时引擎（ExprEngine/QueryEngine）。
  * 这避免了 L1 的 Def.slots[].accepts: Expr 字段声明造成 L1 反向 import L2 的分层违规。
  */
-import type { Id } from './ids.js';
-import type { Value } from './value.js';
+import type { Id } from './ids';
+import type { Value } from './value';
 
 export type Expr =
   | Value

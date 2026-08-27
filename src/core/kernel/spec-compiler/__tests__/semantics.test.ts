@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { candidate, createHarness } from './fixtures.js';
+import { candidate, createHarness } from './fixtures';
 
 async function codesFor(text: string, overrides = {}): Promise<readonly string[]> {
   const harness = createHarness();

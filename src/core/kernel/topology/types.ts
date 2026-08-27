@@ -1,10 +1,10 @@
 /**
  * L1 Topology: Node/Link/Container/Slot 结构（design.md 3.2节 / 需求7、10）。
  */
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Ref } from '../state/ids.js';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Expr } from '../state/expr-types';
+import type { Ref } from '../state/ids';
 
 export interface Node {
   readonly id: Id;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createEntityShape, createItemShape } from '../entity.js';
+import { createEntityShape, createItemShape } from '../entity';
 
 describe('Entity / Item 基本结构（需求2.1-2.4）', () => {
   it('createEntityShape 产生 node/slot 均为空的初始结构（互斥由 InvariantChecker 校验）', () => {

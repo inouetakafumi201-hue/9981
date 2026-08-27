@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbReachableState } from './generators.js';
+import { arbReachableState } from './generators';
 
 describe('Property 3: 玩家可见数值 1-5 约束', () => {
   it('isVisibleGameplayValue 只接受 1-5 整数', () => {

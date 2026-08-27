@@ -39,7 +39,7 @@ export type {
   ValidationReport,
   ValidationStage,
   ValidationStatus,
-} from './model/index.js';
+} from './model/index';
 
 export {
   CANDIDATE_SOURCE_KINDS,
@@ -53,7 +53,7 @@ export {
   createCandidateDocument,
   createCandidateSource,
   isValidatedReport,
-} from './model/index.js';
+} from './model/index';
 
 // 跨领域契约类型。
 export type {
@@ -61,11 +61,11 @@ export type {
   IntegrationContractSnapshot,
   IntegrationDomain,
   ResolvedContractExport,
-} from './model/contract-types.js';
-export { INTEGRATION_DOMAINS } from './model/contract-types.js';
+} from './model/contract-types';
+export { INTEGRATION_DOMAINS } from './model/contract-types';
 
 // 诊断：只导出目录、排序与等价比较；工厂供宿主构造诊断，不含任何旁路能力。
-export type { DiagnosticCodeCatalog, UGCDiagnosticCategory, UGCDiagnosticFactory } from './diagnostics/index.js';
+export type { DiagnosticCodeCatalog, UGCDiagnosticCategory, UGCDiagnosticFactory } from './diagnostics/index';
 export {
   UGC_DIAGNOSTIC_CATEGORIES,
   compareDiagnostics,
@@ -73,7 +73,7 @@ export {
   createDiagnosticFactory,
   diagnosticsEquivalent,
   sortDiagnostics,
-} from './diagnostics/index.js';
+} from './diagnostics/index';
 
 // 上游端口接口与失败关闭适配器。
 export type {
@@ -85,7 +85,7 @@ export type {
   SchemaVersionCatalog,
   TrustedSchemaMigration,
   UnresolvedPortEvidence,
-} from './ports/index.js';
+} from './ports/index';
 export {
   UNAVAILABLE_PROVIDER_ID,
   createUnavailableDefinitionRegistryGateway,
@@ -96,61 +96,61 @@ export {
   createUnavailableSchemaVersionCatalog,
   isPortUnavailable,
   sha256FingerprintGateway,
-} from './ports/index.js';
+} from './ports/index';
 
-export type { StableFingerprintGateway } from './model/index.js';
+export type { StableFingerprintGateway } from './model/index';
 
 // 配额：导出档案校验与预算工厂。预算实现类本身不导出。
-export { createQuotaBudget, inspectQuotaProfile, validateQuotaProfile } from './quota/index.js';
+export { createQuotaBudget, inspectQuotaProfile, validateQuotaProfile } from './quota/index';
 
 // 解码：导出解码器工厂与效果契约端口。
-export type { EffectContractView, StructuralJsonDecoder } from './codec/index.js';
-export { SCHEMA_VERSION_MEMBER, createProhibitedConstructGate, createStrictJsonDecoder } from './codec/index.js';
+export type { EffectContractView, StructuralJsonDecoder } from './codec/index';
+export { SCHEMA_VERSION_MEMBER, createProhibitedConstructGate, createStrictJsonDecoder } from './codec/index';
 
 // 迁移与规范化。
-export type { SchemaMigrationCoordinator, SchemaMigrationCoordinatorDeps } from './migration/index.js';
-export { createSchemaMigrationCoordinator } from './migration/index.js';
-export type { CanonicalizationGateway } from './canonical/index.js';
-export { createCanonicalizationGateway } from './canonical/index.js';
-export type { CanonicalizationSchemaView } from './ports/schema-ports.js';
+export type { SchemaMigrationCoordinator, SchemaMigrationCoordinatorDeps } from './migration/index';
+export { createSchemaMigrationCoordinator } from './migration/index';
+export type { CanonicalizationGateway } from './canonical/index';
+export { createCanonicalizationGateway } from './canonical/index';
+export type { CanonicalizationSchemaView } from './ports/schema-ports';
 
 // 跨领域契约目录与验证基线。
-export type { IntegrationContractCatalog } from './contracts/index.js';
-export { createIntegrationContractCatalog, inspectContracts } from './contracts/index.js';
-export type { BaselineSources } from './baseline/index.js';
-export { captureBaseline, recheckBaseline } from './baseline/index.js';
+export type { IntegrationContractCatalog } from './contracts/index';
+export { createIntegrationContractCatalog, inspectContracts } from './contracts/index';
+export type { BaselineSources } from './baseline/index';
+export { captureBaseline, recheckBaseline } from './baseline/index';
 
 // 适配器：四种来源共用同一条生产调用链。
-export { ALL_ADAPTERS, editorAdapter, handAuthoredAdapter, importAdapter, naturalLanguageAdapter } from './adapter/index.js';
+export { ALL_ADAPTERS, editorAdapter, handAuthoredAdapter, importAdapter, naturalLanguageAdapter } from './adapter/index';
 
 // 验证流水线与表现回退。
-export type { CoordinatorDeps, UGCValidationCoordinator } from './validation/index.js';
+export type { CoordinatorDeps, UGCValidationCoordinator } from './validation/index';
 export {
   ACTIVE_MATCH_REPLACEMENT_MEMBER,
   COMPATIBILITY_MEMBER,
   createValidationCoordinator,
-} from './validation/index.js';
-export type { PresentationFallbackResolver } from './presentation/index.js';
-export { createPresentationFallbackResolver } from './presentation/index.js';
+} from './validation/index';
+export type { PresentationFallbackResolver } from './presentation/index';
+export { createPresentationFallbackResolver } from './presentation/index';
 
 // 原子激活协调器（不导出产物铸造工厂）。
-export type { AtomicActivationCoordinator, AtomicActivationDeps } from './activation/atomic-activation-coordinator.js';
-export { createAtomicActivationCoordinator } from './activation/atomic-activation-coordinator.js';
+export type { AtomicActivationCoordinator, AtomicActivationDeps } from './activation/atomic-activation-coordinator';
+export { createAtomicActivationCoordinator } from './activation/atomic-activation-coordinator';
 
 // 唯一公共入口。
-export type { FacadeDeps, UGCIngressFacade } from './facade/ugc-ingress-facade.js';
-export { createUGCIngressFacade } from './facade/ugc-ingress-facade.js';
+export type { FacadeDeps, UGCIngressFacade } from './facade/ugc-ingress-facade';
+export { createUGCIngressFacade } from './facade/ugc-ingress-facade';
 
 // 基类层真实端口的唯一生产装配边界。
-export type { L2UGCHostDependencies, L2UGCIntegration } from './integration/l2-adapter.js';
-export { assembleL2UGCIntegration, createL2UGCIntegration } from './integration/l2-adapter.js';
-export type { L2PortBundle, L2PortBundleProblem } from './integration/l2-port-contract.js';
+export type { L2UGCHostDependencies, L2UGCIntegration } from './integration/l2-adapter';
+export { assembleL2UGCIntegration, createL2UGCIntegration } from './integration/l2-adapter';
+export type { L2PortBundle, L2PortBundleProblem } from './integration/l2-port-contract';
 export {
   L2PortBundleContractError,
   assertL2PortBundle,
   inspectL2PortBundle,
   isL2PortBundleReady,
-} from './integration/l2-port-contract.js';
+} from './integration/l2-port-contract';
 
 // 上游 Schema 视图与效果契约端口（由基类层实现）。
-export type { UpstreamSchemaView, PresentationGap, FieldClassification } from './model/upstream.js';
+export type { UpstreamSchemaView, PresentationGap, FieldClassification } from './model/upstream';

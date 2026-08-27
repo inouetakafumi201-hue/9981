@@ -2,10 +2,10 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { createAnimationScheduler } from '../../animation/scheduler.js';
-import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial.js';
-import { arbReachableProjection } from '../support/arbitraries.js';
-import { profileFixture, revision } from '../support/fixtures.js';
+import { createAnimationScheduler } from '../../animation/scheduler';
+import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial';
+import { arbReachableProjection } from '../support/arbitraries';
+import { profileFixture, revision } from '../support/fixtures';
 
 const MODES = ['standard', 'user-skipped', 'reduced-motion', 'resource-fallback'] as const;
 

@@ -26,24 +26,24 @@
  */
 
 import { createHash } from 'node:crypto';
-import type { DefKind } from '../core/kernel/state/def.js';
-import type { SourceRecord } from '../core/kernel/state/diagnostic.js';
-import { InMemoryEmergencySink } from '../core/kernel/safety/fatal-boundary.js';
+import type { DefKind } from '../core/kernel/state/def';
+import type { SourceRecord } from '../core/kernel/state/diagnostic';
+import { InMemoryEmergencySink } from '../core/kernel/safety/fatal-boundary';
 import {
   InMemoryArtifactStore,
   InMemorySpecificationRegistry,
   SchemaRegistry,
   SemanticFamilyRegistry,
   SpecificationCompiler,
-} from '../core/kernel/spec-compiler/index.js';
+} from '../core/kernel/spec-compiler/index';
 import type {
   CandidateDocumentInput,
   CompilationResult,
   DefinitionSchema,
   FieldRule,
   SchemaVersion,
-} from '../core/kernel/spec-compiler/index.js';
-import type { ClassCatalog } from './class-contract.js';
+} from '../core/kernel/spec-compiler/index';
+import type { ClassCatalog } from './class-contract';
 
 /** 编译器 schema 契约版本；与目录数据版本（catalog.version）是两个独立的版本号。 */
 export const CATALOG_COMPILER_SCHEMA_VERSION = '1.0.0';

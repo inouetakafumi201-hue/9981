@@ -25,7 +25,7 @@ import {
   mergeQuotasConservative,
   createQuotaConsumption,
   isQuotaExhausted,
-} from '../../security/index.js';
+} from '../../security/index';
 
 describe('Security Port: Hash Functions', () => {
   describe('SHA-256 hash', () => {

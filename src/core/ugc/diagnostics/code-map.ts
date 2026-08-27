@@ -5,7 +5,7 @@
  * 任务 1.3 已核实：下列全部代码都存在于 `src/core/kernel/state/error-codes.ts` 且在
  * `HINT_TEMPLATES` 中有 hint（由 `checkHintCompleteness` 强制）。
  */
-import type { ErrCode } from '../../kernel/state/error-codes.js';
+import type { ErrCode } from '../../kernel/state/error-codes';
 
 export const UGC_DIAGNOSTIC_CATEGORIES = [
   'JSON_SYNTAX',

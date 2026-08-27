@@ -6,10 +6,10 @@
  * callback, so callers cannot bypass the kernel's Action/Decision/Intent/Op
  * lifecycle through the AI API.
  */
-import type { LegalAction } from '../actions/types.js';
-import type { Query } from '../state/expr-types.js';
-import type { Ref } from '../state/ids.js';
-import type { Value } from '../state/value.js';
+import type { LegalAction } from '../actions/types';
+import type { Query } from '../state/expr-types';
+import type { Ref } from '../state/ids';
+import type { Value } from '../state/value';
 
 export type AIPolicyCategory = 'player-assistance' | 'npc-behavior';
 export type PlanningTier = 'exact' | 'coarse';
@@ -321,7 +321,7 @@ export interface AIDecisionResult {
   readonly candidate?: AICandidate;
   readonly diagnostics: readonly AIDiagnostic[];
   /** 可选：本次决策的完整审计记录（DecisionTrace），由成功路径回填；既有消费方不受影响。 */
-  readonly trace?: import('./tuning/trace.js').DecisionTrace;
+  readonly trace?: import('./tuning/trace').DecisionTrace;
 }
 
 /** The only formal public decision entry point. */

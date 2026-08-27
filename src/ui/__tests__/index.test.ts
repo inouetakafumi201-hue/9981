@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createUiSystem } from '../index.js';
-import { UI_DIAGNOSTIC_CODES } from '../model/diagnostic.js';
-import type { InteractionIntent } from '../model/intent.js';
-import type { RuleEventProjection } from '../model/event-projection.js';
-import type { ActionPort } from '../ports/action-port.js';
+import { createUiSystem } from '../index';
+import { UI_DIAGNOSTIC_CODES } from '../model/diagnostic';
+import type { InteractionIntent } from '../model/intent';
+import type { RuleEventProjection } from '../model/event-projection';
+import type { ActionPort } from '../ports/action-port';
 import {
   createInMemoryActionPort,
   createInMemoryActionQueryPort,
@@ -14,8 +14,8 @@ import {
   createPendingContractPorts,
   createRecordingDiagnosticSink,
   createReplayModeActionPort,
-} from './support/in-memory-ports.js';
-import { profileFixture, revision } from './support/fixtures.js';
+} from './support/in-memory-ports';
+import { profileFixture, revision } from './support/fixtures';
 
 const INTENT: InteractionIntent = Object.freeze({
   intentId: 'intent.a',

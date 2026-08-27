@@ -8,7 +8,7 @@
  * 因为 `Object.freeze` 不阻止 `Map.prototype.set`。
  */
 
-import type { DeepReadonly } from './json.js';
+import type { DeepReadonly } from './json';
 
 const MUTATING_MAP_METHODS = ['set', 'delete', 'clear'] as const;
 const MUTATING_SET_METHODS = ['add', 'delete', 'clear'] as const;

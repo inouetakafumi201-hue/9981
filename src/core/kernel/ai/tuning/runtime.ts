@@ -9,8 +9,8 @@
  * 分值求值（拆分 + 稀缺 + 击杀奖励 + 倒地威胁）与 `design-currency.ts` 逐行对齐，
  * 只新增「分数构成（ScoreBreakdown）记录」，不改任何分值与语义。
  */
-import type { BeliefSlice, KnownFact } from '../types.js';
-import type { DesignCurrencyConfig, DesignCurrencyChargeConfig, PivotKind } from './config-design-currency.js';
+import type { BeliefSlice, KnownFact } from '../types';
+import type { DesignCurrencyConfig, DesignCurrencyChargeConfig, PivotKind } from './config-design-currency';
 
 /** ——— 与 `design-currency.ts` 对称的运行时解析 ——— */
 export function observedNumber(slice: BeliefSlice, field: string): number | null {

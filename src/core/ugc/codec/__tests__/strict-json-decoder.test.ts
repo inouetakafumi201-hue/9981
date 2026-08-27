@@ -7,18 +7,18 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createStrictJsonDecoder } from '../strict-json-decoder.js';
-import { SCHEMA_VERSION_MEMBER } from '../strict-json-decoder.js';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createQuotaBudget } from '../../quota/quota-budget.js';
-import { candidateFromText, createCandidateDocument, createCandidateSource } from '../../model/candidate.js';
-import type { JsonAst } from '../../model/json-ast.js';
-import type { QuotaKind, TrustedQuotaProfile } from '../../model/quota-types.js';
-import type { UgcResult } from '../../model/result.js';
-import type { ParsedCandidateDocument } from '../../model/json-ast.js';
-import type { Diagnostic } from '../../../kernel/state/diagnostic.js';
+import { createStrictJsonDecoder } from '../strict-json-decoder';
+import { SCHEMA_VERSION_MEMBER } from '../strict-json-decoder';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createQuotaBudget } from '../../quota/quota-budget';
+import { candidateFromText, createCandidateDocument, createCandidateSource } from '../../model/candidate';
+import type { JsonAst } from '../../model/json-ast';
+import type { QuotaKind, TrustedQuotaProfile } from '../../model/quota-types';
+import type { UgcResult } from '../../model/result';
+import type { ParsedCandidateDocument } from '../../model/json-ast';
+import type { Diagnostic } from '../../../kernel/state/diagnostic';
 
 const catalog = createDiagnosticCodeCatalog(sha256FingerprintGateway);
 const factory = createDiagnosticFactory(catalog);

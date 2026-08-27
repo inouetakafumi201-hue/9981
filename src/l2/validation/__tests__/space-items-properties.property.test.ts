@@ -27,9 +27,9 @@
 
 import fc from 'fast-check';
 import { describe, it, expect } from 'vitest';
-import type { CandidateDefinition, DefinitionPackage } from '../../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes.js';
-import { buildValidationContext, validatePackage, DEFINITION_RULES } from '../validator.js';
+import type { CandidateDefinition, DefinitionPackage } from '../../model/definition';
+import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes';
+import { buildValidationContext, validatePackage, DEFINITION_RULES } from '../validator';
 
 const TEST_SOURCE_RECORD = Object.freeze({
   sourceFile: 'docs/L2_基类层/基类层定义.md',

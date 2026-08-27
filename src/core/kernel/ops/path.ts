@@ -9,8 +9,8 @@
  * Node/Link 的 .props，world.props，以及 knowledge.*.facts / knowledge.*.seen），
  * 任何指向结构区字段（如 entities.e:1.node、items.i:1.stack）的路径都被拒绝。
  */
-import type { WorldState } from '../state/world-state.js';
-import type { Value } from '../state/value.js';
+import type { WorldState } from '../state/world-state';
+import type { Value } from '../state/value';
 
 const WRITABLE_PATH_PATTERNS: RegExp[] = [
   /^world\.props(\..+)?$/,

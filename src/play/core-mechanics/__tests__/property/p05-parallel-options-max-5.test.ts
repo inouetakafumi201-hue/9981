@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbCarriedItems } from './generators.js';
+import { arbCarriedItems } from './generators';
 
 describe('Property 5: 五并列约束', () => {
   it('同一父动作下的附着动作集合 ≤5', () => {

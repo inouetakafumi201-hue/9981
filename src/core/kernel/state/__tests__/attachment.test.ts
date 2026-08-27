@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { cascadeRemovalSet, type Attachment } from '../attachment.js';
+import { cascadeRemovalSet, type Attachment } from '../attachment';
 
 function att(id: string, grantedBy?: string): Attachment {
   return { id, def: 'd:x', target: { $: 'e:1' }, props: {}, stack: 1, grantedBy };

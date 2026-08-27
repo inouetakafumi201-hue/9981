@@ -6,14 +6,14 @@ import {
   createProjectionCache,
   findUnfrozenPaths,
   type AcceptProjectionInput,
-} from '../projection-cache.js';
+} from '../projection-cache';
 import {
   authority,
   descriptor,
   projection,
   revision,
-} from '../../__tests__/support/fixtures.js';
-import type { ReadOnlySemanticProjection } from '../../model/view.js';
+} from '../../__tests__/support/fixtures';
+import type { ReadOnlySemanticProjection } from '../../model/view';
 
 function input(overrides: Partial<AcceptProjectionInput> = {}): AcceptProjectionInput {
   return {

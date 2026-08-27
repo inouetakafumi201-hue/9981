@@ -10,25 +10,25 @@
  * 3. 同一决策编号的不同语义陈述**不合并**，只产生追踪诊断。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { warningDiagnostic } from '../model/diagnostic-factory.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { warningDiagnostic } from '../model/diagnostic-factory';
 import type {
   NormativeContract,
   SourceRecord,
   SourceStatement,
   UnresolvedItem,
-} from '../model/source.js';
-import { precedenceRank } from '../model/source.js';
+} from '../model/source';
+import { precedenceRank } from '../model/source';
 import {
   canonicalSort,
   compareDiagnostics,
   compareSourceRecords,
   compareSourceStatements,
   fingerprint,
-} from '../model/ordering.js';
-import { findUnresolvedQuestion } from './decision-catalog.js';
-import type { ConflictResolution } from './types.js';
+} from '../model/ordering';
+import { findUnresolvedQuestion } from './decision-catalog';
+import type { ConflictResolution } from './types';
 
 /**
  * 语义指纹：用于判断同优先级的两条陈述是否**实质**冲突。

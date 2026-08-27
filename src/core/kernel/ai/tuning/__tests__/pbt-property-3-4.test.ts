@@ -9,9 +9,9 @@
  */
 import { describe, it } from 'vitest';
 import fc from 'fast-check';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import { snapshotWorldState, restoreFromSnapshot, hashWorldState } from '../snapshot.js';
-import type { WorldState } from '../../../state/world-state.js';
+import { createEmptyWorldState } from '../../../state/world-state';
+import { snapshotWorldState, restoreFromSnapshot, hashWorldState } from '../snapshot';
+import type { WorldState } from '../../../state/world-state';
 
 /**
  * 随机 WorldState 生成器：基于空世界，随机 0-1 个实体（props 随机 0-3 个 vitality 值）。

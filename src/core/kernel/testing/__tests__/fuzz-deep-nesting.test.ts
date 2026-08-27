@@ -8,11 +8,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { createFullHarness, defaultSeedDefs } from '../full-harness.js';
-import { InvariantChecker } from '../../ops/invariants.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { createContainerForOwner } from '../../ops/structural-ops.js';
-import type { Ref } from '../../state/ids.js';
+import { createFullHarness, defaultSeedDefs } from '../full-harness';
+import { InvariantChecker } from '../../ops/invariants';
+import { resetIdCounters } from '../../state/ids';
+import { createContainerForOwner } from '../../ops/structural-ops';
+import type { Ref } from '../../state/ids';
 
 const invariantChecker = new InvariantChecker();
 

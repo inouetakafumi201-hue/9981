@@ -6,14 +6,14 @@ import { describe, expect, it } from 'vitest';
 import {
   DEPRECATED_TERM_REPLACEMENTS,
   REJECTED_LAYER_TERMS,
-} from '../../l2/model/constitution.js';
+} from '../../l2/model/constitution';
 import {
   importSpecifiers,
   locate,
   scanUiSources,
   stripComments,
   type ScannedSource,
-} from './support/source-scan.js';
+} from './support/source-scan';
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const UI_ROOT = resolve(TEST_DIR, '..');
@@ -29,10 +29,10 @@ const FORBIDDEN_WRITE_IDENTIFIERS = [
 ] as const;
 
 const ALLOWED_L2_CONTRACT_MODULES = new Set([
-  '../../l2/model/projection.js',
-  '../../l2/model/family-contracts.js',
-  '../../l2/model/diagnostic-codes.js',
-  '../../l2/model/constitution.js',
+  '../../l2/model/projection',
+  '../../l2/model/family-contracts',
+  '../../l2/model/diagnostic-codes',
+  '../../l2/model/constitution',
 ]);
 
 /**
@@ -40,8 +40,8 @@ const ALLOWED_L2_CONTRACT_MODULES = new Set([
  * 稳定编译器契约模块；其余 core 具体模块仍一律拒绝。
  */
 const ALLOWED_PROFILE_COMPILER_MODULES = new Set([
-  '../../core/kernel/spec-compiler/json-codec.js',
-  '../../core/kernel/spec-compiler/types.js',
+  '../../core/kernel/spec-compiler/json-codec',
+  '../../core/kernel/spec-compiler/types',
 ]);
 
 const ANIMATION_FORBIDDEN_IMPORT_NAMES = [
@@ -191,7 +191,7 @@ describe('UI 架构约束', () => {
   it('人为注入写入标识符或具体上游 import 时机械失败', () => {
     const injected = [
       synthetic('bad-write.ts', "const write = OpRegistry;\n"),
-      synthetic('bad-import.ts', "import { World } from '../../core/kernel/world.js';\n"),
+      synthetic('bad-import.ts', "import { World } from '../../core/kernel/world';\n"),
     ];
     expect(inspectUiArchitecture(injected).map((item) => item.rule)).toEqual([
       'write-identifier',
@@ -202,7 +202,7 @@ describe('UI 架构约束', () => {
   it('人为向动画目录注入提交能力 import 时机械失败', () => {
     const injected = synthetic(
       'animation/bad.ts',
-      "import type { ActionPort } from '../ports/action-port.js';\n",
+      "import type { ActionPort } from '../ports/action-port';\n",
     );
     expect(inspectUiArchitecture([injected])).toEqual([
       expect.objectContaining({ rule: 'animation-import' }),

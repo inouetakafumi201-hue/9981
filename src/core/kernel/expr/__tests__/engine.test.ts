@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { ExprEngine, makeDefaultEvalContext } from '../engine.js';
-import type { Expr } from '../../state/expr-types.js';
+import { ExprEngine, makeDefaultEvalContext } from '../engine';
+import type { Expr } from '../../state/expr-types';
 
 const engine = new ExprEngine();
 

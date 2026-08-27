@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbStatusApplyPair } from './generators.js';
+import { arbStatusApplyPair } from './generators';
 
 describe('Property 28: 状态到期无可见 0', () => {
   it('剩余 ≥2 时推进到 remainingTurns-1', () => {

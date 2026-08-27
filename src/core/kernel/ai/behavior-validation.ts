@@ -5,8 +5,8 @@
  * already-validated projection and checks cross-boundary invariants that must
  * remain true at AI use time.
  */
-import type { Ref } from '../state/ids.js';
-import type { AIBehaviorValidationGateway, AIResult, ValidatedAIBehaviorBinding, ValidatedAIParameter } from './types.js';
+import type { Ref } from '../state/ids';
+import type { AIBehaviorValidationGateway, AIResult, ValidatedAIBehaviorBinding, ValidatedAIParameter } from './types';
 
 export type ValidatedBindingResolver = (binding: Ref) => AIResult<ValidatedAIBehaviorBinding>;
 

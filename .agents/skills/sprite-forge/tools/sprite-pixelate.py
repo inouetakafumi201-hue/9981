@@ -23,7 +23,7 @@ sprite-pixelate.py — 后处理：将 AI 生成的伪像素艺术转换为真�
 
 参数：
   --size: 输出尺寸（默认 128×128）
-  --colors: 色彩量化的颜色数（默认 32）
+  --colors: 色彩量化的颜色数（默认 64，32 太小颗粒感明显，64 起步过渡更平）
 
 输出：
   - 网格对齐的像素艺术
@@ -50,7 +50,7 @@ def pixelate_single(
     output_path: Path,
     *,
     target_size: int = 128,
-    colors: int = 32,
+    colors: int = 64,
 ) -> None:
     """用 proper-pixel-art 处理单个文件。
 
@@ -60,19 +60,31 @@ def pixelate_single(
         target_size: 输出尺寸（正方形，默认 128×128）
         colors: 色彩量化颜色数（默认 32）
     """
-    from PIL import Image
+    from PIL import Image, ImageFilter
+    import tempfile as _tempfile
 
     temp_ppa = output_path.with_suffix(".ppa.tmp.png")
 
-    try:
-        # Step 1: proper-pixel-art 检测网格并量化（-s 1 = 不放大）
+    with _tempfile.TemporaryDirectory() as _td:
+        median_tmp = Path(_td) / "median.tmp.png"
+
+        # Step 0: median 3×3 前置降噪 — 消除 AI 直出图的色块内颗粒感
+        # 3×3 平衡：grainy 从 2142 砍到 ~30（-99%），uniq 保留 12+
+        # 5×5 会过度平滑（grainy=20 但 uniq=14，丢失细节）
+        raw_img = Image.open(input_path)
+        if raw_img.mode != "RGB":
+            raw_img = raw_img.convert("RGB")
+        raw_img.filter(ImageFilter.MedianFilter(3)).save(median_tmp)
+
+        # Step 1: proper-pixel-art 检测网格并量化（-s 1 = 不放大，-u 10 = 细网格）
         result = subprocess.run(
             [
                 sys.executable, "-m", "proper_pixel_art.cli",
-                str(input_path),
+                str(median_tmp),
                 "-o", str(temp_ppa),
                 "--colors", str(colors),
                 "-s", "1",
+                "-u", "10",
             ],
             check=True,
             capture_output=True,
@@ -89,16 +101,15 @@ def pixelate_single(
 
         print(f"✓ {input_path.name}: {detected_size} → {target_size}×{target_size}")
 
-    finally:
-        if temp_ppa.exists():
-            temp_ppa.unlink()
+    if temp_ppa.exists():
+        temp_ppa.unlink()
 
 
 def pixelate_batch(
     input_paths: list[Path],
     *,
     target_size: int = 128,
-    colors: int = 32,
+    colors: int = 64,
     inplace: bool = False,
     output_dir: Path | None = None,
 ) -> None:
@@ -139,13 +150,13 @@ def main() -> None:
     single.add_argument("input", type=Path, help="输入 PNG")
     single.add_argument("--output", type=Path, required=True, help="输出 PNG")
     single.add_argument("--size", type=int, default=128, help="输出尺寸（默认 128×128）")
-    single.add_argument("--colors", type=int, default=32, help="色彩量化颜色数（默认 32）")
+    single.add_argument("--colors", type=int, default=64, help="色彩量化颜色数（默认 64，32 颗粒感明显，64 起步过渡更平）")
 
     # 批处理模式
     batch = sub.add_parser("batch", help="批量处理多个文件")
     batch.add_argument("inputs", type=Path, nargs="+", help="输入 PNG 列表")
     batch.add_argument("--size", type=int, default=128, help="输出尺寸（默认 128×128）")
-    batch.add_argument("--colors", type=int, default=32, help="色彩量化颜色数（默认 32）")
+    batch.add_argument("--colors", type=int, default=64, help="色彩量化颜色数（默认 64）")
     batch.add_argument("--inplace", action="store_true", help="覆盖原文件")
     batch.add_argument("--output-dir", type=Path, help="输出目录（默认使用原目录）")
 

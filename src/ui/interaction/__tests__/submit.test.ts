@@ -3,17 +3,17 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { actionView, revision, uiViewFixture } from '../../__tests__/support/fixtures.js';
+import { actionView, revision, uiViewFixture } from '../../__tests__/support/fixtures';
 import {
   REJECTED_OUTCOME,
   STALE_OUTCOME,
   createInMemoryActionPort,
-} from '../../__tests__/support/in-memory-ports.js';
-import { stripComments } from '../../__tests__/support/source-scan.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { buildIntent } from '../intent-factory.js';
-import { createPendingRegistry } from '../pending-registry.js';
-import { createSubmitFlow } from '../submit.js';
+} from '../../__tests__/support/in-memory-ports';
+import { stripComments } from '../../__tests__/support/source-scan';
+import type { InteractionIntent } from '../../model/intent';
+import { buildIntent } from '../intent-factory';
+import { createPendingRegistry } from '../pending-registry';
+import { createSubmitFlow } from '../submit';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const COMMITTED = revision(2, 'fp-2');

@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { validatePresentationDescriptor } from '../../presentation/descriptor-validator.js';
-import { arbDamagedDescriptor } from '../support/arbitraries.js';
+import { validatePresentationDescriptor } from '../../presentation/descriptor-validator';
+import { arbDamagedDescriptor } from '../support/arbitraries';
 
 const REQUIRED_ACTION_FIELDS = ['actionId', 'costCategory', 'available', 'assetRefs', 'targets'] as const;
 

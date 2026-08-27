@@ -15,11 +15,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { createFullHarness, defaultSeedDefs } from '../full-harness.js';
-import { runOpSequence } from '../op-sequence-driver.js';
-import { opSequenceArb } from '../op-sequence-arbitrary.js';
-import { InvariantChecker } from '../../ops/invariants.js';
-import { resetIdCounters } from '../../state/ids.js';
+import { createFullHarness, defaultSeedDefs } from '../full-harness';
+import { runOpSequence } from '../op-sequence-driver';
+import { opSequenceArb } from '../op-sequence-arbitrary';
+import { InvariantChecker } from '../../ops/invariants';
+import { resetIdCounters } from '../../state/ids';
 
 const invariantChecker = new InvariantChecker();
 

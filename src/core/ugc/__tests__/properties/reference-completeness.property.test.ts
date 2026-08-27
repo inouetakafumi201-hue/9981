@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
-import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../ports/definition-ports.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
+import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../ports/definition-ports';
 
 describe('Feature: wakeup-ugc, Property 7: typed reference completeness', () => {
   it('rejects the complete change set when any reference target is missing', () => {

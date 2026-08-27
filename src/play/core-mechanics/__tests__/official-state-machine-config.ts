@@ -23,8 +23,8 @@
  * - 倒地→站起：`damageDefaultRule` 在零血时 prop.del vitality + attach.add ATT_DOWNED_ZERO，
  *   `standUpAction` 走 ATT_KNOCKED_DOWN 的普通倒地路径（M10 要求"倒地→站起"发生在玩家可见尺度）。
  */
-import { defaultCoreMechanicsConfig, type CoreMechanicsConfig } from '../load.js';
-import { STAMINA_MAX } from '../defs/ids.js';
+import { defaultCoreMechanicsConfig, type CoreMechanicsConfig } from '../load';
+import { STAMINA_MAX } from '../defs/ids';
 
 /** 攻击伤害数值的"已冻结"来源 ref（由装载/测试预置到 world.props.play.damageAmountRef）。
  *  这是测试靶声明的开发期值，不混入玩法层基类默认伤害表（T-001 未冻结的只有那张表本身）。 */

@@ -1,5 +1,5 @@
-import { canonicalStringify, compareCodePoints, joinJsonPointer, jsonTypeOf } from './json-codec.js';
-import { composedTypeIdentity } from './type-identity.js';
+import { canonicalStringify, compareCodePoints, joinJsonPointer, jsonTypeOf } from './json-codec';
+import { composedTypeIdentity } from './type-identity';
 import type {
   CandidateDefinition,
   ConsumeWork,
@@ -10,7 +10,7 @@ import type {
   Report,
   ResolvedDefinition,
   SchemaVersion,
-} from './types.js';
+} from './types';
 
 /** Definition members that describe structure rather than configurable content. */
 export const STRUCTURAL_DEFINITION_FIELDS: ReadonlySet<string> = new Set([

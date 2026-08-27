@@ -8,18 +8,18 @@
  * 这里不注册任何替身：Op 实现、事务、Id 分配、图度量全是引擎本体。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { OpRegistry } from '../../../core/kernel/ops/registry.js';
-import { WorldStateHolder } from '../../../core/kernel/ops/transaction.js';
-import { registerPrefabOps } from '../../../core/kernel/ops/prefab-ops.js';
-import { makeItemMove, registerStructuralOps } from '../../../core/kernel/ops/structural-ops.js';
-import { createEmptyWorldState } from '../../../core/kernel/state/world-state.js';
-import { resetIdCounters } from '../../../core/kernel/state/ids.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../../core/kernel/expr/engine.js';
-import { dist, shortestPath } from '../../../core/kernel/topology/metrics.js';
-import type { Def } from '../../../core/kernel/state/def.js';
-import type { PrefabDef, PrefabHandle } from '../../../core/kernel/topology/prefab.js';
-import { compileMap } from '../compile.js';
-import type { MapData } from '../types.js';
+import { OpRegistry } from '../../../core/kernel/ops/registry';
+import { WorldStateHolder } from '../../../core/kernel/ops/transaction';
+import { registerPrefabOps } from '../../../core/kernel/ops/prefab-ops';
+import { makeItemMove, registerStructuralOps } from '../../../core/kernel/ops/structural-ops';
+import { createEmptyWorldState } from '../../../core/kernel/state/world-state';
+import { resetIdCounters } from '../../../core/kernel/state/ids';
+import { ExprEngine, makeDefaultEvalContext } from '../../../core/kernel/expr/engine';
+import { dist, shortestPath } from '../../../core/kernel/topology/metrics';
+import type { Def } from '../../../core/kernel/state/def';
+import type { PrefabDef, PrefabHandle } from '../../../core/kernel/topology/prefab';
+import { compileMap } from '../compile';
+import type { MapData } from '../types';
 
 /** 基类层在本测试中的替代：只提供 def 登记，不含任何玩法数值。 */
 const CLASS_DEFS = new Map<string, Def>([

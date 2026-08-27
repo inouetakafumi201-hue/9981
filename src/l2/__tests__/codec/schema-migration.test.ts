@@ -13,7 +13,7 @@ import {
   type CandidateMigration,
   SchemaMigrationGraph,
   compareVersions,
-} from '../../codec/schema-migration.js';
+} from '../../codec/schema-migration';
 
 describe('compareVersions', () => {
   it('compares major versions correctly', () => {

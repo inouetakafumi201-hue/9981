@@ -10,16 +10,16 @@
  */
 import { describe, it } from 'vitest';
 import fc from 'fast-check';
-import { BehaviorAssertionRegistry, AssertionRunner, type BehaviorAssertion } from '../assertions.js';
-import { AttributionEngine } from '../attribution.js';
-import { ParameterTuner } from '../tuner.js';
-import { TuningOrchestrator } from '../orchestrator.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import { buildDecisionTrace } from '../build-trace.js';
-import { scoreBreakdown } from '../../design-currency.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import { solidifyAssertion } from '../report.js';
-import type { BeliefSlice } from '../../types.js';
+import { BehaviorAssertionRegistry, AssertionRunner, type BehaviorAssertion } from '../assertions';
+import { AttributionEngine } from '../attribution';
+import { ParameterTuner } from '../tuner';
+import { TuningOrchestrator } from '../orchestrator';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import { buildDecisionTrace } from '../build-trace';
+import { scoreBreakdown } from '../../design-currency';
+import { createEmptyWorldState } from '../../../state/world-state';
+import { solidifyAssertion } from '../report';
+import type { BeliefSlice } from '../../types';
 
 const world = createEmptyWorldState('sched:pbt14');
 

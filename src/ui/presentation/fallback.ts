@@ -16,7 +16,7 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 
 export const FALLBACK_RESOURCE_KINDS = [
   'icon',

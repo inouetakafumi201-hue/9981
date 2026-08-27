@@ -12,13 +12,13 @@
  * - 引用完整性：组合引用（能力、槽位、容器、弹药、配件、结构边界）不得悬空。
  */
 
-import type { JsonValue } from '../core/kernel/spec-compiler/types.js';
-import { compileFamilyComponentShapeIndex } from '../l2/model/family-component-shapes.js';
+import type { JsonValue } from '../core/kernel/spec-compiler/types';
+import { compileFamilyComponentShapeIndex } from '../l2/model/family-component-shapes';
 import {
   alignCapabilityToComponentContract,
   type AlignmentComponent,
   type CapabilityAlignmentInput,
-} from '../l2/model/component-alignment.js';
+} from '../l2/model/component-alignment';
 import {
   ClassCatalogContractError,
   assertAllowedKeys,
@@ -35,7 +35,7 @@ import {
   expectUniqueStringArray,
   type JsonObject,
   visitJson,
-} from './json-contract.js';
+} from './json-contract';
 
 /** 违规项：稳定代码、定位、原因与修正建议。 */
 export interface ContractViolation {

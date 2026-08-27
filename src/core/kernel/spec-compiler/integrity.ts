@@ -1,6 +1,6 @@
-import type { DefKind } from '../state/def.js';
-import { canonicalStringify, compareCodePoints } from './json-codec.js';
-import type { CompiledModel, JsonValue, SchemaVersion } from './types.js';
+import type { DefKind } from '../state/def';
+import { canonicalStringify, compareCodePoints } from './json-codec';
+import type { CompiledModel, JsonValue, SchemaVersion } from './types';
 
 /** One way the activated model failed to describe what the candidate actually said. */
 export interface SemanticDamage {

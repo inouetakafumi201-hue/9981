@@ -1,6 +1,6 @@
 ---
 name: sprite-forge
-description: "开发期像素/位图精灵管线（对接上游 open-source agent-sprite-forge）。用 Nano Banana API 生成 solid-#FF00FF 多行网格 raw sheet，经 generate2dsprite.py 本地后处理产出 transparent sheet、逐帧 PNG、GIF、QC 元数据。当用户要:生成像素组件/精灵/动画帧/spell包/战斗特效/位图 icon、给 2D 角色做 idle/run/attack/cast 动作 sheet、把 AI 出图切格对齐出透明资源、或跑 sprite 管线自测时使用。纯开发期工具，不碰 src/、不进产品运行时，零渲染依赖红线不动。"
+description: "开发期像素/位图精灵管线 + 词条图标语义库。前者对接上游 open-source agent-sprite-forge：用 Nano Banana API 生成 solid-#FF00FF 多行网格 raw sheet，经 generate2dsprite.py 本地后处理产出 transparent sheet、逐帧 PNG、GIF、QC 元数据。后者是全项目唯一符号词汇表：304 个 game-icons 开源 SVG 的定论语义名 + 泛化规则 + 统一美化（token-icon-beautify.ts 上色/高光/光晕）。当用户要:生成像素组件/精灵/动画帧/spell包/战斗特效/位图 icon、给 2D 角色做 idle/run/attack/cast 动作 sheet、把 AI 出图切格对齐出透明资源、查/定词条图标语义、给图标上色美化、或跑 sprite 管线自测时使用。纯开发期工具，不碰 src/ 产品运行时（图标源 SVG 除外）。"
 ---
 
 # sprite-forge
@@ -55,6 +55,15 @@ python .agents/skills/sprite-forge/tools/nano-banana-sprite.py generate \
 `--rows/--cols` 按上游 `sheet` 建议选：4帧>2x2, 6帧>2x3, 9帧>3x3；**不要**用 raw 单行
 strip 做身体动画（上游明文禁止 1x4/1xN，模型易水平漂移）。`--reference` 可传上一版
 raw sheet/主视觉做图生图局部重绘、锁定风格。
+
+### 角色整套模板规则
+
+角色生成入口当前使用紫衣侦探的完整 16 帧模板：`run/精灵图管线/1-成品/s2-blue/s2-blue-purified.png`。
+它是 1254×1254 的 AI raw sheet，检测到的 4×4 网格包含 16 帧；第 12 格
+（行 3，列 4）已经替换为已验收的修正版，并对应
+`frames/f01.png` 至 `frames/f16.png`。生成新角色时必须传完整 16 帧模板，复制 16 格的顺序、
+姿态、比例和像素风格，只改变服装/帽子/配色；不得只传旧单帧、旧 contact 或旧
+`run/plt01/master/` 母版。旧目录可以继续作为历史 provenance 保存，但不属于当前生效入口。
 
 第二步：本地后处理(切格/抠图/对齐/QC/透明导出)：
 
@@ -138,15 +147,15 @@ PRINT_PROMPT_ONLY=1 python tools/sprite-component.py --type item-consumable --de
 `item-consumable`（绿=正面或橙=消耗）/ `item-tool`（橙=进行中或黄=感官）/
 `item-equipment`（蓝=科技）/ `device`（灰白=可交互受制状态+蓝科技）/ `environment`（低饱和灰棕=背景素描）
 
-**语境（`--context`，统一俯视平面视图）**：
-- `map`（**默认**）= 地图实体，**强制俯视平面视图**（top-down plan view：平面轮廓 + 可读剪影 +
+**语境（`--context`，统一正面俯视视图）**：
+- `map`（**默认**）= 地图实体，**强制正面俯视视图**（top-down plan view：平面轮廓 + 可读剪影 +
   落地阴影；无前脸/侧脸/顶面/斜投影纵深，非 45° 侧身、非 isometric、非纯侧影）——凡是会显示在地图上的组件必须用它
-- `ui` = 背包/界面图标，**同样俯视平面视图**，只更强调剪影对比与人眼识别（仍无立面、不倾斜、不是斜投影）
+- `ui` = 背包/界面图标，**同样正面俯视视图**，只更强调剪影对比与人眼识别（仍无立面、不倾斜、不是斜投影）
 
 **风格锁定**（全部硬编码在脚本里，不随机发挥）：
-- 俯视平面视图（top-down plan view）——map 与 ui 统一，全项目唯一视角
+- 正面俯视视图（top-down plan view）——map 与 ui 统一，全项目唯一视角
 - 硬边色块、64×64 像素、无抗锯齿/渐变/抖动
-- 光影 = 俯视平面下的平面明暗分区 + 统一方向落影（光源左上），没有逐面明暗（无立面）
+- 光影 = 正面俯视下的平面明暗分区 + 统一方向落影（光源左上），没有逐面明暗（无立面）
 - 品红底 #FF00FF，纯化背景（近品红→纯品红）
 - 后处理 = proper-pixel-art 网格重建 + 最近邻放进 64×64 画布（保留纵横比）
 
@@ -176,6 +185,33 @@ python .agents/skills/sprite-forge/tools/selftest-component-grid.py
 ```
 覆盖横排 / 竖排 / 检测失败回退三种网格，断言帧数、无反向裁剪、无非品红内容，并验证
 质量闸门拒绝纯色块与帧数不匹配输入。
+
+## 词条图标语义库（图标 → 语义 → 泛化）
+
+**来源**：`src/svg-game-icons/`（game-icons.net 开源集，304 个单色 `currentColor` SVG）
+**定位**：全项目唯一「符号词汇表」——词条图标、素材类别图标、HUD 状态图标、编辑器图层图标等
+一切抽象符号需求，都从语义库取「语义最近」的图标，不另造、不混用。
+
+**三条铁律**：
+1. **泛化不取本义**：图标选入必有丰富内涵。例：`wireframe-globe`=全球化/全局范围，
+   `winchester-rifle`=泛化到所有猎枪，`abstract-018`=世界观物品「锚定导流仪」。
+2. **选最近不造名**：词条/素材/UI 需要图标时，只能从语义库选最近的「定论语义名」，
+   找不到就换一个接近的，不允许自由发挥新名字或新含义。
+3. **颜色随品级不随语义**：图标源保持黑色/`currentColor`，上色统一走
+   `tools/token-icon-beautify.ts`（语义定「用哪个符号」，品级定「上什么色」：
+   灰白1/绿2/蓝3/银4/金5）。
+
+**文件**：
+- `icon-semantics/icon-catalog.md` — 304 个图标的定论语义名 + 泛化/游戏内用法 + 受控大类
+- `tools/token-icon-beautify.ts` — 统一美化后处理（上色/高光/光晕/容器）
+- `src/svg-game-icons/` — 源 SVG（黑色 currentColor）
+- `src/px-game-icons/` — 历史重复导出（外壳参数差异，已被 svg 版取代，勿再引用）
+
+**用法（AI / 迭代者）**：
+1. 需要抽象符号 → 查 `icon-semantics/icon-catalog.md`，按泛化语义找最近的 `id`。
+2. 引用 `src/svg-game-icons/game-icons--<id>.svg`（黑色源图）。
+3. 上色/高光/光晕 → `tools/token-icon-beautify.ts` 按品级或类别统一处理。
+4. 新图标入表 → 先由项目所有者定论语义名，补进 catalog，之后才可被引用。
 
 ## 后处理管线：AI 伪像素 → 真正像素艺术
 

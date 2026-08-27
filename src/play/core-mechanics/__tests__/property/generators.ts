@@ -13,14 +13,14 @@
 import * as fc from 'fast-check';
 
 // === 引擎层类型导入（相对路径 + .js 后缀，统一从 kernel 桶导出） ===
-import type { WorldState } from '../../../../core/kernel/state/world-state.js';
-import type { ActionDef } from '../../../../core/kernel/actions/types.js';
-import type { AttachmentDef } from '../../../../core/kernel/attachment/types.js';
-import type { Effect } from '../../../../core/kernel/events/effect-types.js';
+import type { WorldState } from '../../../../core/kernel/state/world-state';
+import type { ActionDef } from '../../../../core/kernel/actions/types';
+import type { AttachmentDef } from '../../../../core/kernel/attachment/types';
+import type { Effect } from '../../../../core/kernel/events/effect-types';
 
 // === 玩法层类型导入 ===
-import type { RollTier, RollParticipant } from '../../allocation.js';
-import type { NumericOwnership, UnresolvedId } from '../../ownership.js';
+import type { RollTier, RollParticipant } from '../../allocation';
+import type { NumericOwnership, UnresolvedId } from '../../ownership';
 
 /** 强力骰承诺的本地形（对应 p16/p17 属性测试使用的承诺形状）。 */
 export type BoostCommitment =

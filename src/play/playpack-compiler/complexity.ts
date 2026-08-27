@@ -8,7 +8,7 @@
  *
  * 定价分档由运营层决定，不在此硬编码。
  */
-import type { ComplexityMetrics } from './types.js';
+import type { ComplexityMetrics } from './types';
 
 /**
  * 计算玩法包的复杂度评分。

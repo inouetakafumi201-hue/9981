@@ -4,13 +4,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   ArtifactChainError, FileSystemArtifactStore, hashBytes, hashUtf8, InMemoryArtifactStore,
-} from '../index.js';
-import type { ArtifactManifest } from '../index.js';
-import type { SourceRecord } from '../../state/diagnostic.js';
-import { DiagnosticSink } from '../../safety/safety.js';
-import { compareCodePoints } from '../json-codec.js';
-import { sortDiagnostics } from '../diagnostic-factory.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
+} from '../index';
+import type { ArtifactManifest } from '../index';
+import type { SourceRecord } from '../../state/diagnostic';
+import { DiagnosticSink } from '../../safety/safety';
+import { compareCodePoints } from '../json-codec';
+import { sortDiagnostics } from '../diagnostic-factory';
+import { candidate, createHarness, validDocument } from './fixtures';
 
 const tempRoots: string[] = [];
 

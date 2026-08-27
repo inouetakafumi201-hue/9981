@@ -8,11 +8,11 @@
  * 本设计**不设默认配额值**（design.md「Unresolved Integration Boundaries」第 5 条）：部署档案
  * 必须显式提供每一项。缺项即拒绝启动验证，而不是回退到某个"看起来安全"的猜测值。
  */
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { QuotaKind, TrustedQuotaProfile } from '../model/quota-types.js';
-import { QUOTA_KINDS } from '../model/quota-types.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { QuotaKind, TrustedQuotaProfile } from '../model/quota-types';
+import { QUOTA_KINDS } from '../model/quota-types';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
 
 export interface QuotaProfileProblem {
   readonly kind: QuotaKind | 'profileId' | 'version';

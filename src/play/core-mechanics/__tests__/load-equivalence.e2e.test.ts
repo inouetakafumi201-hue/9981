@@ -30,28 +30,26 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { StrictJsonCodec } from '../../../core/kernel/spec-compiler/json-codec.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../../../core/kernel/spec-compiler/types.js';
-import { decodePlaypack } from '../../../core/kernel/schedule/playpack-codec.js';
-import type { PlaypackDef } from '../../../core/kernel/schedule/playpack.js';
-import type { LegalAction } from '../../../core/kernel/actions/types.js';
-import type { ActionDef } from '../../../core/kernel/actions/types.js';
-import { createFullHarness } from '../../../core/kernel/testing/full-harness.js';
-import { ActionCatalog } from '../../../core/kernel/actions/catalog.js';
-import { setPath } from '../../../core/kernel/ops/path.js';
-import { resetIdCounters } from '../../../core/kernel/state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../../core/kernel/state/world-state.js';
-import { createEntityShape } from '../../../core/kernel/state/entity.js';
-import { createAgentShape } from '../../../core/kernel/state/agent.js';
-import { createNodeShape } from '../../../core/kernel/topology/types.js';
-import type { WorldStateHolder } from '../../../core/kernel/ops/transaction.js';
-import type { Value } from '../../../core/kernel/state/value.js';
-import type { EvalContext } from '../../../core/kernel/expr/engine.js';
-import type { CoreMechanicsLoadOptions } from '../load.js';
-import { loadCoreMechanics } from '../load.js';
-import { CoreMechanicsPlaypack } from '../defs/playpack.js';
-import type { CoreMechanicsProjection } from '../projection.js';
-import { officialCoreMechanicsConfig, ATTACK_DAMAGE_VALUE } from './official-state-machine-config.js';
+import { StrictJsonCodec } from '../../../core/kernel/spec-compiler/json-codec';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../../core/kernel/spec-compiler/types';
+import { decodePlaypack } from '../../../core/kernel/schedule/playpack-codec';
+import type { PlaypackDef } from '../../../core/kernel/schedule/playpack';
+import type { LegalAction } from '../../../core/kernel/actions/types';
+import type { ActionDef } from '../../../core/kernel/actions/types';
+import { createFullHarness } from '../../../core/kernel/testing/full-harness';
+import { ActionCatalog } from '../../../core/kernel/actions/catalog';
+import { setPath } from '../../../core/kernel/ops/path';
+import { resetIdCounters } from '../../../core/kernel/state/ids';
+import { createEmptyWorldState, type WorldState } from '../../../core/kernel/state/world-state';
+import { createEntityShape } from '../../../core/kernel/state/entity';
+import { createAgentShape } from '../../../core/kernel/state/agent';
+import { createNodeShape } from '../../../core/kernel/topology/types';
+import type { WorldStateHolder } from '../../../core/kernel/ops/transaction';
+import type { CoreMechanicsLoadOptions } from '../load';
+import { loadCoreMechanics } from '../load';
+import { CoreMechanicsPlaypack } from '../defs/playpack';
+import type { CoreMechanicsProjection } from '../projection';
+import { officialCoreMechanicsConfig, ATTACK_DAMAGE_VALUE } from './official-state-machine-config';
 import {
   ACT_ATTACK,
   ACT_MOVE,
@@ -64,7 +62,7 @@ import {
   RULE_STAMINA_GRANT_DEFAULT,
   SCHEDULE_ID,
   TAG_ROLL_PARTICIPANT,
-} from '../defs/ids.js';
+} from '../defs/ids';
 
 // ---------------------------------------------------------------------------
 // JSON fixture 装载（读磁盘 → StrictJsonCodec → decodePlaypack）
@@ -106,13 +104,10 @@ function runtimeOf(harness: ReturnType<typeof createFullHarness>): CoreMechanics
     getState: () => harness.holder.getState(),
     exprEngine: harness.exprEngine,
     queryEngine: harness.queryEngine,
-    // 把 ActionCatalog 展开的 target/node 绑定透传给 ctxForSelf（full-harness 的 ctxForSelf 接口
-    // 声明为单参，但实现签名接受第二参 vars 并合并进求值上下文；不传的话带目标绑定的动作 require
-    // 会在未绑定 var 上求值出 null，攻击/移动永远不可见，投影可见集断言就失去了意义）。
-    ctxForActor: ((actor, bindings) =>
-      (harness.ctxForSelf as unknown as (ref: { $: string }, vars: Record<string, Value>) => EvalContext)(actor, bindings)) as (
-      actor: { $: string }, bindings: Record<string, Value>,
-    ) => EvalContext,
+    // 把 ActionCatalog 展开的 target/node 绑定透传给 ctxForSelf（full-harness 的 ctxForSelf 接受
+    // 第二参 vars 并合并进求值上下文；不传的话带目标绑定的动作 require 会在未绑定 var 上求值出
+    // null，攻击/移动永远不可见，投影可见集断言就失去了意义）。
+    ctxForActor: (actor, bindings) => harness.ctxForSelf(actor, bindings),
     listActionDefs: () => harness.defRegistry.allResolved()
       .filter((definition): definition is ActionDef => definition.kind === 'action') as ActionDef[],
   });
@@ -431,6 +426,16 @@ describe('装载等价：官方 TS 包 vs 语义等价 JSON 玩法包（D-081 / 
       expect(fixtureEntry?.cost).toEqual(officialEntry?.cost);
       expect(fixtureEntry?.cost).toEqual([{ pool: POOL_AP, amount: 1 }]);
     }
+
+    // 带目标动作的绑定展开一致（P3 升级）：attack 的 target 目标查询枚举全部合法靶子，
+    // 绑定键是目标名 `target`，值是被选中的实体 Ref（这里世界里有 hero 与 enemy 两个实体）。
+    // bindings 透传若中断，target 绑定会缺失/求值为 null，攻击在投影里就不可见——上面可见集
+    // 断言已兜住；这里再断言两个包对同一世界展开出完全相同的绑定集合。
+    const officialAttacks = officialAll.filter((a) => a.action === ACT_ATTACK);
+    const fixtureAttacks = fixtureAll.filter((a) => a.action === ACT_ATTACK);
+    const bindingSets = (entries: readonly LegalAction[]) => entries.map((a) => a.bindings).sort(JSON.stringify as unknown as (a: unknown, b: unknown) => number);
+    expect(bindingSets(officialAttacks)).toEqual(bindingSets(fixtureAttacks));
+    expect(bindingSets(fixtureAttacks)).toEqual([{ target: { $: HERO } }, { target: { $: ENEMY } }]);
   });
 
   it('UGC 覆盖官方机制：官方包与 fixture 顺序装载同一组合根，同 key 后装覆盖、两套规则并存', () => {

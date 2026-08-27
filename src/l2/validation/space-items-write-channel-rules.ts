@@ -8,11 +8,11 @@
  * - 10.3：座位/货舱/门必须使用引擎层容器、槽位、引用与动作契约；不得自建车内存储
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import type { CandidateDefinition } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context';
+import { defError } from './helpers';
 
 export const validateWriteChannel: DefinitionRule = (
   definition: CandidateDefinition,

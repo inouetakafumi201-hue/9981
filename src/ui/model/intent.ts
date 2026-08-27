@@ -9,7 +9,7 @@
  * 4. `inputSource` **不参与合法性判定**，只用于诊断（Requirement 4.9）。
  */
 
-import type { StateRevision } from './revision.js';
+import type { StateRevision } from './revision';
 
 /**
  * 归一化后的交互来源，闭合枚举。
@@ -24,8 +24,8 @@ export function isInputSource(candidate: unknown): candidate is InputSource {
   return typeof candidate === 'string' && (INPUT_SOURCES as readonly string[]).includes(candidate);
 }
 
-/** 绑定取值：只能是投影中出现过的标识或值。 */
-export type ProjectedBindingValue = string | number | boolean;
+/** 绑定取值：投影标识或纯值，或 Ref（{ $: string }）。 */
+export type ProjectedBindingValue = string | number | boolean | { readonly $: string };
 
 export interface ActionIntentTarget {
   readonly kind: 'action';

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { TechnicalQuotaError } from '../spec-compiler/index.js';
-import type { CompilationResult } from '../spec-compiler/index.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures.js';
-import type { Harness } from '../spec-compiler/__tests__/fixtures.js';
+import { TechnicalQuotaError } from '../spec-compiler/index';
+import type { CompilationResult } from '../spec-compiler/index';
+import type { Diagnostic } from '../state/diagnostic';
+import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures';
+import type { Harness } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * Closure cases for the gaps found while auditing the compiler against the base-layer specification.

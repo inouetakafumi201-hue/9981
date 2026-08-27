@@ -14,8 +14,8 @@ import type {
   CandidateSourceKind,
   TargetOwnership,
   UGCAdapter,
-} from '../model/candidate.js';
-import { createCandidateDocument } from '../model/candidate.js';
+} from '../model/candidate';
+import { createCandidateDocument } from '../model/candidate';
 
 const utf8Encoder = new TextEncoder();
 

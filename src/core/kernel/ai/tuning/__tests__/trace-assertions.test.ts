@@ -5,12 +5,12 @@
  *  - AssertionRunner 对 trace 检错（wrongSelection / scoreConstraint / pivotConstraint）。
  */
 import { describe, expect, it } from 'vitest';
-import { scoreBreakdown } from '../../design-currency.js';
-import { buildDecisionTrace, minimalDecisionTrace, submissionOfResult, type TraceCandidateInput } from '../build-trace.js';
-import { extractObservedFacts, readableFieldName } from '../trace.js';
-import { BehaviorAssertionRegistry, AssertionRunner, type BehaviorAssertion } from '../assertions.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { BeliefSlice } from '../../types.js';
+import { scoreBreakdown } from '../../design-currency';
+import { buildDecisionTrace, minimalDecisionTrace, submissionOfResult, type TraceCandidateInput } from '../build-trace';
+import { extractObservedFacts, readableFieldName } from '../trace';
+import { BehaviorAssertionRegistry, AssertionRunner, type BehaviorAssertion } from '../assertions';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { BeliefSlice } from '../../types';
 
 function slice(facts: Record<string, number>): BeliefSlice {
   return { agent: { $: 'g:agent' }, visibleFacts: { ...facts }, knownFacts: {}, visibleRefs: [], policyContext: {} };

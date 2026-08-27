@@ -8,9 +8,9 @@
  * 以便验证器发现越层声明；解码本身不拒绝它们。
  */
 
-import { joinJsonPath } from '../model/ids.js';
-import type { JsonValue } from '../model/json.js';
-import { isJsonValue } from '../model/json.js';
+import { joinJsonPath } from '../model/ids';
+import type { JsonValue } from '../model/json';
+import { isJsonValue } from '../model/json';
 import {
   ACTION_COST_CATEGORIES,
   ATTACHMENT_CLEANUP_BEHAVIORS,
@@ -32,8 +32,8 @@ import {
   TRANSITION_DIRECTIONALITIES,
   WEAPON_CLASSES,
   type FamilyContract,
-} from '../model/family-contracts.js';
-import type { DecodeContext } from './decode.js';
+} from '../model/family-contracts';
+import type { DecodeContext } from './decode';
 import {
   optionalArray,
   optionalBoolean,
@@ -44,15 +44,15 @@ import {
   requireEnum,
   requireObject,
   requireString,
-} from './decode.js';
-import { decodeParameterSchema, decodeTypedReference, decodeTypedReferenceArray } from './schema-decoder.js';
-import type { TypedReference } from '../model/reference.js';
-import type { SourceRecord } from '../model/source.js';
+} from './decode';
+import { decodeParameterSchema, decodeTypedReference, decodeTypedReferenceArray } from './schema-decoder';
+import type { TypedReference } from '../model/reference';
+import type { SourceRecord } from '../model/source';
 import {
   OWNING_LAYERS,
   SOURCE_CLASSIFICATION_KINDS,
   SOURCE_PRECEDENCE_ORDER,
-} from '../model/source.js';
+} from '../model/source';
 
 /** 逐元素解码引用数组，跳过报错元素（诊断已记录）。 */
 function refArray(ctx: DecodeContext, value: unknown, path: string, role: string): readonly TypedReference[] {

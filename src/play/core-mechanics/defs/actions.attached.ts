@@ -18,13 +18,13 @@
  * 也不会回滚 `abort` 之前已经落下的写入。把前置条件写成"要么整体执行、要么只记 `veto`"的
  * 单个 `if`，才能保证"前置不满足 ⇒ 零写入"。`veto` 由父动作的守卫兑现为整体回滚。
  */
-import type { ActionDef, CostSpec } from '../../../core/kernel/actions/types.js';
-import type { Def } from '../../../core/kernel/state/def.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import type { RuleDef } from '../../../core/kernel/events/types.js';
-import type { AttachedFailureBehavior, AttachedTriggerPoint, NumericOwnershipRule } from '../ownership.js';
-import { buildNumericOwnership, gameplayValue, internalMetric, playExt, structuralBound } from '../ownership.js';
+import type { ActionDef, CostSpec } from '../../../core/kernel/actions/types';
+import type { Def } from '../../../core/kernel/state/def';
+import type { Effect } from '../../../core/kernel/events/effect-types';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import type { RuleDef } from '../../../core/kernel/events/types';
+import type { AttachedFailureBehavior, AttachedTriggerPoint, NumericOwnershipRule } from '../ownership';
+import { buildNumericOwnership, gameplayValue, internalMetric, playExt, structuralBound } from '../ownership';
 import {
   and,
   atOf,
@@ -47,7 +47,7 @@ import {
   requestField,
   setRequestField,
   varOf,
-} from './expr.js';
+} from './expr';
 import {
   ACT_ATTACK,
   ACT_CANCEL_BLOCK,
@@ -85,7 +85,7 @@ import {
   TAG_DOWNED_ZERO,
   TRIGGER_AFTER_PARENT,
   TRIGGER_BEFORE_PARENT,
-} from './ids.js';
+} from './ids';
 
 /** 附着动作的成本：空数组（Requirement 3.6、4.8）。 */
 export const ATTACHED_COST: readonly CostSpec[] = [];
@@ -180,6 +180,8 @@ function attachedAction(input: AttachedActionInput): ActionDef {
     // 规则（require 不满足且 visible 不满足即不出现），附着动作不进入任何结果集。
     require: and(contextGuard, input.preconditions),
     cost: [...ATTACHED_COST],
+    // 双轨制 P3：附着动作与父付费动作同属卡片轨，由玩家在发牌器里管理。
+    track: 'card' as const,
     effects: invocationEffects,
   };
 

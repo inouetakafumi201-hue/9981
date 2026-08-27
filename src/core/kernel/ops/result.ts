@@ -1,7 +1,7 @@
 /**
  * L3 Ops: Result 类型（design.md 3.4节 / 需求16.2）。
  */
-import type { ErrCode } from '../state/error-codes.js';
+import type { ErrCode } from '../state/error-codes';
 
 export type Result<T> = { ok: true; value: T } | { ok: false; code: ErrCode; detail: string };
 

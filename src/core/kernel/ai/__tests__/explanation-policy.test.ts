@@ -3,8 +3,8 @@
  * never a reference the viewer cannot see even when the key is declared.
  */
 import { describe, expect, it } from 'vitest';
-import { projectAIExplanation, type AIExplanationPolicy } from '../explanation.js';
-import type { AICandidate, AIDecisionResult, BeliefSlice } from '../types.js';
+import { projectAIExplanation, type AIExplanationPolicy } from '../explanation';
+import type { AICandidate, AIDecisionResult, BeliefSlice } from '../types';
 
 const HIDDEN = 'e:hidden-target';
 

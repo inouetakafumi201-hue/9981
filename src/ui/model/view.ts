@@ -22,16 +22,18 @@ import type {
   SemanticStateEntry,
   TargetDescriptor,
   VisibilityEntry,
-} from '../../l2/model/projection.js';
+} from '../../l2/model/projection';
 import type {
   ActionCostCategory,
+  ActionCardColorTheme,
+  CardInteractionMode,
   InteractionIntent,
   ResourceSemanticRole,
-} from '../../l2/model/family-contracts.js';
-import type { GameplayValue, InternalMetric } from '../presentation/gameplay-value.js';
-import type { StateRevision } from './revision.js';
-import type { SalienceTier } from './profile.js';
-import type { UiDiagnostic } from './diagnostic.js';
+} from '../../l2/model/family-contracts';
+import type { GameplayValue, InternalMetric } from '../presentation/gameplay-value';
+import type { StateRevision } from './revision';
+import type { SalienceTier } from './profile';
+import type { UiDiagnostic } from './diagnostic';
 
 export type {
   ActionDescriptor,
@@ -47,6 +49,7 @@ export type {
   VisibilityEntry,
 };
 export type { ActionCostCategory, InteractionIntent, ResourceSemanticRole };
+export type { ActionCardColorTheme, CardInteractionMode };
 
 /**
  * 上游 Agent 授权令牌。
@@ -96,10 +99,10 @@ export function agentScopeCacheKey(agentId: string, scopeId: string): string {
   return `${agentId}\u0000${scopeId}`;
 }
 
-/** 已验证的目标绑定。取值只能是投影中出现过的标识或值。 */
+/** 已验证的目标绑定。取值可以是纯值或 Ref（{ $: string }）。 */
 export interface UiBinding {
   readonly key: string;
-  readonly value: string | number | boolean;
+  readonly value: string | number | boolean | { readonly $: string };
 }
 
 /** 已验证的资源呈现项。 */
@@ -125,6 +128,29 @@ export interface UiActionView {
   readonly assetRefs: readonly string[];
   readonly bindings: readonly UiBinding[];
   readonly targets: readonly UiTargetView[];
+  /**
+   * 双轨制轨道（双轨制 P1）。从 L2 ActionDescriptor.track 透传到 UI 层。
+   * - `'highlight'`：高亮轨（地图直接点实体）
+   * - `'card'`：卡片轨（发牌器渲染）
+   */
+  readonly track: 'highlight' | 'card';
+  /**
+   * 卡片元数据（双轨制 P1）。仅当 `track === 'card'` 时出现。
+   * 不可用时 `effectText` 降级为 `unavailabilityText`。
+   */
+  readonly cardPresentation?: UiCardPresentation;
+}
+
+/**
+ * 前端安全的卡片元数据（双轨制 P1）。
+ * 从 L2 ResolvedCardPresentation 经 UiCardAdapter 安全化后得到。
+ */
+export interface UiCardPresentation {
+  readonly iconRef: string;                 // 已注册资产路径
+  readonly colorTheme: ActionCardColorTheme;
+  /** 不可用时前端应显示 `unavailabilityText` 而非本字段。 */
+  readonly effectText: string;
+  readonly interactionMode: CardInteractionMode;
 }
 
 export interface UiTargetView {

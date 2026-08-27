@@ -8,8 +8,8 @@
  * 不需要额外包装层。
  */
 
-import type { Diagnostic, StructuredRejection, WarningDiagnostic } from './diagnostic.js';
-import { isErrorDiagnostic, isWarningDiagnostic } from './diagnostic.js';
+import type { Diagnostic, StructuredRejection, WarningDiagnostic } from './diagnostic';
+import { isErrorDiagnostic, isWarningDiagnostic } from './diagnostic';
 
 export interface Ok<T> {
   readonly rejected: false;

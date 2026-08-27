@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeRevision, type StateRevision } from '../revision.js';
+import { makeRevision, type StateRevision } from '../revision';
 import {
   INPUT_SOURCES,
   bindingsKey,
@@ -10,7 +10,7 @@ import {
   stableHash,
   type InteractionIntent,
   type IntentTarget,
-} from '../intent.js';
+} from '../intent';
 
 const made = makeRevision(9, 'fp-9');
 if (!made.ok) throw new Error('fixture revision must be constructible');

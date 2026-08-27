@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures.js';
-import type { Harness } from '../spec-compiler/__tests__/fixtures.js';
+import { candidate, createHarness } from '../spec-compiler/__tests__/fixtures';
+import type { Harness } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * Activation is a change set applied atomically to the whole active specification.

@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection, arbReachableState } from './generators.js';
+import { arbFailureInjection, arbReachableState } from './generators';
 
 describe('Property 2: 拒绝保持事务前状态', () => {
   it('任何失败的 Op 调用不改变状态', () => {

@@ -11,9 +11,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { validateValue, isValidValue, isFiniteNumber } from '../state/value.js';
-import { InvariantChecker } from '../ops/invariants.js';
-import { createEmptyWorldState } from '../state/world-state.js';
+import { validateValue, isValidValue, isFiniteNumber } from '../state/value';
+import { InvariantChecker } from '../ops/invariants';
+import { createEmptyWorldState } from '../state/world-state';
 
 /**
  * 任意 JSON 兼容值生成器：覆盖非有限数、原型键、深层嵌套、Ref 形状、数组/对象。

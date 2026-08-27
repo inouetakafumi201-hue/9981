@@ -900,6 +900,7 @@
       "kind": "action",
       "label": "攻击",
       "group": "play.paid",
+      "track": "card",
       "tags": ["ugc"],
       "targets": [
         {
@@ -1287,6 +1288,7 @@
       "kind": "action",
       "label": "移动到相邻位置",
       "group": "play.paid",
+      "track": "card",
       "tags": ["ugc"],
       "targets": [
         {
@@ -1652,6 +1654,7 @@
       "kind": "action",
       "label": "睡下",
       "group": "play.paid",
+      "track": "card",
       "tags": ["ugc"],
       "require": {
         "op": "and",

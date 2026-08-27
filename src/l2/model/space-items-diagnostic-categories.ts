@@ -13,18 +13,18 @@
  * 的诊断不会在同一 (定义, 路径, 代码) 三元组上重复出现。
  */
 
-import type { ErrCode } from '../../core/kernel/state/error-codes.js';
+import type { ErrCode } from '../../core/kernel/state/error-codes';
 import type {
   DefinitionId,
   HumanReadableText,
   JsonPath,
   PackageId,
-} from './ids.js';
-import type { Diagnostic, DiagnosticSeverity } from './diagnostic.js';
-import { createDiagnostic } from './diagnostic-factory.js';
-import type { SourceLocation, SourceRecord } from './source.js';
-import { canonicalSort, compareDiagnostics } from './ordering.js';
-import { deepFreeze } from './immutable.js';
+} from './ids';
+import type { Diagnostic, DiagnosticSeverity } from './diagnostic';
+import { createDiagnostic } from './diagnostic-factory';
+import type { SourceLocation, SourceRecord } from './source';
+import { canonicalSort, compareDiagnostics } from './ordering';
+import { deepFreeze } from './immutable';
 
 /** 本领域拥有的诊断类别（封闭集合）。 */
 export const SPACE_ITEMS_DIAGNOSTIC_CATEGORIES = Object.freeze([

@@ -14,8 +14,8 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from '../model/diagnostic.js';
-import type { UiView } from '../model/view.js';
+} from '../model/diagnostic';
+import type { UiView } from '../model/view';
 
 /** 空串或纯空白视为缺失。非字符串同样视为缺失。 */
 export function isLabelMissing(label: unknown): boolean {

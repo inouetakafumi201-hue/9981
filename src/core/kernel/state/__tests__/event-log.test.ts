@@ -11,9 +11,9 @@ import {
   appendLogEntry,
   applyLogRetention,
   logEntryToValue,
-} from '../event-log.js';
-import type { LogEntry } from '../world-state.js';
-import { createEmptyWorldState } from '../world-state.js';
+} from '../event-log';
+import type { LogEntry } from '../world-state';
+import { createEmptyWorldState } from '../world-state';
 
 function entry(seq: number, phase: number, type = 'e'): LogEntry {
   return { seq, type, phase, payload: {} };

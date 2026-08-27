@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { actionView, revision } from '../../__tests__/support/fixtures.js';
-import { makeInternalMetric } from '../gameplay-value.js';
-import type { UiView } from '../../model/view.js';
+import { actionView, revision } from '../../__tests__/support/fixtures';
+import { makeInternalMetric } from '../gameplay-value';
+import type { UiView } from '../../model/view';
 import {
   buildAccessibleOutputs,
   checkNonColorEquivalent,
   isLabelMissing,
   resolveAccessibleLabel,
   ruleSignificantItems,
-} from '../accessibility.js';
+} from '../accessibility';
 
 function view(): UiView {
   return Object.freeze({

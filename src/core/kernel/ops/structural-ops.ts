@@ -1,24 +1,24 @@
 /**
  * L3 Ops: 结构类 Op（design.md 3.4节 / 需求2.1-2.4, 7.1-7.6, 8.1-8.7, 10.1-10.10, 16.6-16.7, 18.1-18.5）。
  */
-import type { OpImpl } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import { createEntityShape, createItemShape } from '../state/entity.js';
-import { createNodeShape, createLinkShape, createContainerShape, createSlotShape } from '../topology/types.js';
-import type { Node } from '../topology/types.js';
-import { linksTouching, cascadeNodeDestroySet } from '../topology/graph.js';
-import { insertSlot, removeSlot, findDefaultSlotIndex, setSlotHolds } from '../topology/container.js';
-import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity, findChildMicroScene } from '../topology/micro-scene.js';
-import type { WorldState } from '../state/world-state.js';
-import type { Def, ContainerSpec } from '../state/def.js';
-import type { Expr } from '../state/expr-types.js';
-import type { ExprEngine, EvalContext } from '../expr/engine.js';
-import { checkInstantiable } from './def-guard.js';
-import type { DefLookupFn } from './def-guard.js';
-import { cascadeRelationsAndAttachments, destroyOwnedContainers, clearHoldingSlot } from './cascade-destroy.js';
+import type { OpImpl } from './registry';
+import type { OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id, Ref } from '../state/ids';
+import { nextId } from '../state/ids';
+import { createEntityShape, createItemShape } from '../state/entity';
+import { createNodeShape, createLinkShape, createContainerShape, createSlotShape } from '../topology/types';
+import type { Node } from '../topology/types';
+import { linksTouching, cascadeNodeDestroySet } from '../topology/graph';
+import { insertSlot, removeSlot, findDefaultSlotIndex, setSlotHolds } from '../topology/container';
+import { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity, findChildMicroScene } from '../topology/micro-scene';
+import type { WorldState } from '../state/world-state';
+import type { Def, ContainerSpec } from '../state/def';
+import type { Expr } from '../state/expr-types';
+import type { ExprEngine, EvalContext } from '../expr/engine';
+import { checkInstantiable } from './def-guard';
+import type { DefLookupFn } from './def-guard';
+import { cascadeRelationsAndAttachments, destroyOwnedContainers, clearHoldingSlot } from './cascade-destroy';
 
 // ---------- entity.create / entity.destroy ----------
 

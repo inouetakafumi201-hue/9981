@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileFixture } from '../../__tests__/support/fixtures.js';
+import { profileFixture } from '../../__tests__/support/fixtures';
 import {
   conflictsWithRuleVisibility,
   inspect,
   resolveSalienceTier,
   resolveSalientStates,
   type SalientStateDeclaration,
-} from '../salience.js';
+} from '../salience';
 
 const PROFILE = profileFixture();
 

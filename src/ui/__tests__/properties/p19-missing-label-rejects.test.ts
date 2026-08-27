@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import { resolveAccessibleLabel } from '../../presentation/accessibility.js';
+import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import { resolveAccessibleLabel } from '../../presentation/accessibility';
 
 it('任意缺失标签且无稳定标识的必要呈现都结构化拒绝', () => {
   const missing = fc.oneof(fc.constant(undefined), fc.constant(null), fc.stringMatching(/^\s*$/u));

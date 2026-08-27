@@ -14,15 +14,15 @@ import {
   uiRejected,
   type UiDiagnostic,
   type UiResult,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 import {
   deriveIntentId,
   type InputSource,
   type InteractionIntent,
   type IntentTarget,
   type ProjectedBindingValue,
-} from '../model/intent.js';
-import type { UiView } from '../model/view.js';
+} from '../model/intent';
+import type { UiView } from '../model/view';
 
 export type IntentSelection =
   | {

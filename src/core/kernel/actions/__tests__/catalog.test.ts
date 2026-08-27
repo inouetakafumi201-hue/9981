@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { ActionCatalog } from '../catalog.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { createEntityShape } from '../../state/entity.js';
-import type { ActionDef } from '../types.js';
-import type { WorldState } from '../../state/world-state.js';
+import { ActionCatalog } from '../catalog';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { createEmptyWorldState } from '../../state/world-state';
+import { createEntityShape } from '../../state/entity';
+import type { ActionDef } from '../types';
+import type { WorldState } from '../../state/world-state';
 
 function setup(state: WorldState, actions: ActionDef[]) {
   const exprEngine = new ExprEngine();
@@ -39,7 +39,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
     let state = createEmptyWorldState('sched:1');
     const e = { ...createEntityShape('e:1', 'd:human'), props: { hp: 50 } };
     state = { ...state, entities: { 'e:1': e } };
-    const action: ActionDef = { id: 'a:heal', kind: 'action', label: 'Heal', require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] }, effects: [] };
+    const action: ActionDef = { id: 'a:heal', kind: 'action', label: 'Heal', require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] }, effects: [], track: 'highlight' };
     const catalog = setup(state, [action]);
     const result = catalog.queryActions({ $: 'e:1' }, 'ui');
     expect(result.some((r) => r.action === 'a:heal')).toBe(true);
@@ -49,7 +49,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
     let state = createEmptyWorldState('sched:1');
     const e = { ...createEntityShape('e:1', 'd:human'), props: { hp: 0 } };
     state = { ...state, entities: { 'e:1': e } };
-    const action: ActionDef = { id: 'a:heal', kind: 'action', label: 'Heal', require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] }, effects: [] };
+    const action: ActionDef = { id: 'a:heal', kind: 'action', label: 'Heal', require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] }, effects: [], track: 'highlight' };
     const catalog = setup(state, [action]);
     const result = catalog.queryActions({ $: 'e:1' }, 'ui');
     expect(result.some((r) => r.action === 'a:heal')).toBe(false);
@@ -66,7 +66,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
       require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] },
       visible: true,
       reason: '生命值为零，无法治疗',
-      effects: [],
+      effects: [], track: 'highlight',
     };
     const catalog = setup(state, [action]);
     const result = catalog.queryActions({ $: 'e:1' }, 'ui');
@@ -86,7 +86,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
           kind: 'action',
           label: 'Heal',
           require: { op: 'gt', args: [{ path: 'entities.e:1.props.hp' }, 0] },
-          effects: [],
+          effects: [], track: 'highlight',
         };
         const catalog = setup(state, [action]);
         const uiResult = catalog.queryActions({ $: 'e:1' }, 'ui');
@@ -105,7 +105,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
       kind: 'action',
       label: 'Throw',
       targets: [{ name: 'power', range: { min: 1, max: 100, step: 1 } }],
-      effects: [],
+      effects: [], track: 'highlight',
     };
     const catalog = setup(state, [action]);
     const uiResult = catalog.queryActions({ $: 'w:0' }, 'ui');
@@ -116,7 +116,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
 
   it('新增 ActionDef 后自动纳入 queryActions 结果，不需要修改 catalog 本身（需求44.2 的雏形，完整 Policy 接线在 L9）', () => {
     const state = createEmptyWorldState('sched:1');
-    const actionsRef: ActionDef[] = [{ id: 'a:old', kind: 'action', label: 'Old', effects: [] }];
+    const actionsRef: ActionDef[] = [{ id: 'a:old', kind: 'action', label: 'Old', effects: [], track: 'highlight' }];
     const catalog = new ActionCatalog({
       getState: () => state,
       queryEngine: new QueryEngine(),
@@ -124,7 +124,7 @@ describe('ActionCatalog.queryActions（需求25.1-25.7, 44.1）', () => {
       ctxForActor: () => makeDefaultEvalContext(),
     });
     const before = catalog.queryActions({ $: 'w:0' }, 'ui');
-    actionsRef.push({ id: 'a:new', kind: 'action', label: 'New', effects: [] });
+    actionsRef.push({ id: 'a:new', kind: 'action', label: 'New', effects: [], track: 'highlight' });
     const after = catalog.queryActions({ $: 'w:0' }, 'ui');
     expect(before.some((r) => r.action === 'a:new')).toBe(false);
     expect(after.some((r) => r.action === 'a:new')).toBe(true);

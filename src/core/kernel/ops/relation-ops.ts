@@ -16,11 +16,11 @@
  * RelationIndex.relOut/relIn 完全一致。state/relation.ts 的 RelationIndex 类仍保留（已有测试
  * 覆盖其纯函数式的对称性/级联清理语义），但不再被 Op 层实例化为跨事务的长生命周期对象。
  */
-import type { OpImpl } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id, Ref } from '../state/ids.js';
-import type { Entity } from '../state/entity.js';
+import type { OpImpl } from './registry';
+import type { OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id, Ref } from '../state/ids';
+import type { Entity } from '../state/entity';
 
 export interface RelationSetArgs {
   from: Id;

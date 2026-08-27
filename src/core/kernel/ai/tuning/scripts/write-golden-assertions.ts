@@ -12,9 +12,9 @@
 import { writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { snapshotWorldState } from '../snapshot.js';
-import { createEmptyWorldState } from '../../../state/world-state.js';
-import type { WorldState } from '../../../state/world-state.js';
+import { snapshotWorldState } from '../snapshot';
+import { createEmptyWorldState } from '../../../state/world-state';
+import type { WorldState } from '../../../state/world-state';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outDir = join(here, '..', 'assertions');

@@ -21,9 +21,9 @@
  * 两者不会漂移，因为 tag 的增删只发生在 `onAdd` / `onRemove` 生命周期效果里——没有任何其它
  * 效果被允许直接增删这些标记。
  */
-import type { AttachmentDef } from '../../../core/kernel/attachment/types.js';
-import { playExt } from '../ownership.js';
-import { refId, tagEffects, varOf } from './expr.js';
+import type { AttachmentDef } from '../../../core/kernel/attachment/types';
+import { playExt } from '../ownership';
+import { refId, tagEffects, varOf } from './expr';
 import {
   ATT_BLOCKING,
   ATT_BOOST_COMMITMENT,
@@ -46,7 +46,7 @@ import {
   TAG_ROLL_PARTICIPANT,
   TAG_SLEEPING,
   TAG_TRANSIT_IN_PROGRESS,
-} from './ids.js';
+} from './ids';
 
 /** `attach.add` / `attach.del` 生命周期效果里，被挂载对象由引擎层绑定到 `target` 变量。 */
 const TARGET = varOf('target');

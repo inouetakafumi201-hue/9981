@@ -3,14 +3,14 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { DecisionState, IntentState } from '../../state/world-state.js';
-import { registerScheduleOps } from '../schedule-ops.js';
-import type { ScheduleDef } from '../types.js';
-import { DefRegistry } from '../../state/def.js';
-import { resetIdCounters } from '../../state/ids.js';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { DecisionState, IntentState } from '../../state/world-state';
+import { registerScheduleOps } from '../schedule-ops';
+import type { ScheduleDef } from '../types';
+import { DefRegistry } from '../../state/def';
+import { resetIdCounters } from '../../state/ids';
 
 function makeRegistry(sched: ScheduleDef): { registry: OpRegistry; holder: WorldStateHolder; defRegistry: DefRegistry } {
   const holder = new WorldStateHolder(createEmptyWorldState(sched.id));

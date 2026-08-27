@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { DefRegistry } from '../../state/def.js';
-import { checkPure, registerExprDef, applyOverrides, type ExprDef } from '../named-expr.js';
-import type { Expr } from '../../state/expr-types.js';
+import { DefRegistry } from '../../state/def';
+import { checkPure, registerExprDef, applyOverrides, type ExprDef } from '../named-expr';
+import type { Expr } from '../../state/expr-types';
 
 function exprDef(id: string, body: Expr): ExprDef {
   return { id, kind: 'expr', body, pure: true };

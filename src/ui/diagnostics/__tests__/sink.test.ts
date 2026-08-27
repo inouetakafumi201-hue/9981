@@ -1,19 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { authority, revision, scope } from '../../__tests__/support/fixtures.js';
+import { authority, revision, scope } from '../../__tests__/support/fixtures';
 import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnosticCode,
-} from '../../model/diagnostic.js';
-import { createAuthorizedAgent } from '../../model/view.js';
+} from '../../model/diagnostic';
+import { createAuthorizedAgent } from '../../model/view';
 import {
   DIAGNOSTIC_CATEGORIES,
   createDiagnosticSink,
   opaqueResourceId,
   renderDiagnosticsSafely,
   type DiagnosticCategory,
-} from '../sink.js';
+} from '../sink';
 
 function diagnostic(code: UiDiagnosticCode = UI_DIAGNOSTIC_CODES.PRESENTATION_RESOURCE_FAILED) {
   return uiDiagnostic({

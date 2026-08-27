@@ -10,10 +10,10 @@
  */
 
 import fc from 'fast-check';
-import type { CandidateDefinition, DefinitionPackage } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { GAMEPLAY_VALUE_RANGE } from '../model/constitution.js';
-import { KNOWN_SEMANTIC_FAMILY_IDS } from '../model/family-contracts.js';
+import type { CandidateDefinition, DefinitionPackage } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { GAMEPLAY_VALUE_RANGE } from '../model/constitution';
+import { KNOWN_SEMANTIC_FAMILY_IDS } from '../model/family-contracts';
 import {
   baseDefinition,
   baseSourceRecord,
@@ -25,7 +25,7 @@ import {
   validConditionGateway,
   validDamageContract,
   validStatusContract,
-} from './builders.js';
+} from './builders';
 
 /** 带期望诊断的无效样例。 */
 export interface InvalidCase {

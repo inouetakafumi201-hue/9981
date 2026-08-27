@@ -11,7 +11,7 @@
  *   `RuleEventProjection`。原始 `Event` 永不进入表现层（Requirement 3.2）。
  */
 
-import type { RuleEventProjection } from '../model/event-projection.js';
+import type { RuleEventProjection } from '../model/event-projection';
 
 export interface EventSubscription {
   readonly unsubscribe: () => void;

@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import { resolveSalienceTier } from '../../presentation/salience.js';
-import { profileFixture } from '../support/fixtures.js';
+import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import { resolveSalienceTier } from '../../presentation/salience';
+import { profileFixture } from '../support/fixtures';
 
 it('任意显著性档位只接受与规则可见性一致的显式 profile 声明', () => {
   fc.assert(fc.property(fc.constantFrom('weakness', 'aiming', 'parry-ready'), fc.boolean(), (state, useMatching) => {

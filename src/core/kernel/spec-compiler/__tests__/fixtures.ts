@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import type { DefKind } from '../../state/def.js';
-import type { SourceRecord } from '../../state/diagnostic.js';
-import { InMemoryEmergencySink } from '../../safety/fatal-boundary.js';
+import type { DefKind } from '../../state/def';
+import type { SourceRecord } from '../../state/diagnostic';
+import { InMemoryEmergencySink } from '../../safety/fatal-boundary';
 import {
   CandidateMigrationRegistry,
   InMemoryArtifactStore,
@@ -9,7 +9,7 @@ import {
   SchemaRegistry,
   SemanticFamilyRegistry,
   SpecificationCompiler,
-} from '../index.js';
+} from '../index';
 import type {
   BoundProvenance,
   CandidateDocumentInput,
@@ -17,8 +17,8 @@ import type {
   DefinitionSchema,
   SchemaVersion,
   TechnicalQuotas,
-} from '../index.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../index.js';
+} from '../index';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../index';
 
 /**
  * Provenance for a bound the test host declares as structural.

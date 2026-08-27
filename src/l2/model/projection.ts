@@ -8,17 +8,18 @@
  * 唯一的语义写入通道是 `registry/action-submitter.ts` 调用的 `OpRegistry.invoke`。
  */
 
-import type { ActionId, AiPolicyId, FieldName, HumanReadableText, JsonPath, OpId, SemanticFamilyId, TagId } from './ids.js';
-import type { JsonValue } from './json.js';
-import type { Diagnostic } from './diagnostic.js';
-import type { OwningLayer, SourceClassificationKind, SourceLocation } from './source.js';
-import type { ReadOnlyResolvedDefinition } from './definition.js';
+import type { ActionId, AiPolicyId, FieldName, HumanReadableText, JsonPath, OpId, SemanticFamilyId, TagId } from './ids';
+import type { JsonValue } from './json';
+import type { Diagnostic } from './diagnostic';
+import type { OwningLayer, SourceClassificationKind, SourceLocation } from './source';
+import type { ReadOnlyResolvedDefinition } from './definition';
 import type {
   ActionCostCategory,
   AiPolicyCategory,
   InteractionIntent,
+  ResolvedCardPresentation,
   ResourceSemanticRole,
-} from './family-contracts.js';
+} from './family-contracts';
 
 // ───────────────────────────────────────────────────────────────────────────
 // 语义状态（由 L1 提供，L2 只读）
@@ -128,7 +129,8 @@ export interface ActionRequest {
   readonly actionId: ActionId;
   readonly actorId: string;
   readonly targetIds: readonly string[];
-  readonly parameters: Readonly<Record<FieldName, JsonValue>>;
+  // 参数可以是 JsonValue 或 Ref（{ $: string }），后者用于 node/item 目标绑定
+  readonly parameters: Readonly<Record<FieldName, JsonValue | { readonly $: string }>>;
   readonly semanticFieldWrites?: readonly SemanticFieldWrite[];
 }
 
@@ -154,7 +156,8 @@ export interface OpCause {
 export interface ValidatedOpRequest {
   readonly actionId: ActionId;
   readonly opId: OpId;
-  readonly args: Readonly<Record<string, JsonValue>>;
+  // args 同时支持 JsonValue 和 Ref，直接透传 UI 绑定的 Ref（需要 kernel 支持）
+  readonly args: Readonly<Record<string, JsonValue | { readonly $: string }>>;
   readonly cause: OpCause;
 }
 
@@ -197,6 +200,17 @@ export interface ActionDescriptor {
   readonly accessibleLabel: string;
   readonly assetRefs: readonly string[];
   readonly targets: readonly TargetDescriptor[];
+  /**
+   * 双轨制轨道（双轨制 P1）。从 L1 ActionDef.track 透传到 L2 投影。
+   * - `'highlight'`：高亮轨（地图直接点实体）
+   * - `'card'`：卡片轨（发牌器渲染）
+   */
+  readonly track: 'highlight' | 'card';
+  /**
+   * 已求值的卡片元数据（双轨制 P1）。仅当 `track === 'card'` 时出现。
+   * `cardPresentation` 缺省时前端使用默认基线值（图标=assetRefs[0]）。
+   */
+  readonly cardPresentation?: ResolvedCardPresentation;
 }
 
 /** 规范地位标签（Requirements 16.12–16.13）。 */

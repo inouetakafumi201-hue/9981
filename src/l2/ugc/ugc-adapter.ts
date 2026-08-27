@@ -23,15 +23,15 @@
  * 「唯一权威」；区别只在调用边界（本地便捷 vs 跨 Spec 端口）。UGC 消费方**不**调用 `fromUgc`。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory.js';
-import type { Result } from '../model/result.js';
-import type { PackageId } from '../model/ids.js';
-import type { SourceLocation } from '../model/source.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import { detectProhibitedConstructs } from '../codec/prohibited-constructs.js';
-import { scanJson } from '../codec/json-scanner.js';
-import { parsePackage, type ParseOptions } from '../codec/json-codec.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory';
+import type { Result } from '../model/result';
+import type { PackageId } from '../model/ids';
+import type { SourceLocation } from '../model/source';
+import type { DefinitionPackage } from '../model/definition';
+import { detectProhibitedConstructs } from '../codec/prohibited-constructs';
+import { scanJson } from '../codec/json-scanner';
+import { parsePackage, type ParseOptions } from '../codec/json-codec';
 
 /**
  * UGC 输入。

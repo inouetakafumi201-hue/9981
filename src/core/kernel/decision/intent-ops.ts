@@ -5,22 +5,22 @@
  * These are public Ops registered in OpRegistry. They call
  * freezeCost/settleCost/refundCost from L6 actions/cost.ts.
  */
-import type { OpImpl, OpRegistry } from '../ops/registry.js';
-import { ok, err } from '../ops/result.js';
-import type { Result } from '../ops/result.js';
-import type { Id, Ref } from '../state/ids.js';
-import { nextId } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { IntentState } from '../state/world-state.js';
-import { freezeCost, settleCost, refundCost } from '../actions/cost.js';
-import type { Reservation, FrozenCostEntry, CostSettleDeps } from '../actions/cost.js';
-import type { Effect } from '../events/effect-types.js';
-import type { ActionDef } from '../actions/types.js';
-import type { Def } from '../state/def.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { Expr } from '../state/expr-types.js';
-import type { OpContext } from '../ops/registry.js';
-import { checkInstantiable } from '../ops/def-guard.js';
+import type { OpImpl, OpRegistry } from '../ops/registry';
+import { ok, err } from '../ops/result';
+import type { Result } from '../ops/result';
+import type { Id, Ref } from '../state/ids';
+import { nextId } from '../state/ids';
+import type { Value } from '../state/value';
+import type { IntentState } from '../state/world-state';
+import { freezeCost, settleCost, refundCost } from '../actions/cost';
+import type { Reservation, FrozenCostEntry, CostSettleDeps } from '../actions/cost';
+import type { Effect } from '../events/effect-types';
+import type { ActionDef } from '../actions/types';
+import type { Def } from '../state/def';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { Expr } from '../state/expr-types';
+import type { OpContext } from '../ops/registry';
+import { checkInstantiable } from '../ops/def-guard';
 
 export type IntentSubmitArgs = {
   action: Id;

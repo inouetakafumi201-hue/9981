@@ -1,5 +1,5 @@
 /** Internal bounded-work accounting for planning and search. */
-import type { AIBudget, AIBudgetKind, AIResult, BudgetLedger } from './types.js';
+import type { AIBudget, AIBudgetKind, AIResult, BudgetLedger } from './types';
 
 function validBudgetValue(value: number): boolean {
   return Number.isInteger(value) && value >= 0;

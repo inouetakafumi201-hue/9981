@@ -10,15 +10,15 @@ export {
   type L2PortBundle,
   type L2PortBundleOptions,
   type AssembledL2Ports,
-} from './port-bundle.js';
+} from './port-bundle';
 
-export { createL2DefinitionValidationGateway, type L2ValidationGatewayOptions } from './validation-gateway.js';
-export { createL2ReferenceResolutionGateway, type L2ResolutionGatewayOptions } from './resolution-gateway.js';
+export { createL2DefinitionValidationGateway, type L2ValidationGatewayOptions } from './validation-gateway';
+export { createL2ReferenceResolutionGateway, type L2ResolutionGatewayOptions } from './resolution-gateway';
 export {
   createL2DefinitionRegistryGateway,
   type L2RegistryGatewayOptions,
   type L2DefinitionRegistryGateway,
-} from './registry-gateway.js';
+} from './registry-gateway';
 
 export {
   L2_PORT_PROVIDER_ID,
@@ -29,22 +29,22 @@ export {
   type L2ValidatedPayload,
   type L2GraphPayload,
   type L2SnapshotPayload,
-} from './port-common.js';
+} from './port-common';
 
-export { createSourceIndex, type SourceIndex } from './source-index.js';
+export { createSourceIndex, type SourceIndex } from './source-index';
 export {
   projectL2Diagnostic,
   projectL2Diagnostics,
   projectSourceRecord,
   L2_DIAGNOSTIC_SELECTORS,
   type DiagnosticProjectionContext,
-} from './diagnostic-projection.js';
-export { scanUnknownMembers, type UnknownMember, type ClosedSchemaScanResult } from './closed-schema.js';
-export { mapCandidatePackage, definitionAnchorsOf, type CandidateMappingResult } from './package-mapping.js';
-export { detectPackageCycles, type PackageCycleInput } from './package-cycle.js';
+} from './diagnostic-projection';
+export { scanUnknownMembers, type UnknownMember, type ClosedSchemaScanResult } from './closed-schema';
+export { mapCandidatePackage, definitionAnchorsOf, type CandidateMappingResult } from './package-mapping';
+export { detectPackageCycles, type PackageCycleInput } from './package-cycle';
 export {
   buildProviderIndex,
   resolveProviderDomain,
   type ProviderIndex,
   type ProviderVerdict,
-} from './provider-domain.js';
+} from './provider-domain';

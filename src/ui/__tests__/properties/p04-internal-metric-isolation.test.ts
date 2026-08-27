@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { isGameplayValue, isInternalMetric, makeInternalMetric } from '../../presentation/gameplay-value.js';
-import { ruleSignificantItems } from '../../presentation/accessibility.js';
-import { uiViewFixture } from '../support/fixtures.js';
+import { isGameplayValue, isInternalMetric, makeInternalMetric } from '../../presentation/gameplay-value';
+import { ruleSignificantItems } from '../../presentation/accessibility';
+import { uiViewFixture } from '../support/fixtures';
 
 it('任意内部度量保持独立 brand 且不进入规则显著项', () => {
   fc.assert(fc.property(fc.integer(), fc.string({ minLength: 1 }), (value, unit) => {

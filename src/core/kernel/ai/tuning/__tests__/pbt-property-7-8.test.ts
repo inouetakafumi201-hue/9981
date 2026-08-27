@@ -9,8 +9,8 @@
  */
 import { describe, it } from 'vitest';
 import fc from 'fast-check';
-import { ParameterTuner, ForbiddenList } from '../tuner.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
+import { ParameterTuner, ForbiddenList } from '../tuner';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
 
 describe('PBT 属性 7/8（Task20）', () => {
   it('属性 7：ok 的 after 必在 allowedRange，且禁碰不被改', () => {

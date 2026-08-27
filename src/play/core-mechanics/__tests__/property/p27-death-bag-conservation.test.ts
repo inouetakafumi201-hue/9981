@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbCarriedItems } from './generators.js';
+import { arbCarriedItems } from './generators';
 
 describe('Property 27: 死亡背包守恒与约束', () => {
   it('物品总数守恒', () => {

@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
-import type { Diagnostic, SourceRecord } from '../../state/diagnostic.js';
+import type { Diagnostic, SourceRecord } from '../../state/diagnostic';
 import type {
   CandidateDocumentInput, CompilationResult, CompilerMode, TechnicalQuotas,
-} from '../index.js';
-import type { CreatorMessageBundle } from '../index.js';
-import { candidate, createHarness } from './fixtures.js';
-import type { Harness } from './fixtures.js';
+} from '../index';
+import type { CreatorMessageBundle } from '../index';
+import { candidate, createHarness } from './fixtures';
+import type { Harness } from './fixtures';
 
 export interface CorpusCase {
   /** Stable label used in assertion messages so a failure names the scenario. */

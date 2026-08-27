@@ -5,9 +5,9 @@
  * ResponsePhase is a pure-read query helper — no writes, no Op registration.
  * The actual PhaseDef struct will be expanded in L9 (ScheduleDef phases).
  */
-import type { Id } from '../state/ids.js';
-import type { IntentState } from '../state/world-state.js';
-import type { WorldState } from '../state/world-state.js';
+import type { Id } from '../state/ids';
+import type { IntentState } from '../state/world-state';
+import type { WorldState } from '../state/world-state';
 
 /** PhaseDef placeholder kind for the 'response' phase (expanded in L9 ScheduleDef). */
 export type ResponsePhaseDef = {

@@ -33,7 +33,7 @@ function minExpr(a: Expr, b: Expr): Expr { return { op: 'min', args: [a, b] }; }
 const VISIBLE_TO: Expr = { op: 'not', args: [{ op: 'includes', args: [{ path: 'world.props.hiddenRefs' }, { var: 'self' }] }] };
 
 const attackAction: ActionDef = {
-  id: 'a:attack', kind: 'action', label: 'Attack',
+  id: 'a:attack', kind: 'action', label: 'Attack', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] } } }],
   require: true, cost: [],
   effects: [
@@ -62,7 +62,7 @@ const aiCombatDamageRule: RuleDef = {
   ],
 };
 const healAction: ActionDef = {
-  id: 'a:heal', kind: 'action', label: 'Heal',
+  id: 'a:heal', kind: 'action', label: 'Heal', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'eq', args: [{ var: 'self' }, { var: 'self' }] } } }],
   require: true, cost: [],
   effects: [
@@ -71,13 +71,13 @@ const healAction: ActionDef = {
   ],
 };
 const moveAction: ActionDef = {
-  id: 'a:move', kind: 'action', label: 'Move',
+  id: 'a:move', kind: 'action', label: 'Move', track: 'highlight',
   targets: [{ name: 'node', query: { from: 'nodes' } }],
   require: true, cost: [],
   effects: [opEffect('entity.place', { entityId: HERO, nodeId: refIdExpr(varRef('node')) })],
 };
 const eternalSleepAction: ActionDef = {
-  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep',
+  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'and', args: [
     { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] },
     { op: 'includes', args: [refGetExpr(varRef('targetRef'), ['tags']), TAG_DOWNED] },
@@ -89,7 +89,7 @@ const eternalSleepAction: ActionDef = {
   cost: [], effects: [{ let: 't', be: varRef('target') }, opEffect('entity.destroy', { id: refIdExpr(varRef('t')) })],
 };
 const pickupAction: ActionDef = {
-  id: 'a:pickup', kind: 'action', label: 'Pickup',
+  id: 'a:pickup', kind: 'action', label: 'Pickup', track: 'highlight',
   targets: [{ name: 'item', query: { from: 'items' } }],
   require: true, cost: [],
   effects: [{ let: 'ownContainer', be: refGetExpr(varRef('self'), ['containers', 'bag']) }, opEffect('item.move', { itemId: refIdExpr(varRef('item')), toContainerId: varRef('ownContainer') })],

@@ -17,41 +17,41 @@
  * 不引入任何新的写入语义——本文件只是把已有的 registerXxxOps 与 wireHooksIntoRegistry
  * 按依赖顺序调用一遍。
  */
-import type { OpRegistry } from '../ops/registry.js';
-import { WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { DefRegistry } from '../state/def.js';
-import type { Def } from '../state/def.js';
-import type { ActionDef } from '../actions/types.js';
-import { ActionCatalog } from '../actions/catalog.js';
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import { makeExprStateAccess } from '../expr/state-access.js';
-import { wireHooksIntoRegistry } from '../wire-hooks.js';
-import type { RuleProvider } from '../events/rule-provider.js';
-import type { HookDispatcher } from '../events/dispatcher.js';
-import type { HookDiagnostic } from '../events/dispatcher.js';
-import type { FlowInterpreter } from '../flow/interpreter.js';
-import { registerPropOps } from '../ops/prop-ops.js';
-import { registerStructuralOps, makeItemMove } from '../ops/structural-ops.js';
-import { registerCarrierOps, makeContainerExit } from '../ops/carrier-ops.js';
-import { registerStackOps } from '../ops/stack-ops.js';
-import { registerRelationOps } from '../ops/relation-ops.js';
-import { registerTransformOps } from '../ops/transform-ops.js';
-import { registerAgentOps } from '../ops/agent-ops.js';
-import { registerOutcomeOps } from '../ops/outcome-ops.js';
-import { registerPrefabOps } from '../ops/prefab-ops.js';
-import { registerDecisionOps, makeProcessDecisionTimeouts } from '../decision/decision-ops.js';
-import { registerIntentOps } from '../decision/intent-ops.js';
-import { registerPoolOps } from '../actions/pool-ops.js';
-import { registerAttachOps } from '../attachment/attach-ops.js';
-import { registerScheduleOps } from '../schedule/schedule-ops.js';
-import { PlaypackLoader } from '../schedule/playpack.js';
-import { PlaypackActivator, registerPlaypackRuntimeOps } from '../schedule/playpack-runtime.js';
-import { registerRandomOps } from '../random/random-ops.js';
-import { nextId } from '../state/ids.js';
-import { getPath } from '../ops/path.js';
+import type { OpRegistry } from '../ops/registry';
+import { WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { DefRegistry } from '../state/def';
+import type { Def } from '../state/def';
+import type { ActionDef } from '../actions/types';
+import { ActionCatalog } from '../actions/catalog';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
+import { QueryEngine } from '../expr/query-engine';
+import { makeExprStateAccess } from '../expr/state-access';
+import { wireHooksIntoRegistry } from '../wire-hooks';
+import type { RuleProvider } from '../events/rule-provider';
+import type { HookDispatcher } from '../events/dispatcher';
+import type { HookDiagnostic } from '../events/dispatcher';
+import type { FlowInterpreter } from '../flow/interpreter';
+import { registerPropOps } from '../ops/prop-ops';
+import { registerStructuralOps, makeItemMove } from '../ops/structural-ops';
+import { registerCarrierOps, makeContainerExit } from '../ops/carrier-ops';
+import { registerStackOps } from '../ops/stack-ops';
+import { registerRelationOps } from '../ops/relation-ops';
+import { registerTransformOps } from '../ops/transform-ops';
+import { registerAgentOps } from '../ops/agent-ops';
+import { registerOutcomeOps } from '../ops/outcome-ops';
+import { registerPrefabOps } from '../ops/prefab-ops';
+import { registerDecisionOps, makeProcessDecisionTimeouts } from '../decision/decision-ops';
+import { registerIntentOps } from '../decision/intent-ops';
+import { registerPoolOps } from '../actions/pool-ops';
+import { registerAttachOps } from '../attachment/attach-ops';
+import { registerScheduleOps } from '../schedule/schedule-ops';
+import { PlaypackLoader } from '../schedule/playpack';
+import { PlaypackActivator, registerPlaypackRuntimeOps } from '../schedule/playpack-runtime';
+import { registerRandomOps } from '../random/random-ops';
+import { nextId } from '../state/ids';
+import { getPath } from '../ops/path';
 
 export interface FullHarness {
   holder: WorldStateHolder;
@@ -61,9 +61,8 @@ export interface FullHarness {
   defs: { get(id: string): Def | undefined };
   exprEngine: ExprEngine;
   queryEngine: QueryEngine;
-  ctxForSelf: (ref: { $: string }) => EvalContext;
-  /** Hook 接线产物：模糊测试可以往 ruleProvider 里挂 RuleDef 来引入真实的 veto/effects 交互。 */
-  ruleProvider: RuleProvider;
+  ctxForSelf: (ref: { $: string }, vars?: Record<string, import('../state/value').Value>) => EvalContext;
+  /** Hook 接线产物：模糊测试可以往 ruleProvider 里挂 RuleDef 来引入真实的 veto/effects 交互。 */  ruleProvider: RuleProvider;
   hookDispatcher: HookDispatcher;
   flowInterpreter: FlowInterpreter;
   playpackLoader: PlaypackLoader;
@@ -94,7 +93,7 @@ export function createFullHarness(seedDefs: Def[] = []): FullHarness {
   // 每次算子求值都读到当时的 draft，而不是 EvalContext 构造时刻的旧状态。
   const stateAccess = makeExprStateAccess(() => holder.getState(), defRegistry);
 
-  const ctxForSelf = (ref: { $: string }, vars: Record<string, import('../state/value.js').Value> = {}): EvalContext =>
+  const ctxForSelf = (ref: { $: string }, vars: Record<string, import('../state/value').Value> = {}): EvalContext =>
     makeDefaultEvalContext({
       self: ref,
       vars: { ...vars, self: ref },
@@ -110,7 +109,7 @@ export function createFullHarness(seedDefs: Def[] = []): FullHarness {
       resolveNamedExpr: (id) => {
         const definition = defRegistry.resolve(id);
         if (!definition || definition.kind !== 'expr' || definition['body'] === undefined) return null;
-        return { body: definition['body'] as import('../state/expr-types.js').Expr };
+        return { body: definition['body'] as import('../state/expr-types').Expr };
       },
       resolveRefDefId: (candidate) => {
         const state = holder.getState();
@@ -132,7 +131,7 @@ export function createFullHarness(seedDefs: Def[] = []): FullHarness {
         return path.split('.').reduce<unknown>((current, segment) => {
           if (current === null || typeof current !== 'object') return null;
           return (current as Record<string, unknown>)[segment] ?? null;
-        }, value) as import('../state/value.js').Value | null;
+        }, value) as import('../state/value').Value | null;
       },
     });
 
@@ -171,9 +170,9 @@ export function createFullHarness(seedDefs: Def[] = []): FullHarness {
   const decisionAnswerDeps = {
     defLookup: { resolve: defLookup },
     recheckPremise: () => true,
-    runEffects: (effects: unknown[], decision: { ctx: Record<string, import('../state/value.js').Value>; answers: Record<string, import('../state/value.js').Value>; id: string }, ctx: import('../ops/registry.js').OpContext) => {
+    runEffects: (effects: unknown[], decision: { ctx: Record<string, import('../state/value').Value>; answers: Record<string, import('../state/value').Value>; id: string }, ctx: import('../ops/registry').OpContext) => {
       flowInterpreter.run(
-        effects as import('../events/effect-types.js').Effect[],
+        effects as import('../events/effect-types').Effect[],
         ctx,
         undefined,
         { decision: { $: decision.id }, ctx: decision.ctx, answers: decision.answers },

@@ -4,8 +4,8 @@
  * 对应 design.md `Specification_Compiler` 与 Requirements 1、5.11–5.12、16。
  */
 
-import type { Diagnostic } from '../model/diagnostic.js';
-import type { SemanticFamilyRegistration } from '../model/definition.js';
+import type { Diagnostic } from '../model/diagnostic';
+import type { SemanticFamilyRegistration } from '../model/definition';
 import type {
   EligibilityVerdict,
   HistoricalExampleEntry,
@@ -18,7 +18,7 @@ import type {
   SourceRecord,
   SourceStatement,
   UnresolvedItem,
-} from '../model/source.js';
+} from '../model/source';
 
 /** 单个数值示例的分类结果（Requirements 5.11–5.12）。 */
 export interface NumericExampleOutcome {

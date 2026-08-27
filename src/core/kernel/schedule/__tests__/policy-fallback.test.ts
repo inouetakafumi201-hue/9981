@@ -5,8 +5,8 @@
  * 现在 decide() 按 mode 求结果，得不出合法着法时沿 fallback 链继续（环守卫、链尽头返回 null）。
  */
 import { describe, it, expect } from 'vitest';
-import { PolicyEvaluator } from '../policy.js';
-import type { PolicyDef, PolicyDecideDeps } from '../policy.js';
+import { PolicyEvaluator } from '../policy';
+import type { PolicyDef, PolicyDecideDeps } from '../policy';
 
 function deps(policies: Record<string, PolicyDef>, condTrue: boolean): PolicyDecideDeps {
   return {

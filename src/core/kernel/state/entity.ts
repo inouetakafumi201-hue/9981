@@ -1,8 +1,8 @@
 /**
  * L1 State: Entity / Item 运行时结构（design.md 3.1节 / 需求2.1-2.4）。
  */
-import type { Id, Ref } from './ids.js';
-import type { Value } from './value.js';
+import type { Id, Ref } from './ids';
+import type { Value } from './value';
 
 export interface Entity {
   readonly id: Id;

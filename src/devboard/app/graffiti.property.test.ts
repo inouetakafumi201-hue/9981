@@ -24,10 +24,10 @@ import {
   translateObstruction,
   sampleMap,
   moveTransitionWindow,
-} from './editor-state.js';
-import { commitHistory, emptyHistory, redoHistory, undoDepth, undoHistory } from './editor-history.js';
-import { clampPoint } from './editor-state.js';
-import { distance } from '../ports/map-contracts.js';
+} from './editor-state';
+import { commitHistory, emptyHistory, redoHistory, undoDepth, undoHistory } from './editor-history';
+import { clampPoint } from './editor-state';
+import { distance } from '../ports/map-contracts';
 import {
   boxCorners,
   Box,
@@ -37,8 +37,8 @@ import {
   mergeSameType,
   pointInBox,
   sceneMemberBoxes,
-} from './graffiti.js';
-import { defaultCamera, flyTo, zoomAt } from './camera.js';
+} from './graffiti';
+import { defaultCamera, flyTo, zoomAt } from './camera';
 
 const anyPoint = fc.record({ x: fc.double({ min: 0, max: 1 }), y: fc.double({ min: 0, max: 1 }) }).filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
 

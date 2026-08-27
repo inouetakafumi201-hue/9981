@@ -1,12 +1,12 @@
-import type { SourceRecord } from '../state/diagnostic.js';
-import { compareCodePoints } from './json-codec.js';
+import type { SourceRecord } from '../state/diagnostic';
+import { compareCodePoints } from './json-codec';
 import type {
   CandidateDefinition,
   CompiledModel,
   JsonValue,
   ResolvedDefinition,
   SemanticFamilyRegistration,
-} from './types.js';
+} from './types';
 
 /**
  * Semantic identity of the activated model.

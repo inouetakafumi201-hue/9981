@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { scanUiSources } from '../support/source-scan.js';
+import { scanUiSources } from '../support/source-scan';
 
 it('任意重复扫描中 UI 代码都不含写入通道标识符', () => {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');

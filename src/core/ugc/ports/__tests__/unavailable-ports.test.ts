@@ -3,15 +3,15 @@
  * 不调用后续端口、不产出 validated 产物、不改变任何可观察快照。
  */
 import { describe, expect, it, vi } from 'vitest';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import type { CanonicalizedChangeRequest } from '../../model/canonical-types.js';
-import type { ValidationBaseline } from '../../model/baseline.js';
-import type { ValidatedChangeSet } from '../../model/validated-change-set.js';
-import { createValidationBaseline } from '../../model/baseline.js';
-import { createCandidateSource } from '../../model/candidate.js';
-import { UNAVAILABLE_PROVIDER_ID, isPortUnavailable } from '../availability.js';
-import { sha256FingerprintGateway } from '../sha256-fingerprint-gateway.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import type { CanonicalizedChangeRequest } from '../../model/canonical-types';
+import type { ValidationBaseline } from '../../model/baseline';
+import type { ValidatedChangeSet } from '../../model/validated-change-set';
+import { createValidationBaseline } from '../../model/baseline';
+import { createCandidateSource } from '../../model/candidate';
+import { UNAVAILABLE_PROVIDER_ID, isPortUnavailable } from '../availability';
+import { sha256FingerprintGateway } from '../sha256-fingerprint-gateway';
 import {
   UNAVAILABLE_SNAPSHOT_FINGERPRINT,
   createUnavailableDefinitionRegistryGateway,
@@ -20,7 +20,7 @@ import {
   createUnavailableRuntimeCompatibilityGateway,
   createUnavailableSchemaMigrationGateway,
   createUnavailableSchemaVersionCatalog,
-} from '../unavailable.js';
+} from '../unavailable';
 
 const factory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 

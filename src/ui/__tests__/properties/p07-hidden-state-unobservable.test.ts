@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial.js';
-import { resolveSalientStates } from '../../presentation/salience.js';
-import { profileFixture } from '../support/fixtures.js';
+import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial';
+import { resolveSalientStates } from '../../presentation/salience';
+import { profileFixture } from '../support/fixtures';
 
 it('任意非所有者观察隐藏招架状态都等同于不存在且静默失效无演出', () => {
   const lapse = fc.constantFrom('received-ranged-attack' as const, 'received-unparryable-damage' as const);

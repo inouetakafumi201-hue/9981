@@ -2,14 +2,14 @@
  * 任务 2.3 验收测试：code catalog 完备性、scope 强制字段、显式 null 定位、确定性排序、跨来源等价。
  */
 import { describe, expect, it } from 'vitest';
-import { ERR_CODES } from '../../../kernel/state/error-codes.js';
-import { HINT_TEMPLATES } from '../../../kernel/safety/safety.js';
-import type { Diagnostic, SourceSpan } from '../../../kernel/state/diagnostic.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from '../code-map.js';
-import { createDiagnosticCodeCatalog } from '../code-catalog.js';
-import { UnmappedDiagnosticError, createDiagnosticFactory, documentAnchorSpan } from '../factory.js';
-import { compareDiagnostics, diagnosticsEquivalent, sortDiagnostics } from '../sort.js';
+import { ERR_CODES } from '../../../kernel/state/error-codes';
+import { HINT_TEMPLATES } from '../../../kernel/safety/safety';
+import type { Diagnostic, SourceSpan } from '../../../kernel/state/diagnostic';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from '../code-map';
+import { createDiagnosticCodeCatalog } from '../code-catalog';
+import { UnmappedDiagnosticError, createDiagnosticFactory, documentAnchorSpan } from '../factory';
+import { compareDiagnostics, diagnosticsEquivalent, sortDiagnostics } from '../sort';
 
 const catalog = createDiagnosticCodeCatalog(sha256FingerprintGateway);
 const factory = createDiagnosticFactory(catalog);

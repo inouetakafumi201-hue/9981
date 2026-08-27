@@ -9,7 +9,7 @@ import {
   NONESSENTIAL_COMMAND_KINDS,
   type PresentationCommand,
   type PresentationCommandKind,
-} from './scheduler.js';
+} from './scheduler';
 
 const NONESSENTIAL = new Set<PresentationCommandKind>(NONESSENTIAL_COMMAND_KINDS);
 

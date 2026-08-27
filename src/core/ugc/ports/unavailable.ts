@@ -7,17 +7,17 @@
  * - **不**产生 validated 产物或依赖图；
  * - **不**改变任何可观察快照（注册表适配器的 previous 与 active 指纹恒相同且 `unchanged` 为 true）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import type { TargetOwnership } from '../model/candidate.js';
-import type { ActivationResult } from '../model/report.js';
-import type { DefinitionRegistryReadSnapshot } from '../model/upstream.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { ValidationStage } from '../model/stage.js';
-import { UNAVAILABLE_PROVIDER_ID, UNRESOLVED_PORT_CORRECTION, describeUnresolvedPort } from './availability.js';
-import type { UnresolvedPortEvidence } from './availability.js';
-import type { CanonicalizedChangeRequest } from '../model/canonical-types.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { ValidationBaseline } from '../model/baseline';
+import type { TargetOwnership } from '../model/candidate';
+import type { ActivationResult } from '../model/report';
+import type { DefinitionRegistryReadSnapshot } from '../model/upstream';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { ValidationStage } from '../model/stage';
+import { UNAVAILABLE_PROVIDER_ID, UNRESOLVED_PORT_CORRECTION, describeUnresolvedPort } from './availability';
+import type { UnresolvedPortEvidence } from './availability';
+import type { CanonicalizedChangeRequest } from '../model/canonical-types';
 import type {
   DefinitionRegistryGateway,
   DefinitionValidationGateway,
@@ -25,8 +25,8 @@ import type {
   ReferenceStageResult,
   RuntimeCompatibilityGateway,
   ValidationStageResult,
-} from './definition-ports.js';
-import type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from './schema-ports.js';
+} from './definition-ports';
+import type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from './schema-ports';
 
 export const UNAVAILABLE_SNAPSHOT_FINGERPRINT = 'ugc-unavailable-registry-snapshot';
 

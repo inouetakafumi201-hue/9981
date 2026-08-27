@@ -20,15 +20,15 @@ import {
   defaultSeedDefs,
   ABSTRACT_SEED_DEF_IDS,
   CONCRETE_SUBCLASS_DEF_IDS,
-} from '../testing/full-harness.js';
-import type { FullHarness } from '../testing/full-harness.js';
-import { resetIdCounters } from '../state/ids.js';
-import { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from '../state/world-state.js';
-import { Transaction } from '../ops/transaction.js';
-import { DefRegistry } from '../state/def.js';
-import { PlaypackLoader } from '../schedule/playpack.js';
-import type { PlaypackDef } from '../schedule/playpack.js';
-import { DiagnosticSink, DiagnosticHaltError } from '../safety/safety.js';
+} from '../testing/full-harness';
+import type { FullHarness } from '../testing/full-harness';
+import { resetIdCounters } from '../state/ids';
+import { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from '../state/world-state';
+import { Transaction } from '../ops/transaction';
+import { DefRegistry } from '../state/def';
+import { PlaypackLoader } from '../schedule/playpack';
+import type { PlaypackDef } from '../schedule/playpack';
+import { DiagnosticSink, DiagnosticHaltError } from '../safety/safety';
 import {
   takeSnapshot,
   Journal,
@@ -36,34 +36,34 @@ import {
   InMemoryCheckpointStore,
   applyMigration,
   LogStore,
-} from '../persistence/persistence.js';
-import type { MigrationDef } from '../persistence/persistence.js';
-import { InvariantChecker } from '../ops/invariants.js';
+} from '../persistence/persistence';
+import type { MigrationDef } from '../persistence/persistence';
+import { InvariantChecker } from '../ops/invariants';
 import {
   Linter,
   RuleCircuitBreaker,
   QuotaEnforcer,
   HINT_TEMPLATES,
-} from '../safety/safety.js';
-import { withShadowStream, snapshotStream, restoreStream } from '../random/shadow-stream.js';
-import { setPath } from '../ops/path.js';
-import { checkPure, registerExprDef, applyOverrides } from '../expr/named-expr.js';
+} from '../safety/safety';
+import { withShadowStream, snapshotStream, restoreStream } from '../random/shadow-stream';
+import { setPath } from '../ops/path';
+import { checkPure, registerExprDef, applyOverrides } from '../expr/named-expr';
 import {
   removeSlot,
   insertSlot,
   findDefaultSlotIndex,
   setSlotHolds,
-} from '../topology/container.js';
-import type { ActionDef } from '../actions/types.js';
-import { AuraEngine } from '../attachment/aura-engine.js';
-import type { Def } from '../state/def.js';
-import { knowledgeStore } from '../knowledge/knowledge-store.js';
-import { PresentationGateway } from '../gateway.js';
-import { ActionCatalog } from '../actions/catalog.js';
-import { dist, spread } from '../topology/metrics.js';
-import type { RuleDef } from '../events/types.js';
-import type { Effect } from '../events/effect-types.js';
-import type { Diagnostic } from '../state/diagnostic.js';
+} from '../topology/container';
+import type { ActionDef } from '../actions/types';
+import { AuraEngine } from '../attachment/aura-engine';
+import type { Def } from '../state/def';
+import { knowledgeStore } from '../knowledge/knowledge-store';
+import { PresentationGateway } from '../gateway';
+import { ActionCatalog } from '../actions/catalog';
+import { dist, spread } from '../topology/metrics';
+import type { RuleDef } from '../events/types';
+import type { Effect } from '../events/effect-types';
+import type { Diagnostic } from '../state/diagnostic';
 
 // ---------------------------------------------------------------------------
 // 辅助

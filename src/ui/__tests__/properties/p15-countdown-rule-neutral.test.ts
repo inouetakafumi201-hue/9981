@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it, vi } from 'vitest';
 
-import { createEndTurnCountdown } from '../../interaction/end-turn-countdown.js';
-import { profileFixture, revision } from '../support/fixtures.js';
+import { createEndTurnCountdown } from '../../interaction/end-turn-countdown';
+import { profileFixture, revision } from '../support/fixtures';
 
 it('任意取消时刻都不提交、不改变规则指纹，结束也只产生普通提交', () => {
   fc.assert(fc.property(fc.integer({ min: 0, max: 2999 }), (cancelAt) => {

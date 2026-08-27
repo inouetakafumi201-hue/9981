@@ -1,0 +1,151 @@
+{
+  "packId": "wakeup-ui-prompt-pack",
+  "version": "1.0.0",
+  "purpose": "Self-contained UI generation attachments for V0.dev and frontend agents",
+  "executionModel": "independent-batch-command",
+  "projectVisibility": "existing-frontend-project-visible",
+  "conversationContextRequired": false,
+  "batchCommandRule": "Execute one batch with its commandEntry and every sameDirectoryAttachments file from the same directory; inspect and modify the existing frontend first. Global G/R/asset attachments are optional supplements, not prerequisites.",
+  "sourceVisibility": "AI reads rewritten briefs; source copies are provenance only",
+  "batches": [
+    {
+      "id": "B1",
+      "directory": "01-shell-startup",
+      "objective": "shell startup title settings focus",
+      "commandEntry": "01-shell-startup/B1-00-shell-startup-prompt.md",
+      "sameDirectoryAttachments": [
+        "01-shell-startup/B1-01-app-shell-control-panel.md",
+        "01-shell-startup/B1-02-startup-loading-recovery.md",
+        "01-shell-startup/B1-03-title-menu-and-settings.md",
+        "01-shell-startup/B1-04-navigation-and-focus-contract.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B2",
+      "directory": "02-battle-hud",
+      "objective": "complete battle HUD and result states",
+      "commandEntry": "02-battle-hud/B2-00-battle-hud-prompt.md",
+      "sameDirectoryAttachments": [
+        "02-battle-hud/B2-01-hud-layout-and-fixed-components.md",
+        "02-battle-hud/B2-02-action-cards-target-context.md",
+        "02-battle-hud/B2-03-dice-turn-status-visibility.md",
+        "02-battle-hud/B2-04-spectator-reconnect-and-result.md",
+        "02-battle-hud/B2-05-visual-quality-gate.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B3",
+      "directory": "03-residence-flow",
+      "objective": "residence matching dream return",
+      "commandEntry": "03-residence-flow/B3-00-residence-flow-prompt.md",
+      "sameDirectoryAttachments": [
+        "03-residence-flow/B3-01-residence-node-and-input.md",
+        "03-residence-flow/B3-02-match-shadow-lobby.md",
+        "03-residence-flow/B3-03-dream-load-return-transition.md",
+        "03-residence-flow/B3-04-residence-empty-error-states.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B4",
+      "directory": "04-pause-utility-feedback",
+      "objective": "pause utilities notifications errors subtitles",
+      "commandEntry": "04-pause-utility-feedback/B4-00-pause-utility-prompt.md",
+      "sameDirectoryAttachments": [
+        "04-pause-utility-feedback/B4-01-pause-menu-and-restart-confirm.md",
+        "04-pause-utility-feedback/B4-02-settings-lifecycle-and-a11y.md",
+        "04-pause-utility-feedback/B4-03-inventory-safe-and-utility-panels.md",
+        "04-pause-utility-feedback/B4-04-notification-history-and-subtitles.md",
+        "04-pause-utility-feedback/B4-05-connection-error-retry-overlay.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B5",
+      "directory": "05-narrative-rpg",
+      "objective": "narrative RPG guidance information overlays",
+      "commandEntry": "05-narrative-rpg/B5-00-narrative-rpg-prompt.md",
+      "sameDirectoryAttachments": [
+        "05-narrative-rpg/B5-01-dialog-and-portrait-fallback.md",
+        "05-narrative-rpg/B5-02-quest-log-objective-tracker.md",
+        "05-narrative-rpg/B5-03-tutorial-help-location-title.md",
+        "05-narrative-rpg/B5-04-notification-priority-and-history.md",
+        "05-narrative-rpg/B5-05-stats-achievements-codex-recap.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B6",
+      "directory": "06-full-journey-integration",
+      "objective": "full journey routing overlay arbitration extraction",
+      "commandEntry": "06-full-journey-integration/B6-00-journey-integration-prompt.md",
+      "sameDirectoryAttachments": [
+        "06-full-journey-integration/B6-01-route-state-machine.md",
+        "06-full-journey-integration/B6-02-overlay-z-index-and-input-arbitration.md",
+        "06-full-journey-integration/B6-03-settings-and-global-feedback-wiring.md",
+        "06-full-journey-integration/B6-04-v0-extraction-handoff.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    },
+    {
+      "id": "B7",
+      "directory": "07-motion-polish",
+      "objective": "motion audio accessibility performance acceptance",
+      "commandEntry": "07-motion-polish/B7-00-motion-polish-prompt.md",
+      "sameDirectoryAttachments": [
+        "07-motion-polish/B7-01-motion-recipe-catalog.md",
+        "07-motion-polish/B7-02-reduced-motion-performance.md",
+        "07-motion-polish/B7-03-visual-acceptance-matrix.md",
+        "07-motion-polish/B7-04-particle-fullscreen-audit.md",
+        "07-motion-polish/B7-05-coherence-performance-engineering.md"
+      ],
+      "globalAttachmentsRequired": false,
+      "canRunStandalone": true,
+      "writesExistingProject": true,
+      "dependsOnConversationMemory": false
+    }
+  ],
+  "globalAttachments": [
+    {"id":"G-01","path":"00-global/G-01-project-and-scope-contract.md","directToAi":true},
+    {"id":"G-02","path":"00-global/G-02-visual-token-contract.md","directToAi":true},
+    {"id":"G-03","path":"00-global/G-03-ui-port-contract.md","directToAi":true},
+    {"id":"G-04","path":"00-global/G-04-interaction-accessibility.md","directToAi":true},
+    {"id":"G-05","path":"00-global/G-05-motion-audio-fallback.md","directToAi":true},
+    {"id":"G-06","path":"00-global/G-06-mock-data-fixtures.md","directToAi":true},
+    {"id":"G-07","path":"00-global/G-07-conflict-register.md","directToAi":true},
+    {"id":"G-08","path":"00-global/G-08-page-and-batch-index.md","directToAi":true}
+  ],
+  "sourceDirectories": [
+    {"path":"references/source","directToAi":false,"role":"provenance-copy"},
+    {"path":"references/assets","directToAi":true,"role":"visual-reference"},
+    {"path":"legacy","directToAi":false,"role":"historical-migration"}
+  ],
+  "rules": {
+    "numberedBriefSections": 15,
+    "maxSimultaneousChoices": 5,
+    "deferredBurstTierSelectableInMvp": false,
+    "requiredBurstEffects": ["selection", "trigger"],
+    "backendPathOnlyReferencesForbidden": true,
+    "zeroMaterialFramingForbidden": true
+  }
+}

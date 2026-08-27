@@ -5,9 +5,9 @@ import type {
   SourceNormativeStatus,
   SourceOwningLayer,
   SourceRecord,
-} from '../state/diagnostic.js';
-import type { ErrCode } from '../state/error-codes.js';
-import type { DefKind } from '../state/def.js';
+} from '../state/diagnostic';
+import type { ErrCode } from '../state/error-codes';
+import type { DefKind } from '../state/def';
 
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonValue };

@@ -1,8 +1,8 @@
 /** The sole public decision facade for bounded AI recommendation and action. */
-import { createAIDiagnostic } from './diagnostics.js';
-import { isSearchPlanner } from './sequential-search.js';
-import { buildDecisionTrace, minimalDecisionTrace, submissionOfResult, type TraceCandidateInput } from './tuning/build-trace.js';
-import { scoreBreakdown } from './design-currency.js';
+import { createAIDiagnostic } from './diagnostics';
+import { isSearchPlanner } from './sequential-search';
+import { buildDecisionTrace, minimalDecisionTrace, submissionOfResult, type TraceCandidateInput } from './tuning/build-trace';
+import { scoreBreakdown } from './design-currency';
 import type {
   AICandidate,
   AIDecisionFacade,
@@ -22,7 +22,7 @@ import type {
   AIReadGateway,
   AIBehaviorValidationGateway,
   ValidatedAIBehaviorBinding,
-} from './types.js';
+} from './types';
 
 export interface AIDecisionFacadeDependencies {
   readonly readGateway: AIReadGateway;

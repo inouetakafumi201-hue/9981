@@ -21,13 +21,13 @@
  * 只读全部生产源文件；本文件不修改任何生产代码。
  */
 import { describe, expect, it } from 'vitest';
-import { StrictJsonCodec } from '../../core/kernel/spec-compiler/json-codec.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../../core/kernel/spec-compiler/types.js';
-import type { ParsedCandidateDocument } from '../../core/kernel/spec-compiler/types.js';
-import { decodePlaypack } from '../../core/kernel/schedule/playpack-codec.js';
-import type { PlaypackDef } from '../../core/kernel/schedule/playpack.js';
-import { CoreMechanicsPlaypack } from '../core-mechanics/defs/playpack.js';
-import type { Def } from '../../core/kernel/state/def.js';
+import { StrictJsonCodec } from '../../core/kernel/spec-compiler/json-codec';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../core/kernel/spec-compiler/types';
+import type { ParsedCandidateDocument } from '../../core/kernel/spec-compiler/types';
+import { decodePlaypack } from '../../core/kernel/schedule/playpack-codec';
+import type { PlaypackDef } from '../../core/kernel/schedule/playpack';
+import { CoreMechanicsPlaypack } from '../core-mechanics/defs/playpack';
+import type { Def } from '../../core/kernel/state/def';
 
 // ---------------------------------------------------------------------------
 // 差距登记（矩阵中「有差距」项必须在此出现，否则测试失败——不静默）
@@ -143,6 +143,8 @@ function minimalAction(overrides: Record<string, unknown> = {}): Record<string, 
     id: 'action:eq-min',
     kind: 'action',
     label: '等价钱形最小动作',
+    // 双轨制 P3：track 为必填闭合域。
+    track: 'card',
     cost: [{ pool: 'ap', amount: 1 }],
     effects: [{ emit: 'eq.fired' }],
     ...overrides,

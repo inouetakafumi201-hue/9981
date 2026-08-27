@@ -8,7 +8,7 @@ import {
   genHealthValue,
   genSceneRef,
   genStatusRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P40: 普通倒地的显式触发与场景约束

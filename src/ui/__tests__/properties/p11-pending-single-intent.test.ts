@@ -2,10 +2,10 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { createPendingRegistry } from '../../interaction/pending-registry.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { arbInputSource } from '../support/arbitraries.js';
-import { revision } from '../support/fixtures.js';
+import { createPendingRegistry } from '../../interaction/pending-registry';
+import type { InteractionIntent } from '../../model/intent';
+import { arbInputSource } from '../support/arbitraries';
+import { revision } from '../support/fixtures';
 
 it('任意待决控件上的额外激活只返回原意图标识', () => {
   fc.assert(fc.property(fc.string({ minLength: 1 }), arbInputSource(), (controlId, inputSource) => {

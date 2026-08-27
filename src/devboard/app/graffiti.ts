@@ -4,7 +4,7 @@
  * 这些是编辑器行为规则，不是 `MapData` 契约本身。涂鸦合并 / 空洞全填是「视觉 + 校验上的假合并」
  * （阴影绘制 + 区域判定），存储不写虚假矩形——空洞全填只影响"能否在此放新场景节点"的判定。
  */
-import type { Vec2 } from '../ports/map-contracts.js';
+import type { Vec2 } from '../ports/map-contracts';
 
 /** 归一化轴对齐矩形（可带旋转角，度）。 */
 export interface Box {

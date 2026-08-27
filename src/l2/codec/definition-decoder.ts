@@ -6,10 +6,10 @@
  * 语义缺失/损坏报错，可选字段缺失静默跳过，表现字段损坏降级为 Warning。
  */
 
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { JsonValue } from '../model/json.js';
-import { isJsonValue } from '../model/json.js';
-import { isL1DefKind, type L1DefKind, L1_EXCLUSIVE_MECHANISMS, type L1ExclusiveMechanism } from '../model/def-kind.js';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { JsonValue } from '../model/json';
+import { isJsonValue } from '../model/json';
+import { isL1DefKind, type L1DefKind, L1_EXCLUSIVE_MECHANISMS, type L1ExclusiveMechanism } from '../model/def-kind';
 import {
   EMPTY_TYPE_IDENTITY,
   FIELD_MERGE_STRATEGIES,
@@ -17,7 +17,7 @@ import {
   type DefinitionReference,
   type FieldMergeRule,
   type TypeIdentity,
-} from '../model/reference.js';
+} from '../model/reference';
 import type {
   BaseDefinition,
   CandidateDefinition,
@@ -29,13 +29,13 @@ import type {
   PresentationMetadata,
   RemovalIntent,
   SemanticFamilyReference,
-} from '../model/definition.js';
+} from '../model/definition';
 import {
   CHILD_LIFECYCLE_OPERATIONS,
   GAMEPLAY_SPECIFIC_RULE_KINDS,
-} from '../model/definition.js';
-import type { GameplayValueAssignment } from '../model/schema.js';
-import type { DecodeContext } from './decode.js';
+} from '../model/definition';
+import type { GameplayValueAssignment } from '../model/schema';
+import type { DecodeContext } from './decode';
 import {
   createDecodeContext,
   optionalArray,
@@ -47,16 +47,16 @@ import {
   requireEnum,
   requireObject,
   requireString,
-} from './decode.js';
-import { decodeParameterSchema, decodeTypedReference, decodeTypedReferenceArray } from './schema-decoder.js';
-import { decodeFamilyContract } from './family-decoder.js';
-import type { JsonNode } from './json-scanner.js';
-import type { SourceLocation, SourceRecord } from '../model/source.js';
+} from './decode';
+import { decodeParameterSchema, decodeTypedReference, decodeTypedReferenceArray } from './schema-decoder';
+import { decodeFamilyContract } from './family-decoder';
+import type { JsonNode } from './json-scanner';
+import type { SourceLocation, SourceRecord } from '../model/source';
 import {
   OWNING_LAYERS,
   SOURCE_CLASSIFICATION_KINDS,
   SOURCE_PRECEDENCE_ORDER,
-} from '../model/source.js';
+} from '../model/source';
 
 function stringArray(ctx: DecodeContext, value: unknown, path: string): readonly string[] {
   const array = optionalArray(ctx, value, path);

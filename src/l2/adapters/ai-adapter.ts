@@ -10,12 +10,12 @@
  * - AI 动作经与非 AI 相同的 `submit → OpRegistry.invoke` 路径（Requirements 10.9）。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { compareStrings } from '../model/ordering.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { compareStrings } from '../model/ordering';
 import type {
   ActionRequest,
   AiEvaluationOutcome,
@@ -24,14 +24,14 @@ import type {
   AuthorizationScope,
   CallerContext,
   OpResult,
-} from '../model/projection.js';
-import type { AiBehaviorContract } from '../model/family-contracts.js';
-import type { ActiveRegistry } from '../registry/definition-registry.js';
-import { query } from '../registry/definition-registry.js';
-import { createProjection } from '../registry/read-only-projection.js';
-import { submit } from '../registry/action-submitter.js';
-import type { KernelContract } from '../kernel/kernel-contract.js';
-import type { RuntimeSemanticState } from '../model/projection.js';
+} from '../model/projection';
+import type { AiBehaviorContract } from '../model/family-contracts';
+import type { ActiveRegistry } from '../registry/definition-registry';
+import { query } from '../registry/definition-registry';
+import { createProjection } from '../registry/read-only-projection';
+import { submit } from '../registry/action-submitter';
+import type { KernelContract } from '../kernel/kernel-contract';
+import type { RuntimeSemanticState } from '../model/projection';
 
 /** 从 AI 策略定义解析合法动作集合。 */
 function legalActionsOf(active: ActiveRegistry, policy: AiBehaviorContract): readonly AiLegalAction[] {

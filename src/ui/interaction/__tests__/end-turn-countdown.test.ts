@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileFixture } from '../../__tests__/support/fixtures.js';
+import { profileFixture } from '../../__tests__/support/fixtures';
 import {
   REJECTED_OUTCOME,
   createInMemoryActionPort,
-} from '../../__tests__/support/in-memory-ports.js';
-import { makeInternalMetric } from '../../presentation/gameplay-value.js';
-import type { SubmissionOutcome } from '../../ports/action-port.js';
-import { COUNTDOWN_STATES, createEndTurnCountdown } from '../end-turn-countdown.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { revision } from '../../__tests__/support/fixtures.js';
+} from '../../__tests__/support/in-memory-ports';
+import { makeInternalMetric } from '../../presentation/gameplay-value';
+import type { SubmissionOutcome } from '../../ports/action-port';
+import { COUNTDOWN_STATES, createEndTurnCountdown } from '../end-turn-countdown';
+import type { InteractionIntent } from '../../model/intent';
+import { revision } from '../../__tests__/support/fixtures';
 
 const END_TURN_INTENT: InteractionIntent = Object.freeze({
   intentId: 'intent:end-turn',

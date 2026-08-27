@@ -13,11 +13,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { registerRandomOps } from '../random/random-ops.js';
-import { OpRegistry } from '../ops/registry.js';
-import { WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState, type WorldState } from '../state/world-state.js';
-import { resetIdCounters } from '../state/ids.js';
+import { registerRandomOps } from '../random/random-ops';
+import { OpRegistry } from '../ops/registry';
+import { WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState, type WorldState } from '../state/world-state';
+import { resetIdCounters } from '../state/ids';
 
 type ROpsOp =
   | { op: 'roll'; sides: number }

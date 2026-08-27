@@ -2,13 +2,13 @@
  * Generic resource-pool operations used by declarative playpacks.
  * Pool semantics are data-driven by PoolDef; this module does not know AP, stamina, or any game rule.
  */
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import { getPath, setPath } from '../ops/path.js';
-import type { OpContext, OpImpl, OpRegistry } from '../ops/registry.js';
-import type { Result } from '../ops/result.js';
-import { err, ok } from '../ops/result.js';
-import type { Id, Ref } from '../state/ids.js';
-import type { PoolDef } from '../schedule/playpack.js';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import { getPath, setPath } from '../ops/path';
+import type { OpContext, OpImpl, OpRegistry } from '../ops/registry';
+import type { Result } from '../ops/result';
+import { err, ok } from '../ops/result';
+import type { Id, Ref } from '../state/ids';
+import type { PoolDef } from '../schedule/playpack';
 
 export type PoolResetTrigger = 'phase' | 'turn';
 

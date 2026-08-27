@@ -6,14 +6,14 @@
  * 2. 由共享 `ERR_CODES` + `HINT_TEMPLATES` 判定 severity 与 hint；缺 hint 即视为契约不完整。
  * 3. 由**内容**派生 `version`，使任何错误码或 hint 变化都让旧 Validation Baseline 过期。
  */
-import { ERR_CODES, isFatalCode, isInfrastructureFatalCode } from '../../kernel/state/error-codes.js';
-import type { ErrCode } from '../../kernel/state/error-codes.js';
-import type { Severity } from '../../kernel/state/diagnostic.js';
-import { HINT_TEMPLATES } from '../../kernel/safety/safety.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import { compareCodePoints, encodeFingerprintPayload } from '../model/fingerprint.js';
-import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from './code-map.js';
-import type { UGCDiagnosticCategory } from './code-map.js';
+import { ERR_CODES, isFatalCode, isInfrastructureFatalCode } from '../../kernel/state/error-codes';
+import type { ErrCode } from '../../kernel/state/error-codes';
+import type { Severity } from '../../kernel/state/diagnostic';
+import { HINT_TEMPLATES } from '../../kernel/safety/safety';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import { compareCodePoints, encodeFingerprintPayload } from '../model/fingerprint';
+import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from './code-map';
+import type { UGCDiagnosticCategory } from './code-map';
 
 /**
  * 非 error severity 的显式例外集合。

@@ -2,12 +2,12 @@
  * 任务 4.1 / 4.2 验收测试：版本判定、唯一迁移路径、隔离且原子的可信迁移。
  */
 import { describe, expect, it } from 'vitest';
-import { ugcOk, ugcReject } from '../../model/result.js';
-import type { JsonAst } from '../../model/json-ast.js';
-import { createUnavailableSchemaMigrationGateway, createUnavailableSchemaVersionCatalog } from '../../ports/unavailable.js';
-import { buildMigrationGraph, classifyVersion, resolveUniquePath } from '../schema-migration-graph.js';
-import { createSchemaMigrationCoordinator } from '../schema-migration-coordinator.js';
-import { budget, catalogFactory, edge, migrationGateway, parse, versionCatalog } from './fixtures.js';
+import { ugcOk, ugcReject } from '../../model/result';
+import type { JsonAst } from '../../model/json-ast';
+import { createUnavailableSchemaMigrationGateway, createUnavailableSchemaVersionCatalog } from '../../ports/unavailable';
+import { buildMigrationGraph, classifyVersion, resolveUniquePath } from '../schema-migration-graph';
+import { createSchemaMigrationCoordinator } from '../schema-migration-coordinator';
+import { budget, catalogFactory, edge, migrationGateway, parse, versionCatalog } from './fixtures';
 
 function coordinator(options: {
   readonly supported: readonly string[];

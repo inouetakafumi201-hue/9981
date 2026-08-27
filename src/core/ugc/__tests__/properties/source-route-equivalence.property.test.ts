@@ -8,10 +8,10 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { arbitraryValidCandidate, candidateForPattern, requestFrom, sourceKindArbitrary } from '../../testing/generators.js';
-import { diagnosticsEquivalent, sortDiagnostics } from '../../diagnostics/sort.js';
-import { ALL_ADAPTERS } from '../../adapter/adapters.js';
+import { createHarness } from '../harness';
+import { arbitraryValidCandidate, candidateForPattern, requestFrom, sourceKindArbitrary } from '../../testing/generators';
+import { diagnosticsEquivalent, sortDiagnostics } from '../../diagnostics/sort';
+import { ALL_ADAPTERS } from '../../adapter/adapters';
 
 describe('Feature: wakeup-ugc, Property 3: source-route equivalence', () => {
   it('gives equivalent canonical identity for equivalent bytes from any source kind', () => {

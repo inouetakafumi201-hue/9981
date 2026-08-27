@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { isValidValue, validateValue, isFiniteNumber } from '../value.js';
-import { isRef, WORLD_REF } from '../ids.js';
+import { isValidValue, validateValue, isFiniteNumber } from '../value';
+import { isRef, WORLD_REF } from '../ids';
 
 // fast-check arbitrary：任意合法构造的 Value（需求1.1、4.2）
 const refArb = fc.constant(WORLD_REF);

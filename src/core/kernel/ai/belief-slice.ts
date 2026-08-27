@@ -5,6 +5,6 @@
  * state-taking sliceFor function: the public AI surface must not accept an
  * unfiltered WorldState alias.
  */
-export type { BeliefSlice, KnownFact } from './types.js';
-export { RestrictedAIReadGateway, UnavailableAIReadGateway } from './read-gateway.js';
-export type { AIReadAdapter, AIReadVersions, ReadAuthority } from './read-gateway.js';
+export type { BeliefSlice, KnownFact } from './types';
+export { RestrictedAIReadGateway, UnavailableAIReadGateway } from './read-gateway';
+export type { AIReadAdapter, AIReadVersions, ReadAuthority } from './read-gateway';

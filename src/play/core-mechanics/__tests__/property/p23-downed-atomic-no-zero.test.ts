@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbDamageCase, arbFailureInjection } from './generators.js';
+import { arbDamageCase, arbFailureInjection } from './generators';
 
 describe('Property 23: 零血倒地原子转换', () => {
   it('生命降至 0 时三项原子写入', () => {

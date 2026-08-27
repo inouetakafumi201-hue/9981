@@ -19,7 +19,7 @@ import type {
   SemanticFamilyId,
   SourceFileId,
   StableFingerprint,
-} from './ids.js';
+} from './ids';
 
 /**
  * 来源优先级（Requirements 1.1）。

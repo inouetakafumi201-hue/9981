@@ -7,10 +7,10 @@
  * （Requirements 13.8、13.10）。每条规则接收只读上下文，向共享收集器追加诊断。
  */
 
-import type { Diagnostic } from '../model/diagnostic.js';
-import type { CandidateDefinition, DefinitionPackage } from '../model/definition.js';
-import type { CompiledSpecification } from '../compiler/types.js';
-import type { SemanticFamilyRegistration } from '../model/definition.js';
+import type { Diagnostic } from '../model/diagnostic';
+import type { CandidateDefinition, DefinitionPackage } from '../model/definition';
+import type { CompiledSpecification } from '../compiler/types';
+import type { SemanticFamilyRegistration } from '../model/definition';
 
 /** 诊断收集器：所有规则共享，保证一次验证收齐全部诊断。 */
 export class DiagnosticCollector {

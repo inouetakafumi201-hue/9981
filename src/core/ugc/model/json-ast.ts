@@ -4,8 +4,8 @@
  * 这**不是**引擎层的 Expr AST，也永远不会被求值。它只是"保留了来源位置和重复成员的 JSON 语法结构"。
  * 保留重复成员是必需的：普通对象物化会让后值静默覆盖前值，从而丢掉需求 2.9 要求检测的冲突。
  */
-import type { SourceSpan } from '../../kernel/state/diagnostic.js';
-import type { CandidateSource, TargetOwnership } from './candidate.js';
+import type { SourceSpan } from '../../kernel/state/diagnostic';
+import type { CandidateSource, TargetOwnership } from './candidate';
 
 export interface JsonMember {
   readonly key: string;

@@ -7,11 +7,11 @@
  * simulation adapter, and tie-breaking is a pure deterministic draw from the
  * AI shadow stream so exploration is replayable without advancing a live stream.
  */
-import { FixedBudgetLedger } from '../budget.js';
-import { createAIDiagnostic } from '../diagnostics.js';
-import type { LegalAction } from '../../actions/types.js';
-import type { Ref } from '../../state/ids.js';
-import type { WorldState } from '../../state/world-state.js';
+import { FixedBudgetLedger } from '../budget';
+import { createAIDiagnostic } from '../diagnostics';
+import type { LegalAction } from '../../actions/types';
+import type { Ref } from '../../state/ids';
+import type { WorldState } from '../../state/world-state';
 import type {
   AIBehaviorValidationGateway,
   AIBudget,
@@ -28,9 +28,9 @@ import type {
   SimulationAdapter,
   SimulationHandle,
   SimulationOutcome,
-} from '../types.js';
-import { DEFAULT_AI_SHADOW_STREAM } from './simulation-adapter.js';
-import { fingerprint } from './state-read.js';
+} from '../types';
+import { DEFAULT_AI_SHADOW_STREAM } from './simulation-adapter';
+import { fingerprint } from './state-read';
 
 /** Identity of the next participant; ordering belongs to the schedule layer. */
 export interface NextParticipant {

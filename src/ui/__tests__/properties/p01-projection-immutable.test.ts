@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { acceptProjection, attemptSemanticWrite, findUnfrozenPaths } from '../../projection/projection-cache.js';
-import { arbDescriptor, arbReachableProjection } from '../support/arbitraries.js';
-import { authority, revision } from '../support/fixtures.js';
+import { acceptProjection, attemptSemanticWrite, findUnfrozenPaths } from '../../projection/projection-cache';
+import { arbDescriptor, arbReachableProjection } from '../support/arbitraries';
+import { authority, revision } from '../support/fixtures';
 
 it('任意已验证投影与描述符均深冻结且写入尝试不改变指纹', () => {
   fc.assert(fc.property(arbReachableProjection(), arbDescriptor(), (reachable, descriptor) => {

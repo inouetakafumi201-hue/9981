@@ -13,40 +13,40 @@
  *   因此"同一候选 + 同一基线 + 同一配额"必然产出等价诊断与顺序（需求 14.9）。
  * - **没有来源专用分支**：`source.kind` 从不参与任何控制流判断。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { documentAnchorSpan } from '../diagnostics/factory.js';
-import type { CandidateChangeRequest } from '../model/candidate.js';
-import { isStableIdentity, isTargetOwnership } from '../model/candidate.js';
-import { computeChangeRequestFingerprint, createChangeRequestBinding } from '../model/binding.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import type { CanonicalCandidate, CanonicalizedChangeRequest } from '../model/canonical-types.js';
-import type { ChangeRequestBinding } from '../model/binding.js';
-import type { IntegrationContractSnapshot } from '../model/contract-types.js';
-import type { DefinitionRegistryReadSnapshot, UpstreamValidatedCandidate } from '../model/upstream.js';
-import type { QuotaBudget, TrustedQuotaProfile } from '../model/quota-types.js';
-import type { ValidationReport } from '../model/report.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import { createQuotaBudget } from '../quota/quota-budget.js';
-import { validateQuotaProfile } from '../quota/quota-profile.js';
-import type { StructuralJsonDecoder } from '../codec/strict-json-decoder.js';
-import type { ProhibitedConstructGate } from '../codec/prohibited-construct-gate.js';
-import type { SchemaMigrationCoordinator } from '../migration/schema-migration-coordinator.js';
-import type { CanonicalizationGateway } from '../canonical/canonicalizer.js';
-import type { BaselineSources } from '../baseline/baseline-factory.js';
-import { captureBaseline } from '../baseline/baseline-factory.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { documentAnchorSpan } from '../diagnostics/factory';
+import type { CandidateChangeRequest } from '../model/candidate';
+import { isStableIdentity, isTargetOwnership } from '../model/candidate';
+import { computeChangeRequestFingerprint, createChangeRequestBinding } from '../model/binding';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import type { CanonicalCandidate, CanonicalizedChangeRequest } from '../model/canonical-types';
+import type { ChangeRequestBinding } from '../model/binding';
+import type { IntegrationContractSnapshot } from '../model/contract-types';
+import type { DefinitionRegistryReadSnapshot, UpstreamValidatedCandidate } from '../model/upstream';
+import type { QuotaBudget, TrustedQuotaProfile } from '../model/quota-types';
+import type { ValidationReport } from '../model/report';
+import type { ValidationBaseline } from '../model/baseline';
+import { createQuotaBudget } from '../quota/quota-budget';
+import { validateQuotaProfile } from '../quota/quota-profile';
+import type { StructuralJsonDecoder } from '../codec/strict-json-decoder';
+import type { ProhibitedConstructGate } from '../codec/prohibited-construct-gate';
+import type { SchemaMigrationCoordinator } from '../migration/schema-migration-coordinator';
+import type { CanonicalizationGateway } from '../canonical/canonicalizer';
+import type { BaselineSources } from '../baseline/baseline-factory';
+import { captureBaseline } from '../baseline/baseline-factory';
 import type {
   DefinitionRegistryGateway,
   DefinitionValidationGateway,
   ReferenceResolutionGateway,
   RuntimeCompatibilityGateway,
-} from '../ports/definition-ports.js';
-import { MANDATORY_RESOLUTION_CAPABILITIES, MANDATORY_VALIDATION_CAPABILITIES } from '../ports/definition-ports.js';
-import type { UpstreamSchemaView } from '../model/upstream.js';
-import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog.js';
-import type { PresentationFallbackResolver } from '../presentation/fallback-resolver.js';
-import { mintValidatedChangeSet } from '../activation/validated-change-set.js';
-import { DiagnosticCollector } from './diagnostic-collector.js';
+} from '../ports/definition-ports';
+import { MANDATORY_RESOLUTION_CAPABILITIES, MANDATORY_VALIDATION_CAPABILITIES } from '../ports/definition-ports';
+import type { UpstreamSchemaView } from '../model/upstream';
+import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog';
+import type { PresentationFallbackResolver } from '../presentation/fallback-resolver';
+import { mintValidatedChangeSet } from '../activation/validated-change-set';
+import { DiagnosticCollector } from './diagnostic-collector';
 
 export interface UGCValidationCoordinator {
   validate(request: CandidateChangeRequest): ValidationReport;

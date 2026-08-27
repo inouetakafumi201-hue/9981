@@ -4,9 +4,9 @@
  * 关键要求：断言可观察的工作量计数器不超过配额推导上界，**不依赖测试超时**作为唯一安全断言。
  */
 import { describe, expect, it } from 'vitest';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import { createHarness } from '../harness.js';
-import { requestFrom } from '../../testing/generators.js';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import { createHarness } from '../harness';
+import { requestFrom } from '../../testing/generators';
 
 function tightHarness() {
   return createHarness({

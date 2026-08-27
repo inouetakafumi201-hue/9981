@@ -9,8 +9,8 @@
  * 的完全覆盖，不存在"随机采样没跑到的角落"。
  */
 import { describe, it, expect } from 'vitest';
-import { checkInstantiable } from '../def-guard.js';
-import type { Def, DefKind } from '../../state/def.js';
+import { checkInstantiable } from '../def-guard';
+import type { Def, DefKind } from '../../state/def';
 
 const ALL_DEF_KINDS: readonly DefKind[] = [
   'entity', 'item', 'node', 'link', 'attachment', 'action', 'rule',

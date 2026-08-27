@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerOutcomeOps } from '../outcome-ops.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerOutcomeOps } from '../outcome-ops';
 
 function setupRegistry() {
   const holder = new WorldStateHolder(createEmptyWorldState('sched:1'));

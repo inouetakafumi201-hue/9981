@@ -11,7 +11,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection } from './generators.js';
+import { arbFailureInjection } from './generators';
 
 describe('Property 19: 阶段守卫与清理原子性', () => {
   it('roll → settle 守卫：承诺齐备', () => {

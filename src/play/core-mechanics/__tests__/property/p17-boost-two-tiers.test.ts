@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbBoostCommitment } from './generators.js';
+import { arbBoostCommitment } from './generators';
 
 describe('Property 17: 强力骰约束', () => {
   it('只有两档：1 点和 2 点', () => {

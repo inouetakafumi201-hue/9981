@@ -10,9 +10,9 @@
  *    只有 `submitted`，没有任何表示"回合已结束"的取值——那个判断只能来自权威投影。
  */
 
-import type { InternalMetric } from '../presentation/gameplay-value.js';
-import type { PresentationProfile } from '../model/profile.js';
-import type { SubmissionOutcome } from '../ports/action-port.js';
+import type { InternalMetric } from '../presentation/gameplay-value';
+import type { PresentationProfile } from '../model/profile';
+import type { SubmissionOutcome } from '../ports/action-port';
 
 export const COUNTDOWN_STATES = ['idle', 'running', 'cancelled', 'submitted'] as const;
 export type CountdownState = (typeof COUNTDOWN_STATES)[number];

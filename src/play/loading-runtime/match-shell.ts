@@ -13,10 +13,10 @@
  * 参照：引擎层 `BattleRoyaleMode` 的 `spawn/victoryCondition/circle` 是概念草稿，本外壳只借鉴
  * 其"胜负声明式"（由玩法包 `OutcomeDef` 声明、外壳只读消费），不照搬实现。
  */
-import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
-import type { Result } from '../../core/kernel/ops/result.js';
-import type { TerminalQuery } from '../core-mechanics/match-lifecycle.js';
-import type { MatchShellEvent } from './types.js';
+import type { WorldStateHolder } from '../../core/kernel/ops/transaction';
+import type { Result } from '../../core/kernel/ops/result';
+import type { TerminalQuery } from '../core-mechanics/match-lifecycle';
+import type { MatchShellEvent } from './types';
 
 const PHASE_NAMES: readonly string[] = ['roll', 'settle', 'playerAction', 'npcAction', 'cleanup'];
 
@@ -27,7 +27,7 @@ export interface MatchShellDeps {
   readonly phaseName?: (phaseIndex: number) => string;
 }
 
-export function createMatchShell(deps: MatchShellDeps): import('./types.js').MatchShell {
+export function createMatchShell(deps: MatchShellDeps): import('./types').MatchShell {
   const listeners = new Set<(event: MatchShellEvent) => void>();
   let endedBroadcast = false;
   let lastRound = deps.terminal.round();

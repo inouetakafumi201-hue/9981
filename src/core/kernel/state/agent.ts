@@ -1,8 +1,8 @@
 /**
  * L1 State: Agent 结构（design.md 3.1/3.12节 / 需求5.1-5.7）。
  */
-import type { Id, Ref } from './ids.js';
-import type { Value } from './value.js';
+import type { Id, Ref } from './ids';
+import type { Value } from './value';
 
 export type AgentKind = 'human' | 'ai' | 'observer';
 

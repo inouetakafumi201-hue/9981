@@ -1,0 +1,69 @@
+{
+  "id": "playpack:play.ugc-override-attack",
+  "kind": "playpack",
+  "version": "1.0.0",
+  "schedule": "schedule:ugc-override",
+  "defs": [
+    {
+      "id": "schedule:ugc-override",
+      "kind": "schedule",
+      "loop": true,
+      "order": "fixed",
+      "phases": [
+        {
+          "id": "phase:ugc-override.action",
+          "name": "行动阶段",
+          "phaseKind": "normal",
+          "input": "actor"
+        }
+      ],
+      "play": {
+        "numericOwnership": {},
+        "sourceTrace": [
+          "D-081 / P5 测试夹具"
+        ]
+      }
+    },
+    {
+      "id": "action:play.attack",
+      "kind": "action",
+      "label": "UGC 重击",
+      "group": "play.paid",
+      "track": "card",
+      "require": true,
+      "cost": [
+        {
+          "pool": "ap",
+          "amount": 1
+        }
+      ],
+      "effects": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.ugcAttackUsed",
+            "value": 1
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "cost.0.amount": {
+            "kind": "constitutional",
+            "sourceId": "S8 一个动作永远 1 AP"
+          },
+          "effects.0.args.value": {
+            "kind": "gameplay",
+            "min": 1,
+            "max": 5,
+            "int": true
+          }
+        },
+        "costClass": "paid",
+        "sourceTrace": [
+          "D-081 / P5 测试夹具"
+        ]
+      }
+    }
+  ]
+}

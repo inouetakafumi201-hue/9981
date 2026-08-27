@@ -2,8 +2,8 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import { createPendingContractPorts } from '../support/in-memory-ports.js';
+import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import { createPendingContractPorts } from '../support/in-memory-ports';
 
 it('任意待汇合能力调用都返回缺失项而非空值或默认值', () => {
   fc.assert(fc.property(fc.constantFrom('resources', 'phase', 'actions', 'scenes', 'ai'), (capability) => {

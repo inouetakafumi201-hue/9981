@@ -1,9 +1,9 @@
 /**
  * L2 Expr: 具名表达式（kind:'expr'）注册与 pure 校验（design.md 3.3节 / 需求13.1-13.5）。
  */
-import type { Id } from '../state/ids.js';
-import type { Def, DefRegistry } from '../state/def.js';
-import type { Expr } from '../state/expr-types.js';
+import type { Id } from '../state/ids';
+import type { Def, DefRegistry } from '../state/def';
+import type { Expr } from '../state/expr-types';
 
 export interface ExprDef extends Def {
   readonly kind: 'expr';

@@ -6,7 +6,7 @@
  * 均直接使用它）。自行实现密码学哈希只会引入一处未经检验的自研代码。端口仍可注入替身。
  */
 import { createHash } from 'node:crypto';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
+import type { StableFingerprintGateway } from '../model/fingerprint';
 
 export const SHA256_ALGORITHM_ID = 'sha256-hex-v1';
 

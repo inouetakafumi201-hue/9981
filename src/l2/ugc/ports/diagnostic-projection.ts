@@ -18,17 +18,17 @@
  * **编译期**强制：l2 新增或删除任何诊断代码都会让本文件编译失败，不可能静默漏掉。
  */
 
-import type { Diagnostic as KernelDiagnostic, SourceRecord as KernelSourceRecord } from '../../../core/kernel/state/diagnostic.js';
-import type { DiagnosticSelector } from '../../../core/ugc/diagnostics/code-map.js';
-import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { ValidationStage } from '../../../core/ugc/model/stage.js';
-import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic.js';
-import { DIAGNOSTIC_CODES, type DiagnosticCode } from '../../model/diagnostic-codes.js';
-import type { SourceClassificationKind, SourceRecord as L2SourceRecord } from '../../model/source.js';
-import { precedenceRank } from '../../model/source.js';
-import { ROOT_JSON_PATH } from '../../model/ids.js';
-import type { SourceIndex } from './source-index.js';
+import type { Diagnostic as KernelDiagnostic, SourceRecord as KernelSourceRecord } from '../../../core/kernel/state/diagnostic';
+import type { DiagnosticSelector } from '../../../core/ugc/diagnostics/code-map';
+import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { ValidationStage } from '../../../core/ugc/model/stage';
+import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic';
+import { DIAGNOSTIC_CODES, type DiagnosticCode } from '../../model/diagnostic-codes';
+import type { SourceClassificationKind, SourceRecord as L2SourceRecord } from '../../model/source';
+import { precedenceRank } from '../../model/source';
+import { ROOT_JSON_PATH } from '../../model/ids';
+import type { SourceIndex } from './source-index';
 
 /**
  * l2 诊断代码 → wakeup-ugc 诊断选择器的封闭映射。

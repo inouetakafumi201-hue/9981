@@ -3,17 +3,17 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { registerAttachOps } from '../attach-ops.js';
-import { AuraEngine } from '../aura-engine.js';
-import type { AttachOpsDeps } from '../attach-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { WORLD_REF } from '../../state/ids.js';
-import type { AttachmentDef } from '../types.js';
-import type { Def } from '../../state/def.js';
-import type { Attachment } from '../../state/attachment.js';
+import { registerAttachOps } from '../attach-ops';
+import { AuraEngine } from '../aura-engine';
+import type { AttachOpsDeps } from '../attach-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { WORLD_REF } from '../../state/ids';
+import type { AttachmentDef } from '../types';
+import type { Def } from '../../state/def';
+import type { Attachment } from '../../state/attachment';
 
 const stackDef: AttachmentDef = {
   id: 'att:buff1',

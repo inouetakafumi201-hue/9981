@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { colors } from '../../design/tokens.js';
+import { colors } from '../../design/tokens';
 
 /**
  * devboard 呈现层令牌：直接把 `src/design/tokens.ts`（表现层唯一美学真相源）映射成 CSS 变量，

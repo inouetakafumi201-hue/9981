@@ -7,4 +7,4 @@ export {
   handAuthoredAdapter,
   importAdapter,
   naturalLanguageAdapter,
-} from './adapters.js';
+} from './adapters';

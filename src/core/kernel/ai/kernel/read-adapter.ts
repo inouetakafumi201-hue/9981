@@ -7,20 +7,20 @@
  * fingerprints of exactly the data the AI is allowed to read, so replay of the
  * same public state yields the same freshness decisions.
  */
-import type { QueryMode } from '../../actions/catalog.js';
-import type { LegalAction } from '../../actions/types.js';
-import { ExprEngine, makeDefaultEvalContext, type EvalContext } from '../../expr/engine.js';
-import type { QueryEngine } from '../../expr/query-engine.js';
-import { makeExprStateAccess } from '../../expr/state-access.js';
-import { WorldKnowledgeStore } from '../../knowledge/knowledge-store.js';
-import type { DefRegistry } from '../../state/def.js';
-import type { Expr, Query, QueryFrom } from '../../state/expr-types.js';
-import type { Ref } from '../../state/ids.js';
-import type { Value } from '../../state/value.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { AIReadAdapter, AIReadVersions, ReadAuthority } from '../read-gateway.js';
-import type { AIResult, BeliefSlice, KnownFact } from '../types.js';
-import { fingerprint, resolveRefDefId, resolveRefProps, resolveRefValuePath, resolveStatePath } from './state-read.js';
+import type { QueryMode } from '../../actions/catalog';
+import type { LegalAction } from '../../actions/types';
+import { ExprEngine, makeDefaultEvalContext, type EvalContext } from '../../expr/engine';
+import type { QueryEngine } from '../../expr/query-engine';
+import { makeExprStateAccess } from '../../expr/state-access';
+import { WorldKnowledgeStore } from '../../knowledge/knowledge-store';
+import type { DefRegistry } from '../../state/def';
+import type { Expr, Query, QueryFrom } from '../../state/expr-types';
+import type { Ref } from '../../state/ids';
+import type { Value } from '../../state/value';
+import type { WorldState } from '../../state/world-state';
+import type { AIReadAdapter, AIReadVersions, ReadAuthority } from '../read-gateway';
+import type { AIResult, BeliefSlice, KnownFact } from '../types';
+import { fingerprint, resolveRefDefId, resolveRefProps, resolveRefValuePath, resolveStatePath } from './state-read';
 
 /** 倒地（零血未终结）的 tag：规则 effect 把 `tag:downed` 写进实体 tags，感知投影据此补 `defeated` 事实。 */
 const TAG_DOWNED = 'tag:downed';

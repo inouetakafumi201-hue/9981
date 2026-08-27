@@ -18,14 +18,14 @@
  * 丢弃——只有 ctx.emit 记录的事件（不经过 draft）会保留。这与内核"机械约束优于代码审查"的
  * 一贯手法一致（对应 readonly 字段、封闭算子表等既有机制）。
  */
-import { ExprEngine, makeDefaultEvalContext } from '../expr/engine.js';
-import type { EvalContext } from '../expr/engine.js';
-import type { Value } from '../state/value.js';
-import type { Result } from '../ops/result.js';
-import { ok } from '../ops/result.js';
-import type { OpContext } from '../ops/registry.js';
-import type { Effect } from './effect-types.js';
-import type { RuleDef, DispatchResult, HookPhase } from './types.js';
+import { ExprEngine, makeDefaultEvalContext } from '../expr/engine';
+import type { EvalContext } from '../expr/engine';
+import type { Value } from '../state/value';
+import type { Result } from '../ops/result';
+import { ok } from '../ops/result';
+import type { OpContext } from '../ops/registry';
+import type { Effect } from './effect-types';
+import type { RuleDef, DispatchResult, HookPhase } from './types';
 
 export type EffectRunner = (
   effects: Effect[],

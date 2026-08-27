@@ -13,9 +13,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import type { Node, Link } from '../topology/types.js';
-import { createNodeShape, createLinkShape } from '../topology/types.js';
-import { dist, spread, shortestPath, radius } from '../topology/metrics.js';
+import type { Node, Link } from '../topology/types';
+import { createNodeShape, createLinkShape } from '../topology/types';
+import { dist, spread, shortestPath, radius } from '../topology/metrics';
 
 const DIR_TOKENS = ['bidirectional', 'unidirectional', 'one-way-down', 'one-way-up'] as const;
 

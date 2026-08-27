@@ -2,8 +2,8 @@
  * L1 Topology: 度量、扩散（design.md 3.2节 / 需求11.1-11.7）。
  * dist：加权最短路（Dijkstra，支持 via/maxCost）。spread：预算受限扩散（有序数组，非 Map）。
  */
-import type { Id } from '../state/ids.js';
-import type { Node, Link } from './types.js';
+import type { Id } from '../state/ids';
+import type { Node, Link } from './types';
 
 export interface DistOpts {
   via?: (link: Link) => boolean;

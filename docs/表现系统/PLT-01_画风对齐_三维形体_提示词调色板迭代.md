@@ -18,9 +18,9 @@ scope: 表现系统目录 · 产物=调色板/留档/您的肉眼裁决，不碰
 
 ## 视角与朝向（铁律，写进所有提示词的骨架）
 
-- **视角 = 俯视平面视图**（权威：`01_图形化与UI` §视觉风格定位·俯视平面视图；本项目唯一视角，地图同此法则）。固定唯一，不换其它。
+- **视角 = 正面俯视视图**（权威：`01_图形化与UI` §视觉风格定位·正面俯视视图；本项目唯一视角，地图同此法则）。固定唯一，不换其它。
   - 从正上方俯瞰角色的**顶部轮廓 / 平面布局**，靠剪影、帽子/衣物/工具的投影方向、地面阴影传达身份与朝向；**没有前脸、侧面或顶部立面可言**。
-  - **朝向不等同于视角**：朝向只能在俯视平面内用方向性细节（头部朝向、工具指向、影子方向、剪影偏移）表达，不能再靠露侧脸 / 露前脸 / 画顶面表现。
+  - **朝向不等同于视角**：朝向只能在正面俯视内用方向性细节（头部朝向、工具指向、影子方向、剪影偏移）表达，不能再靠露侧脸 / 露前脸 / 画顶面表现。
 - **口令（唯一）**：`top-down plan view`（同义 `overhead plan-view sprite`）。
 - **禁止表述**（不得使用）：`正面斜投影`、`Cabinet projection`、`Cavalier projection`、`front-facing`、`front face`、`side face`、`right side face`、`top face`、`oblique of the side`、`three-quarter`、`isometric`、`slightly angled for depth`，以及以第三方游戏名作为视角名称或提示词类比（D-025）。「斜侧 / three-quarter / 45° 侧身」这类词一律废止。
 
@@ -49,7 +49,7 @@ scope: 表现系统目录 · 产物=调色板/留档/您的肉眼裁决，不碰
 
 - **S1 · 静态单图**：`--rows 1 --cols 1 --cell 1024` —— 用来先看「这个形态长什么样」，最省、最快、最直观，**首轮主力**。
 - **S2 · 待机微动画**：`--rows 2 --cols 2 --cell 384` —— 2 帧微态变化。三轴收敛后，用它看「形态在轻动作下是否稳」。
-- **S3 · base sheet 视角**：`--rows 3 --cols 2 --cell 384` —— **俯视平面**下的朝向变体行（如 左上→右/下一行 左→右下…），每个都是同一俯视平面精灵的朝向/姿态变体，**最后阶段**跑。
+- **S3 · base sheet 视角**：`--rows 3 --cols 2 --cell 384` —— **正面俯视**下的朝向变体行（如 左上→右/下一行 左→右下…），每个都是同一正面俯视精灵的朝向/姿态变体，**最后阶段**跑。
 
 > S1 与 S3 的提示词措辞**共用同一套骨架**，只换 rows/cols 与「视图」词。在调色板骨架里，静态视图与 sheet 视图用占位符区分，保证「S1 挑中的那张，能直接升成 S3 的规范视角」——这正是 base sheet 的由来。
 
@@ -57,7 +57,7 @@ scope: 表现系统目录 · 产物=调色板/留档/您的肉眼裁决，不碰
 
 ```
 Pixel-art 64x64, near-humanoid single character, high saturation, bold readable silhouette.
-[VIEW+CUE 铁律: 俯视平面视图(top-down plan view)]
+[VIEW+CUE 铁律: 正面俯视视图(top-down plan view)]
 Top-down plan view / overhead plan-view sprite: the figure reads as a flat top-down outline and
 clean silhouette. Direction and identity are shown in the plan plane through hat, coat, tool and
 ground-shadow orientation. NO front face, NO side face, NO top face, NO oblique depth, no three-quarter.
@@ -76,7 +76,7 @@ indicated by readable arms/hands in the plane. Head distinct from torso. Proport
 Background: 100% solid flat magenta (#FF00FF).
 ```
 
-- `[VIEW+CUE]` **铁律**：俯视平面视图（`top-down plan view`）；非前脸、非侧脸、非顶面、非斜投影、非 three-quarter、非 isometric。
+- `[VIEW+CUE]` **铁律**：正面俯视视图（`top-down plan view`）；非前脸、非侧脸、非顶面、非斜投影、非 three-quarter、非 isometric。
 
 - `[CORE]` 是**不可动摇的形态律**：无腿、遮盖式落地、重心中部、整体实心非中空、下摆短不拖地。
 - `[STYLE]` 是**可迭代的**（本次给现代灰色倾向，走“都市灰调”阵营）。
@@ -89,7 +89,7 @@ Background: 100% solid flat magenta (#FF00FF).
 `sprite-generate.py generate --rows 1 --cols 1`（**一张一遍，别开多格**）。产物落在
 `run/plt01/{维度}/`。留档 = 图 + 对应 `.raw.json`（skill 自动写），这正是「提示词留档」。
 
-示例提示词（S1 静态单图，对应 §三「体态·重心」行，已含俯视平面视图+朝向）——
+示例提示词（S1 静态单图，对应 §三「体态·重心」行，已含正面俯视视图+朝向）——
 
 ```
 Pixel-art 64x64, near-humanoid single character, high saturation, bold readable silhouette.
@@ -120,8 +120,8 @@ tall proportion, full body visible, centered.
 > - Run 0 全否——prompt 把"无腿"写成"盖腿"，模型仍画正常人形，且用正前平视。
 > - Run 2 除了 e1/e6 外不可用；且**视角错误**——用了模糊 "three-quarter view"，模型画出 45° 侧身。
 > - Run 2 确认可用形态：e1-sack-hood（连帽袋）+ e6-detective-flow（侦探衣摆）。
-> - **视角定案 = 俯视平面视图**：从正上方俯瞰平面轮廓（见 §视角与朝向），下一步按这两张做
->   32×32 俯视平面精灵收敛。
+> - **视角定案 = 正面俯视视图**：从正上方俯瞰平面轮廓（见 §视角与朝向），下一步按这两张做
+>   32×32 正面俯视精灵收敛。
 >
 > 由 **auditor 项目所有者**过目。每一行：**留档目录** → **这条要测的东西** → **变体** → **肉眼关注点**。
 > 每个变体 = 一条 `sprite-generate.py generate --rows 1 --cols 1`（**单张**）。
@@ -164,41 +164,47 @@ tall proportion, full body visible, centered.
 > **母版的意义**：画风语言固定后，新建角色不再逐个从零生成，而是**复用母版形态 + 换服装**。
 > 母版本身要**稳定、流畅、高质量**，是"钱花在刀刃上"的集中投入。
 
-### 姿态清单（16 帧，4×4 网格，已定案）
+### 姿态清单（16 帧，4×4 网格，已定案 · 编号 = 文件名编号，01=正面参考图）
 
-| # | 姿态名 | 语义 | 复用说明 |
-|---|---|---|---|
-| 1 | `idle` | 中间态（直立） | 标准待机 |
-| 2 | `idle_lean_forward` | **疲惫前倾** | 前倾幅度**小**，与 #1、#3 组三态摇晃/呼吸循环 |
-| 3 | `idle_lean_back` | 后仰休息 | 身体后仰、放松，与 #1、#2 组循环 |
-| 4 | `weak_lean_forward` | **虚弱前倾** | 前倾幅度**大**（近 T4 右帧），衣服凌乱、**领口等带血** |
-| 5 | `weak_breath` | 虚弱呼吸帧 | 虚弱前倾的呼吸变体，配合 #4 循环 |
-| 6 | `jump_forward` | 跳跃凌空前倾 | 衣服飘起、动感强；模拟凌空姿态 |
-| 7 | `jump_backward` | 跳跃凌空后仰 | 衣服飘起、准备落地；模拟凌空姿态 |
-| 8 | `hit_recoil` | 受击蜷缩 | 身体蜷缩、疼痛姿态 |
-| 9 | `idle_breath` | 普通呼吸帧 | 与 #1 `idle` 配合做呼吸起伏循环 |
-| 10 | `crouch` | 蹲下 | 高度压缩到 24px |
-| 11 | `prone` | 倒地 | 躺倒（16px），无蓝闪=击倒/死亡态 |
-| 12 | `falling` | 倒下过程（也叫**受击后仰**） | 站立→倒地过渡，**不从容**；可复用为失足摔落等 |
-| 13 | `crawl_extend` | 爬行伸展 | 身体整体伸长、头微仰（**无手**） |
-| 14 | `crawl_compress` | 爬行压缩 | 身体整体压缩、头缩回（**无手**） |
-| 15 | `sleep` | 睡眠 | 躺卧（24px），配合 ZZZ；与 `prone` 区分：睡眠有呼吸/蜷曲 |
-| 16 | `get_up_mid` | 起身过渡 | 有**爬起床**感（床侧起身）或从地上爬起来；倒地→站立过渡 |
+**当前生效模板（2026-08-21）**：`run/精灵图管线/1-成品/s2-blue/`。
+- 完整参考图：`s2-blue-purified.png`（1254×1254，检测到的 4×4 网格，16 帧）。
+- 单帧来源：`frames/f01.png` 至 `frames/f16.png`；第 12 帧 `frames/f12.png` 是已修改并验收的紫衣侦探倒下姿态。
+- 生成新角色时必须把完整 `s2-blue-purified.png` 作为参考，复制所有 16 格的姿态顺序、比例、风格和品红背景；第 12 格已是修正版。
+- `run/plt01/master/` 保留为历史生成留档与 provenance，不再是当前生成入口的母版。
+
+| # | 文件名 | 姿态名 | 语义 | 复用说明（单帧泛化用途） |
+|---|---|---|---|---|
+| 01 | `01-front.png` | 正面参考图（直立） | 中性直立、正面朝向镜头 | **所有姿态的 reference 锁风格**；本身即「正面朝向」站姿帧，可作对话/面向镜头待机 |
+| 02 | `02-idle.png` | `idle` | 中间态（直立待机） | 标准待机；三态循环中间帧；一切「正常站立」场景的默认帧 |
+| 03 | `03-lean-fwd-tired.png` | `lean-fwd-tired` | **疲惫前倾** | 前倾幅度**小**、衣服整齐；与 02、04 组三态摇晃/呼吸循环；**承接原 set9 的「前倾呼吸」语义** |
+| 04 | `04-lean-back-rest.png` | `lean-back-rest` | 后仰休息 | 身体后仰、放松；与 02、03 组三态循环；靠墙/休息/放松场景 |
+| 05 | `05-weak-lean-fwd.png` | `weak-lean-fwd` | **虚弱前倾** | 前倾幅度**大**（近 T4 右帧），衣服凌乱、**领口等带血**；低血/重伤/濒死状态 |
+| 06 | `06-weak-breathe.png` | `weak-breathe` | 虚弱呼吸帧 | 虚弱前倾的呼吸变体；与 05 配对循环（身体微升 2-3px）；濒死喘息 |
+| 07 | `07-jump_forward.png` | `jump_forward` | 跳跃凌空前倾 | 衣服飘起、动感强；跳跃动画前进段；镜像可作向右跳 |
+| 08 | `08-jump_backward.png` | `jump_backward` | 跳跃凌空后仰 | 衣服飘起、准备落地；跳跃动画落地段；受击后跳/后退 |
+| 09 | `09-hit_recoil.png` | `hit_recoil` | 受击后仰/蜷缩 | 身体蜷缩、疼痛姿态；受伤反馈；被击退/撞墙的起始帧 |
+| 10 | `10-crouch.png` | `crouch` | 蹲下 | 高度压缩到 24px；掩体/潜行/降低姿态 |
+| 11 | `11-prone.png` | `prone` | 倒地 | 躺倒（16px），无蓝闪=击倒/死亡态；伏地隐蔽 |
+| 12 | `12-falling.png` | `falling` | 倒下过程（也叫**受击后仰**） | 站立→倒地过渡，**不从容**；可复用为失足摔落/跌落/被击飞 |
+| 13 | `13-crawl_extend.png` | `crawl_extend` | 爬行伸展 | 身体整体伸长、头微仰（**无手**）；爬行动画前半 |
+| 14 | `14-crawl_compress.png` | `crawl_compress` | 爬行压缩 | 身体整体压缩、头缩回（**无手**）；爬行动画后半 |
+| 15 | `15-sleep.png` | `sleep` | 睡眠 | 躺卧（24px），配合 ZZZ；与 `prone` 区分：睡眠有呼吸/蜷曲；纯黑闭眼无白眼 |
+| 16 | `16-get_up_mid.png` | `get_up_mid` | 起身过渡 | 有**爬起床**感（床侧起身）或从地上爬起来；倒地→站立过渡帧 |
 
 > **姿态定义关键**：
 > - **疲惫前倾 vs 虚弱前倾**：疲惫=前倾幅度小、衣服整齐；虚弱=前倾幅度大、衣服凌乱带血。
 > - **睡眠 vs 倒下**：睡眠=有呼吸、身体松弛蜷曲（床上 24px）；倒下=僵硬躺倒（16px，不从容）。
 > - **jump_forward/jump_backward** 是**凌空模拟**（衣服飘起），与 idle 三态前倾（拖地虚弱）**不同**。
 
-### 复用循环（母版性价比的核心）
+### 复用循环（母版性价比的核心，编号 = 文件名编号）
 
-- **普通呼吸**：`idle ↔ idle_breath`
-- **疲惫三态循环**：`idle_lean_forward ↔ idle ↔ idle_lean_back`（过载摇晃/疲惫站立/轻度眩晕）
-- **虚弱呼吸循环**：`weak_lean_forward ↔ weak_breath`（重伤/濒死/重度过载）
-- **跳跃凌空**：`jump_forward → → → jump_backward`
-- **爬行**：`crawl_extend ↔ crawl_compress`
-- **倒下**：`falling`（受击后仰/失足摔落，不从容）
-- **姿态转换**：`falling`（倒下去）、`get_up_mid`（爬起来）
+- **标准待机**：`02-idle` 单帧；呼吸起伏由 `03` 的前倾姿态承接（原 `idle_breath` 已删，不再单设呼吸帧）
+- **疲惫三态循环**：`03-lean-fwd-tired ↔ 02-idle ↔ 04-lean-back-rest`（过载摇晃/疲惫站立/轻度眩晕）
+- **虚弱呼吸循环**：`05-weak-lean-fwd ↔ 06-weak-breathe`（重伤/濒死/重度过载）
+- **跳跃凌空**：`07-jump_forward → → → 08-jump_backward`
+- **爬行**：`13-crawl_extend ↔ 14-crawl_compress`
+- **倒下**：`12-falling`（受击后仰/失足摔落，不从容）
+- **姿态转换**：`12-falling`（倒下去）、`16-get_up_mid`（爬起来）
 
 ### 表情系统设计（方案 C：混合方案，2026-08-16 定案）
 
@@ -250,7 +256,7 @@ Hard-edged pixel art, solid color blocks, clean silhouette.
 
 #### 关键改进点
 
-1. **视角明确化**（俯视平面视图）：
+1. **视角明确化**（正面俯视视图）：
    - ❌ 旧：`Facing left side profile`（AI 理解为完全侧面，只画一只眼睛）
    - ❌ 旧：`Facing left at three-quarter angle showing both white square eyes`（three-quarter 仍是斜投影）
    - ✅ 新：`Top-down plan view: top-down outline, no front/side/top face`（正视平面，无任何立面）
@@ -268,18 +274,28 @@ Hard-edged pixel art, solid color blocks, clean silhouette.
    - 删除了过于细节的像素艺术规则（limited palette, NO gradients 等），让 AI 聚焦核心形态
    - 保留最关键的"无腿约束"和"bean-shaped"轮廓
 
-#### 姿态描述示例（基于 v2 成功案例）
+#### 姿态描述示例（基于 v2 成功案例；姿态名 = 文件名编号，与 `run/plt01/master/` 一一对应）
 
-- **idle**：`Standing upright, neutral relaxed pose`
-- **tired (lean-fwd-tired)**：`Slight forward slouch, shoulders drooping slightly, tired posture, head tilted down a bit`
-- **weak (weak-lean-fwd)**：`Body leaning heavily forward, unsteady posture, shoulders hunched, weak stance (NO blood, NO wounds)`
-- **weak_breathe**：`Same weak posture but body raised slightly higher (2-3 pixels up) as taking a labored breath, chest slightly expanded`
-- **jump_forward**：`Slight forward lean with coat bottom lifting gently (2-3 pixels), subtle jump motion`
-- **jump_backward**：`Slight backward lean with coat bottom lifting gently, preparing to land softly`
-- **falling**：`Falling backward out of control, arms flailing, body tilted back sharply, coat swirling, panicked chaotic motion`
-- **sleep**：`Lying down horizontally in peaceful sleep, relaxed curled position, 24px height, face is PURE BLACK with NO white eyes (eyes closed)`
+| 编号 | 姿态名 | `[POSE]` 提示词（英文，直接填模板） |
+|---|---|---|
+| 01 | front（正面参考图，无 POSE，用完整独立提示词） | 见 `01-front.raw.json`：`Facing camera head-on, upright near-humanoid figure, lower body tapers to flat base, face is pure black silhouette with only two small white square pixel eyes` |
+| 02 | idle | `Standing upright, neutral relaxed pose` |
+| 03 | lean-fwd-tired | `Slight forward slouch, shoulders drooping slightly, tired posture, head tilted down a bit` |
+| 04 | lean-back-rest | `Leaning back and relaxing, body tilted slightly backward, resting pose` |
+| 05 | weak-lean-fwd | `Body leaning heavily forward, unsteady posture, shoulders hunched, weak stance (NO blood, NO wounds)` |
+| 06 | weak-breathe | `Same weak posture but body raised slightly higher (2-3 pixels up) as taking a labored breath, chest slightly expanded` |
+| 07 | jump_forward | `Slight forward lean with coat bottom lifting gently (2-3 pixels), subtle jump motion` |
+| 08 | jump_backward | `Slight backward lean with coat bottom lifting gently, preparing to land softly` |
+| 09 | hit_recoil | `Body knocked back and curling inward from impact, hunched pain posture, head pulled in` |
+| 10 | crouch | `Crouching down low, body compressed to half height, compact lowered silhouette` |
+| 11 | prone | `Lying flat on the ground, stiff straight collapsed body, arms flat, 16px height` |
+| 12 | falling | `Falling backward out of control, arms flailing, body tilted back sharply, coat swirling, panicked chaotic motion` |
+| 13 | crawl_extend | `Crawling on the ground, body stretched long, head raised slightly forward, reaching motion` |
+| 14 | crawl_compress | `Crawling on the ground, body compressed short, head pulled back, gathering motion` |
+| 15 | sleep | `Lying down horizontally in peaceful sleep, relaxed curled position, 24px height, face is PURE BLACK with NO white eyes (eyes closed)` |
+| 16 | get_up_mid | `Midway getting up from the ground, body lifted at an angle, one side pushing up, transitional pose` |
 
-**每次新建角色 = 改 `[POSE]` + 修改 `[CORE_STRUCTURE]` 中的服装描述**，其余结构完全固定。
+**每次新建角色 = 改 `[POSE]` + 修改 `[CORE_STRUCTURE]` 中的服装描述**，其余结构完全固定。整套 16 帧的单帧泛化用途见上文「姿态清单」表的「复用说明」列。
 
 ### 背景处理（两种底色都合法）
 
@@ -339,15 +355,15 @@ pip install proper-pixel-art
 - AI 出图后 → 立即运行 `sprite-pixelate.py batch` → 生成 contact sheet
 - 眼睛修正留给最后手动润色阶段（批量处理后用画笔工具逐帧检查）
 
-### 母版角色定案（紫衣侦探，2026-08-15~16 完成）
+### 母版角色定案（紫衣侦探，2026-08-15~16 完成；当前模板于 2026-08-21 更新）
 
 - **首个母版角色 = 紫色侦探**（紫色大衣 + 褐色软呢帽 + 纯黑脸双白眼）
-- **16 姿态完整集**（编号连续：01 正面参考 + 02~16 姿态；旧 set9-idle_breath 已删，语义由 03 承接）：
+- **16 姿态完整集**（编号连续 01~16，01 为正面参考图）：
   1. **正面参考图**：`01-front.png`（用作后续姿态的 reference）
   2. **idle**：中性直立待机（`02-idle.png`）
-  3. **lean-fwd-tired**：前倾疲惫（`03-lean-fwd-tired.png`，原 set5 weak-breathe，神色更符合 tired）
+  3. **lean-fwd-tired**：前倾疲惫（`03-lean-fwd-tired.png`）
   4. **lean-back-rest**：后仰休息（`04-lean-back-rest.png`）
-  5. **weak-lean-fwd**：虚弱前倾（`05-weak-lean-fwd.png`，重新生成，无血/无蓝色脚部渲染错误）
+  5. **weak-lean-fwd**：虚弱前倾（`05-weak-lean-fwd.png`，无血/无蓝色脚部渲染错误）
   6. **weak-breathe**：虚弱呼吸（`06-weak-breathe.png`，与 05 一次生成，身体微升 2-3px）
   7. **jump_forward**：前跳（`07-jump_forward.png`，小幅飘动，衣摆轻抬）
   8. **jump_backward**：后跳（`08-jump_backward.png`，小幅后仰，衣摆轻飘）
@@ -360,26 +376,21 @@ pip install proper-pixel-art
   15. **sleep**：睡眠（`15-sleep.png`，纯黑闭眼，无白眼）
   16. **get_up_mid**：起身中（`16-get_up_mid.png`，爬起床的过渡帧）
 
-  **编号规则**：`NN-姿态` 连续编号（01 起），正面参考图占 01，姿态从 02 起。旧 `setN` 命名 → 新编号映射 = `setN → N+1`（set1→02，set10→10，…），避免"set8 之后直接跳 set10"的断号混乱。
+  **编号规则（现行标准）**：`NN-姿态名` 连续编号（01 起）。**01 固定为正面参考图**；02~09 = 旧 `set1`~`set8` 各 +1；旧 `set9` 已删除（空缺位由 `09-hit_recoil` 填补）；10~16 = 旧 `set10`~`set16` **编号不变**。即：`set1→02 … set8→09`，`set10→10 … set16→16`。整套 01~16 无断号。
 
 - **生成策略**：
   - 正面图作 reference 锁风格
   - weak 系列（05/06）、jump 系列（07/08）一次生成 2 帧（提示词 `--rows 1 --cols 2`），确保配对姿态风格一致
-  - 旧 set9 删除原因：完全左视图，与俯视平面视图冲突（历史"three-quarter angle"教训），用 lean-fwd-tired 替代其"俯视平面内前倾呼吸"语义
+  - 旧 set9 删除原因：完全左视图，与正面俯视视图冲突（历史"three-quarter angle"教训），用 lean-fwd-tired 替代其"正面俯视内前倾呼吸"语义
 
 - **实测质量**：batch 首轮（2026-08-15）质量"非常高、几乎无修可用"
 - **迭代经验**（2026-08-16）：
   - 硬伤 1：腿部露出 + 裤子颜色不一致 → 提示词强化"coat hem ALWAYS fully covers"
-  - 硬伤 2：视角漂移（露出侧面）→ 提示词统一为"俯视平面视图：top-down plan view，无前脸/侧脸/顶面"，朝向用帽饰/衣摆/影子方向表达
+  - 硬伤 2：视角漂移（露出侧面）→ 提示词统一为"正面俯视视图：top-down plan view，无前脸/侧脸/顶面"，朝向用帽饰/衣摆/影子方向表达
   - 解决方案：简化提示词 + 聚焦核心特征，删除冗余约束（见 §提示词模板 v2）
 
-- **交付物**：`run/plt01/master/` 目录，包含：
-  - 16 张 PNG（1 正面 + 15 姿态）
-  - 对应 `.raw.json` 元数据
-  - `_contact.png` 总览图（5×4 网格）
-  - `_zoom/` 缩略图目录
-  - `_old/` 备份目录（迭代前的旧版本）
-  - 背景统计：RGBA 透明 9 帧 / RGB 品红 7 帧
+- **历史交付物**：`run/plt01/master/` 目录，包含旧版 16 张 PNG、`.raw.json`、`_contact.png`、`_zoom/` 和 `_old/`。该目录继续保留 provenance，但不再是当前角色生成入口。
+- **当前交付物**：`run/精灵图管线/1-成品/s2-blue/`，包含 `s2-blue-purified.png`（1254×1254 AI raw sheet，检测到的 4×4 网格），`frames/f01.png` 至 `frames/f16.png` 以及 manifest/登记信息；`sheet.png` 为像素化后的 512×512 contact sheet；第 12 帧 `frames/f12.png` 使用已修改并验收的紫衣侦探倒下姿态。背景标准仍为纯品红 `#FF00FF`。
 
 ---
 

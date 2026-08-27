@@ -3,14 +3,14 @@
  * carry 是字段选择器数组，Op 实现内部按选择器逐一迁移旧对象的引用到新对象/keep 节点，
  * 再销毁旧对象——先接管引用，再销毁来源，保证事务中途失败时旧对象仍完整存在。
  */
-import type { OpImpl } from './registry.js';
-import type { OpRegistry } from './registry.js';
-import { ok, err } from './result.js';
-import type { Id } from '../state/ids.js';
-import type { Entity } from '../state/entity.js';
-import type { Node } from '../topology/types.js';
-import { checkInstantiable } from './def-guard.js';
-import type { DefLookupFn } from './def-guard.js';
+import type { OpImpl } from './registry';
+import type { OpRegistry } from './registry';
+import { ok, err } from './result';
+import type { Id } from '../state/ids';
+import type { Entity } from '../state/entity';
+import type { Node } from '../topology/types';
+import { checkInstantiable } from './def-guard';
+import type { DefLookupFn } from './def-guard';
 
 export type CarryField = 'props' | 'relations' | 'containers' | 'attachments' | 'tags';
 

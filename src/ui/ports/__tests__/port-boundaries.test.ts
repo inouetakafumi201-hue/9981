@@ -2,10 +2,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { importSpecifiers, scanUiSources } from '../../__tests__/support/source-scan.js';
-import { converged, pendingConvergence, convergenceDiagnostic } from '../convergence.js';
-import { isAccepted, type SubmissionOutcome } from '../action-port.js';
-import type { StateRevision } from '../../model/revision.js';
+import { importSpecifiers, scanUiSources } from '../../__tests__/support/source-scan';
+import { converged, pendingConvergence, convergenceDiagnostic } from '../convergence';
+import { isAccepted, type SubmissionOutcome } from '../action-port';
+import type { StateRevision } from '../../model/revision';
 
 const UI_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PORT_SOURCES = scanUiSources(UI_ROOT).filter((source) => source.path.startsWith('ports/'));

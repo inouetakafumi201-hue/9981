@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { actionView, revision, uiViewFixture } from '../../__tests__/support/fixtures.js';
-import { REJECTED_OUTCOME } from '../../__tests__/support/in-memory-ports.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { buildIntent } from '../intent-factory.js';
-import { createPendingRegistry } from '../pending-registry.js';
+import { actionView, revision, uiViewFixture } from '../../__tests__/support/fixtures';
+import { REJECTED_OUTCOME } from '../../__tests__/support/in-memory-ports';
+import type { InteractionIntent } from '../../model/intent';
+import { buildIntent } from '../intent-factory';
+import { createPendingRegistry } from '../pending-registry';
 
 function intentFor(controlId: string, sequence = 1): InteractionIntent {
   const view = uiViewFixture({

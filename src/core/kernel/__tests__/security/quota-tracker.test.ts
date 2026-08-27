@@ -9,7 +9,7 @@ import {
   DEFAULT_TECHNICAL_QUOTAS,
   QuotaTracker,
   type TechnicalQuotas,
-} from '../../security/quotas.js';
+} from '../../security/quotas';
 
 describe('QuotaTracker', () => {
   let tracker: QuotaTracker;

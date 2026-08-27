@@ -13,17 +13,17 @@
  * - Q-04 不擅自裁决载具内部微型场景边界。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { NODE_CONNECTION_BOUND } from '../model/constitution.js';
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { NODE_CONNECTION_BOUND } from '../model/constitution';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
 import type {
   MicroSceneContract,
   NaturalSceneContract,
   TransitionContract,
-} from '../model/family-contracts.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+} from '../model/family-contracts';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 export function validateNaturalScene(
   definition: CandidateDefinition,

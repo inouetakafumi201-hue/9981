@@ -3,11 +3,11 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { queryPendingIntentsFor, queryAllPendingIntents } from '../response-phase.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { IntentState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
+import { queryPendingIntentsFor, queryAllPendingIntents } from '../response-phase';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { WorldState } from '../../state/world-state';
+import type { IntentState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
 
 describe('Response Phase Query Interface', () => {
   let state: WorldState;

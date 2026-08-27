@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbFailureInjection } from './generators.js';
+import { arbFailureInjection } from './generators';
 
 describe('Property 12: 结算事务原子性', () => {
   it('结算四项写入在同一事务内（全成或全不成）', () => {

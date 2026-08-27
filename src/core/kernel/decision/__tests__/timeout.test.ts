@@ -10,15 +10,15 @@ import {
   registerDecisionOps,
   makeProcessDecisionTimeouts,
   type DecisionAnswerDeps,
-} from '../decision-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import type { Def } from '../../state/def.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { DecisionDef } from '../types.js';
+} from '../decision-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import type { Def } from '../../state/def';
+import type { ScheduleDef } from '../../schedule/types';
+import type { DecisionDef } from '../types';
 
 const sched: ScheduleDef = { id: 's:sched', kind: 'schedule', phases: [{ id: 'p:0' }, { id: 'p:1' }], loop: true };
 

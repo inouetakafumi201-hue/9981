@@ -7,16 +7,16 @@
  * fails after a successful submit, the frozen reservation is released through
  * `intent.void` so no partial state or unsettled cost survives.
  */
-import { sameLegalAction } from '../candidate-planner.js';
-import type { QueryMode } from '../../actions/catalog.js';
-import type { LegalAction } from '../../actions/types.js';
-import type { Result } from '../../ops/result.js';
-import type { Def } from '../../state/def.js';
-import type { Id, Ref } from '../../state/ids.js';
-import type { Value } from '../../state/value.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { CanonicalSubmissionAdapter } from '../commit-gateway.js';
-import type { AIResult, CanonicalCommitResult } from '../types.js';
+import { sameLegalAction } from '../candidate-planner';
+import type { QueryMode } from '../../actions/catalog';
+import type { LegalAction } from '../../actions/types';
+import type { Result } from '../../ops/result';
+import type { Def } from '../../state/def';
+import type { Id, Ref } from '../../state/ids';
+import type { Value } from '../../state/value';
+import type { WorldState } from '../../state/world-state';
+import type { CanonicalSubmissionAdapter } from '../commit-gateway';
+import type { AIResult, CanonicalCommitResult } from '../types';
 
 export interface OpInvoker {
   invoke<A, T>(name: string, args: A): Result<T>;

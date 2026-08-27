@@ -11,7 +11,7 @@
  * 预算耗尽的表现只是付费面为空，零费面与结束回合按键照旧保留。
  */
 
-import type { UiActionView } from '../model/view.js';
+import type { UiActionView } from '../model/view';
 
 export const MENU_FACES = ['paid', 'zero-cost'] as const;
 export type MenuFace = (typeof MENU_FACES)[number];

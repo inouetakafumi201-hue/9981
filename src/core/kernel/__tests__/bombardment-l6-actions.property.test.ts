@@ -12,13 +12,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { Transaction, WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { freezeCost, settleCost, refundCost, type Reservation } from '../actions/cost.js';
-import { getPath } from '../ops/path.js';
-import { setPath } from '../ops/path.js';
-import type { OpContext } from '../ops/registry.js';
-import { ok } from '../ops/result.js';
+import { Transaction, WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { freezeCost, settleCost, refundCost, type Reservation } from '../actions/cost';
+import { getPath } from '../ops/path';
+import { setPath } from '../ops/path';
+import type { OpContext } from '../ops/registry';
+import { ok } from '../ops/result';
 
 function poolPath(pool: string, scopeId: string, field: 'available' | 'real'): string {
   return `world.props.pools.${pool}.${scopeId}.${field}`;

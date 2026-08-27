@@ -7,7 +7,7 @@ import {
   makeRevision,
   revisionSortKey,
   type StateRevision,
-} from '../revision.js';
+} from '../revision';
 
 function revision(sequence: number, fingerprint: string): StateRevision {
   const made = makeRevision(sequence, fingerprint);

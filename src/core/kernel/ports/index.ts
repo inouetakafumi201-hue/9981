@@ -21,8 +21,8 @@
  * - UGC 不依赖 spec-compiler，只消费 L2 端口与引擎端口
  */
 
-export * from './json-codec-contract.js';
-export * from './hash-contract.js';
-export * from './diagnostic-contract.js';
-export * from './artifact-store-contract.js';
-export * from './quota-contract.js';
+export * from './json-codec-contract';
+export * from './hash-contract';
+export * from './diagnostic-contract';
+export * from './artifact-store-contract';
+export * from './quota-contract';

@@ -9,13 +9,13 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { FixedBudgetLedger } from '../budget.js';
+import { FixedBudgetLedger } from '../budget';
 import {
   DESIGN_CURRENCY_CHARGES,
   DESIGN_CURRENCY_PRINCIPLES,
   scoreDesignCurrency,
-} from '../design-currency.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
+} from '../design-currency';
+import { SequentialSearchPlanner } from '../sequential-search';
 import type {
   AIPlan,
   BeliefSlice,
@@ -24,8 +24,8 @@ import type {
   SearchDecisionContext,
   SearchSession,
   SimulationOutcome,
-} from '../types.js';
-import type { LegalAction as KernelLegalAction } from '../../actions/types.js';
+} from '../types';
+import type { LegalAction as KernelLegalAction } from '../../actions/types';
 
 /** 任意 1-5 的体能字段值（玩家可见部分；死亡锚/稀缺只在这段有意义）。 */
 const vitalityValue = fc.integer({ min: 1, max: 5 });

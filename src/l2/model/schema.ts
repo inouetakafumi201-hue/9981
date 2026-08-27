@@ -10,10 +10,10 @@
  * - `Internal_Metric`     回合编号、实体数量、距离、结算预算、性能统计等系统数值；不套用 1–5。
  */
 
-import type { FieldName, HumanReadableText, SemanticFamilyId, UnitId } from './ids.js';
-import type { JsonValue } from './json.js';
-import type { OwningLayer, SourceRecord } from './source.js';
-import type { L1DefKind } from './def-kind.js';
+import type { FieldName, HumanReadableText, SemanticFamilyId, UnitId } from './ids';
+import type { JsonValue } from './json';
+import type { OwningLayer, SourceRecord } from './source';
+import type { L1DefKind } from './def-kind';
 
 /** 数值/字段分类（Requirements 5.7 要求四者之一必须存在）。 */
 export const PARAMETER_CLASSIFICATIONS = [

@@ -11,11 +11,11 @@ import type {
   BaseDefinition,
   CandidateDefinition,
   DefinitionPackage,
-} from '../model/definition.js';
-import { EMPTY_PARAMETER_SCHEMA, type ParameterField } from '../model/schema.js';
-import { EMPTY_TYPE_IDENTITY, type TypeIdentity, type TypedReference } from '../model/reference.js';
-import type { SourceRecord } from '../model/source.js';
-import type { FamilyContract } from '../model/family-contracts.js';
+} from '../model/definition';
+import { EMPTY_PARAMETER_SCHEMA, type ParameterField } from '../model/schema';
+import { EMPTY_TYPE_IDENTITY, type TypeIdentity, type TypedReference } from '../model/reference';
+import type { SourceRecord } from '../model/source';
+import type { FamilyContract } from '../model/family-contracts';
 
 /** 一条中性的基类层 Source_Record。 */
 export function baseSourceRecord(fingerprint: string): SourceRecord {

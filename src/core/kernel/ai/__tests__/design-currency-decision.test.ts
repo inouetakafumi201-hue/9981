@@ -13,41 +13,41 @@
  * 已下发的活体属性名（`defs/ids.ts` PROP_VITALITY）。所有可见数值保持 1-5。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { setPath } from '../../ops/path.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { FlowInterpreter } from '../../flow/interpreter.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { createAgentShape } from '../../state/agent.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEntityShape } from '../../state/entity.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { DESIGN_CURRENCY_PRINCIPLES, DesignCurrencyGateway } from '../design-currency.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { SchedulePhaseParticipants } from '../kernel/participant-order.js';
-import { KernelAIReadAdapter } from '../kernel/read-adapter.js';
-import { KernelSearchSessionGateway } from '../kernel/search-session.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Def } from '../../state/def.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { Effect } from '../../events/effect-types.js';
-import type { NPCActionRequest } from '../types.js';
+import { ActionCatalog } from '../../actions/catalog';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { setPath } from '../../ops/path';
+import { registerPropOps } from '../../ops/prop-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { FlowInterpreter } from '../../flow/interpreter';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { createAgentShape } from '../../state/agent';
+import { DefRegistry } from '../../state/def';
+import { createEntityShape } from '../../state/entity';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { DESIGN_CURRENCY_PRINCIPLES, DesignCurrencyGateway } from '../design-currency';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { SchedulePhaseParticipants } from '../kernel/participant-order';
+import { KernelAIReadAdapter } from '../kernel/read-adapter';
+import { KernelSearchSessionGateway } from '../kernel/search-session';
+import type { ActionDef } from '../../actions/types';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Def } from '../../state/def';
+import type { Expr } from '../../state/expr-types';
+import type { Effect } from '../../events/effect-types';
+import type { NPCActionRequest } from '../types';
 
 /** 玩法层同一专写的 Effect 构造器：`prop.set` 的 args 是已就绪的 `path`/`value`。 */
 function opEffect(op: string, args: Record<string, Expr | number>): Effect {
@@ -69,6 +69,7 @@ const recklesslyAttackAction: ActionDef = {
   id: 'a:reckless',
   kind: 'action',
   label: 'Reckless',
+  track: 'highlight',
   require: true,
   cost: [],
   effects: [opEffect('prop.set', { path: `entities.${ENTITY}.props.vitality`, value: 1 })],
@@ -77,6 +78,7 @@ const cautiousHoldAction: ActionDef = {
   id: 'a:cautious',
   kind: 'action',
   label: 'Cautious',
+  track: 'highlight',
   require: true,
   cost: [],
   effects: [opEffect('prop.set', { path: `entities.${ENTITY}.props.vitality`, value: 5 })],
@@ -121,6 +123,7 @@ function makePooledWorld(startVitality: number, startAp: number, startStamina: n
     id: 'a:dump-ap',
     kind: 'action',
     label: 'Dump AP',
+    track: 'highlight',
     require: true,
     cost: [],
     effects: [
@@ -132,6 +135,7 @@ function makePooledWorld(startVitality: number, startAp: number, startStamina: n
     id: 'a:dump-stamina',
     kind: 'action',
     label: 'Dump Stamina',
+    track: 'highlight',
     require: true,
     cost: [],
     effects: [
@@ -406,7 +410,7 @@ describe('设计货币驱动的 AI 决策（真实内核链路）', () => {
 });
 
 /** 轻量别名：复用 canonical 模拟 + 内核模拟适配器，保持测试可读。 */
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
 const CanonicalSimulationAdapterExt = CanonicalSimulationAdapter;
 const KernelSimulationAdapterExt = KernelSimulationAdapter;

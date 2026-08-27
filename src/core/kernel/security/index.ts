@@ -15,7 +15,7 @@
  * - 不能改变默认配额的严格性（只能变更严格）
  */
 
-export { hashBytes, hashUtf8, hashObject, fnv1aHash, fnv1aString } from './hash.js';
+export { hashBytes, hashUtf8, hashObject, fnv1aHash, fnv1aString } from './hash';
 export {
   DEFAULT_TECHNICAL_QUOTAS,
   TechnicalQuotaError,
@@ -24,5 +24,5 @@ export {
   mergeQuotasConservative,
   createQuotaConsumption,
   isQuotaExhausted,
-} from './quotas.js';
-export type { TechnicalQuotas, QuotaConsumption } from './quotas.js';
+} from './quotas';
+export type { TechnicalQuotas, QuotaConsumption } from './quotas';

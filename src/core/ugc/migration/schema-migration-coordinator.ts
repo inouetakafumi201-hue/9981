@@ -11,18 +11,18 @@
  * 迁移成功**不等于**获得激活资格：迁移后的候选必须重新走完整的当前 Schema 检查、验证与引用解析
  * （需求 12.7）。本模块只负责把文档搬到受支持版本，并如实报告位置已重基。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { documentAnchorSpan } from '../diagnostics/factory.js';
-import type { JsonAst, MigratedCandidateDocument, ParsedCandidateDocument } from '../model/json-ast.js';
-import type { QuotaBudget } from '../model/quota-types.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
-import type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from '../ports/schema-ports.js';
-import { SCHEMA_CATALOG_EVIDENCE, SCHEMA_MIGRATION_EVIDENCE, unresolvedContractDiagnostic } from '../ports/unavailable.js';
-import { isPortUnavailable } from '../ports/availability.js';
-import type { MigrationGraphProblem } from './schema-migration-graph.js';
-import { buildMigrationGraph, classifyVersion, resolveUniquePath } from './schema-migration-graph.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { documentAnchorSpan } from '../diagnostics/factory';
+import type { JsonAst, MigratedCandidateDocument, ParsedCandidateDocument } from '../model/json-ast';
+import type { QuotaBudget } from '../model/quota-types';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
+import type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from '../ports/schema-ports';
+import { SCHEMA_CATALOG_EVIDENCE, SCHEMA_MIGRATION_EVIDENCE, unresolvedContractDiagnostic } from '../ports/unavailable';
+import { isPortUnavailable } from '../ports/availability';
+import type { MigrationGraphProblem } from './schema-migration-graph';
+import { buildMigrationGraph, classifyVersion, resolveUniquePath } from './schema-migration-graph';
 
 const STAGE = 'schema-migration' as const;
 

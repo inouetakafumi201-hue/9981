@@ -9,7 +9,7 @@
  * ——静默相等会让 UI 把两个不同的语义状态当成同一个，这是最危险的失效形态。
  */
 
-import { UI_DIAGNOSTIC_CODES, uiDiagnostic, uiOk, uiRejected, type UiResult } from './diagnostic.js';
+import { UI_DIAGNOSTIC_CODES, uiDiagnostic, uiOk, uiRejected, type UiResult } from './diagnostic';
 
 export interface StateRevision {
   /** 顺序段：单调不减、裁剪后不复用。用于判序。 */

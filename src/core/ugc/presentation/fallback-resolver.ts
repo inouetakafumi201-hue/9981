@@ -12,13 +12,13 @@
  * 另外：解析**不修改**原始 `CandidateDocument` 或 `CanonicalCandidate`，只产出独立的回退决定和
  * 一个新的上游候选值（需求 10.10）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { PresentationFallbackDecision } from '../model/presentation.js';
-import { comparePresentationDecisions, createPresentationFallbackDecision } from '../model/presentation.js';
-import type { PresentationGap, UpstreamSchemaView, UpstreamValidatedCandidate } from '../model/upstream.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { PresentationFallbackDecision } from '../model/presentation';
+import { comparePresentationDecisions, createPresentationFallbackDecision } from '../model/presentation';
+import type { PresentationGap, UpstreamSchemaView, UpstreamValidatedCandidate } from '../model/upstream';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
 
 const STAGE = 'presentation-resolution' as const;
 

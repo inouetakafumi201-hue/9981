@@ -12,11 +12,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { parseStrictDataJson } from '../../class/catalog-loader.js';
-import type { JsonValue } from '../../core/kernel/ports/index.js';
-import { loadPlayProfiles } from '../profiles/catalog.js';
-import { allDocDivergences, type DocDivergence } from '../profiles/known-divergences.js';
-import { classifyNumericField } from '../types/numeric-classification.js';
+import { parseStrictDataJson } from '../../class/catalog-loader';
+import type { JsonValue } from '../../core/kernel/ports/index';
+import { loadPlayProfiles } from '../profiles/catalog';
+import { allDocDivergences, type DocDivergence } from '../profiles/known-divergences';
+import { classifyNumericField } from '../types/numeric-classification';
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const PLAYPACK_PATH = resolve(TEST_DIR, '..', 'action-turn', 'playpack.json');

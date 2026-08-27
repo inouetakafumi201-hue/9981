@@ -7,8 +7,8 @@
  *  - 属性 7/8 单元版。
  */
 import { describe, expect, it } from 'vitest';
-import { ParameterTuner, ForbiddenList } from '../tuner.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
+import { ParameterTuner, ForbiddenList } from '../tuner';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
 
 function makeTuner() {
   const config = defaultDesignCurrencyConfig();

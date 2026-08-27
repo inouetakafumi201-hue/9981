@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { Diagnostic } from '../../state/diagnostic.js';
-import { candidate, createHarness, validDocument } from './fixtures.js';
-import { FULL_CORPUS, collectDiagnostics, runCase } from './diagnostic-corpus.js';
+import type { Diagnostic } from '../../state/diagnostic';
+import { candidate, createHarness, validDocument } from './fixtures';
+import { FULL_CORPUS, collectDiagnostics, runCase } from './diagnostic-corpus';
 
 /**
  * These cases treat a confusing diagnostic as a defect.

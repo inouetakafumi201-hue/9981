@@ -8,7 +8,6 @@
  * Phase 1 将从旧 spec-compiler::StrictJsonCodec 迁出完整实现。
  */
 
-import { createHash } from 'node:crypto';
 import type {
   CandidateDocumentInput,
   ParsedCandidateDocument,
@@ -19,8 +18,8 @@ import type {
   TechnicalQuotas,
   StrictJsonCodecPort,
   JsonCodecError,
-} from '../ports/index.js';
-import { QuotaBudget } from '../ports/quota-contract.js';
+} from '../ports/index';
+import { QuotaBudget } from '../ports/quota-contract';
 
 /**
  * 占位实现（待 Phase 1 迁出完整实现）
@@ -44,7 +43,10 @@ export class InMemoryJsonCodec implements StrictJsonCodecPort {
     }
 
     // 计算源码哈希
-    const contentHash = createHash('sha256').update(input.sourceText, 'utf8').digest('hex');
+    const contentHash = (() => {
+      const h = input.sourceText.split('').reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 0);
+      return h.toString(16).padStart(16, '0');
+    })();
     const sourceSliceHash = contentHash; // 简化：整个文档作为一个跨度
 
     // 构建 SourceRecord

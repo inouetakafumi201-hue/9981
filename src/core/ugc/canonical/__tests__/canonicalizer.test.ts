@@ -2,17 +2,17 @@
  * 任务 4.3 验收测试：确定性规范化、往返、字节幂等、语义顺序保留、无序集合唯一性。
  */
 import { describe, expect, it } from 'vitest';
-import type { MigratedCandidateDocument } from '../../model/json-ast.js';
-import { createUnavailableSchemaVersionCatalog } from '../../ports/unavailable.js';
-import type { CanonicalizationSchemaView } from '../../ports/schema-ports.js';
-import { createCanonicalizationGateway } from '../canonicalizer.js';
+import type { MigratedCandidateDocument } from '../../model/json-ast';
+import { createUnavailableSchemaVersionCatalog } from '../../ports/unavailable';
+import type { CanonicalizationSchemaView } from '../../ports/schema-ports';
+import { createCanonicalizationGateway } from '../canonicalizer';
 import {
   budget,
   canonicalSchema,
   catalogFactory,
   fingerprint,
   parse,
-} from '../../migration/__tests__/fixtures.js';
+} from '../../migration/__tests__/fixtures';
 
 function migrated(text: string): MigratedCandidateDocument {
   const document = parse(text);

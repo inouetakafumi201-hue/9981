@@ -2,19 +2,19 @@
  * 任务 5.1 / 5.2 验收测试：契约目录失败关闭、确定性指纹、基线捕获与提交前复检。
  */
 import { describe, expect, it, vi } from 'vitest';
-import type { SourceRecord } from '../../../kernel/state/diagnostic.js';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import type { IntegrationContract } from '../../model/contract-types.js';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import type { TrustedQuotaProfile } from '../../model/quota-types.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createUnavailableDefinitionRegistryGateway } from '../../ports/unavailable.js';
-import type { DefinitionRegistryGateway } from '../../ports/definition-ports.js';
-import type { SchemaVersionCatalog } from '../../ports/schema-ports.js';
-import { captureBaseline, recheckBaseline } from '../../baseline/baseline-factory.js';
-import type { BaselineSources } from '../../baseline/baseline-factory.js';
-import { createIntegrationContractCatalog, inspectContracts } from '../integration-contract-catalog.js';
+import type { SourceRecord } from '../../../kernel/state/diagnostic';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import type { IntegrationContract } from '../../model/contract-types';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import type { TrustedQuotaProfile } from '../../model/quota-types';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createUnavailableDefinitionRegistryGateway } from '../../ports/unavailable';
+import type { DefinitionRegistryGateway } from '../../ports/definition-ports';
+import type { SchemaVersionCatalog } from '../../ports/schema-ports';
+import { captureBaseline, recheckBaseline } from '../../baseline/baseline-factory';
+import type { BaselineSources } from '../../baseline/baseline-factory';
+import { createIntegrationContractCatalog, inspectContracts } from '../integration-contract-catalog';
 
 const diagnosticCatalog = createDiagnosticCodeCatalog(sha256FingerprintGateway);
 const factory = createDiagnosticFactory(diagnosticCatalog);

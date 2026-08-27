@@ -13,8 +13,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { InMemoryArtifactStore, hashBytes } from '../../persistence/index.js';
-import { OutputLease } from '../../persistence/output-lease.js';
+import { InMemoryArtifactStore, hashBytes } from '../../persistence/index';
+import { OutputLease } from '../../persistence/output-lease';
 
 describe('Persistence Port: Characterization', () => {
   describe('InMemoryArtifactStore', () => {

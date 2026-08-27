@@ -18,13 +18,13 @@
  * op 存在性与许可集合（Requirement 3.3）属于 H-ECS-03 交接项，由族级集成测试
  * 对比 `listOpNames()` 完成，context 不含 kernel 引用。
  */
-import type { CandidateDefinition } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { COMPOSITION_KINDS } from '../model/composition-registry.js';
-import { caSFieldMatches } from '../model/cas-field-alignment.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import type { CandidateDefinition } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { COMPOSITION_KINDS } from '../model/composition-registry';
+import { caSFieldMatches } from '../model/cas-field-alignment';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context';
+import { defError } from './helpers';
 
 /** 收集 parameters 声明的槽位名（parameters[*].name；与组件契约 parameters 的 key 同源，宽容前缀存进 caSFieldMatches）。 */
 function parametersArrayNames(parameters: unknown): readonly string[] {

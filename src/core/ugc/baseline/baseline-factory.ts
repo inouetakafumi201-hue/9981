@@ -8,16 +8,16 @@
  * `ValidationBaseline` 的**类型与比较**在 `model/baseline.ts`（纯数据，DAG 根）；
  * 本模块负责**从端口采集**这些版本令牌，属于行为层。
  */
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import type { DiagnosticCodeCatalog } from '../diagnostics/code-catalog.js';
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import type { TrustedQuotaProfile } from '../model/quota-types.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import { createValidationBaseline, diffValidationBaselines } from '../model/baseline.js';
-import type { DefinitionRegistryGateway } from '../ports/definition-ports.js';
-import type { SchemaVersionCatalog } from '../ports/schema-ports.js';
-import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog.js';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import type { DiagnosticCodeCatalog } from '../diagnostics/code-catalog';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import type { TrustedQuotaProfile } from '../model/quota-types';
+import type { ValidationBaseline } from '../model/baseline';
+import { createValidationBaseline, diffValidationBaselines } from '../model/baseline';
+import type { DefinitionRegistryGateway } from '../ports/definition-ports';
+import type { SchemaVersionCatalog } from '../ports/schema-ports';
+import type { IntegrationContractCatalog } from '../contracts/integration-contract-catalog';
 
 export interface BaselineSources {
   readonly registry: DefinitionRegistryGateway;

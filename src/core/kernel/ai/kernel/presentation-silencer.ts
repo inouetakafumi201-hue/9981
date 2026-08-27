@@ -5,8 +5,8 @@
  * simulated branch. Rule outcomes, Op results, invariant checks and diagnostics
  * are never silenced: they still run and still fail inside the branch.
  */
-import type { Value } from '../../state/value.js';
-import type { PresentationSilencer } from './simulation-adapter.js';
+import type { Value } from '../../state/value';
+import type { PresentationSilencer } from './simulation-adapter';
 
 export interface PresentationDispatchTarget {
   dispatch(type: string, payload: Record<string, Value>): void;

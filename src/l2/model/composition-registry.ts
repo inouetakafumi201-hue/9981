@@ -16,10 +16,10 @@
  * 保证任意登记顺序下产出顺序稳定，供 Canonical_Snapshot 复用。
  */
 
-import type { FieldName, HumanReadableText, JsonPath, OpId, SemanticFamilyId } from './ids.js';
-import type { ParameterField } from './schema.js';
-import type { TypedReference } from './reference.js';
-import type { SourceRecord } from './source.js';
+import type { FieldName, HumanReadableText, JsonPath, OpId, SemanticFamilyId } from './ids';
+import type { ParameterField } from './schema';
+import type { TypedReference } from './reference';
+import type { SourceRecord } from './source';
 
 // ---------------------------------------------------------------------------
 // 组合形态常量（compositionKind）

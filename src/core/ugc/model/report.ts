@@ -1,12 +1,12 @@
 /**
  * 验证报告与激活结果（design.md「Validation baseline and pipeline」/ 需求 11.10、13.12、14.2-14.9）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { ValidationBaseline } from './baseline.js';
-import type { ChangeRequestBinding } from './binding.js';
-import type { QuotaUsageSnapshot } from './quota-types.js';
-import type { SkippedCheck } from './stage.js';
-import type { ValidatedChangeSet } from './validated-change-set.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { ValidationBaseline } from './baseline';
+import type { ChangeRequestBinding } from './binding';
+import type { QuotaUsageSnapshot } from './quota-types';
+import type { SkippedCheck } from './stage';
+import type { ValidatedChangeSet } from './validated-change-set';
 
 export type ValidationStatus = 'rejected' | 'validated';
 

@@ -7,10 +7,10 @@
  * 故障注入通过**包装已登记端口**实现，而不是在生产代码里加 if 分支。这保证被测代码路径与
  * 生产路径完全一致（design.md：Fault injection is dependency injection at documented ports）。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
-import type { ActivationResult, ValidationReport } from '../model/report.js';
-import type { ValidationStage } from '../model/stage.js';
-import type { QuotaKind } from '../model/quota-types.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
+import type { ActivationResult, ValidationReport } from '../model/report';
+import type { ValidationStage } from '../model/stage';
+import type { QuotaKind } from '../model/quota-types';
 
 export interface StageObservation {
   readonly reachedStages: readonly ValidationStage[];

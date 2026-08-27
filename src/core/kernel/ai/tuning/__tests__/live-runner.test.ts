@@ -14,20 +14,20 @@
  * 由真实 facade.act 回填（既有 status/candidate/diagnostics 行为不变）。
  */
 import { describe, expect, it, beforeEach } from 'vitest';
-import type { Value } from '../../../state/value.js';
-import type { Def } from '../../../state/def.js';
-import type { ActionDef } from '../../../actions/types.js';
-import type { Expr } from '../../../state/expr-types.js';
-import type { Effect } from '../../../events/effect-types.js';
-import type { RuleDef } from '../../../events/types.js';
-import type { ScheduleDef } from '../../../schedule/types.js';
-import { resetIdCounters } from '../../../state/ids.js';
-import { createPlayAiRuntime, type PlayAiRuntime } from '../../../../../play/ai-runtime.js';
-import { DesignCurrencyGateway } from '../../design-currency.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
-import { BehaviorAssertionRegistry, AssertionRunner } from '../assertions.js';
-import { makeLiveAssertionRunner } from '../live-runner.js';
-import { loadGoldenAssertionsFile } from './assertions-fixture.js';
+import type { Value } from '../../../state/value';
+import type { Def } from '../../../state/def';
+import type { ActionDef } from '../../../actions/types';
+import type { Expr } from '../../../state/expr-types';
+import type { Effect } from '../../../events/effect-types';
+import type { RuleDef } from '../../../events/types';
+import type { ScheduleDef } from '../../../schedule/types';
+import { resetIdCounters } from '../../../state/ids';
+import { createPlayAiRuntime, type PlayAiRuntime } from '../../../../../play/ai-runtime';
+import { DesignCurrencyGateway } from '../../design-currency';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
+import { BehaviorAssertionRegistry, AssertionRunner } from '../assertions';
+import { makeLiveAssertionRunner } from '../live-runner';
+import { loadGoldenAssertionsFile } from './assertions-fixture';
 
 const POLICY = 'd:ai-policy';
 const BINDING = 'd:ai-binding';
@@ -46,7 +46,7 @@ function minExpr(a: Expr, b: Expr): Expr { return { op: 'min', args: [a, b] }; }
 const VISIBLE_TO: Expr = { op: 'not', args: [{ op: 'includes', args: [{ path: 'world.props.hiddenRefs' }, { var: 'self' }] }] };
 
 const attackAction: ActionDef = {
-  id: 'a:attack', kind: 'action', label: 'Attack',
+  id: 'a:attack', kind: 'action', label: 'Attack', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] } } }],
   require: true, cost: [],
   effects: [
@@ -75,7 +75,7 @@ const aiCombatDamageRule: RuleDef = {
   ],
 };
 const healAction: ActionDef = {
-  id: 'a:heal', kind: 'action', label: 'Heal',
+  id: 'a:heal', kind: 'action', label: 'Heal', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'eq', args: [{ var: 'self' }, { var: 'self' }] } } }],
   require: true, cost: [],
   effects: [
@@ -84,13 +84,13 @@ const healAction: ActionDef = {
   ],
 };
 const moveAction: ActionDef = {
-  id: 'a:move', kind: 'action', label: 'Move',
+  id: 'a:move', kind: 'action', label: 'Move', track: 'highlight',
   targets: [{ name: 'node', query: { from: 'nodes' } }],
   require: true, cost: [],
   effects: [opEffect('entity.place', { entityId: HERO, nodeId: refIdExpr(varRef('node')) })],
 };
 const eternalSleepAction: ActionDef = {
-  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep',
+  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'and', args: [
     { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] },
     { op: 'includes', args: [refGetExpr(varRef('targetRef'), ['tags']), TAG_DOWNED] },
@@ -102,7 +102,7 @@ const eternalSleepAction: ActionDef = {
   cost: [], effects: [{ let: 't', be: varRef('target') }, opEffect('entity.destroy', { id: refIdExpr(varRef('t')) })],
 };
 const pickupAction: ActionDef = {
-  id: 'a:pickup', kind: 'action', label: 'Pickup',
+  id: 'a:pickup', kind: 'action', label: 'Pickup', track: 'highlight',
   targets: [{ name: 'item', query: { from: 'items' } }],
   require: true, cost: [],
   effects: [{ let: 'ownContainer', be: refGetExpr(varRef('self'), ['containers', 'bag']) }, opEffect('item.move', { itemId: refIdExpr(varRef('item')), toContainerId: varRef('ownContainer') })],

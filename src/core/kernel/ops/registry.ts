@@ -4,13 +4,13 @@
  * 唯一写入通道：WorldState 全部结构区字段标记 readonly，只能通过 OpRegistry.invoke 修改。
  * invoke 自动包一层顶层事务：begin -> 执行 Op 实现 -> InvariantChecker.checkAll -> commit/rollback。
  */
-import type { Value } from '../state/value.js';
-import { Transaction, WorldStateHolder } from './transaction.js';
-import { InvariantChecker } from './invariants.js';
-import type { Result } from './result.js';
-import { err } from './result.js';
-import type { Diagnostic } from '../state/diagnostic.js';
-import { beginIdCounterScope, commitIdCounters, rollbackIdCounters } from '../state/ids.js';
+import type { Value } from '../state/value';
+import { Transaction, WorldStateHolder } from './transaction';
+import { InvariantChecker } from './invariants';
+import type { Result } from './result';
+import { err } from './result';
+import type { Diagnostic } from '../state/diagnostic';
+import { beginIdCounterScope, commitIdCounters, rollbackIdCounters } from '../state/ids';
 
 export interface OpContext {
   tx: Transaction;

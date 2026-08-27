@@ -5,8 +5,8 @@
  * UGC 自己需要用来做"结果完整性检查、确定性检查、表现回退资格判定和诊断定位"的最小信息，其余一律
  * 装在 `payload: unknown` 里对 UGC 不透明。UGC 读不懂 payload，也不应该读懂。
  */
-import type { SourceSpan } from '../../kernel/state/diagnostic.js';
-import type { TargetOwnership } from './candidate.js';
+import type { SourceSpan } from '../../kernel/state/diagnostic';
+import type { TargetOwnership } from './candidate';
 
 /** 上游验证通过的候选。`payload` 由基类层拥有，UGC 只转交。 */
 export interface UpstreamValidatedCandidate {

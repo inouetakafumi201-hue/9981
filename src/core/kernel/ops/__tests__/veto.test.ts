@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { ok } from '../result.js';
-import type { OpImpl } from '../registry.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { ok } from '../result';
+import type { OpImpl } from '../registry';
 
 /**
  * L3 Ops: 结构性 Op 否决机制（design.md 3.4节 / 需求19.1-19.4）。

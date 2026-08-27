@@ -14,12 +14,12 @@
  * - UI 动作走统一 `submit`（Requirements 14.7）。
  */
 
-import { compareStrings } from '../model/ordering.js';
-import { deepFreeze } from '../model/immutable.js';
-import { warningDiagnostic } from '../model/diagnostic-factory.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
+import { compareStrings } from '../model/ordering';
+import { deepFreeze } from '../model/immutable';
+import { warningDiagnostic } from '../model/diagnostic-factory';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
 import type {
   ActionDescriptor,
   ActionRequest,
@@ -32,14 +32,14 @@ import type {
   RuntimeSemanticState,
   SemanticStateEntry,
   UiQuery,
-} from '../model/projection.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import type { ActionContract, ResourceSemanticRole } from '../model/family-contracts.js';
-import type { ActiveRegistry } from '../registry/definition-registry.js';
-import { query } from '../registry/definition-registry.js';
-import { createProjection } from '../registry/read-only-projection.js';
-import { submit } from '../registry/action-submitter.js';
-import type { KernelContract } from '../kernel/kernel-contract.js';
+} from '../model/projection';
+import type { Diagnostic } from '../model/diagnostic';
+import type { ActionContract, ResourceSemanticRole } from '../model/family-contracts';
+import type { ActiveRegistry } from '../registry/definition-registry';
+import { query } from '../registry/definition-registry';
+import { createProjection } from '../registry/read-only-projection';
+import { submit } from '../registry/action-submitter';
+import type { KernelContract } from '../kernel/kernel-contract';
 
 type MutableDiagnostics = Diagnostic[];
 
@@ -93,10 +93,14 @@ function actionDescriptor(
     accessibleLabel,
     assetRefs: presentation?.assetRefs ?? [],
     targets: [],
+    // 双轨制 P2：track 透传 L2 ActionContract.track；缺省按 P3 数据填充约定默认 'card'。
+    track: action.track ?? 'card',
     ...(action.interactionIntent === undefined ? {} : { interactionIntent: action.interactionIntent }),
     // 2026-08-08 权威变更：attackShape 已删除，见 model/family-contracts.ts 顶部权威变更说明。
     ...(action.posture === undefined ? {} : { posture: action.posture }),
     ...(unavailabilityReason === undefined ? {} : { unavailabilityReason }),
+    // 双轨制 P2：cardPresentation 由装载期已求值；ui-adapter 仅透传。
+    ...(action.cardPresentation === undefined ? {} : { cardPresentation: action.cardPresentation }),
   };
 }
 

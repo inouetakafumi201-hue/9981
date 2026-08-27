@@ -8,12 +8,12 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { DESIGN_CURRENCY_PRINCIPLES } from '../../design-currency.js';
+import { DESIGN_CURRENCY_PRINCIPLES } from '../../design-currency';
 import {
   parseDesignCurrencyConfig,
   defaultDesignCurrencyConfig,
   loadDesignCurrencyConfig,
-} from '../config-design-currency.js';
+} from '../config-design-currency';
 
 describe('DesignCurrencyConfig（Task1/2）', () => {
   it('默认配置的 principles 与既有源码一致（锁死值）', () => {

@@ -4,23 +4,23 @@
  * 这些替身只实现端口契约，不含任何 UGC 生产逻辑；它们让测试能通过**生产入口**驱动流水线，
  * 而不是绕过它（design.md Testing strategy：Fault injection is dependency injection at documented ports）。
  */
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../diagnostics/factory.js';
-import { candidateFromText, createCandidateSource } from '../../model/candidate.js';
-import type { JsonAst, ParsedCandidateDocument } from '../../model/json-ast.js';
-import { QUOTA_KINDS } from '../../model/quota-types.js';
-import type { QuotaBudget, TrustedQuotaProfile } from '../../model/quota-types.js';
-import { ugcOk } from '../../model/result.js';
-import type { UgcResult } from '../../model/result.js';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../diagnostics/factory';
+import { candidateFromText, createCandidateSource } from '../../model/candidate';
+import type { JsonAst, ParsedCandidateDocument } from '../../model/json-ast';
+import { QUOTA_KINDS } from '../../model/quota-types';
+import type { QuotaBudget, TrustedQuotaProfile } from '../../model/quota-types';
+import { ugcOk } from '../../model/result';
+import type { UgcResult } from '../../model/result';
 import type {
   CanonicalizationSchemaView,
   SchemaMigrationGateway,
   SchemaVersionCatalog,
   TrustedSchemaMigration,
-} from '../../ports/schema-ports.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createQuotaBudget } from '../../quota/quota-budget.js';
-import { createStrictJsonDecoder } from '../../codec/strict-json-decoder.js';
+} from '../../ports/schema-ports';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createQuotaBudget } from '../../quota/quota-budget';
+import { createStrictJsonDecoder } from '../../codec/strict-json-decoder';
 
 export const catalogFactory = createDiagnosticFactory(createDiagnosticCodeCatalog(sha256FingerprintGateway));
 export const decoder = createStrictJsonDecoder(catalogFactory);

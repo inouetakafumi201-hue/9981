@@ -192,13 +192,13 @@ console.log('\n===== 6) D-025 违规命名 =====');
 }
 
 // ─────────────────────────────────────────────
-// 6.5 俯视平面视图术语守卫
+// 6.5 正面俯视视图术语守卫
 // ─────────────────────────────────────────────
-console.log('\n===== 6.5 俯视平面视图术语守卫 =====');
+console.log('\n===== 6.5 正面俯视视图术语守卫 =====');
 {
   // 守卫范围：权威文档 + 根 AGENTS.md + sprite-forge skill 文档/生成 prompt。
   // 规则：任何活跃规范不得把旧"正面斜投影/Cabinet/Cavalier/三面可见/Among Us 类比"当作现行视角；
-  // 凡现行定义处必须声明"俯视平面视图"，并给出固定英文口令 top-down plan view。
+  // 凡现行定义处必须声明"正面俯视视图"，并给出固定英文口令 top-down plan view。
   const targets = [
     'docs/表现系统/01_图形化与UI.md',
     'docs/表现系统/05_组件生成风格规范.md',
@@ -251,7 +251,7 @@ console.log('\n===== 6.5 俯视平面视图术语守卫 =====');
   for (const m of missing) console.log(`  ✗ ${m} 缺少固定口令 top-down plan view`);
   if (missing.length) { fail = 1; broken++; }
 
-  if (!broken) console.log('  ✓ 俯视平面视图术语守卫通过');
+  if (!broken) console.log('  ✓ 正面俯视视图术语守卫通过');
 }
 
 // ─────────────────────────────────────────────

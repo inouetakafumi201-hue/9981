@@ -5,13 +5,13 @@
  * 拥有；UGC 只在 `integration/l2-adapter.ts` 的唯一装配缝消费其冻结导出，不从本端口根再导出
  * registry 实现或 l2 内部形状。
  */
-export type { UpstreamPortIdentity, UnresolvedPortEvidence } from './availability.js';
+export type { UpstreamPortIdentity, UnresolvedPortEvidence } from './availability';
 export {
   UNAVAILABLE_PROVIDER_ID,
   UNRESOLVED_PORT_CORRECTION,
   describeUnresolvedPort,
   isPortUnavailable,
-} from './availability.js';
+} from './availability';
 
 export type {
   DefinitionRegistryGateway,
@@ -23,13 +23,13 @@ export type {
   RuntimeCompatibilityGateway,
   ValidationCapability,
   ValidationStageResult,
-} from './definition-ports.js';
+} from './definition-ports';
 export {
   MANDATORY_RESOLUTION_CAPABILITIES,
   MANDATORY_VALIDATION_CAPABILITIES,
-} from './definition-ports.js';
+} from './definition-ports';
 
-export type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from './schema-ports.js';
+export type { SchemaMigrationGateway, SchemaVersionCatalog, TrustedSchemaMigration } from './schema-ports';
 
 export {
   DEFINITION_REGISTRY_EVIDENCE,
@@ -46,6 +46,6 @@ export {
   createUnavailableSchemaMigrationGateway,
   createUnavailableSchemaVersionCatalog,
   unresolvedContractDiagnostic,
-} from './unavailable.js';
+} from './unavailable';
 
-export { SHA256_ALGORITHM_ID, sha256FingerprintGateway } from './sha256-fingerprint-gateway.js';
+export { SHA256_ALGORITHM_ID, sha256FingerprintGateway } from './sha256-fingerprint-gateway';

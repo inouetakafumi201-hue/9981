@@ -15,10 +15,10 @@
  * 8. 来源自称分类 + 来源优先级
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory.js';
-import type { SemanticFamilyRegistration } from '../model/definition.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory';
+import type { SemanticFamilyRegistration } from '../model/definition';
 import type {
   EligibilityVerdict,
   FamilyEligibilityEvidence,
@@ -27,20 +27,20 @@ import type {
   SourceClassificationKind,
   SourceMarker,
   SourceStatement,
-} from '../model/source.js';
-import { precedenceRank } from '../model/source.js';
-import { canonicalSort, compareDiagnostics } from '../model/ordering.js';
+} from '../model/source';
+import { precedenceRank } from '../model/source';
+import { canonicalSort, compareDiagnostics } from '../model/ordering';
 import {
   findDecisionStatus,
   findUnresolvedQuestion,
   GLOSSARY_FILE,
-} from './decision-catalog.js';
+} from './decision-catalog';
 import {
   deprecationSourceRecord,
   findDeprecatedMechanic,
   type DeprecatedMechanicEntry,
-} from './deprecated-mechanics.js';
-import type { NumericExampleOutcome, SourceClassificationOutcome } from './types.js';
+} from './deprecated-mechanics';
+import type { NumericExampleOutcome, SourceClassificationOutcome } from './types';
 
 /**
  * 三判据判定（design.md `classifyProposedFamily`）。

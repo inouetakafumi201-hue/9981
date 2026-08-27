@@ -15,8 +15,8 @@
  * - 不能改变诊断代码的严重程度分类
  */
 
-export { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory.js';
-export type { DiagnosticBuildInput } from './diagnostic-factory.js';
+export { DiagnosticFactory, sortDiagnostics } from './diagnostic-factory';
+export type { DiagnosticBuildInput } from './diagnostic-factory';
 export {
   ZH_CN_CREATOR_BUNDLE,
   COMPILER_EMITTED_CODES,
@@ -27,5 +27,5 @@ export {
   renderCreatorMessage,
   missingBundleCodes,
   unresolvedPlaceholders,
-} from './message-bundles.js';
-export type { CreatorMessageEntry, CreatorMessageBundle } from './message-bundles.js';
+} from './message-bundles';
+export type { CreatorMessageEntry, CreatorMessageBundle } from './message-bundles';

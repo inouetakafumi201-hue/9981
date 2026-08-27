@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { DefRegistry, type Def } from '../def.js';
+import { DefRegistry, type Def } from '../def';
 
 function baseDef(id: string, extendsIds?: string[], props?: Record<string, unknown>): Def {
   return {

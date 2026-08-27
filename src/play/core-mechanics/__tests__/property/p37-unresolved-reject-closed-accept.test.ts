@@ -8,7 +8,7 @@ import {
   genItemRef,
   genStatusRef,
   genClassRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P37: 引用未冻结项一律拒绝且不产生默认值

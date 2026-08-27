@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { revision } from '../../__tests__/support/fixtures.js';
-import type { RuleEventProjection } from '../../model/event-projection.js';
-import type { AnimationCompletionHandler, AnimationQueueRequest } from '../scheduler.js';
-import { createAnimationScheduler } from '../scheduler.js';
+import { revision } from '../../__tests__/support/fixtures';
+import type { RuleEventProjection } from '../../model/event-projection';
+import type { AnimationCompletionHandler, AnimationQueueRequest } from '../scheduler';
+import { createAnimationScheduler } from '../scheduler';
 
 function event(sequence: number, revisionSequence = 1, fingerprint = 'fp-1'): RuleEventProjection {
   return Object.freeze({

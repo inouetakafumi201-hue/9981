@@ -11,12 +11,12 @@ import {
   shadowOnTransparency,
   verticalInteractionSide,
   visibleLayers,
-} from '../layers/layer-rules.js';
-import { overlayOpacity } from '../layers/layer-shapes.js';
-import type { MapLayer } from '../layers/layer-shapes.js';
-import { blueprintCopy, serializeMapPublish, stableMapId } from '../editor/map-io.js';
-import { emptyLayer } from '../editor/workspace-state.js';
-import type { MapData } from '../ports/map-contracts.js';
+} from '../layers/layer-rules';
+import { overlayOpacity } from '../layers/layer-shapes';
+import type { MapLayer } from '../layers/layer-shapes';
+import { blueprintCopy, serializeMapPublish, stableMapId } from '../editor/map-io';
+import { emptyLayer } from '../editor/workspace-state';
+import type { MapData } from '../ports/map-contracts';
 
 function layer(id: string, height?: number): MapLayer {
   return { id, ...(height !== undefined ? { height } : {}) };
@@ -71,10 +71,10 @@ describe('devboard 图层规则', () => {
     expect(shadowOnTransparency(false)).toBe(false);
   });
 
-  it('overlayOpacity：两侧都填 height → min(1,|Δh|·.1)；任一侧留空 → null(三界外不叠加)', () => {
-    expect(overlayOpacity(1, 2)).toBeCloseTo(0.1, 6);
-    expect(overlayOpacity(1, 11)).toBe(1); // 差满 10 全隐
-    expect(overlayOpacity(3, 3)).toBe(0);
+  it('overlayOpacity：两侧都填 height → clamp(1 - |Δh| × 0.1, 0, 1)；任一侧留空 → null(三界外不叠加)', () => {
+    expect(overlayOpacity(1, 2)).toBeCloseTo(0.9, 6);
+    expect(overlayOpacity(1, 11)).toBe(0); // 差满 10 全隐
+    expect(overlayOpacity(3, 3)).toBe(1);
     expect(overlayOpacity(undefined, 2)).toBeNull();
     expect(overlayOpacity(1, undefined)).toBeNull();
   });
@@ -111,16 +111,21 @@ describe('devboard 加载 / 蓝本 / 导出', () => {
     expect(stableMapId('  ')).toBe('map'); // 全空兜底
   });
 
-  it('serializeMapPublish：导出含 layers 且不含 bounds；transform 保序', () => {
+  it('serializeMapPublish：导出 canonical layers/layerId、不含 bounds；transform 保序', () => {
     const layers = [layer('l0', 1), { ...layer('l1'), transform: { scaleX: 2, scaleY: 2, tx: 10, ty: 20 } }];
     const json = serializeMapPublish({ map: baseMap, layers });
     expect(json).toContain('"l0"');
     expect(json).toContain('"scaleX"');
     expect(json).not.toContain('"bounds"');
-    const parsed = JSON.parse(json) as { layers: MapLayer[] };
+    // canonical 输出：schemaVersion 升到 2.0，不再写 legacy floors/floor。
+    const parsed = JSON.parse(json) as { schemaVersion: string; layers: MapLayer[]; nodes: { layerId?: string }[] };
+    expect(parsed.schemaVersion).toBe('2.0');
+    expect(json).not.toContain('"floors"');
     expect(parsed.layers.length).toBe(2);
     expect(parsed.layers[0]!.id).toBe('l0');
     expect(parsed.layers[1]!.transform!.tx).toBe(10);
+    // 空地图节点归一化为 canonical 层引用（无节点时该约束空成立）。
+    expect(parsed.nodes.every((n) => typeof n.layerId === 'string')).toBe(true);
   });
 
   it('emptyLayer：新建图层为空画布，height 未填(三界外)', () => {

@@ -15,8 +15,8 @@ import {
   compileMap,
   connectedGroups,
   adjacencyOf,
-} from '../ports/map-contracts.js';
-import type { MapDiagnostic, MapData, MapClassIndex, CompileResult } from '../ports/map-contracts.js';
+} from '../ports/map-contracts';
+import type { MapDiagnostic, MapData, MapClassIndex, CompileResult } from '../ports/map-contracts';
 
 /** 每次改动即时结构校验：诊断按 path 稳定排序、列表、无自动 correction。 */
 export function structureDiagnostics(map: MapData): readonly MapDiagnostic[] {

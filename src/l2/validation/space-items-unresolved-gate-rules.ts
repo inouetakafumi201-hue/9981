@@ -6,12 +6,12 @@
  * - 13.9：提升未决项需新控制决策 / 来源 / 拥有层 / 替代关系
  */
 
-import type { CandidateDefinition } from '../model/definition.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
-import { REGULATORY_DETECTION_FIELDS } from '../model/space-items-contracts.js';
+import type { CandidateDefinition } from '../model/definition';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { DiagnosticCollector, DefinitionRule, ValidationContext } from './context';
+import { defError } from './helpers';
+import { REGULATORY_DETECTION_FIELDS } from '../model/space-items-contracts';
 
 export const validateUnresolvedItems: DefinitionRule = (
   definition: CandidateDefinition,

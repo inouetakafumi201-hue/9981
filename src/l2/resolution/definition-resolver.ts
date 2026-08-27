@@ -11,18 +11,18 @@
  * - 继承只改变类型契约，不注入玩法值。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic } from '../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic } from '../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering';
 import type {
   CandidateDefinition,
   ResolvedComponent,
   ResolvedDefinition,
-} from '../model/definition.js';
-import type { ParameterField } from '../model/schema.js';
-import type { FieldMergeRule, TypeIdentity } from '../model/reference.js';
-import type { ReferenceGraph } from './reference-graph.js';
+} from '../model/definition';
+import type { ParameterField } from '../model/schema';
+import type { FieldMergeRule, TypeIdentity } from '../model/reference';
+import type { ReferenceGraph } from './reference-graph';
 
 export interface ResolveInput {
   readonly definitionId: string;

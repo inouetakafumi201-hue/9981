@@ -7,19 +7,19 @@
  * 到达时兑现。这里锁定：排期写入正确、兑现时机与顺序正确、快照捕获挂起队列。
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { FlowInterpreter } from '../interpreter.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { Transaction, WorldStateHolder } from '../../ops/transaction.js';
-import { ExprEngine } from '../../expr/engine.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { DefRegistry } from '../../state/def.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { takeSnapshot } from '../../persistence/persistence.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Effect } from '../../events/effect-types.js';
-import type { OpContext } from '../../ops/registry.js';
+import { FlowInterpreter } from '../interpreter';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { registerPropOps } from '../../ops/prop-ops';
+import { OpRegistry } from '../../ops/registry';
+import { Transaction, WorldStateHolder } from '../../ops/transaction';
+import { ExprEngine } from '../../expr/engine';
+import { createEmptyWorldState } from '../../state/world-state';
+import { DefRegistry } from '../../state/def';
+import { resetIdCounters } from '../../state/ids';
+import { takeSnapshot } from '../../persistence/persistence';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Effect } from '../../events/effect-types';
+import type { OpContext } from '../../ops/registry';
 
 const sched: ScheduleDef = {
   id: 's:sched',

@@ -1,8 +1,8 @@
 /** L2 Compiler: 统一导出。 */
 
-export * from './types.js';
-export * from './decision-catalog.js';
-export * from './deprecated-mechanics.js';
-export * from './source-classifier.js';
-export * from './conflict-resolver.js';
-export * from './specification-compiler.js';
+export * from './types';
+export * from './decision-catalog';
+export * from './deprecated-mechanics';
+export * from './source-classifier';
+export * from './conflict-resolver';
+export * from './specification-compiler';

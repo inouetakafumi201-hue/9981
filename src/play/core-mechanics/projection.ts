@@ -8,11 +8,11 @@
  *    AP 未分配 / 体力耗尽 / 生命耗尽一律投影为离散取值，而不是 0。
  * 3. 同屏并列独立选项 ≤ 5（Requirement 3.8）：超过时分页，分页是呈现行为，不改变合法动作集合。
  */
-import type { WorldState } from '../../core/kernel/state/world-state.js';
-import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
-import type { Result } from '../../core/kernel/ops/result.js';
-import type { LegalAction } from '../../core/kernel/actions/types.js';
-import { MAX_PARALLEL_OPTIONS, POOL_AP, POOL_STAMINA, PROP_VITALITY, GROUP_PAID, GROUP_ATTACHED } from './defs/ids.js';
+import type { WorldState } from '../../core/kernel/state/world-state';
+import type { Diagnostic } from '../../core/kernel/state/diagnostic';
+import type { Result } from '../../core/kernel/ops/result';
+import type { LegalAction } from '../../core/kernel/actions/types';
+import { MAX_PARALLEL_OPTIONS, POOL_AP, POOL_STAMINA, PROP_VITALITY, GROUP_PAID, GROUP_ATTACHED } from './defs/ids';
 
 /** 玩家可见 AP：1-3 的离散值，或"未分配"（不是 0）。 */
 export type ProjectedAp =

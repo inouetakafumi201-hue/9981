@@ -10,29 +10,31 @@
  * 铁律：本文件不 import `src/ui`、`src/devboard`（UI 经端口注入，见 `ui-host.ts`）；
  * 不新造 L1↔L2 桥（专项 D 已交付，组合根消费它装进去）；玩家可见数值守 1-5，round 等内部值例外。
  */
-import type { WorldState } from '../../core/kernel/state/world-state.js';
-import type { WorldStateHolder } from '../../core/kernel/ops/transaction.js';
-import type { OpRegistry } from '../../core/kernel/ops/registry.js';
-import type { DefRegistry } from '../../core/kernel/state/def.js';
-import type { RuleProvider } from '../../core/kernel/events/rule-provider.js';
-import type { ExprEngine } from '../../core/kernel/expr/engine.js';
-import type { QueryEngine } from '../../core/kernel/expr/query-engine.js';
-import type { ActionCatalog } from '../../core/kernel/actions/catalog.js';
-import type { PlaypackLoader } from '../../core/kernel/schedule/playpack.js';
-import type { PlaypackActivator } from '../../core/kernel/schedule/playpack-runtime.js';
-import type { Diagnostic } from '../../core/kernel/state/diagnostic.js';
-import type { Result } from '../../core/kernel/ops/result.js';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { CoreMechanicsConfig, CoreMechanicsLoadResult, CoreMechanicsRuntime, CoreMechanicsFacade } from '../core-mechanics/load.js';
-import type { TerminalQuery } from '../core-mechanics/match-lifecycle.js';
-import type { CoreMechanicsProjection } from '../core-mechanics/projection.js';
-import type { MapData } from '../map/types.js';
-import type { PlayAiRuntime } from '../ai-runtime.js';
-import type { RegistryBridge } from '../../l2/kernel/registry-bridge.js';
-import type { KernelContract } from '../../l2/kernel/kernel-contract.js';
-import type { PresentationGateway } from '../../core/kernel/gateway.js';
-import type { UiSystem } from '../../ui/index.js';
-import type { PresentationProfile } from '../../ui/model/profile.js';
+import type { WorldState } from '../../core/kernel/state/world-state';
+import type { WorldStateHolder } from '../../core/kernel/ops/transaction';
+import type { OpRegistry } from '../../core/kernel/ops/registry';
+import type { DefRegistry } from '../../core/kernel/state/def';
+import type { RuleProvider } from '../../core/kernel/events/rule-provider';
+import type { ExprEngine } from '../../core/kernel/expr/engine';
+import type { QueryEngine } from '../../core/kernel/expr/query-engine';
+import type { ActionCatalog } from '../../core/kernel/actions/catalog';
+import type { PlaypackLoader } from '../../core/kernel/schedule/playpack';
+import type { PlaypackActivator } from '../../core/kernel/schedule/playpack-runtime';
+import type { Diagnostic } from '../../core/kernel/state/diagnostic';
+import type { Result } from '../../core/kernel/ops/result';
+import type { Value } from '../../core/kernel/state/value';
+import type { CoreMechanicsConfig, CoreMechanicsLoadResult, CoreMechanicsRuntime, CoreMechanicsFacade } from '../core-mechanics/load';
+import type { TerminalQuery } from '../core-mechanics/match-lifecycle';
+import type { CoreMechanicsProjection } from '../core-mechanics/projection';
+import type { MapDataDocument } from '../map/types';
+import type { PlayAiRuntime } from '../ai-runtime';
+import type { RegistryBridge } from '../../l2/kernel/registry-bridge';
+import type { KernelContract } from '../../l2/kernel/kernel-contract';
+import type { PresentationGateway } from '../../core/kernel/gateway';
+import type { UiSystem } from '../../ui/index';
+import type { PresentationProfile } from '../../ui/model/profile';
+import type { DesignCurrencyConfig } from '../../core/kernel/ai/tuning/config-design-currency';
+import type { PlaypackDef } from '../../core/kernel/schedule/playpack';
 
 /** 出生装配的实体来源。`spawnCandidates` 优先；缺省时回退到 `playerEntityIds`。 */
 export interface SpawnInput {
@@ -45,6 +47,8 @@ export interface SpawnInput {
 export interface LoadedMatchOptions {
   /** 玩法层装载配置。生产 config 属玩法层（Q-3），整合层只注入，不持有默认值。 */
   readonly config: CoreMechanicsConfig;
+  /** 可选的已编译玩法文件/玩法包定义；缺省时使用官方默认玩法包。 */
+  readonly playpack?: PlaypackDef;
   /** 本局参与的玩家实体 id（出生 + 参与者自动注册输入）。 */
   readonly playerEntityIds: readonly string[];
   /**
@@ -54,13 +58,22 @@ export interface LoadedMatchOptions {
    * 预置只做「数据落地」，不做任何规则语义；规则语义全部由玩法包装载派生。
    */
   readonly initialWorld?: WorldState;
-  /** 可选：装载进 world 的地图（compileMap → PrefabDef → prefab.spawn，消费现有 MapData 契约）。 */
-  readonly map?: MapData;
+  /**
+   * 可选：装载进 world 的地图（compileMap → PrefabDef → prefab.spawn）。接受 legacy v1
+   * floor 形状或 canonical v2 layer 形状；组合根在 compileMap 前统一经 `normalizeMapDocument`
+   * 规范化为 canonical，legacy floor 只在导入边界出现。
+   */
+  readonly map?: MapDataDocument;
   /** 可选：AI 预算提供者；不传则本局无 NPC（npcAction 阶段空队列直接通过）。 */
   readonly npcBudget?: () => readonly {
-    readonly entry: import('../ai-runtime.js').NpcEntry;
+    readonly entry: import('../ai-runtime').NpcEntry;
     readonly ap: number;
   }[];
+  /**
+   * 可选：AI 决策使用的设计货币费目表（调参产物）。`createPlayAiRuntime` 已支持注入；
+   * 不传则使用默认费目表。仅影响 AI 决策估值，不改任何玩法规则。
+   */
+  readonly designCurrencyConfig?: DesignCurrencyConfig;
   /** 可选：Presentation_Profile（UI 宿主侧注入）。不传则不装配 UI 面。 */
   readonly profile?: PresentationProfile;
 }
@@ -104,6 +117,10 @@ export interface LoadedMatch {
   readonly terminal: TerminalQuery;
   /** 演员面：AI runtime（无 NPC 时为 null）。 */
   readonly ai: PlayAiRuntime | null;
+  /** 关联合并快照：把主 holder 的最新可见世界合入 AI runtime 的决策快照，保留 AI 侧
+   *  登记（agent / NPC 实体 / npcQueue / 实体作用域 AP）不被主世界覆盖。宿主可在任何
+   *  `prop.set` 或阶段推进后调用，保证 AI 仿真分支读到与主世界一致的判罚前置。 */
+  readonly syncAiFromMatch: () => void;
   /** L1↔L2 注册表桥产物：`kernel` 是真实 OpRegistry 包裹的唯一语义写入通道。 */
   readonly bridge: RegistryBridge;
   /** 桥产 KernelContract 包裹的动作提交器（专项 D 承接链：UI 与玩家/AI 同一判罚路径）。 */
@@ -155,7 +172,7 @@ export interface MatchShell {
 /** 装载请求：传给 `createLoadedMatch` 的全部输入。 */
 export interface LoadMatchRequest extends LoadedMatchOptions {
   readonly scheduleId: string;
-  readonly seedDefs?: readonly import('../../core/kernel/state/def.js').Def[];
+  readonly seedDefs?: readonly import('../../core/kernel/state/def').Def[];
 }
 
 /** 只读门面持有者（`getState` 不暴露任何写通道）。 */

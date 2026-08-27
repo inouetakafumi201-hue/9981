@@ -20,8 +20,8 @@
  * 因此本模块只使用两个位置都真实可用的通道：`{path}`、`{var}`、`refGet`，以及算术/比较/逻辑/
  * 表算子。`{q:...}` 只在 `Effect` 里使用（`require` 里没有 `runQuery`，用了会恒为 `null`）。
  */
-import type { Expr } from '../../../core/kernel/state/expr-types.js';
-import type { Effect } from '../../../core/kernel/events/effect-types.js';
+import type { Expr } from '../../../core/kernel/state/expr-types';
+import type { Effect } from '../../../core/kernel/events/effect-types';
 
 // ---------------------------------------------------------------------------
 // 基础形态

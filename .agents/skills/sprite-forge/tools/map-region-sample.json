@@ -1,0 +1,19 @@
+{
+  "schema": "wakeup.map-regions.v1",
+  "source": {"image": "source.png", "author_pass": "author-pass.png"},
+  "regions": [
+    {
+      "id": "hall-west",
+      "building_group": "school-west",
+      "bbox": [8, 12, 24, 16],
+      "shell": {"type": "wall", "path": "shell"},
+      "floor": {"branch": "tile", "path": "floor"},
+      "normalized_frame": {"width": 24, "height": 16, "scale": 1},
+      "entrance_anchors": [{"x": 20, "y": 27, "kind": "door"}],
+      "stair_anchors": [{"x": 30, "y": 20, "kind": "stairs"}],
+      "view": "top-down-plan",
+      "text_detected": false,
+      "dynamic_objects_detected": false
+    }
+  ]
+}

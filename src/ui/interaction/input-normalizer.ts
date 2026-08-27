@@ -17,8 +17,8 @@ import {
   uiRejected,
   type UiDiagnostic,
   type UiResult,
-} from '../model/diagnostic.js';
-import type { InputSource } from '../model/intent.js';
+} from '../model/diagnostic';
+import type { InputSource } from '../model/intent';
 
 /** 物理输入来源。比 `InputSource` 多两类，归一化时收敛。 */
 export const RAW_INPUT_KINDS = [

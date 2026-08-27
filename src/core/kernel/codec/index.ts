@@ -14,5 +14,5 @@
  * - 不能删除现有公共导出
  */
 
-export { StrictJsonCodec, JsonCodecError, canonicalStringify, compareCodePoints, jsonTypeOf, escapeJsonPointer, joinJsonPointer } from './strict-json-codec.js';
-export type { JsonObject, JsonArray } from './strict-json-codec.js';
+export { StrictJsonCodec, JsonCodecError, canonicalStringify, compareCodePoints, jsonTypeOf, escapeJsonPointer, joinJsonPointer } from './strict-json-codec';
+export type { JsonObject, JsonArray } from './strict-json-codec';

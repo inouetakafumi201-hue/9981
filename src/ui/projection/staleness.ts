@@ -14,7 +14,7 @@
  * 语义状态当成同一个，是本模块要防的最危险失效形态。
  */
 
-import { compareRevision, type StateRevision } from '../model/revision.js';
+import { compareRevision, type StateRevision } from '../model/revision';
 
 export const STALENESS_VERDICTS = ['fresh', 'stale', 'requires-full-resync'] as const;
 export type StalenessVerdict = (typeof STALENESS_VERDICTS)[number];

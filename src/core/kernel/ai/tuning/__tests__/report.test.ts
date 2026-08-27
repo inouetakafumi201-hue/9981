@@ -5,10 +5,10 @@
  *  - 否则拒绝固化。
  */
 import { describe, expect, it } from 'vitest';
-import { generateTuningReport, solidifyAssertion } from '../report.js';
-import { BehaviorAssertionRegistry } from '../assertions.js';
-import type { BehaviorAssertion } from '../assertions.js';
-import type { ParameterTuningRecord } from '../tuner.js';
+import { generateTuningReport, solidifyAssertion } from '../report';
+import { BehaviorAssertionRegistry } from '../assertions';
+import type { BehaviorAssertion } from '../assertions';
+import type { ParameterTuningRecord } from '../tuner';
 
 function mkAssertion(id: string, opts: Partial<BehaviorAssertion> = {}): BehaviorAssertion {
   return {

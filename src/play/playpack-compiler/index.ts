@@ -3,9 +3,9 @@
  *
  * 这是 LLM 工具、玩家上传、审核系统的共同入口。
  */
-export { compile } from './compile.js';
-export { compileToPlaypackDef } from './assemble.js';
-export { calculateComplexityScore, suggestPriceTier } from './complexity.js';
+export { compile } from './compile';
+export { compileToPlaypackDef } from './assemble';
+export { calculateComplexityScore, suggestPriceTier } from './complexity';
 export type {
   CompileOptions,
   CompiledPlaypack,
@@ -16,4 +16,4 @@ export type {
   PlaypackDiagnostic,
   PlaypackInput,
   PlaypackSource,
-} from './types.js';
+} from './types';

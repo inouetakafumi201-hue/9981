@@ -5,9 +5,9 @@
  * 术语翻译成贴近玩家的语言（见 readableFieldName），并对单位当量、触发场景、调参历史、
  * ±0.5 影响做「模拟」说明。design.md §6「表自述生成器」+ §7「浅出输出」。
  */
-import type { DesignCurrencyConfig, DesignCurrencyChargeConfig } from './config-design-currency.js';
-import { readableFieldName } from './trace.js';
-import type { ParameterTuningRecord } from './tuner.js';
+import type { DesignCurrencyConfig, DesignCurrencyChargeConfig } from './config-design-currency';
+import { readableFieldName } from './trace';
+import type { ParameterTuningRecord } from './tuner';
 
 /** 字段 → 玩家语言的映射（与 trace.readableFieldName 同源，避免重复维护）。 */
 export { readableFieldName };

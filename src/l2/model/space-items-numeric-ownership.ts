@@ -12,14 +12,14 @@
  * - `Internal_Metric` → 按自身 Schema 校验，不套用 1–5；缺显式标注的数值不得以"内部"为由豁免。
  */
 
-import type { HumanReadableText } from './ids.js';
-import { joinJsonPath } from './ids.js';
-import type { OwningLayer, SourceRecord } from './source.js';
-import type { DeclaredRange, ParameterField } from './schema.js';
-import { NUMERIC_DECLARED_TYPES } from './schema.js';
-import { GAMEPLAY_VALUE_RANGE } from './constitution.js';
-import { compareStrings } from './ordering.js';
-import { deepFreeze } from './immutable.js';
+import type { HumanReadableText } from './ids';
+import { joinJsonPath } from './ids';
+import type { OwningLayer, SourceRecord } from './source';
+import type { DeclaredRange, ParameterField } from './schema';
+import { NUMERIC_DECLARED_TYPES } from './schema';
+import { GAMEPLAY_VALUE_RANGE } from './constitution';
+import { compareStrings } from './ordering';
+import { deepFreeze } from './immutable';
 
 /** 数值归属四分类。与 `./schema.ts` 的 `ParameterClassification` 同取值。 */
 export const NUMERIC_OWNERSHIPS = Object.freeze([

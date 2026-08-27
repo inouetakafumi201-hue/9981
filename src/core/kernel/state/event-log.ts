@@ -8,8 +8,8 @@
  * 为什么把裁剪与写入放在一起：需求15.1 要求缓冲"有界"，若写入与裁剪分离成两步，任何忘记调用
  * 裁剪的路径都会让缓冲无界增长，而这正是需求15.4 与"不挂死"承诺要排除的情形。
  */
-import type { Value } from './value.js';
-import type { LogEntry, WorldState } from './world-state.js';
+import type { Value } from './value';
+import type { LogEntry, WorldState } from './world-state';
 
 /**
  * 保留窗口声明（对应 `PlaypackDef.logRetention`，需求15.2）。

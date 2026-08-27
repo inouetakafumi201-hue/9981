@@ -6,8 +6,8 @@
  */
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { overlayOpacity } from '../layers/layer-shapes.js';
-import { hasDuplicateHeights, visibleLayers } from '../layers/layer-rules.js';
+import { overlayOpacity } from '../layers/layer-shapes';
+import { hasDuplicateHeights, visibleLayers } from '../layers/layer-rules';
 
 // 生成一个图层：id、可空 height（留空 = 三界外）。option 用 { nil: undefined } 让留空为 undefined。
 // 稳定 id：非空、不含空白（对齐 isStableIdentity）。
@@ -160,28 +160,29 @@ describe('devboard correctness properties', () => {
     );
   });
 
-  it('Property 5: 透明公式单调 — 两侧都填 height 时 opacity=min(1,|Δh|·.1)，差满 10 达 1，且随差值单调不减(含浮点容差)', () => {
+  it('Property 5: 透明公式单调 — 两侧都填 height 时 opacity = clamp(1 - |Δh| × 0.1, 0, 1)，差满 10 达 0，且随差值单调不增(含浮点容差)', () => {
     fc.assert(
       fc.property(finitePosArb, finitePosArb, (a, b) => {
         const op = overlayOpacity(a, b);
         expect(op).not.toBeNull();
         const d = Math.abs(a - b);
         if (d >= 10) {
-          expect(op).toBe(1);
+          expect(op).toBe(0);
         } else {
-          expect(op!).toBeCloseTo(d * 0.1, 5);
+          expect(op!).toBeCloseTo(1 - d * 0.1, 5);
         }
         // 任一侧留空 → null（三界外不叠加）
         expect(overlayOpacity(undefined, b)).toBeNull();
         expect(overlayOpacity(a, undefined)).toBeNull();
-        // 单调不减：提高差值（对浮点用相对容差）
+        // 差值变大时不透明度不增（对浮点用相对容差）
         const op2 = overlayOpacity(a + 0.5, b);
         expect(op2).not.toBeNull();
         const diffAfter = Math.abs(a + 0.5 - b);
-        const expected = Math.min(1, diffAfter * 0.1);
+        const expected = Math.max(0, Math.min(1, 1 - diffAfter * 0.1));
         expect(op2!).toBeCloseTo(expected, 5);
       }),
       { numRuns: 200 },
     );
   });
+
 });

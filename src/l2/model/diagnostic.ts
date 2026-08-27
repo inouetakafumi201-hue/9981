@@ -15,8 +15,8 @@ import type {
   JsonPath,
   PackageId,
   StableDiagnosticCode,
-} from './ids.js';
-import type { SourceLocation, SourceRecord } from './source.js';
+} from './ids';
+import type { SourceLocation, SourceRecord } from './source';
 
 /** 诊断严重级别（Requirements 13.1）。 */
 export type DiagnosticSeverity = 'Error' | 'Warning';

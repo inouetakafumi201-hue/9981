@@ -810,6 +810,7 @@
       "kind": "action",
       "label": "强力骰 +1",
       "group": "initiative-window",
+      "track": "card",
       "require": {
         "op": "isNull",
         "args": [
@@ -861,6 +862,7 @@
       "kind": "action",
       "label": "强力骰 +2",
       "group": "initiative-window",
+      "track": "card",
       "require": {
         "op": "isNull",
         "args": [
@@ -912,6 +914,7 @@
       "kind": "action",
       "label": "逆转",
       "group": "initiative-window",
+      "track": "card",
       "require": {
         "op": "isNull",
         "args": [
@@ -963,6 +966,7 @@
       "kind": "action",
       "label": "超逆转",
       "group": "initiative-window",
+      "track": "card",
       "require": {
         "op": "isNull",
         "args": [
@@ -1014,6 +1018,7 @@
       "kind": "action",
       "label": "招架",
       "group": "preparation",
+      "track": "card",
       "cost": [
         { "pool": "AP", "amount": 1 }
       ],
@@ -1032,6 +1037,7 @@
       "kind": "action",
       "label": "完成行动",
       "group": "turn-control",
+      "track": "card",
       "require": {
         "op": "not",
         "args": [

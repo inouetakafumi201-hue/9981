@@ -10,48 +10,48 @@
  * 真实基类层端口证据位于 `__tests__/integration/full-pipeline.integration.test.ts`；保留本 harness 是为了
  * 精确注入上游失败、能力缺口和 TOCTOU，而不是替代生产 `l2-adapter.ts`。
  */
-import { createDiagnosticCodeCatalog } from '../diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../diagnostics/factory.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../ports/sha256-fingerprint-gateway.js';
-import { QUOTA_KINDS } from '../model/quota-types.js';
-import type { TrustedQuotaProfile } from '../model/quota-types.js';
-import type { SourceRecord } from '../../kernel/state/diagnostic.js';
+import { createDiagnosticCodeCatalog } from '../diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../diagnostics/factory';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { sha256FingerprintGateway } from '../ports/sha256-fingerprint-gateway';
+import { QUOTA_KINDS } from '../model/quota-types';
+import type { TrustedQuotaProfile } from '../model/quota-types';
+import type { SourceRecord } from '../../kernel/state/diagnostic';
 import type {
   DefinitionRegistryReadSnapshot,
   PresentationGap,
   UpstreamResolvedReferenceGraph,
   UpstreamSchemaView,
   UpstreamValidatedCandidate,
-} from '../model/upstream.js';
-import type { ActivationResult } from '../model/report.js';
-import type { ValidationBaseline } from '../model/baseline.js';
-import type { ValidatedChangeSet } from '../model/validated-change-set.js';
-import type { TargetOwnership } from '../model/candidate.js';
+} from '../model/upstream';
+import type { ActivationResult } from '../model/report';
+import type { ValidationBaseline } from '../model/baseline';
+import type { ValidatedChangeSet } from '../model/validated-change-set';
+import type { TargetOwnership } from '../model/candidate';
 import {
   MANDATORY_RESOLUTION_CAPABILITIES,
   MANDATORY_VALIDATION_CAPABILITIES,
-} from '../ports/definition-ports.js';
+} from '../ports/definition-ports';
 import type {
   DefinitionRegistryGateway,
   DefinitionValidationGateway,
   ReferenceResolutionGateway,
   RuntimeCompatibilityGateway,
-} from '../ports/definition-ports.js';
-import type { CanonicalizationSchemaView, SchemaMigrationGateway, SchemaVersionCatalog } from '../ports/schema-ports.js';
-import type { EffectContractView, MemberVerdict } from '../codec/prohibited-construct-gate.js';
-import type { IntegrationContract } from '../model/contract-types.js';
-import { createIntegrationContractCatalog } from '../contracts/integration-contract-catalog.js';
-import type { BaselineSources } from '../baseline/baseline-factory.js';
-import { createStrictJsonDecoder } from '../codec/strict-json-decoder.js';
-import { createProhibitedConstructGate } from '../codec/prohibited-construct-gate.js';
-import { createSchemaMigrationCoordinator } from '../migration/schema-migration-coordinator.js';
-import { createCanonicalizationGateway } from '../canonical/canonicalizer.js';
-import { createPresentationFallbackResolver } from '../presentation/fallback-resolver.js';
-import { createValidationCoordinator } from '../validation/coordinator.js';
-import { createAtomicActivationCoordinator } from '../activation/atomic-activation-coordinator.js';
-import { createUGCIngressFacade } from '../facade/ugc-ingress-facade.js';
-import type { UGCIngressFacade } from '../facade/ugc-ingress-facade.js';
+} from '../ports/definition-ports';
+import type { CanonicalizationSchemaView, SchemaMigrationGateway, SchemaVersionCatalog } from '../ports/schema-ports';
+import type { EffectContractView, MemberVerdict } from '../codec/prohibited-construct-gate';
+import type { IntegrationContract } from '../model/contract-types';
+import { createIntegrationContractCatalog } from '../contracts/integration-contract-catalog';
+import type { BaselineSources } from '../baseline/baseline-factory';
+import { createStrictJsonDecoder } from '../codec/strict-json-decoder';
+import { createProhibitedConstructGate } from '../codec/prohibited-construct-gate';
+import { createSchemaMigrationCoordinator } from '../migration/schema-migration-coordinator';
+import { createCanonicalizationGateway } from '../canonical/canonicalizer';
+import { createPresentationFallbackResolver } from '../presentation/fallback-resolver';
+import { createValidationCoordinator } from '../validation/coordinator';
+import { createAtomicActivationCoordinator } from '../activation/atomic-activation-coordinator';
+import { createUGCIngressFacade } from '../facade/ugc-ingress-facade';
+import type { UGCIngressFacade } from '../facade/ugc-ingress-facade';
 
 export const fingerprint = sha256FingerprintGateway;
 export const diagnosticCatalog = createDiagnosticCodeCatalog(fingerprint);

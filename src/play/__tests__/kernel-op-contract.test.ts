@@ -10,14 +10,14 @@
  * profile 级的 `kernelOps` 又反向多声明了从未落地的 `list.remove` 与 `tag.add`。
  */
 import { describe, expect, it } from 'vitest';
-import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness.js';
-import { loadPlayProfiles, type PlayProfile } from '../profiles/catalog.js';
+import { createFullHarness, defaultSeedDefs } from '../../core/kernel/testing/full-harness';
+import { loadPlayProfiles, type PlayProfile } from '../profiles/catalog';
 import {
   auditKernelOpDeclarations,
   collectUsedOpSites,
   declaredOpsField,
   PENDING_OPS_FIELD,
-} from '../profiles/audit.js';
+} from '../profiles/audit';
 
 const profiles = loadPlayProfiles();
 

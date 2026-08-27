@@ -9,14 +9,14 @@
  *  - 受 step 步长约束。
  * 产生 ParameterTuningRecord（attribution / change / verification / decision），支持回滚。
  */
-import type { DesignCurrencyConfig, DesignCurrencyChargeConfig } from './config-design-currency.js';
+import type { DesignCurrencyConfig, DesignCurrencyChargeConfig } from './config-design-currency';
 import {
   defaultDesignCurrencyConfig,
   parseDesignCurrencyConfig,
   saveDesignCurrencyConfig,
   toCompactCharge,
-} from './config-design-currency.js';
-import type { DecisionTrace } from './trace.js';
+} from './config-design-currency';
+import type { DecisionTrace } from './trace';
 
 /** 可调参数类型。 */
 export type TunableField = 'unit' | 'scarcity.coefficient';

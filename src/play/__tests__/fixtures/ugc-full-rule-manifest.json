@@ -1,0 +1,148 @@
+{
+  "id": "playpack:play.ugc-full-rule",
+  "kind": "playpack",
+  "version": "1.0.0",
+  "schedule": "schedule:ugc-full",
+  "rules": [
+    "rule:ugc-full.taunt"
+  ],
+  "pools": [
+    {
+      "name": "ap",
+      "per": "actor",
+      "min": 0,
+      "max": 3,
+      "reset": "turn"
+    }
+  ],
+  "outcomes": [
+    {
+      "name": "round-checkpoint",
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "not",
+            "args": [
+              {
+                "op": "isNull",
+                "args": [
+                  { "path": "world.props.play.round" }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "eq",
+            "args": [
+              { "path": "world.props.play.matchEnded" },
+              false
+            ]
+          }
+        ]
+      },
+      "scope": "game",
+      "rank": 1,
+      "ends": false
+    }
+  ],
+  "defs": [
+    {
+      "id": "schedule:ugc-full",
+      "kind": "schedule",
+      "loop": true,
+      "order": "fixed",
+      "phases": [
+        {
+          "id": "phase:ugc-full.action",
+          "name": "行动阶段",
+          "phaseKind": "normal",
+          "input": "actor"
+        },
+        {
+          "id": "phase:ugc-full.settle",
+          "name": "结算阶段",
+          "phaseKind": "normal",
+          "input": "none"
+        }
+      ],
+      "play": {
+        "numericOwnership": {},
+        "sourceTrace": ["D-081 / P5 测试夹具"]
+      }
+    },
+    {
+      "id": "action:play.ugc.taunt",
+      "kind": "action",
+      "label": "嘲讽",
+      "group": "play.paid",
+      "track": "card",
+      "require": true,
+      "cost": [
+        { "pool": "ap", "amount": 1 }
+      ],
+      "effects": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.ugcTauntUsed",
+            "value": 1
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "cost.0.amount": {
+            "kind": "constitutional",
+            "sourceId": "S8 一个动作永远 1 AP"
+          },
+          "effects.0.args.value": {
+            "kind": "gameplay",
+            "min": 1,
+            "max": 5,
+            "int": true
+          }
+        },
+        "costClass": "paid",
+        "sourceTrace": ["D-081 / P5 测试夹具"]
+      }
+    },
+    {
+      "id": "rule:ugc-full.taunt",
+      "kind": "rule",
+      "on": "play.ugc.taunt.request",
+      "phase": "default",
+      "priority": 100,
+      "when": {
+        "op": "isNull",
+        "args": [
+          { "path": "world.props.play.request.ugcTaunt.veto" }
+        ]
+      },
+      "effects": [
+        {
+          "op": "prop.set",
+          "args": {
+            "path": "world.props.play.ugcTauntResolved",
+            "value": 1
+          }
+        }
+      ],
+      "play": {
+        "numericOwnership": {
+          "priority": {
+            "kind": "internal",
+            "note": "规则结算次序编号，不呈现给玩家，也不参与玩法刻度比较。"
+          },
+          "effects.0.args.value": {
+            "kind": "gameplay",
+            "min": 1,
+            "max": 5,
+            "int": true
+          }
+        },
+        "sourceTrace": ["D-081 / P5 测试夹具"]
+      }
+    }
+  ]
+}

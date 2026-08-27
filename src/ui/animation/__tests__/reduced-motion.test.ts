@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { revision } from '../../__tests__/support/fixtures.js';
-import type { PresentationCommand, PresentationCommandKind } from '../scheduler.js';
+import { revision } from '../../__tests__/support/fixtures';
+import type { PresentationCommand, PresentationCommandKind } from '../scheduler';
 import {
   applyReducedMotion,
   presentationInformationSignature,
-} from '../reduced-motion.js';
+} from '../reduced-motion';
 
 function command(kind: PresentationCommandKind, sequence: number): PresentationCommand {
   return Object.freeze({

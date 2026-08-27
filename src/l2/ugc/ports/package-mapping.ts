@@ -20,18 +20,18 @@
  * 使它们与其他 l2 诊断走完全相同的投影与排序路径。
  */
 
-import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { ValidationStage } from '../../../core/ugc/model/stage.js';
-import type { CanonicalizedChangeRequest } from '../../../core/ugc/model/canonical-types.js';
-import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes.js';
-import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic.js';
-import { errorDiagnostic } from '../../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics, compareStrings, stableStringify } from '../../model/ordering.js';
-import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids.js';
-import type { DefinitionPackage } from '../../model/definition.js';
-import { parsePackage } from '../../codec/json-codec.js';
-import type { SourceIndex } from './source-index.js';
+import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { ValidationStage } from '../../../core/ugc/model/stage';
+import type { CanonicalizedChangeRequest } from '../../../core/ugc/model/canonical-types';
+import { DIAGNOSTIC_CODES } from '../../model/diagnostic-codes';
+import type { Diagnostic as L2Diagnostic } from '../../model/diagnostic';
+import { errorDiagnostic } from '../../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics, compareStrings, stableStringify } from '../../model/ordering';
+import { joinJsonPath, ROOT_JSON_PATH } from '../../model/ids';
+import type { DefinitionPackage } from '../../model/definition';
+import { parsePackage } from '../../codec/json-codec';
+import type { SourceIndex } from './source-index';
 
 export interface CandidateMappingInput {
   readonly request: CanonicalizedChangeRequest;

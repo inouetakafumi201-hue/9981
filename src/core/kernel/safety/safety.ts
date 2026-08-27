@@ -2,16 +2,16 @@
  * L13 Safety: DiagnosticSink, HINT_TEMPLATES, RuleCircuitBreaker, Linter, QuotaEnforcer
  * (design.md 3.14 / requirements 39.1-39.12, Property 20, 29).
  */
-import type { ErrCode } from '../state/error-codes.js';
-import type { Diagnostic, Severity } from '../state/diagnostic.js';
-import { isFatalCode, isInfrastructureFatalCode } from '../state/error-codes.js';
-import type { WorldState } from '../state/world-state.js';
-import type { RuleCircuitEntry } from '../state/world-state.js';
-import type { Id } from '../state/ids.js';
-import type { Def } from '../state/def.js';
-import type { Expr } from '../state/expr-types.js';
-import { collectCallTargets } from '../state/expr-types.js';
-import type { AttachmentDef } from '../attachment/types.js';
+import type { ErrCode } from '../state/error-codes';
+import type { Diagnostic, Severity } from '../state/diagnostic';
+import { isFatalCode, isInfrastructureFatalCode } from '../state/error-codes';
+import type { WorldState } from '../state/world-state';
+import type { RuleCircuitEntry } from '../state/world-state';
+import type { Id } from '../state/ids';
+import type { Def } from '../state/def';
+import type { Expr } from '../state/expr-types';
+import { collectCallTargets } from '../state/expr-types';
+import type { AttachmentDef } from '../attachment/types';
 
 // ---------------------------------------------------------------------------
 // DiagnosticSink: four-severity contract + fatal handling + dedup/folding

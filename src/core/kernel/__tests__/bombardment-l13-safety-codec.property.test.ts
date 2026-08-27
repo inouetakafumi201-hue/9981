@@ -10,13 +10,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { StrictJsonCodec, JsonCodecError, canonicalStringify } from '../codec/index.js';
-import { RuleCircuitBreaker, QuotaEnforcer, DiagnosticSink, DiagnosticHaltError } from '../safety/safety.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../ports/index.js';
-import type { CandidateDocumentInput } from '../ports/index.js';
-import type { Diagnostic, DiagnosticScope, CompilationStage } from '../state/diagnostic.js';
-import type { ErrCode } from '../state/error-codes.js';
+import { StrictJsonCodec, JsonCodecError, canonicalStringify } from '../codec/index';
+import { RuleCircuitBreaker, QuotaEnforcer, DiagnosticSink, DiagnosticHaltError } from '../safety/safety';
+import { createEmptyWorldState } from '../state/world-state';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../ports/index';
+import type { CandidateDocumentInput } from '../ports/index';
+import type { Diagnostic, DiagnosticScope, CompilationStage } from '../state/diagnostic';
+import type { ErrCode } from '../state/error-codes';
 
 const codec = new StrictJsonCodec();
 

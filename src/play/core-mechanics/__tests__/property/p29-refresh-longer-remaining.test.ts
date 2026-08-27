@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbStatusApplyPair } from './generators.js';
+import { arbStatusApplyPair } from './generators';
 
 describe('Property 29: 刷新策略与强度', () => {
   it('pickLongerRemainingTurns 选择较大值', () => {

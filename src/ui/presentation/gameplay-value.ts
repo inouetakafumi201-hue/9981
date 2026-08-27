@@ -10,15 +10,15 @@
  * 该约束由 `__tests__/gameplay-value.test.ts` 的源文本扫描机械保证。
  */
 
-import { GAMEPLAY_VALUE_RANGE } from '../../l2/model/constitution.js';
-import type { ResourceSemanticRole } from '../../l2/model/family-contracts.js';
+import { GAMEPLAY_VALUE_RANGE } from '../../l2/model/constitution';
+import type { ResourceSemanticRole } from '../../l2/model/family-contracts';
 import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   uiOk,
   uiRejected,
   type UiResult,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 
 /**
  * 玩法数值的合法取值域。

@@ -15,7 +15,6 @@
  * - ✅ 规范化快照（canonical JSON）
  */
 
-import { createHash } from 'node:crypto';
 import type {
   CandidateDocumentInput,
   ParsedCandidateDocument,
@@ -25,8 +24,8 @@ import type {
   JsonValue,
   TechnicalQuotas,
   StrictJsonCodecPort,
-} from '../ports/index.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../security/index.js';
+} from '../ports/index';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../security/index';
 
 export type JsonObject = Record<string, JsonValue>;
 export type JsonArray = JsonValue[];
@@ -111,7 +110,10 @@ export class StrictJsonCodec implements StrictJsonCodecPort {
     }
 
     // 计算源码整体哈希
-    const contentHash = createHash('sha256').update(input.sourceText, 'utf8').digest('hex');
+    const contentHash = (() => {
+      const h = input.sourceText.split('').reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 0);
+      return h.toString(16).padStart(16, '0');
+    })();
 
     // 解析 JSON
     let value: JsonValue;

@@ -33,31 +33,31 @@ export {
   makeRef,
   nextId,
   resetIdCounters,
-} from './state/ids.js';
-export type { Id, IdPrefix, Ref } from './state/ids.js';
+} from './state/ids';
+export type { Id, IdPrefix, Ref } from './state/ids';
 
-export { isFiniteNumber, isValidValue, validateValue } from './state/value.js';
-export type { Value, ValueValidationResult } from './state/value.js';
+export { isFiniteNumber, isValidValue, validateValue } from './state/value';
+export type { Value, ValueValidationResult } from './state/value';
 
-export { DefRegistry } from './state/def.js';
-export type { Def, DefKind, DefRegisterResult, ContainerSpec, SlotSpec } from './state/def.js';
+export { DefRegistry } from './state/def';
+export type { Def, DefKind, DefRegisterResult, ContainerSpec, SlotSpec } from './state/def';
 
-export { createEntityShape, createItemShape } from './state/entity.js';
-export type { Entity, Item } from './state/entity.js';
+export { createEntityShape, createItemShape } from './state/entity';
+export type { Entity, Item } from './state/entity';
 
-export { createAttachmentShape, cascadeRemovalSet } from './state/attachment.js';
-export type { Attachment } from './state/attachment.js';
+export { createAttachmentShape, cascadeRemovalSet } from './state/attachment';
+export type { Attachment } from './state/attachment';
 
-export { createAgentShape } from './state/agent.js';
-export type { Agent, AgentKind } from './state/agent.js';
+export { createAgentShape } from './state/agent';
+export type { Agent, AgentKind } from './state/agent';
 
-export { RelationIndex } from './state/relation.js';
-export type { Relation } from './state/relation.js';
+export { RelationIndex } from './state/relation';
+export type { Relation } from './state/relation';
 
-export { hasTag } from './state/tag.js';
-export type { Taggable } from './state/tag.js';
+export { hasTag } from './state/tag';
+export type { Taggable } from './state/tag';
 
-export { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from './state/world-state.js';
+export { createEmptyWorldState, TOP_LEVEL_COLLECTION_KEYS } from './state/world-state';
 export type {
   WorldState,
   WorldTop,
@@ -68,13 +68,13 @@ export type {
   RuleCircuitEntry,
   DeferredEffect,
   LogEntry,
-} from './state/world-state.js';
+} from './state/world-state';
 
-export { DEFAULT_LOG_RETENTION, applyLogRetention, appendLogEntry, logEntryToValue } from './state/event-log.js';
-export type { LogRetention } from './state/event-log.js';
+export { DEFAULT_LOG_RETENTION, applyLogRetention, appendLogEntry, logEntryToValue } from './state/event-log';
+export type { LogRetention } from './state/event-log';
 
-export { collectCallTargets } from './state/expr-types.js';
-export type { Expr, Query, QueryFrom } from './state/expr-types.js';
+export { collectCallTargets } from './state/expr-types';
+export type { Expr, Query, QueryFrom } from './state/expr-types';
 
 export {
   ERR_CODES,
@@ -82,10 +82,10 @@ export {
   INFRASTRUCTURE_FATAL_CODES,
   isFatalCode,
   isInfrastructureFatalCode,
-} from './state/error-codes.js';
-export type { ErrCode } from './state/error-codes.js';
+} from './state/error-codes';
+export type { ErrCode } from './state/error-codes';
 
-export type { Diagnostic, Severity } from './state/diagnostic.js';
+export type { Diagnostic, Severity } from './state/diagnostic';
 
 // ===========================================================================
 // L1 Topology — 需求 7、8、9、10、11
@@ -96,8 +96,8 @@ export type { Diagnostic, Severity } from './state/diagnostic.js';
 // 布局数据，应落在 src/scene，不能进这条导出面。
 // ===========================================================================
 
-export { createNodeShape, createLinkShape, createSlotShape, createContainerShape } from './topology/types.js';
-export type { Node, Link, Slot, Container } from './topology/types.js';
+export { createNodeShape, createLinkShape, createSlotShape, createContainerShape } from './topology/types';
+export type { Node, Link, Slot, Container } from './topology/types';
 
 export {
   insertSlot,
@@ -108,34 +108,34 @@ export {
   removeSlotShift,
   findDefaultSlotIndex,
   setSlotHolds,
-} from './topology/container.js';
+} from './topology/container';
 
-export { linksTouching, connectedComponents, childNodesOf, cascadeNodeDestroySet } from './topology/graph.js';
+export { linksTouching, connectedComponents, childNodesOf, cascadeNodeDestroySet } from './topology/graph';
 
-export { dist, spread, shortestPath, radius } from './topology/metrics.js';
-export type { DistOpts, SpreadOpts, SpreadResult } from './topology/metrics.js';
+export { dist, spread, shortestPath, radius } from './topology/metrics';
+export type { DistOpts, SpreadOpts, SpreadResult } from './topology/metrics';
 
-export { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity } from './topology/micro-scene.js';
-export type { MicroSceneSpec, CreateNodeFn } from './topology/micro-scene.js';
+export { ensureMicroScene, onMicroSceneOccupantsChanged, checkMicroSceneCapacity } from './topology/micro-scene';
+export type { MicroSceneSpec, CreateNodeFn } from './topology/micro-scene';
 
-export { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from './topology/prefab.js';
-export type { PrefabDef, PrefabHandle } from './topology/prefab.js';
+export { buildKeyToIdMap, remapLinks, resolveAttachToRoot } from './topology/prefab';
+export type { PrefabDef, PrefabHandle } from './topology/prefab';
 
 // ===========================================================================
 // L2 Expr / Query — 需求 12、13、14、15
 // ===========================================================================
 
-export { ExprEngine, makeDefaultEvalContext } from './expr/engine.js';
-export type { EvalContext, ExprOpImpl } from './expr/engine.js';
+export { ExprEngine, makeDefaultEvalContext } from './expr/engine';
+export type { EvalContext, ExprOpImpl } from './expr/engine';
 
-export { checkPure, registerExprDef, applyOverrides } from './expr/named-expr.js';
-export type { ExprDef, PureCheckResult } from './expr/named-expr.js';
+export { checkPure, registerExprDef, applyOverrides } from './expr/named-expr';
+export type { ExprDef, PureCheckResult } from './expr/named-expr';
 
-export { QueryEngine, collectSourceRefs } from './expr/query-engine.js';
-export type { QueryRunDeps } from './expr/query-engine.js';
+export { QueryEngine, collectSourceRefs } from './expr/query-engine';
+export type { QueryRunDeps } from './expr/query-engine';
 
-export { makeExprStateAccess, asRef } from './expr/state-access.js';
-export type { ExprStateAccess, TopologyOpOpts } from './expr/state-access.js';
+export { makeExprStateAccess, asRef } from './expr/state-access';
+export type { ExprStateAccess, TopologyOpOpts } from './expr/state-access';
 
 // ===========================================================================
 // L3 Ops / Transactions — 需求 16、17、18、19、20、21
@@ -145,23 +145,23 @@ export type { ExprStateAccess, TopologyOpOpts } from './expr/state-access.js';
 // setPath/deletePath 是 prop.* 系列 Op 的内部实现，故意不出现在这里。
 // ===========================================================================
 
-export { OpRegistry } from './ops/registry.js';
-export type { OpContext, OpImpl, InvokeHooks } from './ops/registry.js';
+export { OpRegistry } from './ops/registry';
+export type { OpContext, OpImpl, InvokeHooks } from './ops/registry';
 
-export { ok, err } from './ops/result.js';
-export type { Result } from './ops/result.js';
+export { ok, err } from './ops/result';
+export type { Result } from './ops/result';
 
-export { Transaction, WorldStateHolder } from './ops/transaction.js';
-export type { JournalEntry } from './ops/transaction.js';
+export { Transaction, WorldStateHolder } from './ops/transaction';
+export type { JournalEntry } from './ops/transaction';
 
-export { InvariantChecker, ALL_INVARIANT_CHECKS } from './ops/invariants.js';
+export { InvariantChecker, ALL_INVARIANT_CHECKS } from './ops/invariants';
 
-export { getPath, isWritablePropsPath } from './ops/path.js';
+export { getPath, isWritablePropsPath } from './ops/path';
 
-export { checkInstantiable } from './ops/def-guard.js';
-export type { DefLookupFn } from './ops/def-guard.js';
+export { checkInstantiable } from './ops/def-guard';
+export type { DefLookupFn } from './ops/def-guard';
 
-export { registerPropOps, makePropAdd, propSet, propDel, listInsert, listRemove, listMove } from './ops/prop-ops.js';
+export { registerPropOps, makePropAdd, propSet, propDel, listInsert, listRemove, listMove } from './ops/prop-ops';
 export type {
   PropSetArgs,
   PropDelArgs,
@@ -170,7 +170,7 @@ export type {
   ListRemoveArgs,
   ListMoveArgs,
   TagArgs,
-} from './ops/prop-ops.js';
+} from './ops/prop-ops';
 
 export {
   registerStructuralOps,
@@ -190,7 +190,7 @@ export {
   makeEntityDemote,
   materializeDefContainers,
   createContainerForOwner,
-} from './ops/structural-ops.js';
+} from './ops/structural-ops';
 export type {
   EntityCreateArgs,
   EntityDestroyArgs,
@@ -207,10 +207,10 @@ export type {
   EntityPlaceArgs,
   ItemPromoteArgs,
   EntityDemoteArgs,
-} from './ops/structural-ops.js';
+} from './ops/structural-ops';
 
-export { registerStackOps, makeStackSplit, stackMerge } from './ops/stack-ops.js';
-export type { StackSplitArgs, StackMergeArgs } from './ops/stack-ops.js';
+export { registerStackOps, makeStackSplit, stackMerge } from './ops/stack-ops';
+export type { StackSplitArgs, StackMergeArgs } from './ops/stack-ops';
 
 export {
   registerRelationOps,
@@ -219,39 +219,39 @@ export {
   relOut,
   relIn,
   removeAllRelationsInvolving,
-} from './ops/relation-ops.js';
-export type { RelationSetArgs, RelationDelArgs } from './ops/relation-ops.js';
+} from './ops/relation-ops';
+export type { RelationSetArgs, RelationDelArgs } from './ops/relation-ops';
 
-export { registerTransformOps, makeEntitySetDef, nodeMerge, makeNodeSplit } from './ops/transform-ops.js';
-export type { CarryField, EntitySetDefArgs, NodeMergeArgs, NodeSplitArgs, NodeSplitSpec } from './ops/transform-ops.js';
+export { registerTransformOps, makeEntitySetDef, nodeMerge, makeNodeSplit } from './ops/transform-ops';
+export type { CarryField, EntitySetDefArgs, NodeMergeArgs, NodeSplitArgs, NodeSplitSpec } from './ops/transform-ops';
 
-export { registerAgentOps, agentCreate, agentBind, agentUnbind } from './ops/agent-ops.js';
-export type { AgentCreateArgs, AgentBindArgs, AgentUnbindArgs } from './ops/agent-ops.js';
+export { registerAgentOps, agentCreate, agentBind, agentUnbind } from './ops/agent-ops';
+export type { AgentCreateArgs, AgentBindArgs, AgentUnbindArgs } from './ops/agent-ops';
 
-export { registerOutcomeOps, outcomeReach } from './ops/outcome-ops.js';
-export type { OutcomeReachArgs } from './ops/outcome-ops.js';
+export { registerOutcomeOps, outcomeReach } from './ops/outcome-ops';
+export type { OutcomeReachArgs } from './ops/outcome-ops';
 
-export { registerPrefabOps } from './ops/prefab-ops.js';
-export type { PrefabSpawnArgs, PrefabDespawnArgs, PrefabOpsDeps } from './ops/prefab-ops.js';
+export { registerPrefabOps } from './ops/prefab-ops';
+export type { PrefabSpawnArgs, PrefabDespawnArgs, PrefabOpsDeps } from './ops/prefab-ops';
 
 export {
   attachmentsCascadeFor,
   cascadeRelationsAndAttachments,
   destroyOwnedContainers,
   clearHoldingSlot,
-} from './ops/cascade-destroy.js';
+} from './ops/cascade-destroy';
 
 // ===========================================================================
 // L4 Events / Hooks — 需求 23、24
 // ===========================================================================
 
-export { HookDispatcher } from './events/dispatcher.js';
-export type { HookCandidate, HookDiagnostic, HookDispatcherDeps, EffectRunner } from './events/dispatcher.js';
+export { HookDispatcher } from './events/dispatcher';
+export type { HookCandidate, HookDiagnostic, HookDispatcherDeps, EffectRunner } from './events/dispatcher';
 
-export { RuleProvider } from './events/rule-provider.js';
-export type { DynamicRuleResolver } from './events/rule-provider.js';
+export { RuleProvider } from './events/rule-provider';
+export type { DynamicRuleResolver } from './events/rule-provider';
 
-export type { Event, HookPhase, RuleDef, DispatchResult } from './events/types.js';
+export type { Event, HookPhase, RuleDef, DispatchResult } from './events/types';
 
 // ===========================================================================
 // L5 Flow — 需求 22
@@ -260,23 +260,23 @@ export type { Event, HookPhase, RuleDef, DispatchResult } from './events/types.j
 // FlowInterpreter 也不导出任何"注册自定义 Effect 形态"的接口。
 // ===========================================================================
 
-export { FlowInterpreter } from './flow/interpreter.js';
-export type { FlowInterpreterDeps, FlowRunResult } from './flow/interpreter.js';
-export type { Effect } from './events/effect-types.js';
+export { FlowInterpreter } from './flow/interpreter';
+export type { FlowInterpreterDeps, FlowRunResult } from './flow/interpreter';
+export type { Effect } from './events/effect-types';
 
 // ===========================================================================
 // L6 Actions — 需求 25、26
 // ===========================================================================
 
-export { ActionCatalog } from './actions/catalog.js';
-export type { ActionCatalogDeps, QueryMode } from './actions/catalog.js';
+export { ActionCatalog } from './actions/catalog';
+export type { ActionCatalogDeps, QueryMode } from './actions/catalog';
 
-export type { ActionDef, TargetSpec, CostSpec, LegalAction } from './actions/types.js';
+export type { ActionDef, TargetSpec, CostSpec, LegalAction } from './actions/types';
 
-export { freezeCost, settleCost, refundCost } from './actions/cost.js';
-export type { FrozenCostEntry, Reservation, CostSettleDeps } from './actions/cost.js';
+export { freezeCost, settleCost, refundCost } from './actions/cost';
+export type { FrozenCostEntry, Reservation, CostSettleDeps } from './actions/cost';
 
-export { registerPoolOps } from './actions/pool-ops.js';
+export { registerPoolOps } from './actions/pool-ops';
 export type {
   PoolResetTrigger,
   PoolInitializeArgs,
@@ -286,7 +286,7 @@ export type {
   PoolResetArgs,
   PoolAddResult,
   PoolOpsDeps,
-} from './actions/pool-ops.js';
+} from './actions/pool-ops';
 
 // ===========================================================================
 // L7 Decision / Intent — 需求 27、28、29
@@ -299,34 +299,34 @@ export {
   makeProcessDecisionTimeouts,
   decisionClose,
   checkQuorum,
-} from './decision/decision-ops.js';
-export type { DecisionDefLookup, DecisionAnswerDeps, QuorumCheckFn } from './decision/decision-ops.js';
+} from './decision/decision-ops';
+export type { DecisionDefLookup, DecisionAnswerDeps, QuorumCheckFn } from './decision/decision-ops';
 
-export { registerIntentOps } from './decision/intent-ops.js';
+export { registerIntentOps } from './decision/intent-ops';
 export type {
   IntentSubmitArgs,
   IntentResolveArgs,
   IntentVoidArgs,
   IntentRevealArgs,
   IntentOpsDeps,
-} from './decision/intent-ops.js';
+} from './decision/intent-ops';
 
-export { queryPendingIntentsFor, queryAllPendingIntents } from './decision/response-phase.js';
-export type { ResponsePhaseDef } from './decision/response-phase.js';
+export { queryPendingIntentsFor, queryAllPendingIntents } from './decision/response-phase';
+export type { ResponsePhaseDef } from './decision/response-phase';
 
-export type { DecisionDef, DecisionOpenArgs, DecisionAnswerArgs } from './decision/types.js';
+export type { DecisionDef, DecisionOpenArgs, DecisionAnswerArgs } from './decision/types';
 
 // ===========================================================================
 // L8 Attachment — 需求 30
 // ===========================================================================
 
-export { registerAttachOps } from './attachment/attach-ops.js';
-export type { AttachAddArgs, AttachDelArgs, AttachExpireArgs, AttachOpsDeps } from './attachment/attach-ops.js';
+export { registerAttachOps } from './attachment/attach-ops';
+export type { AttachAddArgs, AttachDelArgs, AttachExpireArgs, AttachOpsDeps } from './attachment/attach-ops';
 
-export { AuraEngine } from './attachment/aura-engine.js';
-export type { AuraComputeResult, AuraEngineOpts } from './attachment/aura-engine.js';
+export { AuraEngine } from './attachment/aura-engine';
+export type { AuraComputeResult, AuraEngineOpts } from './attachment/aura-engine';
 
-export type { AttachmentDef, AttachStackStrategy } from './attachment/types.js';
+export type { AttachmentDef, AttachStackStrategy } from './attachment/types';
 
 // ===========================================================================
 // L9 Schedule / Playpack / Policy — 需求 31、32、33、34
@@ -335,26 +335,26 @@ export type { AttachmentDef, AttachStackStrategy } from './attachment/types.js';
 // 本段不导出任何 setInterval/setTimeout/Clock/RealTime 接口。
 // ===========================================================================
 
-export { registerScheduleOps } from './schedule/schedule-ops.js';
-export type { ScheduleAdvanceArgs, ScheduleOpsDeps } from './schedule/schedule-ops.js';
+export { registerScheduleOps } from './schedule/schedule-ops';
+export type { ScheduleAdvanceArgs, ScheduleOpsDeps } from './schedule/schedule-ops';
 
-export type { PhaseDef, PhaseInput, PhaseKind, ScheduleDef } from './schedule/types.js';
+export type { PhaseDef, PhaseInput, PhaseKind, ScheduleDef } from './schedule/types';
 
-export { PlaypackLoader } from './schedule/playpack.js';
-export type { PlaypackDef, PoolDef, OutcomeDef, LoadResult, PlaypackLoaderOpts } from './schedule/playpack.js';
+export { PlaypackLoader } from './schedule/playpack';
+export type { PlaypackDef, PoolDef, OutcomeDef, LoadResult, PlaypackLoaderOpts } from './schedule/playpack';
 
-export { PlaypackActivator, registerPlaypackRuntimeOps } from './schedule/playpack-runtime.js';
+export { PlaypackActivator, registerPlaypackRuntimeOps } from './schedule/playpack-runtime';
 export type {
   PlaypackActivateArgs,
   PlaypackActivatorDeps,
   PlaypackRuntimeOpsDeps,
   ActivationResult,
-} from './schedule/playpack-runtime.js';
+} from './schedule/playpack-runtime';
 
-export { PlaypackCodec, decodePlaypack } from './schedule/playpack-codec.js';
-export type { PlaypackDecodeResult } from './schedule/playpack-codec.js';
+export { PlaypackCodec, decodePlaypack } from './schedule/playpack-codec';
+export type { PlaypackDecodeResult } from './schedule/playpack-codec';
 
-export { PolicyEvaluator } from './schedule/policy.js';
+export { PolicyEvaluator } from './schedule/policy';
 export type {
   PolicyDef,
   PolicyRuleEntry,
@@ -363,22 +363,22 @@ export type {
   PolicyEvalContext,
   CheckpointRestoreHook,
   SearchPolicyResolver,
-} from './schedule/policy.js';
+} from './schedule/policy';
 
 // ===========================================================================
 // L10 Random — 需求 35
 // ===========================================================================
 
-export { registerRandomOps } from './random/random-ops.js';
+export { registerRandomOps } from './random/random-ops';
 export type {
   RandomRollArgs,
   RandomPickArgs,
   RandomShuffleArgs,
   RandomWeightedPickArgs,
-} from './random/random-ops.js';
+} from './random/random-ops';
 
-export { withShadowStream, snapshotStream, restoreStream } from './random/shadow-stream.js';
-export type { ShadowStreamOpts } from './random/shadow-stream.js';
+export { withShadowStream, snapshotStream, restoreStream } from './random/shadow-stream';
+export type { ShadowStreamOpts } from './random/shadow-stream';
 
 // ===========================================================================
 // L11 Knowledge — 需求 36
@@ -387,8 +387,8 @@ export type { ShadowStreamOpts } from './random/shadow-stream.js';
 // 这里不存在 setFact 这条第二写入路径。
 // ===========================================================================
 
-export { WorldKnowledgeStore, knowledgeStore } from './knowledge/knowledge-store.js';
-export type { KnowledgeStore } from './knowledge/knowledge-store.js';
+export { WorldKnowledgeStore, knowledgeStore } from './knowledge/knowledge-store';
+export type { KnowledgeStore } from './knowledge/knowledge-store';
 
 // ===========================================================================
 // L12 Persistence — 需求 37、38
@@ -403,7 +403,7 @@ export {
   applyMigration,
   compareVersions,
   LogStore,
-} from './persistence/persistence.js';
+} from './persistence/persistence';
 export type {
   Snapshot,
   JournalRecord,
@@ -414,7 +414,7 @@ export type {
   // 与 state/world-state.ts 的 LogEntry 同名但语义不同（前者是 world.log 的条目，
   // 后者是 LogStore 的条目），因此重命名导出，避免导出面出现二义。
   LogEntry as PersistenceLogEntry,
-} from './persistence/persistence.js';
+} from './persistence/persistence';
 
 // ===========================================================================
 // L13 Safety — 需求 39、41、42
@@ -428,7 +428,7 @@ export {
   RuleCircuitBreaker,
   Linter,
   QuotaEnforcer,
-} from './safety/safety.js';
+} from './safety/safety';
 export type {
   DiagnosticOverflowPolicy,
   DiagnosticSinkOpts,
@@ -436,17 +436,17 @@ export type {
   LintResult,
   LinterOpts,
   QuotaLimits,
-} from './safety/safety.js';
+} from './safety/safety';
 
-export { FatalErrorBoundary, InMemoryEmergencySink, CompilationHaltedError } from './safety/fatal-boundary.js';
-export type { EmergencyCode, EmergencySink, FatalEnvelope } from './safety/fatal-boundary.js';
+export { FatalErrorBoundary, InMemoryEmergencySink, CompilationHaltedError } from './safety/fatal-boundary';
+export type { EmergencyCode, EmergencySink, FatalEnvelope } from './safety/fatal-boundary';
 
 // ===========================================================================
 // 横切：表现层只读通道（需求40）与 Hook 接线（design 3.4节 withVeto 的落点）
 // ===========================================================================
 
-export { PresentationGateway } from './gateway.js';
-export type { GatewayEventHandler, GatewaySubscription, PresentationGatewayDeps } from './gateway.js';
+export { PresentationGateway } from './gateway';
+export type { GatewayEventHandler, GatewaySubscription, PresentationGatewayDeps } from './gateway';
 
-export { wireHooksIntoRegistry, WiredOpRegistry } from './wire-hooks.js';
-export type { WiredHooks, WireHooksOpts } from './wire-hooks.js';
+export { wireHooksIntoRegistry, WiredOpRegistry } from './wire-hooks';
+export type { WiredHooks, WireHooksOpts } from './wire-hooks';

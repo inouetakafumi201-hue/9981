@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { StrictJsonCodec } from '../../spec-compiler/json-codec.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../../spec-compiler/types.js';
-import type { ParsedCandidateDocument } from '../../spec-compiler/types.js';
-import type { Def } from '../../state/def.js';
-import { decodePlaypack } from '../playpack-codec.js';
-import { downedZeroAttachment } from '../../../../play/core-mechanics/defs/attachments.js';
-import { CoreMechanicsPlaypack } from '../../../../play/core-mechanics/defs/playpack.js';
+import { StrictJsonCodec } from '../../spec-compiler/json-codec';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../spec-compiler/types';
+import type { ParsedCandidateDocument } from '../../spec-compiler/types';
+import type { Def } from '../../state/def';
+import { decodePlaypack } from '../playpack-codec';
+import { downedZeroAttachment } from '../../../../play/core-mechanics/defs/attachments';
+import { CoreMechanicsPlaypack } from '../../../../play/core-mechanics/defs/playpack';
 import {
   GAMEPLAY_VALUE_MAX,
   playExtensionOf,
   validateGameplayValueRange,
   validateNumericOwnership,
   validateProvenance,
-} from '../../../../play/core-mechanics/ownership.js';
+} from '../../../../play/core-mechanics/ownership';
 
 /**
  * 官方 TS 包的 Def 会被 `DefRegistry` 的 deepClone 之类工具复制，其 `play` 扩展是普通对象。
@@ -41,6 +41,8 @@ function fullPlayDef(): Record<string, unknown> {
     id: 'action:full-play',
     kind: 'action',
     label: 'Full play extension action',
+    // 双轨制 P3：track 为必填闭合域。
+    track: 'card',
     cost: [{ pool: 'actor-ap', amount: 1 }],
     effects: [{ emit: 'full.play', data: 5 }],
     play: {

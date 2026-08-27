@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbDamageCase } from './generators.js';
+import { arbDamageCase } from './generators';
 
 describe('Property 25: 治疗上限与不复活', () => {
   it('治疗最高恢复到 5', () => {

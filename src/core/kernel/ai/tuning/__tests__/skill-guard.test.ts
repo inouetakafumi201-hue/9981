@@ -7,8 +7,8 @@
 import { describe, expect, it } from 'vitest';
 import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { validateSkillContext, MANDATORY_SKILL_FILES } from '../skill-guard.js';
-import { projectRoot } from './_paths.js';
+import { validateSkillContext, MANDATORY_SKILL_FILES } from '../skill-guard';
+import { projectRoot } from './_paths';
 
 describe('skill-guard（Task15 / 属性12）', () => {
   it('强制加载清单包含费目配置/断言目录/禁碰清单/规则文档', () => {

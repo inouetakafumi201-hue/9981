@@ -7,7 +7,7 @@ import {
   genEntityRef,
   genActionRef,
   genAPValue
-} from './generators.js';
+} from './generators';
 
 /**
  * P35: UI、AI、UGC 与玩家共用同一合法性判定与同一拒绝原因

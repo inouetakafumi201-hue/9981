@@ -10,15 +10,15 @@
  * - Q-02 不推导两步/一步默认：验证器不要求也不禁止序列长度，只校验结构。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
 import type {
   ActionContract,
   GatewayContract,
-} from '../model/family-contracts.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+} from '../model/family-contracts';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 function actionOf(definition: CandidateDefinition): ActionContract | undefined {
   return definition.familyContract?.contractKind === 'action' ? definition.familyContract : undefined;

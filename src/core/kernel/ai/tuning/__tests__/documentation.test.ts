@@ -5,8 +5,8 @@
  *  - 未知费目输出「不在当前费目表」提示。
  */
 import { describe, expect, it } from 'vitest';
-import { generateFeeItemDocumentation, generateConfigOverview } from '../documentation.js';
-import { defaultDesignCurrencyConfig } from '../config-design-currency.js';
+import { generateFeeItemDocumentation, generateConfigOverview } from '../documentation';
+import { defaultDesignCurrencyConfig } from '../config-design-currency';
 
 describe('documentation（Task12）', () => {
   it('已知费目输出 Markdown 含当前当量', () => {

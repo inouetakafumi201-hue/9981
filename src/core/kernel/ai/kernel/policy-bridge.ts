@@ -6,15 +6,15 @@
  * submit through the canonical lifecycle. `submit` is offered separately for
  * schedulers that explicitly want the AI to commit the action itself.
  */
-import type { PolicyDef, PolicyEvalContext } from '../../schedule/policy.js';
-import type { Id, Ref } from '../../state/ids.js';
+import type { PolicyDef, PolicyEvalContext } from '../../schedule/policy';
+import type { Id, Ref } from '../../state/ids';
 import type {
   AIDecisionFacade,
   AIDecisionResult,
   AIDiagnostic,
   NPCActionRequest,
   NPCRecommendationRequest,
-} from '../types.js';
+} from '../types';
 
 /** Identity and bounded budget for one policy-driven AI decision. */
 export interface AIPolicyRequestBinding {

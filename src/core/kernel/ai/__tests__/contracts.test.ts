@@ -2,16 +2,16 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { FixedBudgetLedger } from '../budget.js';
-import { ValidatedBehaviorGateway, UnavailableBehaviorValidationGateway } from '../behavior-validation.js';
-import { createAIDiagnostic, unavailableContract } from '../diagnostics.js';
-import { RestrictedAIReadGateway, UnavailableAIReadGateway } from '../read-gateway.js';
+import { FixedBudgetLedger } from '../budget';
+import { ValidatedBehaviorGateway, UnavailableBehaviorValidationGateway } from '../behavior-validation';
+import { createAIDiagnostic, unavailableContract } from '../diagnostics';
+import { RestrictedAIReadGateway, UnavailableAIReadGateway } from '../read-gateway';
 import type {
   AIRecommendationRequest,
   AIDecisionRequest,
   PlayerRecommendationRequest,
   ValidatedAIBehaviorBinding,
-} from '../types.js';
+} from '../types';
 
 type Assert<T extends true> = T;
 type PlayerCannotAct = Extract<PlayerRecommendationRequest, { mode: 'act' }> extends never ? true : false;

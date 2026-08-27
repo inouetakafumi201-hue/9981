@@ -8,21 +8,21 @@
  * 四态穷举（不是随机采样），确认每一态都产生正确的 Result 且不产生任何状态改动（除合法态）。
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { registerStructuralOps, makeItemMove } from '../structural-ops.js';
-import { registerTransformOps } from '../transform-ops.js';
-import { registerPrefabOps } from '../prefab-ops.js';
-import { registerAttachOps } from '../../attachment/attach-ops.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { registerDecisionOps } from '../../decision/decision-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import type { Def } from '../../state/def.js';
-import type { Ref } from '../../state/ids.js';
-import type { PrefabDef } from '../../topology/prefab.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { registerStructuralOps, makeItemMove } from '../structural-ops';
+import { registerTransformOps } from '../transform-ops';
+import { registerPrefabOps } from '../prefab-ops';
+import { registerAttachOps } from '../../attachment/attach-ops';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { registerDecisionOps } from '../../decision/decision-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import type { Def } from '../../state/def';
+import type { Ref } from '../../state/ids';
+import type { PrefabDef } from '../../topology/prefab';
 
 type DefState = 'missing' | 'wrongKind' | 'abstract' | 'valid';
 const ALL_STATES: readonly DefState[] = ['missing', 'wrongKind', 'abstract', 'valid'];

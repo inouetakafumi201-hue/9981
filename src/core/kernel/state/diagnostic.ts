@@ -6,9 +6,9 @@
  * 需要在装载 L13 之前就能返回 Diagnostic[]，若类型定义在 L13 会造成 L3 反向 import L13。
  * L13（kernel/safety）拥有的是运行时逻辑：DiagnosticSink.emit/onFatal、hint 规则、去重折叠、熔断。
  */
-import type { Id, Ref } from './ids.js';
-import type { Value } from './value.js';
-import type { ErrCode } from './error-codes.js';
+import type { Id, Ref } from './ids';
+import type { Value } from './value';
+import type { ErrCode } from './error-codes';
 
 export type Severity = 'fatal' | 'error' | 'warn' | 'info';
 

@@ -14,21 +14,21 @@
  * 候选对象也不会原地写入活动对象（工作副本用 deepClonePlain 隔离）。
  */
 
-import type { StructuredRejection } from '../model/diagnostic.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { structuredRejection } from '../model/diagnostic-factory.js';
-import { isWarningDiagnostic } from '../model/diagnostic.js';
-import type { DefinitionPackage, ReadOnlyResolvedDefinition, ResolvedDefinition, SemanticFamilyRegistration } from '../model/definition.js';
-import type { PackageId } from '../model/ids.js';
-import type { TypedReference } from '../model/reference.js';
-import type { SourceRecord } from '../model/source.js';
-import type { CanonicalSnapshot } from '../model/snapshot.js';
-import type { CompiledSpecification } from '../compiler/types.js';
-import { deepFreeze } from '../model/immutable.js';
-import type { GraphNodeInfo, ReferenceGraph } from '../resolution/reference-graph.js';
-import { validateFullPackage } from '../validation/package-validation.js';
-import { createSnapshot, emptySnapshot } from './canonical-snapshot.js';
+import type { StructuredRejection } from '../model/diagnostic';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { structuredRejection } from '../model/diagnostic-factory';
+import { isWarningDiagnostic } from '../model/diagnostic';
+import type { DefinitionPackage, ReadOnlyResolvedDefinition, ResolvedDefinition, SemanticFamilyRegistration } from '../model/definition';
+import type { PackageId } from '../model/ids';
+import type { TypedReference } from '../model/reference';
+import type { SourceRecord } from '../model/source';
+import type { CanonicalSnapshot } from '../model/snapshot';
+import type { CompiledSpecification } from '../compiler/types';
+import { deepFreeze } from '../model/immutable';
+import type { GraphNodeInfo, ReferenceGraph } from '../resolution/reference-graph';
+import { validateFullPackage } from '../validation/package-validation';
+import { createSnapshot, emptySnapshot } from './canonical-snapshot';
 
 /** 已激活包的追踪记录（供快照使用）。 */
 export interface ActivatedPackageRecord {

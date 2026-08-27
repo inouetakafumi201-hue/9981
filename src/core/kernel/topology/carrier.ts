@@ -11,12 +11,12 @@
  * `checkSingleContainment`/`checkNoContainmentCycle`/`checkContainerBidirectional`
  * 均对实体/物品一体适用。本模块只补齐承载面的具名声明与判定。
  */
-import type { Id } from '../state/ids.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Container, Slot } from './types.js';
-import { createContainerShape, createSlotShape } from './types.js';
-import { nextId } from '../state/ids.js';
-import { insertSlot } from './container.js';
+import type { Id } from '../state/ids';
+import type { Expr } from '../state/expr-types';
+import type { Container, Slot } from './types';
+import { createContainerShape, createSlotShape } from './types';
+import { nextId } from '../state/ids';
+import { insertSlot } from './container';
 
 /**
  * 容器承载活体的具名特化形态。结构上就是 `Container`，多一个 `category` 标记。

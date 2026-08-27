@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial.js';
-import { CONFIRMED_DECISION_IDS } from '../../model/profile.js';
-import { profileFixture } from '../support/fixtures.js';
+import { planCeremonialPresentation, visibleStableIdFromProjection } from '../../animation/ceremonial';
+import { CONFIRMED_DECISION_IDS } from '../../model/profile';
+import { profileFixture } from '../support/fixtures';
 
 it('任意集合外动作无全屏演出且集合内每项来源均已确认', () => {
   fc.assert(fc.property(fc.string({ minLength: 1, maxLength: 40 }), (semantic) => {

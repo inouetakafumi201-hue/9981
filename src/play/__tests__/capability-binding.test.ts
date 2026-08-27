@@ -11,11 +11,11 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { loadClassLayerIndex, loadPlayProfiles, type PlayProfile } from '../profiles/catalog.js';
+import { loadClassLayerIndex, loadPlayProfiles, type PlayProfile } from '../profiles/catalog';
 import {
   auditCapabilityParameterBindings,
   auditTargetBinding,
-} from '../profiles/audit.js';
+} from '../profiles/audit';
 const profiles = loadPlayProfiles();
 const classIndex = loadClassLayerIndex();
 

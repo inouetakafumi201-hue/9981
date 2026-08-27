@@ -7,13 +7,13 @@
  * - fatal `E_INV_*` 不可被候选或警告改写。
  */
 import { describe, expect, it } from 'vitest';
-import { ERR_CODES, isFatalCode } from '../../../kernel/state/error-codes.js';
-import { HINT_TEMPLATES, checkHintCompleteness, DiagnosticSink } from '../../../kernel/safety/safety.js';
-import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from '../../diagnostics/code-map.js';
-import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog.js';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { ERR_CODES, isFatalCode } from '../../../kernel/state/error-codes';
+import { HINT_TEMPLATES, checkHintCompleteness, DiagnosticSink } from '../../../kernel/safety/safety';
+import { CODE_MAP, UGC_DIAGNOSTIC_CATEGORIES } from '../../diagnostics/code-map';
+import { createDiagnosticCodeCatalog } from '../../diagnostics/code-catalog';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 describe('Feature: wakeup-ugc, Task 11.2: shared diagnostic contracts', () => {
   it('every code UGC maps to exists in the closed ERR_CODES enum with a hint', () => {

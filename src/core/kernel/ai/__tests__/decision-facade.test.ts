@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry, UnavailablePlannerRegistry } from '../planner-registry.js';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry, UnavailablePlannerRegistry } from '../planner-registry';
 import type {
   AICandidate,
   AIReadScope,
@@ -14,7 +14,7 @@ import type {
   SearchPlanner,
   SearchSessionGateway,
   ValidatedAIBehaviorBinding,
-} from '../types.js';
+} from '../types';
 
 const npcRequest: NPCActionRequest = {
   category: 'npc-behavior',

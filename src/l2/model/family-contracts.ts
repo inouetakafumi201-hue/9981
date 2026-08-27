@@ -21,11 +21,11 @@ import type {
   SemanticFamilyId,
   SlotId,
   TagId,
-} from './ids.js';
-import type { JsonValue } from './json.js';
-import type { ExpectedReferenceType, ParameterSchema } from './schema.js';
-import type { SourceRecord } from './source.js';
-import type { TypedReference } from './reference.js';
+} from './ids';
+import type { JsonValue } from './json';
+import type { ExpectedReferenceType, ParameterSchema } from './schema';
+import type { SourceRecord } from './source';
+import type { TypedReference } from './reference';
 
 // ───────────────────────────────────────────────────────────────────────────
 // 通用片段
@@ -109,6 +109,31 @@ export const ACTION_COST_CATEGORIES = ['paid', 'attached'] as const;
 export type ActionCostCategory = (typeof ACTION_COST_CATEGORIES)[number];
 
 /**
+ * 卡片主题闭合枚举（双轨制 P1）。
+ * 图标颜色由前端组件映射到具体色值，不在此处指定十六进制。
+ */
+export const ACTION_CARD_COLOR_THEMES = ['neutral', 'aggressive', 'defensive', 'utility', 'mystical'] as const;
+export type ActionCardColorTheme = (typeof ACTION_CARD_COLOR_THEMES)[number];
+
+/**
+ * 卡片交互模式（双轨制 P1）。
+ * 可缺省；缺省时由 `interactionIntent` 推导：
+ * - `traversal` → `instant`
+ * - `precise-interaction` → `toggle`
+ * - `hostile-interaction` | `executable-target` → `target`
+ */
+export const CARD_INTERACTION_MODES = ['instant', 'toggle', 'target'] as const;
+export type CardInteractionMode = (typeof CARD_INTERACTION_MODES)[number];
+
+/** 已求值的卡片元数据（L2 投影层）。 */
+export interface ResolvedCardPresentation {
+  readonly icon: string;               // AssetRef 路径，已注册
+  readonly colorTheme: ActionCardColorTheme;
+  readonly effectText: string;         // Expr 求值结果，已转 string
+  readonly interactionMode: CardInteractionMode;
+}
+
+/**
  * 多步骤付费交互的一步。
  * Requirements 6.2：多步骤付费交互必须表达为有序 Paid_Action 序列并带显式中间状态。
  * 除最后一步外，每一步都必须声明 `intermediateStatusRef`。
@@ -147,6 +172,18 @@ export interface ActionContract {
   /** 姿态语义标签；L2 不枚举具体姿态，原样透传给 UI。 */
   readonly posture?: string;
   readonly accessibleLabel?: HumanReadableText;
+  /**
+   * 双轨制轨道（双轨制 P1）。
+   * - `'highlight'`：高亮轨
+   * - `'card'`：卡片轨
+   * 与 L1 ActionDef.track 同步。
+   */
+  readonly track?: 'highlight' | 'card';
+  /**
+   * 已求值的卡片元数据（双轨制 P1）。
+   * 仅当 `track === 'card'` 时出现。
+   */
+  readonly cardPresentation?: ResolvedCardPresentation;
 }
 
 // ───────────────────────────────────────────────────────────────────────────

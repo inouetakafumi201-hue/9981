@@ -6,13 +6,13 @@
  * 并复用与对象查询同一套 where/orderBy/limit 过滤链。
  */
 import { describe, expect, it } from 'vitest';
-import { QueryEngine } from '../query-engine.js';
-import { ExprEngine, makeDefaultEvalContext } from '../engine.js';
-import type { EvalContext } from '../engine.js';
-import { appendLogEntry } from '../../state/event-log.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import type { WorldState } from '../../state/world-state.js';
-import type { Expr } from '../../state/expr-types.js';
+import { QueryEngine } from '../query-engine';
+import { ExprEngine, makeDefaultEvalContext } from '../engine';
+import type { EvalContext } from '../engine';
+import { appendLogEntry } from '../../state/event-log';
+import { createEmptyWorldState } from '../../state/world-state';
+import type { WorldState } from '../../state/world-state';
+import type { Expr } from '../../state/expr-types';
 
 const exprEngine = new ExprEngine();
 const queryEngine = new QueryEngine();

@@ -10,9 +10,9 @@
  *
  * 失败一律返回引擎层 `Result`，不抛异常、不返回布尔或字符串原因（design.md 7.1）。
  */
-import type { Result } from '../../core/kernel/ops/result.js';
-import { ok, err } from '../../core/kernel/ops/result.js';
-import { GAMEPLAY_VALUE_MAX, GAMEPLAY_VALUE_MIN, isVisibleGameplayValue } from './ownership.js';
+import type { Result } from '../../core/kernel/ops/result';
+import { ok, err } from '../../core/kernel/ops/result';
+import { GAMEPLAY_VALUE_MAX, GAMEPLAY_VALUE_MIN, isVisibleGameplayValue } from './ownership';
 
 // ---------------------------------------------------------------------------
 // 类型

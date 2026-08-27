@@ -4,7 +4,7 @@
  * 验证统一出口头能正确组合现有编译器，并返回结构化诊断。
  */
 import { describe, expect, it } from 'vitest';
-import { compile, suggestPriceTier, type PlaypackInput } from '../index.js';
+import { compile, suggestPriceTier, type PlaypackInput } from '../index';
 
 function makeInput(overrides?: Partial<PlaypackInput>): PlaypackInput {
   return {

@@ -9,18 +9,18 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerStructuralOps, makeItemMove, createContainerForOwner } from '../../ops/structural-ops.js';
-import { registerCarrierOps, makeContainerExit } from '../../ops/carrier-ops.js';
-import { createCarrierSurface, addCarrierSlot } from '../../topology/carrier.js';
-import { resetIdCounters, nextId } from '../../state/ids.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import type { Def } from '../../state/def.js';
-import type { Ref } from '../../state/ids.js';
-import type { Entity } from '../../state/entity.js';
-import type { WorldState } from '../../state/world-state.js';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerStructuralOps, makeItemMove, createContainerForOwner } from '../../ops/structural-ops';
+import { registerCarrierOps, makeContainerExit } from '../../ops/carrier-ops';
+import { createCarrierSurface, addCarrierSlot } from '../../topology/carrier';
+import { resetIdCounters, nextId } from '../../state/ids';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import type { Def } from '../../state/def';
+import type { Ref } from '../../state/ids';
+import type { Entity } from '../../state/entity';
+import type { WorldState } from '../../state/world-state';
 
 const TEST_DEFS = new Map<string, Def>([
   ['d:human', { id: 'd:human', kind: 'entity' }],

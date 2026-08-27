@@ -19,38 +19,38 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createLoadedCoreMechanics } from '../../../../play/core-mechanics/__tests__/state-machine-load-driver.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { createEntityShape } from '../../state/entity.js';
-import { createAgentShape } from '../../state/agent.js';
-import { createContainerShape, createSlotShape, createNodeShape } from '../../topology/types.js';
-import { setPath } from '../../ops/path.js';
-import { DefRegistry } from '../../state/def.js';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { ExprEngine } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { KernelAIReadAdapter, type LegalActionSource } from '../kernel/read-adapter.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { DesignCurrencyGateway } from '../design-currency.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { KernelSearchSessionGateway } from '../kernel/search-session.js';
-import { SchedulePhaseParticipants } from '../kernel/participant-order.js';
-import { TAG_ROLL_PARTICIPANT } from '../../../../play/core-mechanics/defs/ids.js';
-import type { Ref } from '../../state/ids.js';
-import type { QueryMode } from '../../actions/catalog.js';
-import type { NPCActionRequest } from '../types.js';
+import { createLoadedCoreMechanics } from '../../../../play/core-mechanics/__tests__/state-machine-load-driver';
+import { resetIdCounters } from '../../state/ids';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { createEntityShape } from '../../state/entity';
+import { createAgentShape } from '../../state/agent';
+import { createContainerShape, createSlotShape, createNodeShape } from '../../topology/types';
+import { setPath } from '../../ops/path';
+import { DefRegistry } from '../../state/def';
+import { ActionCatalog } from '../../actions/catalog';
+import { ExprEngine } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { KernelAIReadAdapter, type LegalActionSource } from '../kernel/read-adapter';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { BoundedAIDecisionFacade } from '../facade';
+import { DesignCurrencyGateway } from '../design-currency';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { KernelSearchSessionGateway } from '../kernel/search-session';
+import { SchedulePhaseParticipants } from '../kernel/participant-order';
+import { TAG_ROLL_PARTICIPANT } from '../../../../play/core-mechanics/defs/ids';
+import type { Ref } from '../../state/ids';
+import type { QueryMode } from '../../actions/catalog';
+import type { NPCActionRequest } from '../types';
 
 // 与玩法层 e2e 同标的标识（引用 play 层交付的 `TAG_ROLL_PARTICIPANT`，不重造字符串）。
 const HERO = 'e:hero';
@@ -61,7 +61,7 @@ const BINDING = 'd:bind';
 const HERO_REF: Ref = { $: HERO };
 
 /** 全实体可见（与 combat-first 的 VISIBLE_TO 同构）。 */
-const VISIBLE_TO: import('../../state/expr-types.js').Expr = {
+const VISIBLE_TO: import('../../state/expr-types').Expr = {
   op: 'not',
   args: [{ op: 'includes', args: [{ path: 'world.props.hiddenRefs' }, { var: 'self' }] }],
 };
@@ -140,9 +140,9 @@ function playActionSource(loadRoot: ReturnType<typeof createLoadedCoreMechanics>
     queryEngine: harness.queryEngine,
     ctxForActor: (actor) => harness.ctxForSelf(actor),
     listActionDefs: () => harness.defRegistry.allResolved()
-      .filter((definition): definition is import('../../actions/types.js').ActionDef => definition.kind === 'action'),
+      .filter((definition): definition is import('../../actions/types').ActionDef => definition.kind === 'action'),
   });
-  const queryActions = (actorRef: Ref, mode: QueryMode): ReturnType<import('../../actions/catalog.js').ActionCatalog['queryActions']> =>
+  const queryActions = (actorRef: Ref, mode: QueryMode): ReturnType<import('../../actions/catalog').ActionCatalog['queryActions']> =>
     catalog.queryActions(actorRef, mode);
   return { queryActions };
 }
@@ -153,7 +153,7 @@ function buildAiFacade(
 ): BoundedAIDecisionFacade {
   const harness = loadRoot.harness;
   const defRegistry: DefRegistry = harness.defRegistry;
-  const defLookup = (id: string): import('../../state/def.js').Def | null => defRegistry.resolve(id);
+  const defLookup = (id: string): import('../../state/def').Def | null => defRegistry.resolve(id);
   const exprEngine: ExprEngine = harness.exprEngine;
   const queryEngine: QueryEngine = harness.queryEngine;
   const actionSource = playActionSource(loadRoot);
@@ -229,13 +229,13 @@ function rootRequest(): NPCActionRequest {
   };
 }
 
-function staminaOf(holder: import('../../ops/transaction.js').WorldStateHolder, actor: string): number | undefined {
+function staminaOf(holder: import('../../ops/transaction').WorldStateHolder, actor: string): number | undefined {
   const pools = (holder.getState().world.props as Record<string, unknown>)['pools'] as Record<string, Record<string, { real?: unknown }>> | undefined;
   const v = pools?.stamina?.[actor]?.real;
   return typeof v === 'number' ? v : undefined;
 }
 
-function hasTag(holder: import('../../ops/transaction.js').WorldStateHolder, actor: string, tag: string): boolean {
+function hasTag(holder: import('../../ops/transaction').WorldStateHolder, actor: string, tag: string): boolean {
   return (holder.getState().entities[actor]?.tags ?? []).includes(tag);
 }
 
@@ -376,4 +376,4 @@ describe('M10 状态机端到端靶（AI 消费：BoundedAIDecisionFacade 在真
 });
 
 /** 避免直接 import CoreMechanicsFacade（那会拖玩法规格器）。用组合根统一的模块边界。 */
-import { CoreMechanicsFacade as loadCoreMechanicsFacade } from '../../../../play/core-mechanics/load.js';
+import { CoreMechanicsFacade as loadCoreMechanicsFacade } from '../../../../play/core-mechanics/load';

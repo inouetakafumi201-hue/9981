@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { ValidatedBehaviorGateway, UnavailableBehaviorValidationGateway } from '../behavior-validation.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { toPublicDiagnostic } from '../diagnostics.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { projectAIExplanation } from '../explanation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { UnavailableAIReadGateway } from '../read-gateway.js';
-import { AI_UGC_SCHEMA_VERSION, DeclarativeAIUGCValidator } from '../ugc.js';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { ValidatedBehaviorGateway, UnavailableBehaviorValidationGateway } from '../behavior-validation';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { toPublicDiagnostic } from '../diagnostics';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { projectAIExplanation } from '../explanation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { UnavailableAIReadGateway } from '../read-gateway';
+import { AI_UGC_SCHEMA_VERSION, DeclarativeAIUGCValidator } from '../ugc';
 import type {
   AIDiagnostic,
   AIReadScope,
@@ -16,7 +16,7 @@ import type {
   NPCActionRequest,
   PlayerRecommendationRequest,
   ValidatedAIBehaviorBinding,
-} from '../types.js';
+} from '../types';
 
 const HIDDEN_ENTITY = 'e:hidden-assassin';
 

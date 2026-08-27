@@ -14,20 +14,20 @@
  * 注册过的动作，是 play 生产代码的受控输入，不是「复制测试对局数据」。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Value } from '../../core/kernel/state/value.js';
-import type { Def } from '../../core/kernel/state/def.js';
-import type { ActionDef } from '../../core/kernel/actions/types.js';
-import type { Expr } from '../../core/kernel/state/expr-types.js';
-import type { Effect } from '../../core/kernel/events/effect-types.js';
-import type { RuleDef } from '../../core/kernel/events/types.js';
-import type { ScheduleDef } from '../../core/kernel/schedule/types.js';
-import { resetIdCounters } from '../../core/kernel/state/ids.js';
-import { createEmptyWorldState } from '../../core/kernel/state/world-state.js';
-import { createAgentShape } from '../../core/kernel/state/agent.js';
-import { createEntityShape } from '../../core/kernel/state/entity.js';
-import { createNodeShape, createContainerShape, createSlotShape } from '../../core/kernel/topology/types.js';
-import { setPath } from '../../core/kernel/ops/path.js';
-import { createPlayAiRuntime, type PlayAiRuntime } from '../ai-runtime.js';
+import type { Value } from '../../core/kernel/state/value';
+import type { Def } from '../../core/kernel/state/def';
+import type { ActionDef } from '../../core/kernel/actions/types';
+import type { Expr } from '../../core/kernel/state/expr-types';
+import type { Effect } from '../../core/kernel/events/effect-types';
+import type { RuleDef } from '../../core/kernel/events/types';
+import type { ScheduleDef } from '../../core/kernel/schedule/types';
+import { resetIdCounters } from '../../core/kernel/state/ids';
+import { createEmptyWorldState } from '../../core/kernel/state/world-state';
+import { createAgentShape } from '../../core/kernel/state/agent';
+import { createEntityShape } from '../../core/kernel/state/entity';
+import { createNodeShape, createContainerShape, createSlotShape } from '../../core/kernel/topology/types';
+import { setPath } from '../../core/kernel/ops/path';
+import { createPlayAiRuntime, type PlayAiRuntime } from '../ai-runtime';
 
 const HERO = 'e:hero';
 const ENEMY = 'e:enemy';
@@ -54,7 +54,7 @@ const VISIBLE_TO: Expr = {
 };
 
 const attackAction: ActionDef = {
-  id: 'a:attack', kind: 'action', label: 'Attack',
+  id: 'a:attack', kind: 'action', label: 'Attack', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] } } }],
   require: true, cost: [],
   effects: [
@@ -96,7 +96,7 @@ const aiCombatDamageRule: RuleDef = {
 };
 
 const pickupAction: ActionDef = {
-  id: 'a:pickup', kind: 'action', label: 'Pickup',
+  id: 'a:pickup', kind: 'action', label: 'Pickup', track: 'highlight',
   targets: [{ name: 'item', query: { from: 'items' } }],
   require: true, cost: [],
   effects: [
@@ -106,7 +106,7 @@ const pickupAction: ActionDef = {
 };
 
 const healAction: ActionDef = {
-  id: 'a:heal', kind: 'action', label: 'Heal',
+  id: 'a:heal', kind: 'action', label: 'Heal', track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'eq', args: [{ var: 'self' }, { var: 'self' }] } } }],
   require: true, cost: [],
   effects: [
@@ -119,14 +119,14 @@ const healAction: ActionDef = {
 };
 
 const moveAction: ActionDef = {
-  id: 'a:move', kind: 'action', label: 'Move',
+  id: 'a:move', kind: 'action', label: 'Move', track: 'highlight',
   targets: [{ name: 'node', query: { from: 'nodes' } }],
   require: true, cost: [],
   effects: [opEffect('entity.place', { entityId: HERO, nodeId: refIdExpr(varRef('node')) })],
 };
 
 const eternalSleepAction: ActionDef = {
-  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep',
+  id: 'a:eternal-sleep', kind: 'action', label: 'EternalSleep', track: 'highlight',
   targets: [{
     name: 'target',
     query: { from: 'entities', where: {

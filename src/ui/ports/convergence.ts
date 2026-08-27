@@ -10,7 +10,7 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from '../model/diagnostic.js';
+} from '../model/diagnostic';
 
 export const PENDING_CONVERGENCE_CODE = 'PENDING_CONVERGENCE_CONTRACT' as const;
 

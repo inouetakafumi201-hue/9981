@@ -12,7 +12,7 @@
  * `<field>.<nested>`、`<nested>.<field>` 与声明槽位视为同一通路；裸 Op（无括号或空字段）
  * 返回 `not-applicable`（不外报，避免误报——真实 capabilities 的 kernelOps 214 个零括号）。
  */
-import type { DiagnosticCode } from './diagnostic-codes.js';
+import type { DiagnosticCode } from './diagnostic-codes';
 
 /** 匹配判定的明确三态，供属性测试断言（wakeup-cas-gap-closure Req 3.3）。 */
 export const CA_SCHEMA_OUTCOMES = ['match', 'no-match', 'not-applicable'] as const;

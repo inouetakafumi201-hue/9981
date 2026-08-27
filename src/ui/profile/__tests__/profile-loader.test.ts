@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic.js';
-import { loadPresentationProfile } from '../profile-loader.js';
+import { UI_DIAGNOSTIC_CODES } from '../../model/diagnostic';
+import { loadPresentationProfile } from '../profile-loader';
 
 const DEFAULT_PROFILE_TEXT = readFileSync(
   new URL('../wakeup-default.profile.json', import.meta.url),

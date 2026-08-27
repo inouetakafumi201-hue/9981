@@ -100,11 +100,11 @@ def assert_valid(frames, states):
 
 
 def assert_prompt_contract(sc) -> None:
-    """断言组件生成提示词遵守全项目唯一视角契约（俯视平面视图）。
+    """断言组件生成提示词遵守全项目唯一视角契约（正面俯视视图）。
 
     防止未来的改动把旧"正面斜投影/Cabinet/Cavalier/Among Us 类比"作为必须视角重新注入
     发往图像模型的 prompt。`NO front face` 这类否定禁令是合法的（它是在禁立面，不是要求立面）。
-    跑挂=视角契约被破坏，需回归 docs/表现系统/01 §俯视平面视图。
+    跑挂=视角契约被破坏，需回归 docs/表现系统/01 §正面俯视视图。
     """
     # 这些词只允许出现在否定禁令里（NO ... / not sidelong）；一旦作为肯定要求出现即违规。
     negatable = ["front face", "side face", "top face", "right side face",
@@ -121,7 +121,7 @@ def assert_prompt_contract(sc) -> None:
         hits2 = [w for w in forbidden_anywhere if w in low]
         assert not hits2, f"[{context}] 视角 prompt 混入被禁旧视角名/案例: {hits2}"
         if context == "map":
-            assert "ground shadow" in low, f"[{context}] 缺少落地阴影（俯视平面表达贴地）"
+            assert "ground shadow" in low, f"[{context}] 缺少落地阴影（正面俯视表达贴地）"
         assert "magenta" in low, f"[{context}] 缺少品红背景描述"
         print(f"=== VIEW contract [{context}]: top-down plan view, forbidden={hits2 or 'none'} GATE PASS ===")
 

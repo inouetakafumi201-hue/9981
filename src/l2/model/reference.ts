@@ -5,8 +5,8 @@
  * `Type_Identity` / `Composition_Component` / 类型化引用数据模型。
  */
 
-import type { DefinitionId, FieldName, HumanReadableText, JsonPath } from './ids.js';
-import type { ExpectedReferenceType, ParameterSchema } from './schema.js';
+import type { DefinitionId, FieldName, HumanReadableText, JsonPath } from './ids';
+import type { ExpectedReferenceType, ParameterSchema } from './schema';
 
 /**
  * 引用角色。

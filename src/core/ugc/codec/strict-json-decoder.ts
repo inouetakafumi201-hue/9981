@@ -8,17 +8,17 @@
  * 3. **创建前消费配额**。每个节点、成员、元素、深度增量都先扣预算再构造，超限即终止受影响遍历。
  * 4. **失败不暴露部分 AST**。任何错误都返回拒绝结果，已构造的栈帧被丢弃（需求 9.8）。
  */
-import type { Diagnostic, SourcePoint, SourceSpan } from '../../kernel/state/diagnostic.js';
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
-import { documentAnchorSpan } from '../diagnostics/factory.js';
-import type { CandidateDocument } from '../model/candidate.js';
-import type { JsonAst, JsonMember, ParsedCandidateDocument } from '../model/json-ast.js';
-import type { QuotaBudget, QuotaViolation } from '../model/quota-types.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
-import { DepthTracker } from '../quota/quota-budget.js';
-import { SourceCursor } from './source-cursor.js';
-import { UTF8_VIOLATION_TEXT, findFirstUtf8Violation } from './utf8.js';
+import type { Diagnostic, SourcePoint, SourceSpan } from '../../kernel/state/diagnostic';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
+import { documentAnchorSpan } from '../diagnostics/factory';
+import type { CandidateDocument } from '../model/candidate';
+import type { JsonAst, JsonMember, ParsedCandidateDocument } from '../model/json-ast';
+import type { QuotaBudget, QuotaViolation } from '../model/quota-types';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
+import { DepthTracker } from '../quota/quota-budget';
+import { SourceCursor } from './source-cursor';
+import { UTF8_VIOLATION_TEXT, findFirstUtf8Violation } from './utf8';
 
 /** 根对象中声明 Schema 版本的成员名（需求 12.1）。 */
 export const SCHEMA_VERSION_MEMBER = 'schemaVersion';

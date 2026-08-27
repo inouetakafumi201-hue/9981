@@ -12,17 +12,17 @@
  * - Q-05 只保留组合接口，不推导盾牌标配。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { joinJsonPath } from '../model/ids.js';
-import { isWellFormedId } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { joinJsonPath } from '../model/ids';
+import { isWellFormedId } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
 import type {
   ItemContract,
   VehicleContract,
   WeaponContract,
-} from '../model/family-contracts.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+} from '../model/family-contracts';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 export function validateWeapon(
   definition: CandidateDefinition,

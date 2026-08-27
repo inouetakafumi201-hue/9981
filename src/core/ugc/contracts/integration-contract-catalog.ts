@@ -9,19 +9,19 @@
  * 本目录因此刻意不缓存任何候选结果——它没有"待重试队列"，也没有候选的引用。
  * 每个候选都必须针对新基线完整重验。
  */
-import type { UGCDiagnosticFactory } from '../diagnostics/factory.js';
+import type { UGCDiagnosticFactory } from '../diagnostics/factory';
 import type {
   ContractExportKind,
   IntegrationContract,
   IntegrationContractSnapshot,
   IntegrationDomain,
   ResolvedContractExport,
-} from '../model/contract-types.js';
-import { INTEGRATION_DOMAINS } from '../model/contract-types.js';
-import type { StableFingerprintGateway } from '../model/fingerprint.js';
-import { compareCodePoints, encodeFingerprintPayload } from '../model/fingerprint.js';
-import type { UgcResult } from '../model/result.js';
-import { ugcOk, ugcReject } from '../model/result.js';
+} from '../model/contract-types';
+import { INTEGRATION_DOMAINS } from '../model/contract-types';
+import type { StableFingerprintGateway } from '../model/fingerprint';
+import { compareCodePoints, encodeFingerprintPayload } from '../model/fingerprint';
+import type { UgcResult } from '../model/result';
+import { ugcOk, ugcReject } from '../model/result';
 
 const STAGE = 'baseline' as const;
 

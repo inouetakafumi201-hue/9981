@@ -6,11 +6,11 @@
  * 由消费方（l2）调用它来自证端口完整——与 UGC 侧「integration 目录零 l2 耦合」的守卫方向相反且不冲突。
  */
 import { describe, expect, it } from 'vitest';
-import { inspectL2PortBundle, isL2PortBundleReady } from '../../../../core/ugc/integration/l2-port-contract.js';
-import { MANDATORY_VALIDATION_CAPABILITIES } from '../../../../core/ugc/ports/definition-ports.js';
-import { createL2PortBundle } from '../port-bundle.js';
-import { L2_PORT_PROVIDER_ID } from '../port-common.js';
-import { budget, makeRequest, makeValidationContext, validPackageJson } from './fixtures.js';
+import { inspectL2PortBundle, isL2PortBundleReady } from '../../../../core/ugc/integration/l2-port-contract';
+import { MANDATORY_VALIDATION_CAPABILITIES } from '../../../../core/ugc/ports/definition-ports';
+import { createL2PortBundle } from '../port-bundle';
+import { L2_PORT_PROVIDER_ID } from '../port-common';
+import { budget, makeRequest, makeValidationContext, validPackageJson } from './fixtures';
 
 describe('PT-02: l2 交付满足 L2PortBundle 目标形状', () => {
   it('装配出的端口集合通过 inspectL2PortBundle / isL2PortBundleReady', () => {

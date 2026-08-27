@@ -7,7 +7,7 @@ import {
   genEntityRef,
   genSceneRef,
   genStatusRef
-} from './generators.js';
+} from './generators';
 
 /**
  * P32: 隐蔽的场景限定、移动移除与不可被找到

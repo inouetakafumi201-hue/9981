@@ -4,7 +4,7 @@
  * 每个破坏性修改入栈一个「命令」，撤销走 `before` 快照、重做走 `after` 快照。
  * 往返恒等：`undo^n(redo^n(after)) == after`。栈空时 no-op（不抖动、不报错）。
  */
-import type { MapData } from '../ports/map-contracts.js';
+import type { MapData } from '../ports/map-contracts';
 
 export interface HistoryEntry {
   readonly label: string; // 撤销菜单/日志显示名

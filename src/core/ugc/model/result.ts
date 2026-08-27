@@ -7,7 +7,7 @@
  * error 级 Diagnostic"（需求 14.5），这两条都无法用单码结构表达。因此 UGC 使用携带完整 Diagnostic 列表的
  * 结果类型；它不替代内核 Result，只在 UGC 边界内部使用，且 Diagnostic/ErrCode 仍复用共享形状。
  */
-import type { Diagnostic } from '../../kernel/state/diagnostic.js';
+import type { Diagnostic } from '../../kernel/state/diagnostic';
 
 export interface UgcOk<T> {
   readonly ok: true;

@@ -9,8 +9,8 @@ import {
   UI_DIAGNOSTIC_CODES,
   uiDiagnostic,
   type UiDiagnostic,
-} from './diagnostic.js';
-import type { StateRevision } from './revision.js';
+} from './diagnostic';
+import type { StateRevision } from './revision';
 
 /** 可安全投影的取值。函数、`undefined`、Symbol 与非有限数一律不属于该集合。 */
 export type SafeProjectedValue =

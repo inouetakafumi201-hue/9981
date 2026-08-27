@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileFixture } from '../../__tests__/support/fixtures.js';
+import { profileFixture } from '../../__tests__/support/fixtures';
 import {
   GENERIC_UNAVAILABILITY_TEXT,
   playerVisibleUnavailabilityText,
   presentUnavailability,
-} from '../unavailability-reason.js';
+} from '../unavailability-reason';
 
 const RAW = '目标在 3 号房间，超出射程';
 

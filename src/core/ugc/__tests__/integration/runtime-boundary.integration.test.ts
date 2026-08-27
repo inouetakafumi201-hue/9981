@@ -9,8 +9,8 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
 
 const UGC_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 

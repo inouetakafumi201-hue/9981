@@ -2,9 +2,9 @@
 // 跳过 pending-registry 直接调用 ActionPort.submit 提交待决意图与陈旧意图，断言权威侧仍执行完整当前状态复校
 
 import { describe, it, expect } from 'vitest';
-import type { ActionPort, SubmissionOutcome } from '../../ports/action-port.js';
-import type { InteractionIntent } from '../../model/intent.js';
-import { UiDiagnosticSeverity } from '../../model/diagnostic.js';
+import type { ActionPort, SubmissionOutcome } from '../../ports/action-port';
+import type { InteractionIntent } from '../../model/intent';
+import { UiDiagnosticSeverity } from '../../model/diagnostic';
 
 /** 构造一个可被 `ActionPort.submit` 返回的拒绝结果（结构化 rejection）。 */
 function rejectedOutcome(code: string): SubmissionOutcome {

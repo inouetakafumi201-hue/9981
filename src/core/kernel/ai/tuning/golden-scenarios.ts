@@ -8,9 +8,9 @@
  * 价值：断言集是「AI 应该怎么表现」的可自动执行标尺（要求 3），且作为 golden 回归基准
  * 供 RegressionGate 使用（要求 3.8）。
  */
-import { BehaviorAssertionRegistry, type BehaviorAssertion } from './assertions.js';
-import { snapshotWorldState } from './snapshot.js';
-import type { DecisionTrace } from './trace.js';
+import { BehaviorAssertionRegistry, type BehaviorAssertion } from './assertions';
+import { snapshotWorldState } from './snapshot';
+import type { DecisionTrace } from './trace';
 
 /** 一个「可实时跑真决断」的 golden 场景。 */
 export interface GoldenSpec {

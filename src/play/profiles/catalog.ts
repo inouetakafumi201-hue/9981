@@ -16,8 +16,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseStrictDataJson } from '../../class/catalog-loader.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import { parseStrictDataJson } from '../../class/catalog-loader';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 

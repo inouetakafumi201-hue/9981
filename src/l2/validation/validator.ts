@@ -7,17 +7,17 @@
  * 不遇错即停、不静默修复。Warning 不改变语义且允许后续按策略激活（Requirements 13.5）。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic, ValidationResult } from '../model/diagnostic.js';
-import { hasError } from '../model/diagnostic.js';
-import { errorDiagnostic } from '../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics } from '../model/ordering.js';
-import { isWellFormedId, joinJsonPath, ROOT_JSON_PATH } from '../model/ids.js';
-import type { CandidateDefinition, DefinitionPackage, SemanticFamilyRegistration } from '../model/definition.js';
-import type { CompiledSpecification } from '../compiler/types.js';
-import { KNOWN_SEMANTIC_FAMILY_IDS } from '../model/family-contracts.js';
-import { DiagnosticCollector, type DefinitionRule, type ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic, ValidationResult } from '../model/diagnostic';
+import { hasError } from '../model/diagnostic';
+import { errorDiagnostic } from '../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics } from '../model/ordering';
+import { isWellFormedId, joinJsonPath, ROOT_JSON_PATH } from '../model/ids';
+import type { CandidateDefinition, DefinitionPackage, SemanticFamilyRegistration } from '../model/definition';
+import type { CompiledSpecification } from '../compiler/types';
+import { KNOWN_SEMANTIC_FAMILY_IDS } from '../model/family-contracts';
+import { DiagnosticCollector, type DefinitionRule, type ValidationContext } from './context';
+import { defError } from './helpers';
 import {
   validateDefKind,
   validateNoL1Mechanism,
@@ -27,23 +27,23 @@ import {
   validateNoDeprecatedMechanic,
   validateSemanticFamily,
   validateAbstractInstantiation,
-} from './classification-rules.js';
-import { validateParameters } from './parameter-rules.js';
-import { validateInheritanceAndComposition } from './inheritance-composition-rules.js';
-import { validateActionsAndGateways } from './action-gateway-rules.js';
-import { validateSpatial } from './spatial-rules.js';
-import { validateItemsAndVehicles } from './item-vehicle-rules.js';
-import { validateEffectsAndAi } from './effect-ai-rules.js';
-import { validateUnresolvedItems } from './space-items-unresolved-gate-rules.js';
-import { validateWriteChannel } from './space-items-write-channel-rules.js';
-import { validateSceneRules } from './space-items-scene-rules.js';
-import { validateMicroSceneRules } from './space-items-micro-scene-rules.js';
-import { validateTransitionRules } from './space-items-transition-rules.js';
-import { validateItemRules } from './space-items-item-rules.js';
-import { validateVehicleRules } from './space-items-vehicle-rules.js';
-import { validateContainerCapabilityBinding } from './space-items-container-rules.js';
-import { validateReferenceCapabilityShape } from './space-items-reference-shape.js';
-import { validateCompositionAlignment } from './composition-alignment-rules.js';
+} from './classification-rules';
+import { validateParameters } from './parameter-rules';
+import { validateInheritanceAndComposition } from './inheritance-composition-rules';
+import { validateActionsAndGateways } from './action-gateway-rules';
+import { validateSpatial } from './spatial-rules';
+import { validateItemsAndVehicles } from './item-vehicle-rules';
+import { validateEffectsAndAi } from './effect-ai-rules';
+import { validateUnresolvedItems } from './space-items-unresolved-gate-rules';
+import { validateWriteChannel } from './space-items-write-channel-rules';
+import { validateSceneRules } from './space-items-scene-rules';
+import { validateMicroSceneRules } from './space-items-micro-scene-rules';
+import { validateTransitionRules } from './space-items-transition-rules';
+import { validateItemRules } from './space-items-item-rules';
+import { validateVehicleRules } from './space-items-vehicle-rules';
+import { validateContainerCapabilityBinding } from './space-items-container-rules';
+import { validateReferenceCapabilityShape } from './space-items-reference-shape';
+import { validateCompositionAlignment } from './composition-alignment-rules';
 
 /** 全部定义级规则，按确定性顺序执行。 */
 export const DEFINITION_RULES: readonly DefinitionRule[] = Object.freeze([

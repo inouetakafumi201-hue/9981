@@ -1,11 +1,11 @@
 /**
  * L4 Events/Hooks: Event / RuleDef 结构（design.md 3.5节 / 需求23.1-23.10, 24.1-24.6）。
  */
-import type { Id } from '../state/ids.js';
-import type { Value } from '../state/value.js';
-import type { Expr } from '../state/expr-types.js';
-import type { Def } from '../state/def.js';
-import type { Effect } from './effect-types.js';
+import type { Id } from '../state/ids';
+import type { Value } from '../state/value';
+import type { Expr } from '../state/expr-types';
+import type { Def } from '../state/def';
+import type { Effect } from './effect-types';
 
 export interface Event {
   readonly type: string;

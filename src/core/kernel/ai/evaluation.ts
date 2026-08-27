@@ -1,6 +1,6 @@
 /** Finite-only evaluation guard and explicit neutral fallback handling. */
-import { createAIDiagnostic } from './diagnostics.js';
-import type { EvaluationContext, EvaluationGuard, EvaluationOutcome } from './types.js';
+import { createAIDiagnostic } from './diagnostics';
+import type { EvaluationContext, EvaluationGuard, EvaluationOutcome } from './types';
 
 function describeInvalidValue(value: unknown): string {
   if (typeof value === 'number' && Number.isNaN(value)) return 'NaN';

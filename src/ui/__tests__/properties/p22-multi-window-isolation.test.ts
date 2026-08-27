@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { acceptProjection, createProjectionCache } from '../../projection/projection-cache.js';
-import { arbDescriptor, arbReachableProjection } from '../support/arbitraries.js';
-import { authority, revision } from '../support/fixtures.js';
+import { acceptProjection, createProjectionCache } from '../../projection/projection-cache';
+import { arbDescriptor, arbReachableProjection } from '../support/arbitraries';
+import { authority, revision } from '../support/fixtures';
 
 it('任意相同实体标识碰撞下不同 Agent 与窗口缓存仍按作用域完全隔离', () => {
   fc.assert(fc.property(arbReachableProjection(), arbDescriptor(), (reachable, descriptor) => {

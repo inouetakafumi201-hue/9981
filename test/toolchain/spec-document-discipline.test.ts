@@ -201,6 +201,12 @@ const DECLARATION_FILES: ReadonlyMap<string, DeclarationFileBaseline> = new Map(
       { anchor: '本领域的废用术语与废案至少包括', counts: { 'base-content': 1 } },
     ],
   }],
+  ['.kiro/specs/wakeup-content-taxonomy-and-runtime-residency/design.md', {
+    reason: '"内容层"是该 spec 自身的第四类内容范畴命名（与基类层/玩法层/表现系统并列的 taxonomy 设计概念），非 L0 废用别名"base-content"（"内容层/模板"的 archive 含义）',
+    contexts: [
+      { anchor: '### 内容层关系', counts: { 'base-content': 1 } },
+    ],
+  }],
   ['.kiro/specs/wakeup-ui-animation/requirements.md', {
     reason: '要求 7 的废用术语清单',
     contexts: [
@@ -467,9 +473,17 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
     state: 'not-adopted',
     note: '5 条要求。2026-08-15 CaS 缝隙闭合专项：把「组件字段名↔System 参数名同碰」的机器闭合从两条并列、规则不同、无单一依赖的实现收敛为单一权威判定函数 caSFieldMatches（src/l2/model/cas-field-alignment.ts）+ 单一诊断码 CAS_FIELD_GAP（入 src/l2/model/diagnostic-codes.ts）+ 生产态组合路径（src/play/profiles/audit.ts）可观察入口。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer。涉及 src/play/**、src/class/** 的跨线交付物写权放开后落地，未授权则登记 T-CaS-04 交接；combat-first 阶段2 红测归 AI 并行线 T-CaS-03',
   }],
+  ['.kiro/specs/wakeup-content-taxonomy-and-runtime-residency/requirements.md', {
+    state: 'not-adopted',
+    note: '内容分类与运行期驻留专项。design.md §"内容层关系"用「内容层」一词是该 spec 自身的概念命名（与「基类层/玩法层/表现系统」三架构层并列的第四类内容范畴），非 L0 废用别名；本 spec 用「接受标准体 + 要求子句回溯」而非逐条「来源追踪」footer，保持 not-adopted',
+  }],
   ['.kiro/specs/wakeup-map-editor-devboard/requirements.md', {
     state: 'not-adopted',
     note: '地图编辑器开发板专项 requirements（并行产出，未采纳）。2026-08-15 开发板 web 应用 spec：Vite+React+TS 从零搭建的独立 web 应用（src/devboard/）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体，非逐条「来源追踪」footer。此条为本会话维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检）；其业务实现与 src/devboard/** 均属外部并行线交付物，不在本 AI 线审计范围',
+  }],
+  ['.kiro/specs/wakeup-full-body-wiring/requirements.md', {
+    state: 'not-adopted',
+    note: '全身接线专项（game-ui-shell-15 ↔ 地图/表现/元状态/电脑UI/素材/运行期事件/统一UI 端口全面接线工程）。保持 not-adopted 的原因与 wakeup-base-layer-ecs 相同：接受标准体 + 要求子句回溯，非逐条「来源追踪」footer',
   }],
   ['.kiro/specs/wakeup-map-editor-graffiti/requirements.md', {
     state: 'not-adopted',
@@ -487,10 +501,40 @@ const SOURCE_TRACING_ADOPTION: ReadonlyMap<string, AdoptionBaseline> = new Map([
     state: 'fully-adopted',
     note: '12/12（Requirement 32~41），采用 `### Requirement N` 标题式，每节恰一个「来源追踪：」footer。专项 B 整合层装载运行期：生产组合根 createLoadedMatch、门禁面、对局外壳 MatchShell、生产加载驱动 driveMatch、演员面、UI 宿主 7 端口、LoadedMatch 门面、事件出口单次语义、门禁对齐与收账。编号从 32 起紧接 CEME 的 20~31；整合专项 A（CEME）/专项 D（注册表桥）承载面与已落地 loading-runtime 实现，收账含 OVERLOAD_GAP 归属（随 CEME Requirement 28 收束）、legacy ui-adapter 处置、04 规划文档归档 L_归档、主状态板入账',
   }],
+  ['.kiro/specs/wakeup-mapdata-floor-layers/requirements.md', {
+    state: 'not-adopted',
+    note: 'MapData floor→layers 契约扩展独立专项（2026-08-18 新建）：使用接受标准体与 requirements/design/tasks 三件套承载，不采用逐条「来源追踪」footer；透明度口径与 legacy 兼容由该 spec 自身定义，当前保持 not-adopted 以匹配文档风格。',
+  }],
+  ['.kiro/specs/wakeup-orca-movement/requirements.md', {
+    state: 'not-adopted',
+    note: 'ORCA 寻路与移动系统独立专项（2026-08-19 并行产出）：使用需求陈述体（Rxxx When/then/验收标准），不采用逐条「来源追踪」footer；本条目为维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检），实现属外部并行线交付物，不在装载等价专项审计范围',
+  }],
+  ['.kiro/specs/v0-frontend-workflow/requirements.md', {
+    state: 'not-adopted',
+    note: '偷师前端前置设计专项（2026-08-19 新建）：只收口 UI 壳层/状态切换/动效/提示词口径的 V0.dev 前置设计要求（作用域切分、输出口径、批次顺序、控制面板抽取边界），采用「要求 + 验收标准」体而非逐条「来源追踪」footer，保持 not-adopted 以匹配文档风格；内容为投喂 V0.dev 的提示词合同，不承接玩法规则/ORCA/地图拓扑',
+  }],
+  ['.kiro/specs/wakeup-material-library/requirements.md', {
+    state: 'not-adopted',
+    note: '素材库与研究台图形化与人机交互专项（2026-08-19 立项）：三设计需求化（创作/02 对接 R1 / 元状态层数据模型+状态转换 R2-R3 / UI 数据接口 R4 / 三界面切换 R5 / 两界面人机交互 R6-R7 / 图形化提取与 V0 投喂产物 R8 / 明确不做 R9），采用接受标准体 + 要求子句回溯，无逐条「来源追踪」footer，保持 not-adopted 以匹配文档风格；产出含 V0 投喂 MD（docs/v0-dev-material-library-spec.md、docs/v0-dev-bench-spec.md、docs/v0-dev-pixel-painter-spec.md）与 PLT-03/04 UI 草稿图提示词，实现（src/meta-state/** 等）列入该 spec tasks.md 批次 B/C',
+  }],
+  ['.kiro/specs/wakeup-presentation-layer/requirements.md', {
+    state: 'not-adopted',
+    note: '表现层架构独立专项（2026-08-19 新建）：四块架构（节点关系/空间/算法/端口面）+ ORCA 段1/段2 + 编排，采用需求陈述体（R001-Rxxx When/验收标准）而非逐条「来源追踪」footer，保持 not-adopted 以匹配文档风格；本条目为维护 T2 门禁健壮性登记（守卫要求每个活跃 requirements.md 都显式选择状态，不得静默漏检），实现属外部并行线交付物，不在素材库专项审计范围',
+  }],
 ]);
 
-/** 逐条要求的标题行：中文「要求 N」与英文「Requirement N」两种标题式在本仓库并存。 */
-const REQUIREMENT_HEADER_PATTERN = /^### (?:要求\s*\d+|Requirement\s*\d+).*$/gm;
+/** 逐条要求的标题行：中文「要求 N」、「Requirement N」与「R\d+」三种标题式在本仓库并存。 */
+const REQUIREMENT_HEADER_PATTERN = /^### (?:要求\s*\d+|Requirement\s*\d+|R\d+).*$/gm;
+
+/**
+ * not-adopted 的 spec 被扫描「要求小节」时，须能识别出至少一个要求小节。
+ * 个别 spec 用「### N. 名称」序号标题式（无 Requirement/要求/R 前缀），扫描不到标题
+ * 但确有要求实体；这类 spec 在此显式登记一个宽松标题锚，让 T2 守卫仍能扫到小节。
+ * 无登记锚的 spec 照旧按 REQUIREMENT_HEADER_PATTERN 扫描。
+ */
+const NOT_ADOPTED_HEADER_ANCHORS: ReadonlyMap<string, RegExp> = new Map([
+  ['.kiro/specs/v0-frontend-workflow/requirements.md', /^### \d+\.\s+/gm],
+]);
 
 /**
  * 「来源追踪」约定的两种等价措辞：多数 spec 用三字标签「来源追踪：」，
@@ -519,7 +563,8 @@ function countLabels(text: string): number {
 
 function countSourceTracing(relativePath: string): SourceTracingCount {
   const text = readFileSync(resolve(REPO_ROOT, relativePath), 'utf8');
-  const headings = [...text.matchAll(REQUIREMENT_HEADER_PATTERN)];
+  const headerPattern = NOT_ADOPTED_HEADER_ANCHORS.get(relativePath) ?? REQUIREMENT_HEADER_PATTERN;
+  const headings = [...text.matchAll(headerPattern)];
   const sections = headings.map((heading, index): RequirementSection => {
     const start = heading.index;
     const end = headings[index + 1]?.index ?? text.length;

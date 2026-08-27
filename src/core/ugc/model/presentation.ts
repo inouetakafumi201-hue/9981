@@ -4,7 +4,7 @@
  * 每个决定必须自证"语义未变"：`semanticFingerprintBefore === semanticFingerprintAfter`。
  * 这不是可选的审计字段，而是回退被接受的前提条件；不相等即转为错误。
  */
-import { compareCodePoints } from './fingerprint.js';
+import { compareCodePoints } from './fingerprint';
 
 export interface PresentationFallbackDecision {
   readonly definitionId: string;

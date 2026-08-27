@@ -8,9 +8,9 @@
  * 反过来，内容相同但来源文档、来源包、目标层、操作或预期目标不同的请求**必须**得到不同指纹，
  * 否则一次验证的产物就能授权另一个请求（需求 13.13 明确禁止）。
  */
-import type { ChangeOperation, TargetOwnership } from './candidate.js';
-import type { FingerprintField, StableFingerprintGateway } from './fingerprint.js';
-import { fingerprintFields } from './fingerprint.js';
+import type { ChangeOperation, TargetOwnership } from './candidate';
+import type { FingerprintField, StableFingerprintGateway } from './fingerprint';
+import { fingerprintFields } from './fingerprint';
 
 export interface ChangeRequestBinding {
   /** 仅由规范化内容派生的候选指纹。 */

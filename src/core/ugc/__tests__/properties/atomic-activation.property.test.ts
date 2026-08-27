@@ -9,9 +9,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
-import { activationUnchanged } from '../../testing/observer.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
+import { activationUnchanged } from '../../testing/observer';
 
 function validatedReport(harness: ReturnType<typeof createHarness>, text = validCandidateText()) {
   const report = harness.facade.validate(requestFrom(text, 'hand-authored'));

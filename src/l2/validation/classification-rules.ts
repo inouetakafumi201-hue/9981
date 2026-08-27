@@ -4,16 +4,16 @@
  * 对应 Requirements 1.6–1.8、2.1–2.8、4.1–4.6、4.8、16.3、16.7–16.8 与 Property 2。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { isL1DefKind } from '../model/def-kind.js';
-import { REJECTED_LAYER_TERMS, DEPRECATED_TERM_REPLACEMENTS, TERMINOLOGY_SOURCE } from '../model/constitution.js';
-import { isKnownSemanticFamilyId, FAMILY_CONTRACT_KIND_BY_FAMILY } from '../model/family-contracts.js';
-import { joinJsonPath } from '../model/ids.js';
-import type { CandidateDefinition } from '../model/definition.js';
-import { qualifyProposedFamily } from '../compiler/source-classifier.js';
-import { findDeprecatedMechanicsInText, deprecationSourceRecord } from '../compiler/deprecated-mechanics.js';
-import type { DiagnosticCollector, ValidationContext } from './context.js';
-import { defError } from './helpers.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { isL1DefKind } from '../model/def-kind';
+import { REJECTED_LAYER_TERMS, DEPRECATED_TERM_REPLACEMENTS, TERMINOLOGY_SOURCE } from '../model/constitution';
+import { isKnownSemanticFamilyId, FAMILY_CONTRACT_KIND_BY_FAMILY } from '../model/family-contracts';
+import { joinJsonPath } from '../model/ids';
+import type { CandidateDefinition } from '../model/definition';
+import { qualifyProposedFamily } from '../compiler/source-classifier';
+import { findDeprecatedMechanicsInText, deprecationSourceRecord } from '../compiler/deprecated-mechanics';
+import type { DiagnosticCollector, ValidationContext } from './context';
+import { defError } from './helpers';
 
 /** 校验合法 Def kind（Requirements 2.2、4.1）。 */
 export function validateDefKind(

@@ -15,40 +15,40 @@
  *    不是另立一套兼容标准。
  */
 
-import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic.js';
-import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway.js';
-import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint.js';
+import type { Diagnostic as KernelDiagnostic } from '../../../core/kernel/state/diagnostic';
+import type { DiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticCodeCatalog } from '../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import type { UGCDiagnosticFactory } from '../../../core/ugc/diagnostics/factory';
+import { sha256FingerprintGateway } from '../../../core/ugc/ports/sha256-fingerprint-gateway';
+import type { StableFingerprintGateway } from '../../../core/ugc/model/fingerprint';
 import type {
   ReferenceResolutionGateway,
   ReferenceStageResult,
   ResolutionCapability,
-} from '../../../core/ugc/ports/definition-ports.js';
-import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../../core/ugc/ports/definition-ports.js';
-import type { IntegrationContractSnapshot } from '../../../core/ugc/model/contract-types.js';
-import type { QuotaBudget } from '../../../core/ugc/model/quota-types.js';
+} from '../../../core/ugc/ports/definition-ports';
+import { MANDATORY_RESOLUTION_CAPABILITIES } from '../../../core/ugc/ports/definition-ports';
+import type { IntegrationContractSnapshot } from '../../../core/ugc/model/contract-types';
+import type { QuotaBudget } from '../../../core/ugc/model/quota-types';
 import type {
   DefinitionRegistryReadSnapshot,
   UpstreamReferenceEdge,
   UpstreamResolvedReferenceGraph,
   UpstreamValidatedCandidate,
-} from '../../../core/ugc/model/upstream.js';
-import { compareStrings } from '../../model/ordering.js';
-import { ROOT_JSON_PATH } from '../../model/ids.js';
-import type { TypedReference } from '../../model/reference.js';
-import type { DefinitionPackage } from '../../model/definition.js';
-import { buildReferenceGraph, matchesExpected } from '../../resolution/reference-graph.js';
-import type { GraphNodeInfo, ReferenceGraph } from '../../resolution/reference-graph.js';
-import { activeReferenceMap } from '../../registry/definition-registry.js';
-import type { ActiveRegistry } from '../../registry/definition-registry.js';
-import { createSourceIndex, type SourceIndex } from './source-index.js';
-import { projectL2Diagnostics } from './diagnostic-projection.js';
-import { buildProviderIndex, domainExportsExpectedKind, resolveProviderDomain } from './provider-domain.js';
-import type { ProviderIndex } from './provider-domain.js';
-import { detectPackageCycles } from './package-cycle.js';
+} from '../../../core/ugc/model/upstream';
+import { compareStrings } from '../../model/ordering';
+import { ROOT_JSON_PATH } from '../../model/ids';
+import type { TypedReference } from '../../model/reference';
+import type { DefinitionPackage } from '../../model/definition';
+import { buildReferenceGraph, matchesExpected } from '../../resolution/reference-graph';
+import type { GraphNodeInfo, ReferenceGraph } from '../../resolution/reference-graph';
+import { activeReferenceMap } from '../../registry/definition-registry';
+import type { ActiveRegistry } from '../../registry/definition-registry';
+import { createSourceIndex, type SourceIndex } from './source-index';
+import { projectL2Diagnostics } from './diagnostic-projection';
+import { buildProviderIndex, domainExportsExpectedKind, resolveProviderDomain } from './provider-domain';
+import type { ProviderIndex } from './provider-domain';
+import { detectPackageCycles } from './package-cycle';
 import {
   L2_GRAPH_PAYLOAD_KIND,
   L2_PORT_PROVIDER_ID,
@@ -59,7 +59,7 @@ import {
   readValidatedPayload,
   type L2GraphPayload,
   type PortDiagnosticEnvelope,
-} from './port-common.js';
+} from './port-common';
 
 const RESOLUTION_STAGE = 'reference-resolution' as const;
 
@@ -464,7 +464,7 @@ function projectStructuralDiagnostics(
   catalog: DiagnosticCodeCatalog,
   index: SourceIndex,
   graphResult: ReturnType<typeof buildReferenceGraph>,
-  packageCycleDiagnostics: readonly import('../../model/diagnostic.js').Diagnostic[],
+  packageCycleDiagnostics: readonly import('../../model/diagnostic').Diagnostic[],
 ): readonly KernelDiagnostic[] {
   const l2Diagnostics = [...graphResult.diagnostics, ...packageCycleDiagnostics];
   if (l2Diagnostics.length === 0) {

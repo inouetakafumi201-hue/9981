@@ -14,7 +14,7 @@ import {
   type ClassFamily,
   type ClassLayerIndex,
   type PlayProfile,
-} from '../profiles/catalog.js';
+} from '../profiles/catalog';
 import {
   auditClassLayerReferences,
   auditCapabilityComponentContract,
@@ -22,15 +22,15 @@ import {
   auditProfileReferences,
   auditVehicleParameterBacking,
   PARALLEL_LIMIT,
-} from '../profiles/audit.js';
+} from '../profiles/audit';
 import {
   COMPOSITION_REGISTRY,
   compileFamilyComponentShapeIndex,
-} from '../../l2/model/family-component-shapes.js';
+} from '../../l2/model/family-component-shapes';
 import {
   UNRESOLVED_CAPABILITY_GAPS,
   UNRESOLVED_INSTANCE_REFERENCES,
-} from '../profiles/known-divergences.js';
+} from '../profiles/known-divergences';
 
 const profiles = loadPlayProfiles();
 const classIndex = loadClassLayerIndex();

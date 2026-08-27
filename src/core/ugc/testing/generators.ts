@@ -7,10 +7,10 @@
  * - 故障注入是"在已登记端口上做依赖注入"，不是在生产代码里加来源专用分支。
  */
 import fc from 'fast-check';
-import type { CandidateChangeRequest, CandidateSourceKind, TargetOwnership } from '../model/candidate.js';
-import { createCandidateChangeRequest, createCandidateSource } from '../model/candidate.js';
-import { ALL_ADAPTERS } from '../adapter/adapters.js';
-import { SCHEMA_VERSION_MEMBER } from '../codec/strict-json-decoder.js';
+import type { CandidateChangeRequest, CandidateSourceKind, TargetOwnership } from '../model/candidate';
+import { createCandidateChangeRequest, createCandidateSource } from '../model/candidate';
+import { ALL_ADAPTERS } from '../adapter/adapters';
+import { SCHEMA_VERSION_MEMBER } from '../codec/strict-json-decoder';
 
 /** 候选缺陷模式。枚举它保证需求 16.3-16.10 的每一类都有生成器覆盖。 */
 export const INVALID_PATTERNS = [

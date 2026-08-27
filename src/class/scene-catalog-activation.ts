@@ -8,8 +8,8 @@
  * 详细的切片边界、两处自主映射判断与设计说明见 `catalog-activation.ts` 顶部注释。
  */
 
-import type { CandidateDocumentInput, CompilationResult } from '../core/kernel/spec-compiler/index.js';
-import type { ClassCatalog } from './class-contract.js';
+import type { CandidateDocumentInput, CompilationResult } from '../core/kernel/spec-compiler/index';
+import type { ClassCatalog } from './class-contract';
 import {
   CATALOG_CAPABILITY_FAMILY,
   CATALOG_COMPILER_SCHEMA_VERSION,
@@ -19,8 +19,8 @@ import {
   buildCatalogSchemaVersion,
   catalogDocumentInput,
   createCatalogCompilerHost,
-} from './catalog-activation.js';
-import type { SchemaVersion } from '../core/kernel/spec-compiler/index.js';
+} from './catalog-activation';
+import type { SchemaVersion } from '../core/kernel/spec-compiler/index';
 
 /** 编译器 schema 契约版本（与通用桥一致）。 */
 export const SCENE_COMPILER_SCHEMA_VERSION = CATALOG_COMPILER_SCHEMA_VERSION;

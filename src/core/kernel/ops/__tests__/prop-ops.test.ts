@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { OpRegistry } from '../registry.js';
-import { WorldStateHolder } from '../transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { registerPropOps } from '../prop-ops.js';
-import { createEntityShape } from '../../state/entity.js';
-import { DefRegistry } from '../../state/def.js';
+import { OpRegistry } from '../registry';
+import { WorldStateHolder } from '../transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { registerPropOps } from '../prop-ops';
+import { createEntityShape } from '../../state/entity';
+import { DefRegistry } from '../../state/def';
 
 function setup() {
   const defRegistry = new DefRegistry();

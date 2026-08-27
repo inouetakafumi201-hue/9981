@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { createHarness } from '../harness.js';
-import { requestFrom, validCandidateText } from '../../testing/generators.js';
-import { TARGET_OWNERSHIPS } from '../../model/candidate.js';
+import { createHarness } from '../harness';
+import { requestFrom, validCandidateText } from '../../testing/generators';
+import { TARGET_OWNERSHIPS } from '../../model/candidate';
 
 describe('Feature: wakeup-ugc, Property 6: base/play separation', () => {
   it('requires exactly one declared target ownership layer', () => {

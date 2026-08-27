@@ -15,9 +15,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { StrictJsonCodec, canonicalStringify } from '../../codec/index.js';
-import { DEFAULT_TECHNICAL_QUOTAS } from '../../ports/index.js';
-import type { CandidateDocumentInput } from '../../ports/index.js';
+import { StrictJsonCodec, canonicalStringify } from '../../codec/index';
+import { DEFAULT_TECHNICAL_QUOTAS } from '../../ports/index';
+import type { CandidateDocumentInput } from '../../ports/index';
 
 const codec = new StrictJsonCodec();
 

@@ -20,56 +20,56 @@
  * 从当前 queryActions 里选出来的，不预设答案。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { makeExprStateAccess } from '../../expr/state-access.js';
-import { setPath } from '../../ops/path.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { createAgentShape } from '../../state/agent.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEntityShape, createItemShape } from '../../state/entity.js';
-import { createContainerShape, createNodeShape, createSlotShape } from '../../topology/types.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { DesignCurrencyGateway } from '../design-currency.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry, type PlannerRegistration } from '../planner-registry.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { SchedulePhaseParticipants } from '../kernel/participant-order.js';
-import { KernelAIReadAdapter } from '../kernel/read-adapter.js';
-import { KernelSearchSessionGateway } from '../kernel/search-session.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
-import { registerPoolOps } from '../../actions/pool-ops.js';
-import { registerAttachOps } from '../../attachment/attach-ops.js';
-import { registerRelationOps } from '../../ops/relation-ops.js';
-import { registerTransformOps } from '../../ops/transform-ops.js';
-import { registerPrefabOps } from '../../ops/prefab-ops.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { registerStructuralOps, makeItemMove } from '../../ops/structural-ops.js';
-import { wireHooksIntoRegistry, type WiredOpRegistry } from '../../wire-hooks.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Def } from '../../state/def.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { Effect } from '../../events/effect-types.js';
-import type { RuleDef } from '../../events/types.js';
-import type { Value } from '../../state/value.js';
-import type { Ref } from '../../state/ids.js';
-import type { QueryMode } from '../../actions/catalog.js';
-import type { LegalActionSource } from '../kernel/read-adapter.js';
-import type { AIDecisionResult, BeliefSlice, NPCActionRequest } from '../types.js';
+import { ActionCatalog } from '../../actions/catalog';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { makeExprStateAccess } from '../../expr/state-access';
+import { setPath } from '../../ops/path';
+import { WorldStateHolder } from '../../ops/transaction';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { createAgentShape } from '../../state/agent';
+import { DefRegistry } from '../../state/def';
+import { createEntityShape, createItemShape } from '../../state/entity';
+import { createContainerShape, createNodeShape, createSlotShape } from '../../topology/types';
+import { resetIdCounters } from '../../state/ids';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { DesignCurrencyGateway } from '../design-currency';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry, type PlannerRegistration } from '../planner-registry';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { SchedulePhaseParticipants } from '../kernel/participant-order';
+import { KernelAIReadAdapter } from '../kernel/read-adapter';
+import { KernelSearchSessionGateway } from '../kernel/search-session';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
+import { registerPoolOps } from '../../actions/pool-ops';
+import { registerAttachOps } from '../../attachment/attach-ops';
+import { registerRelationOps } from '../../ops/relation-ops';
+import { registerTransformOps } from '../../ops/transform-ops';
+import { registerPrefabOps } from '../../ops/prefab-ops';
+import { registerPropOps } from '../../ops/prop-ops';
+import { registerStructuralOps, makeItemMove } from '../../ops/structural-ops';
+import { wireHooksIntoRegistry, type WiredOpRegistry } from '../../wire-hooks';
+import type { ActionDef } from '../../actions/types';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Def } from '../../state/def';
+import type { Expr } from '../../state/expr-types';
+import type { Effect } from '../../events/effect-types';
+import type { RuleDef } from '../../events/types';
+import type { Value } from '../../state/value';
+import type { Ref } from '../../state/ids';
+import type { QueryMode } from '../../actions/catalog';
+import type { LegalActionSource } from '../kernel/read-adapter';
+import type { AIDecisionResult, BeliefSlice, NPCActionRequest } from '../types';
 
 /** 玩法层同一专写：`prop.set` 等 Op 的 args 是已就绪的 `path`/`value`。 */
 function opEffect(op: string, args: Record<string, Expr | number>): Effect {
@@ -123,6 +123,7 @@ const attackAction: ActionDef = {
   id: 'a:attack',
   kind: 'action',
   label: 'Attack',
+  track: 'highlight',
   // 攻击锁定「对方实体」：排除自己（攻击自己是自杀），只留下另一侧实体作为候选目标。
   //  是 ActionCatalog 展开查询时为当前候选 Ref 注入的变量（catalog.ts），用它做
   // self ≠ targetRef 即可把「当前正在判断的那个实体」排除掉，hero 侧就只剩 e:enemy。
@@ -200,6 +201,7 @@ const pickupAction: ActionDef = {
   id: 'a:pickup',
   kind: 'action',
   label: 'Pickup',
+  track: 'highlight',
   targets: [{ name: 'item', query: { from: 'items' } }],
   require: true,
   cost: [],
@@ -220,6 +222,7 @@ const healAction: ActionDef = {
   id: 'a:heal',
   kind: 'action',
   label: 'Heal',
+  track: 'highlight',
   // 医疗锁定「自我治疗」：治疗别人在真实的 1-5 生命意义上是另一个动作，这里不提供。
   // 敌我不分地加到任意目标会让「满血该补刀」在分支评分上跟「给敌方回血」搅在一起，AI 反而
   // 读错方向。所以治疗只作用于自己（self），用 eq(self, self) 恒真锁死自己这一票。
@@ -248,6 +251,7 @@ const moveAction: ActionDef = {
   id: 'a:move',
   kind: 'action',
   label: 'Move',
+  track: 'highlight',
   targets: [{ name: 'node', query: { from: 'nodes' } }],
   require: true,
   cost: [],
@@ -266,6 +270,7 @@ const eternalSleepAction: ActionDef = {
   id: 'a:eternal-sleep',
   kind: 'action',
   label: 'EternalSleep',
+  track: 'highlight',
   // targets：query 限定候选目标为「零血倒地」的实体，并排除自己。query 的 where 在求值每个候选
   // 时会把该候选 Ref 绑为 `self`、同步注入 `${target.name}Ref`（即 `targetRef`）——用 neq(self,
   // targetRef) 排除自己、includes(refGet(targetRef,'tags'), tag) 限定倒地。这样 eternal-sleep 的
@@ -323,6 +328,7 @@ const enemyStrikeAction: ActionDef = {
   id: 'a:strike',
   kind: 'action',
   label: 'Strike',
+  track: 'highlight',
   targets: [{ name: 'target', query: { from: 'entities', where: { op: 'neq', args: [{ var: 'self' }, { var: 'targetRef' }] } } }],
   require: { op: 'gt', args: [{ path: 'world.props.aiCombatDamageRef' }, 0] },
   cost: [],

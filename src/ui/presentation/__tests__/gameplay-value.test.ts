@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { GAMEPLAY_VALUE_RANGE } from '../../../l2/model/constitution.js';
+import { GAMEPLAY_VALUE_RANGE } from '../../../l2/model/constitution';
 import {
   discreteSegments,
   isGameplayValue,
@@ -12,7 +12,7 @@ import {
   makeInternalMetric,
   type GameplayValue,
   type GameplayValueOwnership,
-} from '../gameplay-value.js';
+} from '../gameplay-value';
 
 const RESOURCE_OWNERSHIP: GameplayValueOwnership = { category: 'resource', playerVisible: true, role: 'hp' };
 const COST_OWNERSHIP: GameplayValueOwnership = { category: 'cost', playerVisible: true };

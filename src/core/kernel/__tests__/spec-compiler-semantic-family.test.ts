@@ -6,8 +6,8 @@ import {
   createSemanticFamilyRegistry,
   failedCriteria,
   satisfiesClassLayerCriteria,
-} from '../spec-compiler/index.js';
-import { candidate, createHarness, familySource } from '../spec-compiler/__tests__/fixtures.js';
+} from '../spec-compiler/index';
+import { candidate, createHarness, familySource } from '../spec-compiler/__tests__/fixtures';
 
 /**
  * The semantic family register is open, and being open is not the same as being unchecked.

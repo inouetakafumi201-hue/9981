@@ -9,13 +9,13 @@
  * - 解码只做"形状"判定；层级、数值归属、族契约深度校验属于验证器职责。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory.js';
-import type { PackageId } from '../model/ids.js';
-import type { SourceLocation } from '../model/source.js';
-import type { JsonNode } from './json-scanner.js';
-import { findPosition } from './json-scanner.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic, warningDiagnostic } from '../model/diagnostic-factory';
+import type { PackageId } from '../model/ids';
+import type { SourceLocation } from '../model/source';
+import type { JsonNode } from './json-scanner';
+import { findPosition } from './json-scanner';
 
 export interface DecodeContext {
   readonly baseLocation: SourceLocation;

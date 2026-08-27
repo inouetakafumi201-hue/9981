@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { arbAttachedAction } from './generators.js';
+import { arbAttachedAction } from './generators';
 
 describe('Property 8: 附着动作三重机械保证', () => {
   it('附着动作的 cost 为空数组', () => {

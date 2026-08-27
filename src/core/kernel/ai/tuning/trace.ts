@@ -5,9 +5,9 @@
  * ScoreBreakdown）、选中谁（selected）、提交成功/被拒（submission）。每次决策携带
  * 唯一 correlationId 与决策时世界状态的 stateHash（抗漂移）。
  */
-import type { BeliefSlice } from '../types.js';
-import type { ScoreBreakdownInstance } from '../design-currency.js';
-import { stableSerialize } from './snapshot.js';
+import type { BeliefSlice } from '../types';
+import type { ScoreBreakdownInstance } from '../design-currency';
+import { stableSerialize } from './snapshot';
 
 /** 一次候选动作的分数明细。 */
 export interface TraceCandidate {

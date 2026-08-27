@@ -96,8 +96,8 @@ export interface ProhibitedConstructHit {
   readonly column: number;
 }
 
-import type { JsonNode, Position } from './json-scanner.js';
-import { walkJson } from './json-scanner.js';
+import type { JsonNode, Position } from './json-scanner';
+import { walkJson } from './json-scanner';
 
 function isInsidePresentationSubtree(path: string): boolean {
   const segments = path.split('/').slice(1);

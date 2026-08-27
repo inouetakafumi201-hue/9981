@@ -3,8 +3,8 @@
  * 本文件提供纯函数式的图操作 helper，供 L3 的 node.create/node.destroy/link.create/link.destroy
  * 这些公开 Op 内部调用（写入通道情形b）——本文件本身不持有 WorldState 写权限，只操作传入的普通对象快照。
  */
-import type { Id } from '../state/ids.js';
-import type { Node, Link } from './types.js';
+import type { Id } from '../state/ids';
+import type { Node, Link } from './types';
 
 /** 计算销毁一个 Node 时应级联销毁的全部 Link Id（需求7.5）。 */
 export function linksTouching(links: Record<Id, Link>, nodeId: Id): Id[] {

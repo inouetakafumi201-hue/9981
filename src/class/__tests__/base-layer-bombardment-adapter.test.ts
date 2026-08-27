@@ -12,8 +12,8 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import type { CandidateDefinition } from '../../l2/model/definition.js';
-import type { ContainerDomainContract } from '../../l2/model/space-items-contracts.js';
+import type { CandidateDefinition } from '../../l2/model/definition';
+import type { ContainerDomainContract } from '../../l2/model/space-items-contracts';
 import {
   containerToRuntimeConfig,
   sceneToRuntimeConfig,
@@ -21,7 +21,7 @@ import {
   validateContainerRuntimeConfig,
   validateSceneRuntimeConfig,
   validateVehicleRuntimeConfig,
-} from '../../l2/adapters/space-items-adapter.js';
+} from '../../l2/adapters/space-items-adapter';
 
 /** 构造一个最小 CandidateDefinition（L2 BaseDefinition 形状；字段由测试以 Record 形态提供）。 */
 function candidate(id: string, fields: Record<string, unknown>): CandidateDefinition & Record<string, unknown> {

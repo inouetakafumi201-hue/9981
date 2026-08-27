@@ -5,10 +5,10 @@
  * 一旦有两条路径，两条都可能产生不同的规范化结果，"同一输入 + 同一注册表 → 同一输出"（需求 12.13）
  * 就不再成立。因此分支歧义是错误，不是可以自动消解的情况。
  */
-import type { TrustedSchemaMigration } from '../ports/schema-ports.js';
-import type { SchemaMigrationGateway, SchemaVersionCatalog } from '../ports/schema-ports.js';
-import type { QuotaBudget, QuotaViolation } from '../model/quota-types.js';
-import { isPortUnavailable } from '../ports/availability.js';
+import type { TrustedSchemaMigration } from '../ports/schema-ports';
+import type { SchemaMigrationGateway, SchemaVersionCatalog } from '../ports/schema-ports';
+import type { QuotaBudget, QuotaViolation } from '../model/quota-types';
+import { isPortUnavailable } from '../ports/availability';
 
 /** 候选声明版本相对当前 Schema 目录的处境。 */
 export type VersionStanding =

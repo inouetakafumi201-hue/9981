@@ -2,9 +2,9 @@
 import fc from 'fast-check';
 import { expect, it } from 'vitest';
 
-import { buildAccessibleOutputs, PRESENTATION_CHANNELS, ruleSignificantItems } from '../../presentation/accessibility.js';
-import { arbLegalActionSet } from '../support/arbitraries.js';
-import { uiViewFixture } from '../support/fixtures.js';
+import { buildAccessibleOutputs, PRESENTATION_CHANNELS, ruleSignificantItems } from '../../presentation/accessibility';
+import { arbLegalActionSet } from '../support/arbitraries';
+import { uiViewFixture } from '../support/fixtures';
 
 it('任意表现通道失败组合都不减少读屏、字幕和 ARIA 信息', () => {
   const failed = fc.uniqueArray(fc.constantFrom(...PRESENTATION_CHANNELS), { maxLength: PRESENTATION_CHANNELS.length });

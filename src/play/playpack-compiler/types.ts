@@ -10,7 +10,7 @@
  *  - 复杂度评分用于定价，与规则正确性无关
  */
 
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 
 /**
  * 玩法包来源标识。
@@ -96,6 +96,15 @@ export interface CompiledPlaypack {
    * 消费，不改变 Schemma 或校验规则（来源不带特权）。
    */
   readonly deliveryForm?: 'ordinary' | 'entry-by-map';
+
+  /**
+   * playpack 清单（D-081 / L0 第十四条：玩法包可携带完整规则与逻辑）。
+   *
+   * zip 根目录的 playpack.json / manifest.json（或顶层 kind:'playpack' 的文档）经引擎严格
+   * 解码链（StrictJsonCodec → decodePlaypack）校验后落在该字段；无清单时为 undefined。
+   * 装配桥（compileToPlaypackDef）以此为基础合并 profiles/maps 展开的 defs。
+   */
+  readonly playpackDef?: import('../../core/kernel/schedule/playpack').PlaypackDef;
 }
 
 /** 解析后的 profile。 */

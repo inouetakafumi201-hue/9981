@@ -9,13 +9,13 @@
  * - 父天然场景删除：子 Micro_Scene 必须通过 L1 支持的生命周期操作处理，否则回滚。
  */
 
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import type { Diagnostic } from '../model/diagnostic.js';
-import { errorDiagnostic } from '../model/diagnostic-factory.js';
-import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering.js';
-import type { DefinitionPackage } from '../model/definition.js';
-import type { TypedReference } from '../model/reference.js';
-import { matchesExpected, type ReferenceGraph } from './reference-graph.js';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import type { Diagnostic } from '../model/diagnostic';
+import { errorDiagnostic } from '../model/diagnostic-factory';
+import { canonicalSort, compareDiagnostics, compareStrings } from '../model/ordering';
+import type { DefinitionPackage } from '../model/definition';
+import type { TypedReference } from '../model/reference';
+import { matchesExpected, type ReferenceGraph } from './reference-graph';
 
 export interface RevalidationInput {
   readonly package: DefinitionPackage;

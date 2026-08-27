@@ -8,13 +8,13 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import fc from 'fast-check';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { resetIdCounters } from '../../state/ids.js';
-import { registerScheduleOps } from '../schedule-ops.js';
-import type { ScheduleDef } from '../types.js';
-import type { IntentState, DecisionState } from '../../state/world-state.js';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { createEmptyWorldState } from '../../state/world-state';
+import { resetIdCounters } from '../../state/ids';
+import { registerScheduleOps } from '../schedule-ops';
+import type { ScheduleDef } from '../types';
+import type { IntentState, DecisionState } from '../../state/world-state';
 
 describe('Response Phase (reactionRounds)', () => {
   beforeEach(() => resetIdCounters());

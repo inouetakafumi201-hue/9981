@@ -18,13 +18,13 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { parseStrictDataJson } from '../catalog-loader.js';
-import { catalogText } from './catalog-fixtures.js';
+import { parseStrictDataJson } from '../catalog-loader';
+import { catalogText } from './catalog-fixtures';
 import {
   buildOpReferenceReport,
   buildRealOpNameSet,
   collectAllCatalogOpUses,
-} from './base-layer-bombardment-harness.js';
+} from './base-layer-bombardment-harness';
 
 /** 已知族特有目录（不进入统一形状解析/激活切片）声明的、真实 OpRegistry 未注册的 Op 名。 */
 const KNOWN_FAMILY_SPECIFIC_UNREGISTERED_OPS: ReadonlySet<string> = new Set([

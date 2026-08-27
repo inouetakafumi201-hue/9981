@@ -11,12 +11,12 @@ import {
   RuleCircuitBreaker,
   Linter,
   QuotaEnforcer,
-} from '../safety.js';
-import { compareVersions } from '../../persistence/persistence.js';
-import { createEmptyWorldState } from '../../state/world-state.js';
-import { ERR_CODES } from '../../state/error-codes.js';
-import type { Diagnostic } from '../../state/diagnostic.js';
-import type { Def } from '../../state/def.js';
+} from '../safety';
+import { compareVersions } from '../../persistence/persistence';
+import { createEmptyWorldState } from '../../state/world-state';
+import { ERR_CODES } from '../../state/error-codes';
+import type { Diagnostic } from '../../state/diagnostic';
+import type { Def } from '../../state/def';
 
 describe('L13 DiagnosticSink: four-severity contract', () => {
   it('emit 将诊断加入 log', () => {

@@ -9,9 +9,9 @@
  * 并把改动合并到上一层，rollback() 弹出保存点并丢弃改动（恢复到该 begin() 调用前的 draft）。
  * journalMark 与 draft 快照同层保存，保证 rollback 时 journal 也同步截断，不残留已回滚的记录。
  */
-import type { WorldState } from '../state/world-state.js';
-import type { Value } from '../state/value.js';
-import { DEFAULT_LOG_RETENTION, appendLogEntry } from '../state/event-log.js';
+import type { WorldState } from '../state/world-state';
+import type { Value } from '../state/value';
+import { DEFAULT_LOG_RETENTION, appendLogEntry } from '../state/event-log';
 
 export interface JournalEntry {
   readonly op: string;

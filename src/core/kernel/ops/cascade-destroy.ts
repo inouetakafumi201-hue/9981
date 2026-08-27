@@ -21,13 +21,13 @@
  *   RuleDef，在这次销毁真正发生前，用 item.move 把容器里的物品转移到当前节点的地面容器——
  *   这正是 before/after Hook 分发点存在的意义：给玩法包一个介入窗口，内核本身不替玩法包做决定。
  */
-import type { Id, Ref } from '../state/ids.js';
-import type { Entity, Item } from '../state/entity.js';
-import type { WorldState } from '../state/world-state.js';
-import type { Attachment } from '../state/attachment.js';
-import { cascadeRemovalSet } from '../state/attachment.js';
-import { removeAllRelationsInvolving } from './relation-ops.js';
-import { setSlotHolds } from '../topology/container.js';
+import type { Id, Ref } from '../state/ids';
+import type { Entity, Item } from '../state/entity';
+import type { WorldState } from '../state/world-state';
+import type { Attachment } from '../state/attachment';
+import { cascadeRemovalSet } from '../state/attachment';
+import { removeAllRelationsInvolving } from './relation-ops';
+import { setSlotHolds } from '../topology/container';
 
 /** 计算目标 target 直接及级联（经 grantedBy）应被移除的全部 Attachment id。 */
 export function attachmentsCascadeFor(allAttachments: readonly Attachment[], target: Ref): Set<Id> {

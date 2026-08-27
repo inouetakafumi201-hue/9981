@@ -9,43 +9,43 @@
  * 所有数值均为 Internal_Metric（可绝对值 > 1-5）；玩家可见值保持 1-5。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ActionCatalog } from '../../actions/catalog.js';
-import { registerIntentOps } from '../../decision/intent-ops.js';
-import { registerScheduleOps } from '../../schedule/schedule-ops.js';
-import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine.js';
-import { QueryEngine } from '../../expr/query-engine.js';
-import { setPath } from '../../ops/path.js';
-import { registerPropOps } from '../../ops/prop-ops.js';
-import { OpRegistry } from '../../ops/registry.js';
-import { WorldStateHolder } from '../../ops/transaction.js';
-import { FlowInterpreter } from '../../flow/interpreter.js';
-import { InMemoryCheckpointStore } from '../../persistence/persistence.js';
-import { createAgentShape } from '../../state/agent.js';
-import { DefRegistry } from '../../state/def.js';
-import { createEntityShape } from '../../state/entity.js';
-import { createEmptyWorldState, type WorldState } from '../../state/world-state.js';
-import { DesignCurrencyGateway } from '../design-currency.js';
-import { ValidatedBehaviorGateway } from '../behavior-validation.js';
-import { ScopedCandidatePlanner } from '../candidate-planner.js';
-import { CanonicalCandidateCommitGateway } from '../commit-gateway.js';
-import { FiniteEvaluationGuard } from '../evaluation.js';
-import { BoundedAIDecisionFacade } from '../facade.js';
-import { StaticPlannerRegistry } from '../planner-registry.js';
-import { RestrictedAIReadGateway } from '../read-gateway.js';
-import { SequentialSearchPlanner } from '../sequential-search.js';
-import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter.js';
-import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter.js';
-import { SchedulePhaseParticipants } from '../kernel/participant-order.js';
-import { KernelAIReadAdapter } from '../kernel/read-adapter.js';
-import { KernelSearchSessionGateway } from '../kernel/search-session.js';
-import { CanonicalSimulationAdapter } from '../simulation.js';
-import { KernelSimulationAdapter } from '../kernel/simulation-adapter.js';
-import type { ActionDef } from '../../actions/types.js';
-import type { ScheduleDef } from '../../schedule/types.js';
-import type { Def } from '../../state/def.js';
-import type { Expr } from '../../state/expr-types.js';
-import type { Effect } from '../../events/effect-types.js';
-import type { NPCActionRequest } from '../types.js';
+import { ActionCatalog } from '../../actions/catalog';
+import { registerIntentOps } from '../../decision/intent-ops';
+import { registerScheduleOps } from '../../schedule/schedule-ops';
+import { ExprEngine, makeDefaultEvalContext } from '../../expr/engine';
+import { QueryEngine } from '../../expr/query-engine';
+import { setPath } from '../../ops/path';
+import { registerPropOps } from '../../ops/prop-ops';
+import { OpRegistry } from '../../ops/registry';
+import { WorldStateHolder } from '../../ops/transaction';
+import { FlowInterpreter } from '../../flow/interpreter';
+import { InMemoryCheckpointStore } from '../../persistence/persistence';
+import { createAgentShape } from '../../state/agent';
+import { DefRegistry } from '../../state/def';
+import { createEntityShape } from '../../state/entity';
+import { createEmptyWorldState, type WorldState } from '../../state/world-state';
+import { DesignCurrencyGateway } from '../design-currency';
+import { ValidatedBehaviorGateway } from '../behavior-validation';
+import { ScopedCandidatePlanner } from '../candidate-planner';
+import { CanonicalCandidateCommitGateway } from '../commit-gateway';
+import { FiniteEvaluationGuard } from '../evaluation';
+import { BoundedAIDecisionFacade } from '../facade';
+import { StaticPlannerRegistry } from '../planner-registry';
+import { RestrictedAIReadGateway } from '../read-gateway';
+import { SequentialSearchPlanner } from '../sequential-search';
+import { DefBackedBehaviorValidator, type AIBehaviorFamilySchema } from '../kernel/behavior-adapter';
+import { KernelCanonicalSubmissionAdapter } from '../kernel/commit-adapter';
+import { SchedulePhaseParticipants } from '../kernel/participant-order';
+import { KernelAIReadAdapter } from '../kernel/read-adapter';
+import { KernelSearchSessionGateway } from '../kernel/search-session';
+import { CanonicalSimulationAdapter } from '../simulation';
+import { KernelSimulationAdapter } from '../kernel/simulation-adapter';
+import type { ActionDef } from '../../actions/types';
+import type { ScheduleDef } from '../../schedule/types';
+import type { Def } from '../../state/def';
+import type { Expr } from '../../state/expr-types';
+import type { Effect } from '../../events/effect-types';
+import type { NPCActionRequest } from '../types';
 
 const pathOf = (path: string): Expr => ({ path });
 
@@ -70,6 +70,7 @@ function makeAction(id: string, vitalityAfter: number): ActionDef {
     id,
     kind: 'action',
     label: id,
+    track: 'highlight',
     require: true,
     cost: [],
     effects: [opEffect('prop.set', { path: `entities.${ENTITY}.props.vitality`, value: vitalityAfter })],
@@ -212,6 +213,7 @@ describe('设计货币驱动 AI 的 AP/资源价值判断（真实内核链路�
       id,
       kind: 'action',
       label: id,
+      track: 'highlight',
       require: true,
       cost: [],
       effects: [opEffect('prop.set', { path: `entities.${ENTITY}.props.ap`, value: selfApAfter })],

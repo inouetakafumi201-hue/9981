@@ -5,23 +5,23 @@
  * `JSON.parse(canonicalJson)` 派生，保证两者语义一致（与 UGC canonicalizer 的不变量相同）。
  */
 
-import { createDiagnosticCodeCatalog } from '../../../../core/ugc/diagnostics/code-catalog.js';
-import { createDiagnosticFactory } from '../../../../core/ugc/diagnostics/factory.js';
-import { sha256FingerprintGateway } from '../../../../core/ugc/ports/sha256-fingerprint-gateway.js';
-import { createQuotaBudget } from '../../../../core/ugc/quota/quota-budget.js';
-import type { QuotaBudget, TrustedQuotaProfile } from '../../../../core/ugc/model/quota-types.js';
-import { QUOTA_KINDS } from '../../../../core/ugc/model/quota-types.js';
-import type { CanonicalizedChangeRequest } from '../../../../core/ugc/model/canonical-types.js';
-import type { ChangeOperation, TargetOwnership } from '../../../../core/ugc/model/candidate.js';
+import { createDiagnosticCodeCatalog } from '../../../../core/ugc/diagnostics/code-catalog';
+import { createDiagnosticFactory } from '../../../../core/ugc/diagnostics/factory';
+import { sha256FingerprintGateway } from '../../../../core/ugc/ports/sha256-fingerprint-gateway';
+import { createQuotaBudget } from '../../../../core/ugc/quota/quota-budget';
+import type { QuotaBudget, TrustedQuotaProfile } from '../../../../core/ugc/model/quota-types';
+import { QUOTA_KINDS } from '../../../../core/ugc/model/quota-types';
+import type { CanonicalizedChangeRequest } from '../../../../core/ugc/model/canonical-types';
+import type { ChangeOperation, TargetOwnership } from '../../../../core/ugc/model/candidate';
 import type {
   DefinitionValidationContext,
-} from '../../../../core/ugc/ports/definition-ports.js';
+} from '../../../../core/ugc/ports/definition-ports';
 import type {
   DefinitionRegistryReadSnapshot,
   UpstreamSchemaView,
-} from '../../../../core/ugc/model/upstream.js';
-import type { ValidationBaseline } from '../../../../core/ugc/model/baseline.js';
-import type { IntegrationContractSnapshot } from '../../../../core/ugc/model/contract-types.js';
+} from '../../../../core/ugc/model/upstream';
+import type { ValidationBaseline } from '../../../../core/ugc/model/baseline';
+import type { IntegrationContractSnapshot } from '../../../../core/ugc/model/contract-types';
 
 export const catalog = createDiagnosticCodeCatalog(sha256FingerprintGateway);
 export const factory = createDiagnosticFactory(catalog);

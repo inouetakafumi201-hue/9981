@@ -21,13 +21,13 @@
  *    Linter 豁免 prefab / prefab 补 play 扩展，待相关线裁决），本文件不把它断言成通过。
  */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { compile, compileToPlaypackDef, type PlaypackInput } from '../playpack-compiler/index.js';
-import { loadCoreMechanics, type CoreMechanicsLoadOptions, type CoreMechanicsLoadResult } from '../core-mechanics/load.js';
-import { createLoadedCoreMechanics } from '../core-mechanics/__tests__/state-machine-load-driver.js';
-import { ACT_ATTACK } from '../core-mechanics/defs/ids.js';
-import { CoreMechanicsPlaypack } from '../core-mechanics/defs/playpack.js';
-import { resetIdCounters } from '../../core/kernel/state/ids.js';
-import type { FullHarness } from '../../core/kernel/testing/full-harness.js';
+import { compile, compileToPlaypackDef, type PlaypackInput } from '../playpack-compiler/index';
+import { loadCoreMechanics, type CoreMechanicsLoadOptions, type CoreMechanicsLoadResult } from '../core-mechanics/load';
+import { createLoadedCoreMechanics } from '../core-mechanics/__tests__/state-machine-load-driver';
+import { ACT_ATTACK } from '../core-mechanics/defs/ids';
+import { CoreMechanicsPlaypack } from '../core-mechanics/defs/playpack';
+import { resetIdCounters } from '../../core/kernel/state/ids';
+import type { FullHarness } from '../../core/kernel/testing/full-harness';
 
 // ---------------------------------------------------------------------------
 // UGC 包样本（uploaded 来源，strict JSON 解析可接受：无注释/尾逗号/重复键）

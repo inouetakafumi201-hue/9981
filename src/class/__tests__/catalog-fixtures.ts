@@ -8,9 +8,9 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseClassJson } from '../catalog-loader.js';
-import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract.js';
-import type { JsonValue } from '../../core/kernel/spec-compiler/types.js';
+import { parseClassJson } from '../catalog-loader';
+import { expectArray, expectObject, expectString, type JsonObject } from '../json-contract';
+import type { JsonValue } from '../../core/kernel/spec-compiler/types';
 
 const FIXTURE_DIR = dirname(fileURLToPath(import.meta.url));
 

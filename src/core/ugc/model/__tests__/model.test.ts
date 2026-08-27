@@ -2,23 +2,23 @@
  * 任务 2.1 验收测试：不可变候选、请求绑定指纹、基线比较、结果通道不变量。
  */
 import { describe, expect, it } from 'vitest';
-import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway.js';
+import { sha256FingerprintGateway } from '../../ports/sha256-fingerprint-gateway';
 import {
   candidateFromText,
   copyCandidateBytes,
   createCandidateDocument,
   createCandidateSource,
-} from '../candidate.js';
+} from '../candidate';
 import {
   computeChangeRequestFingerprint,
   createChangeRequestBinding,
   diffChangeRequestBindings,
-} from '../binding.js';
-import { createValidationBaseline, diffValidationBaselines } from '../baseline.js';
-import { compareCodePoints, encodeFingerprintPayload, utf8ByteLength } from '../fingerprint.js';
-import { hasBlockingDiagnostic, ugcOk, ugcReject } from '../result.js';
-import { compareSkippedChecks, createSkippedCheck } from '../stage.js';
-import { createPresentationFallbackDecision, isSemanticsPreserving } from '../presentation.js';
+} from '../binding';
+import { createValidationBaseline, diffValidationBaselines } from '../baseline';
+import { compareCodePoints, encodeFingerprintPayload, utf8ByteLength } from '../fingerprint';
+import { hasBlockingDiagnostic, ugcOk, ugcReject } from '../result';
+import { compareSkippedChecks, createSkippedCheck } from '../stage';
+import { createPresentationFallbackDecision, isSemanticsPreserving } from '../presentation';
 
 const gateway = sha256FingerprintGateway;
 

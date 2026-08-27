@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import * as AI from '../index.js';
+import * as AI from '../index';
 
 describe('AI migration regression', () => {
   it('exposes the bounded facade and removes the legacy state-taking entry points', () => {

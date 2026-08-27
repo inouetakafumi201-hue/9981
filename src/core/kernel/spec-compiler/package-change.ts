@@ -1,13 +1,13 @@
-import { compareCodePoints } from './json-codec.js';
-import { inboundFrom } from './resolver.js';
-import type { ReferenceGraph } from './resolver.js';
+import { compareCodePoints } from './json-codec';
+import { inboundFrom } from './resolver';
+import type { ReferenceGraph } from './resolver';
 import type {
   CandidateDefinition,
   JsonValue,
   PackageRecord,
   Report,
   TechnicalQuotas,
-} from './types.js';
+} from './types';
 
 /**
  * Package-level intent declared by one candidate document.

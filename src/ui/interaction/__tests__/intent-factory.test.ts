@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { actionView, decisionView, uiViewFixture } from '../../__tests__/support/fixtures.js';
-import { INPUT_SOURCES } from '../../model/intent.js';
-import { buildIntent } from '../intent-factory.js';
+import { actionView, decisionView, uiViewFixture } from '../../__tests__/support/fixtures';
+import { INPUT_SOURCES } from '../../model/intent';
+import { buildIntent } from '../intent-factory';
 
 const VIEW = uiViewFixture({
   actions: [actionView({ actionId: 'act.move', bindings: [{ key: 'to', value: 'n1' }] })],

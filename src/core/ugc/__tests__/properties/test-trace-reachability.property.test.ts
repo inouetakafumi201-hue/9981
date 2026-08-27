@@ -10,13 +10,13 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHarness } from '../harness.js';
+import { createHarness } from '../harness';
 import {
   INVALID_PATTERNS,
   candidateForPattern,
   observe,
   requestFrom,
-} from '../../testing/index.js';
+} from '../../testing/index';
 
 const PROPERTY_DIR = dirname(fileURLToPath(import.meta.url));
 

@@ -19,10 +19,10 @@
  * checkInstantiable 是这三维校验的唯一实现，全部会实例化 Def 的 Op 都必须调用它，
  * 不允许每个 Op 各自手写一份（这类重复正是此前"部分 Op 校验、部分 Op 不校验"不一致的根源）。
  */
-import type { Id } from '../state/ids.js';
-import type { Def, DefKind } from '../state/def.js';
-import type { Result } from './result.js';
-import { ok, err } from './result.js';
+import type { Id } from '../state/ids';
+import type { Def, DefKind } from '../state/def';
+import type { Result } from './result';
+import { ok, err } from './result';
 
 export type DefLookupFn = (id: Id) => Def | null;
 

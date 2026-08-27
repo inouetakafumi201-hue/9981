@@ -1,8 +1,8 @@
 /**
  * 规范化产物类型（design.md「Schema migration and canonicalization」/ 需求 11.1-11.9）。
  */
-import type { ChangeRequestBinding } from './binding.js';
-import type { CandidateSource, TargetOwnership } from './candidate.js';
+import type { ChangeRequestBinding } from './binding';
+import type { CandidateSource, TargetOwnership } from './candidate';
 
 export interface CanonicalCandidate {
   readonly source: CandidateSource;

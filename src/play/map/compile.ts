@@ -12,11 +12,12 @@
  * 游戏照样跑"这条判据的可执行形式——编译产物就是删掉几何之后的那份数据。渲染层单独读
  * MapData 取几何，两条路互不依赖。
  */
-import type { PrefabDef } from '../../core/kernel/topology/prefab.js';
-import type { Expr } from '../../core/kernel/state/expr-types.js';
-import type { MapData, MapEdge, MapNode, MapPlacement, Directionality } from './types.js';
-import { validateMapStructure } from './validate.js';
-import type { MapDiagnostic } from './validate.js';
+import type { PrefabDef } from '../../core/kernel/topology/prefab';
+import type { Expr } from '../../core/kernel/state/expr-types';
+import type { MapDataDocument, MapEdge, MapPlacement, CanonicalMapNode, Directionality } from './types';
+import { normalizeMapDocument } from './types';
+import { validateMapStructure } from './validate';
+import type { MapDiagnostic } from './validate';
 
 /** 编译结果。失败时只带诊断，不带半成品产物。 */
 export type CompileResult =
@@ -29,7 +30,7 @@ export type CompileResult =
  *
  * L-07 透传：`parent` 经 props 传入 PrefabDef，`prefab.spawn` 读 props.parent 传给 createNodeShape。
  */
-function nodeSpecOf(node: MapNode): { key: string; def: string; props?: Record<string, Expr> } {
+function nodeSpecOf(node: CanonicalMapNode): { key: string; def: string; props?: Record<string, Expr> } {
   const props: Record<string, Expr> = { scale: node.scale };
   if (node.name !== undefined) props['name'] = node.name;
   if (node.parent !== undefined) props['parent'] = node.parent;
@@ -86,17 +87,18 @@ function entitySpecOf(placement: MapPlacement): {
  * 跨目录引用校验（`validateMapAgainstClasses`）不在这里调用：它需要加载基类层目录，而编译
  * 必须保持无 IO 才能在属性测试里被高频调用。调用方负责在发布前另外跑那一层。
  */
-export function compileMap(map: MapData, prefabId?: string): CompileResult {
-  const findings = validateMapStructure(map);
+export function compileMap(map: MapDataDocument, prefabId?: string): CompileResult {
+  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
+  const findings = validateMapStructure(canonical);
   const errors = findings.filter((finding) => finding.severity === 'error');
   if (errors.length > 0) return { ok: false, diagnostics: findings };
 
   const prefab: PrefabDef = {
     id: prefabId ?? `d:map/${map.id}`,
     kind: 'prefab',
-    nodes: map.nodes.map(nodeSpecOf),
-    links: map.edges.map(linkSpecOf),
-    entities: map.placements.map(entitySpecOf),
+    nodes: canonical.nodes.map(nodeSpecOf),
+    links: canonical.edges.map(linkSpecOf),
+    entities: canonical.placements.map(entitySpecOf),
   };
 
   return {
@@ -110,10 +112,11 @@ export function compileMap(map: MapData, prefabId?: string): CompileResult {
  * 把编译产物还原成拓扑邻接表，供 `dist`/`shortestPath` 之类的度量在没有完整 WorldState 时
  * 做离线推演——例如编辑器的"试玩"要回答"从出生点能不能走到目标"，不必起一局真游戏。
  */
-export function adjacencyOf(map: MapData): ReadonlyMap<string, readonly string[]> {
+export function adjacencyOf(map: MapDataDocument): ReadonlyMap<string, readonly string[]> {
+  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
   const adjacency = new Map<string, string[]>();
-  for (const node of map.nodes) adjacency.set(node.id, []);
-  for (const edge of map.edges) {
+  for (const node of canonical.nodes) adjacency.set(node.id, []);
+  for (const edge of canonical.edges) {
     adjacency.get(edge.a)?.push(edge.b);
     if (edge.directionality === 'bidirectional') adjacency.get(edge.b)?.push(edge.a);
   }
@@ -130,17 +133,18 @@ export function adjacencyOf(map: MapData): ReadonlyMap<string, readonly string[]
  * 区域。但它值得提示，因为绝大多数不连通是画漏了一条边。方向性在这里被忽略：判定的是
  * "有没有一片区域和主体完全没有连线"，而不是"能不能单向抵达"。
  */
-export function connectedGroups(map: MapData): readonly (readonly string[])[] {
+export function connectedGroups(map: MapDataDocument): readonly (readonly string[])[] {
+  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
   const undirected = new Map<string, string[]>();
-  for (const node of map.nodes) undirected.set(node.id, []);
-  for (const edge of map.edges) {
+  for (const node of canonical.nodes) undirected.set(node.id, []);
+  for (const edge of canonical.edges) {
     undirected.get(edge.a)?.push(edge.b);
     undirected.get(edge.b)?.push(edge.a);
   }
 
   const visited = new Set<string>();
   const groups: string[][] = [];
-  for (const node of map.nodes) {
+  for (const node of canonical.nodes) {
     if (visited.has(node.id)) continue;
     const group: string[] = [];
     const stack = [node.id];

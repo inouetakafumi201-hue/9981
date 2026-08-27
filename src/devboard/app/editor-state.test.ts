@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addEdge, addNode, blankMap, deleteSelection, moveNode, sampleMap } from './editor-state.js';
+import { addEdge, addNode, blankMap, deleteSelection, moveNode, sampleMap } from './editor-state';
 
 describe('开发板地图编辑状态', () => {
   it('放置节点归一化坐标并登记楼层', () => {

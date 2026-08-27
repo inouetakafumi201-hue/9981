@@ -9,15 +9,15 @@
  * 由于规范化只重排键序，两次解析得到的语义内容一致。
  */
 
-import { canonicalizeJsonValue, compareStrings } from '../model/ordering.js';
-import type { JsonValue } from '../model/json.js';
-import { isJsonValue } from '../model/json.js';
-import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes.js';
-import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory.js';
-import type { Result } from '../model/result.js';
-import { ok } from '../model/result.js';
-import { scanJson } from './json-scanner.js';
-import { nodeToJsonValue } from './json-scanner.js';
+import { canonicalizeJsonValue, compareStrings } from '../model/ordering';
+import type { JsonValue } from '../model/json';
+import { isJsonValue } from '../model/json';
+import { DIAGNOSTIC_CODES } from '../model/diagnostic-codes';
+import { errorDiagnostic, structuredRejection } from '../model/diagnostic-factory';
+import type { Result } from '../model/result';
+import { ok } from '../model/result';
+import { scanJson } from './json-scanner';
+import { nodeToJsonValue } from './json-scanner';
 
 /** 规范化缩进（两空格）。缩进是纯表现，不影响语义等价。 */
 const INDENT = '  ';

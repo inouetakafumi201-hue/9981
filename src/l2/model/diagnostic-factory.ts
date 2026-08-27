@@ -16,13 +16,13 @@ import type {
   JsonPath,
   PackageId,
   StableDiagnosticCode,
-} from './ids.js';
-import type { Diagnostic, DiagnosticSeverity, StructuredRejection } from './diagnostic.js';
-import { isErrorDiagnostic } from './diagnostic.js';
-import type { SourceLocation, SourceRecord } from './source.js';
-import { canonicalSort, compareDiagnostics, compareSourceRecords, fingerprint } from './ordering.js';
-import type { CanonicalSnapshot } from './snapshot.js';
-import { DIAGNOSTIC_CODES } from './diagnostic-codes.js';
+} from './ids';
+import type { Diagnostic, DiagnosticSeverity, StructuredRejection } from './diagnostic';
+import { isErrorDiagnostic } from './diagnostic';
+import type { SourceLocation, SourceRecord } from './source';
+import { canonicalSort, compareDiagnostics, compareSourceRecords, fingerprint } from './ordering';
+import type { CanonicalSnapshot } from './snapshot';
+import { DIAGNOSTIC_CODES } from './diagnostic-codes';
 
 /** 诊断构造输入。 */
 export interface DiagnosticInput {

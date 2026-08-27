@@ -13,7 +13,7 @@
  * - 不能改变原子性保证
  */
 
-export { InMemoryArtifactStore, hashBytes } from './artifact-store.js';
-export type { ArtifactStore, ArtifactManifest, ArtifactManifestEntry } from './artifact-store.js';
-export { OutputLease, OutputLeaseError } from './output-lease.js';
-export type { OutputLeaseState } from './output-lease.js';
+export { InMemoryArtifactStore, hashBytes } from './artifact-store';
+export type { ArtifactStore, ArtifactManifest, ArtifactManifestEntry } from './artifact-store';
+export { OutputLease, OutputLeaseError } from './output-lease';
+export type { OutputLeaseState } from './output-lease';

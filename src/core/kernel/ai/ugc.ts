@@ -1,12 +1,12 @@
 /** Declarative, validated UGC references for bounded AI behavior. */
-import type { Ref } from '../state/ids.js';
+import type { Ref } from '../state/ids';
 import type {
   AIBehaviorValidationGateway,
   AIPolicyCategory,
   AIResult,
   PlannerRegistry,
   ValidatedAIBehaviorBinding,
-} from './types.js';
+} from './types';
 
 export const AI_UGC_SCHEMA_VERSION = 'wakeup.ai.binding/v1';
 

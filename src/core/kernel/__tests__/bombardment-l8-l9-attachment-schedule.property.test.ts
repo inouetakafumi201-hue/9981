@@ -16,19 +16,19 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { registerAttachOps, type AttachOpsDeps } from '../attachment/attach-ops.js';
-import { cascadeRemovalSet, type Attachment } from '../state/attachment.js';
-import { registerScheduleOps } from '../schedule/schedule-ops.js';
-import { OpRegistry, type OpContext } from '../ops/registry.js';
-import { WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { resetIdCounters } from '../state/ids.js';
-import type { Def } from '../state/def.js';
-import type { AttachmentDef } from '../attachment/types.js';
-import type { ScheduleDef } from '../schedule/types.js';
-import type { Effect } from '../events/effect-types.js';
-import { ok, err } from '../ops/result.js';
-import type { WorldState } from '../state/world-state.js';
+import { registerAttachOps, type AttachOpsDeps } from '../attachment/attach-ops';
+import { cascadeRemovalSet, type Attachment } from '../state/attachment';
+import { registerScheduleOps } from '../schedule/schedule-ops';
+import { OpRegistry, type OpContext } from '../ops/registry';
+import { WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { resetIdCounters } from '../state/ids';
+import type { Def } from '../state/def';
+import type { AttachmentDef } from '../attachment/types';
+import type { ScheduleDef } from '../schedule/types';
+import type { Effect } from '../events/effect-types';
+import { ok, err } from '../ops/result';
+import type { WorldState } from '../state/world-state';
 
 // ---- L8 fixtures ----
 const indepDef: AttachmentDef = { id: 'att:indep', kind: 'attachment', stackStrategy: 'independent' };

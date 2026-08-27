@@ -1,5 +1,5 @@
 /** Honest sequential MaxN search over bounded SearchDecisionContext instances. */
-import type { LegalAction } from '../actions/types.js';
+import type { LegalAction } from '../actions/types';
 import type {
   AICandidate,
   AIDecisionRequest,
@@ -15,7 +15,7 @@ import type {
   SearchScoreVector,
   SearchSession,
   ValidatedAIBehaviorBinding,
-} from './types.js';
+} from './types';
 
 /** Identifies a search-capable planner without changing CandidatePlanner's base contract. */
 export function isSearchPlanner(planner: CandidatePlanner): planner is SearchPlanner {

@@ -8,12 +8,12 @@
  * 对应 design.md 批次 D 门禁与 Requirements 6.1、10.13、13.6–13.7。
  */
 
-import type { OpRegistry } from '../../core/kernel/ops/registry.js';
-import type { JsonValue } from '../model/json.js';
-import type { OpCause, RuntimeSemanticState } from '../model/projection.js';
-import { fingerprint } from '../model/ordering.js';
-import type { KernelContract, KernelInvokeResult } from './kernel-contract.js';
-import { classifyKernelErrorCode } from './kernel-contract.js';
+import type { OpRegistry } from '../../core/kernel/ops/registry';
+import type { JsonValue } from '../model/json';
+import type { OpCause, RuntimeSemanticState } from '../model/projection';
+import { fingerprint } from '../model/ordering';
+import type { KernelContract, KernelInvokeResult } from './kernel-contract';
+import { classifyKernelErrorCode } from './kernel-contract';
 
 /** 适配器依赖。 */
 export interface OpRegistryAdapterDeps {
@@ -56,11 +56,11 @@ export function createKernelContractFromOpRegistry(deps: OpRegistryAdapterDeps):
 
     invoke(
       opId: string,
-      args: Readonly<Record<string, JsonValue>>,
+      args: Readonly<Record<string, JsonValue | { readonly $: string }>>,
       cause: OpCause,
     ): KernelInvokeResult {
       deps.recordCause?.(opId, cause);
-      const result = deps.opRegistry.invoke<Readonly<Record<string, JsonValue>>, unknown>(opId, args);
+      const result = deps.opRegistry.invoke<Readonly<Record<string, JsonValue | { readonly $: string }>>, unknown>(opId, args);
       const fingerprintAfter = fingerprintOf();
       if (result.ok) {
         return {

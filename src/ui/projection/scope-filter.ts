@@ -21,23 +21,23 @@ import {
   uiRejected,
   type UiDiagnostic,
   type UiResult,
-} from '../model/diagnostic.js';
-import { projectSafePayload, type RuleEventProjection } from '../model/event-projection.js';
-import type { StateRevision } from '../model/revision.js';
-import type { PresentationProfile } from '../model/profile.js';
-import type { AuthorizationScope } from '../model/view.js';
+} from '../model/diagnostic';
+import { projectSafePayload, type RuleEventProjection } from '../model/event-projection';
+import type { StateRevision } from '../model/revision';
+import type { PresentationProfile } from '../model/profile';
+import type { AuthorizationScope } from '../model/view';
 import type {
   ActionQueryPort,
   ScopedQueryOutcome,
   ScopedQuerySpec,
   ScopedRef,
-} from '../ports/action-query-port.js';
+} from '../ports/action-query-port';
 import type {
   EventPort,
   EventSubscription,
   RawEventSource,
   RawGatewayEvent,
-} from '../ports/event-port.js';
+} from '../ports/event-port';
 
 /**
  * 安全字段的引用种类。

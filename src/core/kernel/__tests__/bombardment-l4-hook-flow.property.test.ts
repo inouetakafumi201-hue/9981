@@ -11,18 +11,18 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { HookDispatcher, type HookCandidate, type HookDispatcherDeps } from '../events/dispatcher.js';
-import { FlowInterpreter, type FlowRunResult } from '../flow/interpreter.js';
-import type { Effect } from '../events/effect-types.js';
-import type { RuleDef, HookPhase } from '../events/types.js';
-import { Transaction, WorldStateHolder } from '../ops/transaction.js';
-import { createEmptyWorldState } from '../state/world-state.js';
-import { QueryEngine } from '../expr/query-engine.js';
-import type { OpContext } from '../ops/registry.js';
-import type { Value } from '../state/value.js';
-import { ok } from '../ops/result.js';
-import { createFullHarness, defaultSeedDefs } from '../testing/full-harness.js';
-import { resetIdCounters } from '../state/ids.js';
+import { HookDispatcher, type HookCandidate, type HookDispatcherDeps } from '../events/dispatcher';
+import { FlowInterpreter, type FlowRunResult } from '../flow/interpreter';
+import type { Effect } from '../events/effect-types';
+import type { RuleDef, HookPhase } from '../events/types';
+import { Transaction, WorldStateHolder } from '../ops/transaction';
+import { createEmptyWorldState } from '../state/world-state';
+import { QueryEngine } from '../expr/query-engine';
+import type { OpContext } from '../ops/registry';
+import type { Value } from '../state/value';
+import { ok } from '../ops/result';
+import { createFullHarness, defaultSeedDefs } from '../testing/full-harness';
+import { resetIdCounters } from '../state/ids';
 
 const PHASES: HookPhase[] = ['before', 'instead', 'modify', 'after'];
 const MAX_DEPTH = 32;

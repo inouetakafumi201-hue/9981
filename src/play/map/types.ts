@@ -192,5 +192,329 @@ export interface MapData {
   readonly placements: readonly MapPlacement[];
 }
 
+// ---------------------------------------------------------------------------
+// 图层 contract 扩展（Task 1：canonical layers/layerId + legacy 规范化入口）
+//
+// 旧的 `floor` / `floors` 只在导入边界出现；canonical 形状以 `layers` 列表 +
+// 节点的 `layerId` 引用表达层级。`schemaVersion: '2.0'` 表示 **只含 canonical
+// 字段**（无 floor / floors）；`'1.0'` 保留为 legacy 导入兼容版本，由
+// `normalizeMapDocument` 规范化为 canonical 形状。独立层：`height` 省略，
+// 不参与高度差比较且恒不透明（L.1-L.10 权威在 docs/创作系统/01 §九）。
+// ---------------------------------------------------------------------------
+
+/** 图层可选的背景图（全屏=固定比例尺铺满 / 局部=贴纸）。 */
+export interface LayerBackdrop {
+  readonly image: string;
+  readonly pixelWidth: number;
+  readonly pixelHeight: number;
+}
+
+/** 图层变换：缩放 + 平移，用于图层间对齐（候选 3：不承载边界）。 */
+export interface LayerTransform {
+  readonly scaleX: number;
+  readonly scaleY: number;
+  readonly tx: number;
+  readonly ty: number;
+}
+
+/**
+ * 一个图层（L.1/L.2/L.10）。`height` 可空：
+ * - 填数值 → 参与透视，同图内参与透视的 height 必须唯一（L.2 去重）；
+ * - 留空 → 三界外独立层，无透视关系，可多个，且恒不透明（L.3）。
+ */
+export interface MapLayer {
+  readonly id: string;
+  readonly name?: string;
+  readonly height?: number;
+  readonly backdrop?: LayerBackdrop;
+  readonly transform?: LayerTransform;
+}
+
+/**
+ * Canonical 地图：以 `layers` 列表 + 节点 `layerId` 引用表达层级。
+ * `schemaVersion` 升到 `'2.0'`，不携带 legacy `floor` / `floors` 字段。
+ */
+export interface CanonicalMapData extends Omit<MapData, 'floors' | 'nodes' | 'schemaVersion'> {
+  readonly schemaVersion: '2.0';
+  readonly layers: readonly MapLayer[];
+  readonly nodes: readonly CanonicalMapNode[];
+  /** Optional presentation branch; never compiled into PrefabDef. */
+  readonly buildingGroups?: readonly BuildingGroup[];
+}
+
+/** Canonical 节点：用 `layerId` 引用 `CanonicalMapData.layers` 中的唯一图层。 */
+export interface CanonicalMapNode extends Omit<MapNode, 'layerId' | 'floor'> {
+  readonly layerId: string;
+}
+
+/**
+ * Legacy 地图 v1：仍使用 `floors` / `MapNode.floor`。只在导入边界出现，
+ * 加载时经 `normalizeMapDocument` 规范化为 `CanonicalMapData`。
+ */
+export interface LegacyMapData extends MapData {
+  readonly schemaVersion: '1.0';
+  readonly nodes: readonly LegacyMapNode[];
+}
+
+/** Legacy 节点：用整数 `floor` 引用 `LegacyMapData.floors` 中的声明楼层。 */
+export interface LegacyMapNode extends Omit<MapNode, 'floor'> {
+  readonly floor: number;
+}
+
+/** 规范化入口的输入文档：legacy v1 或 canonical v2 均可。 */
+export type MapDataDocument = LegacyMapData | CanonicalMapData;
+
+/** 建筑组的归一化地图框（表现定位数据，不进入引擎拓扑）。 */
+export interface BuildingFrame {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** 建筑组内楼层；height/ordinal 只在所属建筑组命名空间内解释。 */
+export interface BuildingFloor {
+  readonly id: string;
+  readonly ordinal: number;
+  readonly height: number;
+  readonly nodes: readonly string[];
+  readonly image?: string;
+  readonly frame?: BuildingFrame;
+}
+
+/** 建筑组门户：建筑内部楼层间的表现/空间引用。 */
+export interface BuildingPortal {
+  readonly id: string;
+  readonly from: string;
+  readonly to: string;
+  readonly def: string;
+}
+
+/** canonical 建筑组分支；主地图 layers 与建筑楼层严格分离。 */
+export interface BuildingGroup {
+  readonly id: string;
+  readonly frame: BuildingFrame;
+  readonly shell: string;
+  readonly floors: readonly BuildingFloor[];
+  readonly portals: readonly BuildingPortal[];
+} 
+
+function cloneBuildingFrame(frame: BuildingFrame): BuildingFrame {
+  return { x: frame.x, y: frame.y, width: frame.width, height: frame.height };
+}
+
+function normalizeBuildingGroups(groups: readonly BuildingGroup[] | undefined): readonly BuildingGroup[] | undefined {
+  if (groups === undefined) return undefined;
+  return groups.map((group) => ({
+    id: group.id,
+    frame: cloneBuildingFrame(group.frame),
+    shell: group.shell,
+    floors: group.floors.map((floor) => ({
+      id: floor.id,
+      ordinal: floor.ordinal,
+      height: floor.height,
+      nodes: [...floor.nodes],
+      ...(floor.image !== undefined ? { image: floor.image } : {}),
+      ...(floor.frame !== undefined ? { frame: cloneBuildingFrame(floor.frame) } : {}),
+    })),
+    portals: group.portals.map((portal) => ({ ...portal })),
+  }));
+}
+
+export interface CanonicalBuildingMapData extends CanonicalMapData {
+  readonly buildingGroups: readonly BuildingGroup[];
+}
+
 /** Expr 判别键。放置覆写的键名撞上其中任何一个都必须被拒绝。 */
 export const EXPR_DISCRIMINANT_KEYS: readonly string[] = ['path', 'op', 'call', 'q', 'var'];
+
+/** 把 legacy floor 编号映射到稳定的 canonical 图层 id，避免和手工 layerId 撞名。 */
+export function deriveLayerId(floor: number): string {
+  return `layer:floor:${floor}`;
+}
+
+/** 独立层 height 统一写成 undefined；其余数值原样保留。 */
+export function normalizeLayerHeight(height: number | null | undefined): number | undefined {
+  return height ?? undefined;
+}
+
+/** Canonical/legacy 节点层引用统一入口：优先 layerId，否则回退 floor。 */
+export function normalizeNodeLayerRef(node: { readonly layerId?: string; readonly floor?: number }): string {
+  return node.layerId ?? deriveLayerId(node.floor ?? 0);
+}
+
+function clonePoint(point: Vec2): Vec2 {
+  return { x: point.x, y: point.y };
+}
+
+function cloneLayerBackdrop(backdrop: LayerBackdrop): LayerBackdrop {
+  return {
+    image: backdrop.image,
+    pixelWidth: backdrop.pixelWidth,
+    pixelHeight: backdrop.pixelHeight,
+  };
+}
+
+function cloneLayerTransform(transform: LayerTransform): LayerTransform {
+  return {
+    scaleX: transform.scaleX,
+    scaleY: transform.scaleY,
+    tx: transform.tx,
+    ty: transform.ty,
+  };
+}
+
+function normalizeMapLayer(layer: {
+  readonly id: string;
+  readonly name?: string;
+  readonly height?: number | null;
+  readonly backdrop?: LayerBackdrop;
+  readonly transform?: LayerTransform;
+}): MapLayer {
+  const height = normalizeLayerHeight(layer.height);
+  return {
+    id: layer.id,
+    ...(layer.name !== undefined ? { name: layer.name } : {}),
+    ...(height !== undefined ? { height } : {}),
+    ...(layer.backdrop !== undefined ? { backdrop: cloneLayerBackdrop(layer.backdrop) } : {}),
+    ...(layer.transform !== undefined ? { transform: cloneLayerTransform(layer.transform) } : {}),
+  };
+}
+
+function normalizeMapBackdrop(backdrop: MapBackdrop): MapBackdrop {
+  return {
+    image: backdrop.image,
+    pixelWidth: backdrop.pixelWidth,
+    pixelHeight: backdrop.pixelHeight,
+    tileRows: backdrop.tileRows,
+    tileCols: backdrop.tileCols,
+  };
+}
+
+function normalizeMapNodeBase(node: {
+  readonly id: string;
+  readonly def: string;
+  readonly scale: SceneScale;
+  readonly at: Vec2;
+  readonly parent?: string;
+  readonly name?: string;
+}): Pick<MapNode, 'id' | 'def' | 'scale' | 'at' | 'parent' | 'name'> {
+  return {
+    id: node.id,
+    def: node.def,
+    scale: node.scale,
+    at: clonePoint(node.at),
+    ...(node.parent !== undefined ? { parent: node.parent } : {}),
+    ...(node.name !== undefined ? { name: node.name } : {}),
+  };
+}
+
+function normalizeCanonicalNode(node: CanonicalMapNode): CanonicalMapNode {
+  return {
+    ...normalizeMapNodeBase(node),
+    layerId: normalizeNodeLayerRef(node),
+  };
+}
+
+function normalizeLegacyNode(node: LegacyMapNode): CanonicalMapNode {
+  return {
+    ...normalizeMapNodeBase(node),
+    layerId: normalizeNodeLayerRef(node),
+  };
+}
+
+function normalizeObstruction(spec: ObstructionSpec): ObstructionSpec {
+  return {
+    shape: spec.shape,
+    ...(spec.bounds !== undefined ? { bounds: spec.bounds.map(clonePoint) } : {}),
+    ...(spec.height !== undefined ? { height: spec.height } : {}),
+  };
+}
+
+function normalizeTransitionWindow(window: TransitionWindowPoints): TransitionWindowPoints {
+  return {
+    control: window.control.map(clonePoint),
+  };
+}
+
+function normalizeMapEdge(edge: MapEdge): MapEdge {
+  return {
+    id: edge.id,
+    def: edge.def,
+    a: edge.a,
+    b: edge.b,
+    directionality: edge.directionality,
+    path: edge.path.map(clonePoint),
+    ...(edge.visualObstruction !== undefined ? { visualObstruction: normalizeObstruction(edge.visualObstruction) } : {}),
+    ...(edge.physicalObstruction !== undefined ? { physicalObstruction: normalizeObstruction(edge.physicalObstruction) } : {}),
+    ...(edge.transitionWindow !== undefined ? { transitionWindow: normalizeTransitionWindow(edge.transitionWindow) } : {}),
+    ...(edge.semanticAnchor !== undefined ? { semanticAnchor: edge.semanticAnchor } : {}),
+  };
+}
+
+function normalizeMapPlacement(placement: MapPlacement): MapPlacement {
+  return {
+    id: placement.id,
+    at: placement.at,
+    def: placement.def,
+    ...(placement.overrides !== undefined ? { overrides: { ...placement.overrides } } : {}),
+    ...(placement.temporaryFree !== undefined ? { temporaryFree: placement.temporaryFree } : {}),
+  };
+}
+
+function uniqueSortedFloors(values: readonly number[]): readonly number[] {
+  return [...new Set(values)].sort((left, right) => left - right);
+}
+
+function legacyFloors(document: LegacyMapData): readonly number[] {
+  return uniqueSortedFloors([
+    ...document.floors,
+    ...document.nodes.map((node) => node.floor),
+  ]);
+}
+
+function normalizeLegacyLayers(document: LegacyMapData): readonly MapLayer[] {
+  return legacyFloors(document).map((floor) => normalizeMapLayer({ id: deriveLayerId(floor), height: floor }));
+}
+
+function normalizeCanonicalLayers(layers: readonly MapLayer[]): readonly MapLayer[] {
+  return layers.map((layer) => normalizeMapLayer(layer));
+}
+
+function normalizeCanonicalNodes(nodes: readonly CanonicalMapNode[]): readonly CanonicalMapNode[] {
+  return nodes.map((node) => normalizeCanonicalNode(node));
+}
+
+function normalizeLegacyNodes(nodes: readonly LegacyMapNode[]): readonly CanonicalMapNode[] {
+  return nodes.map((node) => normalizeLegacyNode(node));
+}
+
+/** 把 legacy floor 文档或 canonical layer 文档统一成 canonical MapData。 */
+export function normalizeMapDocument(document: MapDataDocument): CanonicalMapData {
+  if (document.schemaVersion === '2.0') {
+    return {
+      schemaVersion: '2.0',
+      id: document.id,
+      name: document.name,
+      backdrop: normalizeMapBackdrop(document.backdrop),
+      layers: normalizeCanonicalLayers(document.layers),
+      nodes: normalizeCanonicalNodes(document.nodes),
+      edges: document.edges.map(normalizeMapEdge),
+      placements: document.placements.map(normalizeMapPlacement),
+      ...(normalizeBuildingGroups(document.buildingGroups) !== undefined
+        ? { buildingGroups: normalizeBuildingGroups(document.buildingGroups) }
+        : {}),
+    };
+  }
+
+  return {
+    schemaVersion: '2.0',
+    id: document.id,
+    name: document.name,
+    backdrop: normalizeMapBackdrop(document.backdrop),
+    layers: normalizeLegacyLayers(document),
+    nodes: normalizeLegacyNodes(document.nodes),
+    edges: document.edges.map(normalizeMapEdge),
+    placements: document.placements.map(normalizeMapPlacement),
+  };
+}
