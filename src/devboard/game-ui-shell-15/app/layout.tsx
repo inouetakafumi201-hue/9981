@@ -23,14 +23,14 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
+  colorScheme: 'only dark',
   themeColor: '#080a0c',
   userScalable: false,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`dark bg-background ${pixelDisplay.variable} ${pixelMono.variable} ${notoSansSC.variable}`}>
+    <html lang="zh-CN" className={`bg-background ${pixelDisplay.variable} ${pixelMono.variable} ${notoSansSC.variable}`}>
       <body className="antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

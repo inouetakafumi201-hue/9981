@@ -32,8 +32,8 @@
   --radius-xl: 12px;
 }
 
-:root {
-  color-scheme: dark;
+.creation-page-transition {
+  color-scheme: only dark;
 
   --background: #07111b;
   --foreground: #dbe7f0;
