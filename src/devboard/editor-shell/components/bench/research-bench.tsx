@@ -110,7 +110,7 @@ export function ResearchBench() {
           <WeightedButton
             onClick={() => {
               playSfx('toggle')
-              window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'asset-library' } }))
+              window.location.assign(`/asset-library?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
             }}
             className="chamfer lib-btn hud-b flex items-center gap-1.5 px-4 py-2 font-sans text-[13px] font-bold text-[color:var(--cyan)]"
             style={{ ['--hud-bc' as string]: 'var(--cyan)' }}

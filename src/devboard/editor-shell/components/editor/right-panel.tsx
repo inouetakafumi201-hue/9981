@@ -550,7 +550,7 @@ function LibraryEntryButton() {
           openLibrary()
         }
         window.setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'asset-library' } }))
+          window.location.assign(`/asset-library?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
         }, 360)
       }}
       style={{ ['--hud-bc' as string]: 'var(--primary)' }}

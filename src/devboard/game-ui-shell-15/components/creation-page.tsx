@@ -32,9 +32,9 @@ export function CreationPage({ tool }: CreationPageProps) {
   useEffect(() => {
     const onNavigate = (event: Event) => {
       const detail = (event as CustomEvent<{ tool: CreationTool }>).detail
-      if (detail?.tool) router.push(switchCreationHref(detail.tool, visit))
+      if (detail?.tool) window.location.assign(switchCreationHref(detail.tool, visit))
     }
-    const onExit = () => router.push(completeCreationVisit(visit))
+    const onExit = () => window.location.assign(completeCreationVisit(visit))
     window.addEventListener('creation:navigate', onNavigate)
     window.addEventListener('creation:exit', onExit)
     return () => {

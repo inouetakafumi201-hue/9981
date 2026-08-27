@@ -121,7 +121,7 @@ function TopBar({ query }: { query: string }) {
       <WeightedButton
         onClick={() => {
           playSfx('toggle')
-          window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'map-editor' } }))
+          window.location.assign(`/map-editor?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
         }}
         className="chamfer lib-btn-cyan shrink-0 px-5 py-2.5 font-sans text-[15px] font-bold"
       >

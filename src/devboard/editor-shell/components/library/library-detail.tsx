@@ -196,7 +196,7 @@ export function LibraryDetail({ asset }: { asset: MaterialMeta }) {
               y: (r.top + r.height / 2) / window.innerHeight,
             })
             window.setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('creation:navigate', { detail: { tool: 'research-bench' } }))
+              window.location.assign(`/research-bench?${new URLSearchParams({ entryTool: 'map-editor', returnTo: window.location.pathname, ...(new URLSearchParams(window.location.search).get('entryId') ? { entryId: new URLSearchParams(window.location.search).get('entryId')! } : {}) }).toString()}`)
             }, 360)
           }}
           className="chamfer lib-btn-cyan flex items-center justify-center gap-1.5 px-4 py-2.5 font-sans text-[14px] font-bold"
