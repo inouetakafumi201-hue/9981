@@ -87,6 +87,7 @@ import { B5_STAGES, INITIAL_B5_SESSION, type B5Session, type B5Stage } from '@/l
 import { type PortScenario } from '@/lib/b6-journey'
 import { ProductShell } from '@/components/product-shell'
 import { creationHref } from '@/lib/creation-navigation'
+import { CreationPage } from '@/components/creation-page'
 
 export default function Page() {
   return <ProductShell />
@@ -123,6 +124,12 @@ function mountSurface(pageId: string, ctx: MountContext, extras: {
   switch (pageId) {
     case 'control-panel-main':
       return <ControlPanelSelfSurface />
+    case 'map-editor':
+      return <CreationPage tool="map-editor" />
+    case 'asset-library':
+      return <CreationPage tool="asset-library" />
+    case 'research-bench':
+      return <CreationPage tool="research-bench" />
     case 'startup-loading':
       return <StartupLoading onReady={() => ctx.navigate('menu-title')} />
     case 'menu-title':
@@ -403,7 +410,7 @@ function ControlPanelMain() {
                 <ScanLine size={15} /><span>研究台</span><small>/research-bench</small>
               </a>
             </div>
-            <p className="cp-note">三个独立入口进入创作页面；进入后可互相切换，退出仅归因最初入口。</p>
+            <p className="cp-note">三个独立入口进入创作页面；进入后可互相切换���退出仅归因最初入口。</p>
           </div>
 
           <div className="control-block">

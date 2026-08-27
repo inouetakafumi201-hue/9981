@@ -299,6 +299,27 @@ const PRODUCT_PAGES: PageDescriptor[] = [
     mockBoundary: '断线与恢复为 mock；阻断层拥有最高 Escape 优先级。',
     eyebrow: 'LINK STATE', title: '信号会断，也会回来。', description: '丢失、重连、失败、超时与安全返回的阻断层。',
   },
+  {
+    pageId: 'map-editor', label: '地图编辑器', family: 'workbench', batchId: 'CREATION', kind: 'product',
+    stateIds: ['ready'], variantIds: ONLY_DEFAULT, entryId: 'entry.map-editor',
+    baselineStatus: 'implemented', fallbackState: 'safe-return',
+    mockBoundary: '地图编辑、素材与研究状态沿用创作套件的 MetaState 投影。',
+    eyebrow: 'CREATION SUITE', title: '绘制世界的骨架。', description: '从游戏端口进入的地图编辑页面。',
+  },
+  {
+    pageId: 'asset-library', label: '素材库', family: 'workbench', batchId: 'CREATION', kind: 'product',
+    stateIds: ['ready'], variantIds: ONLY_DEFAULT, entryId: 'entry.asset-library',
+    baselineStatus: 'implemented', fallbackState: 'safe-return',
+    mockBoundary: '素材筛选、详情与收藏沿用创作套件的 MetaState 投影。',
+    eyebrow: 'CREATION SUITE', title: '找到世界的零件。', description: '从游戏端口进入的素材库页面。',
+  },
+  {
+    pageId: 'research-bench', label: '研究台', family: 'workbench', batchId: 'CREATION', kind: 'product',
+    stateIds: ['ready'], variantIds: ONLY_DEFAULT, entryId: 'entry.research-bench',
+    baselineStatus: 'implemented', fallbackState: 'safe-return',
+    mockBoundary: '研究、提取与锻造沿用创作套件的 MetaState 投影。',
+    eyebrow: 'CREATION SUITE', title: '让素材变成能力。', description: '从游戏端口进入的研究台页面。',
+  },
 ]
 
 /* ------------------------------------------------------------------ */

@@ -83,6 +83,9 @@ export const JOURNEY_NODES: readonly ShellJourneyNode[] = [
   { nodeId: 'closure.reward', label: '奖励投影示例', kind: 'milestone', pageId: 'transition-result', milestoneId: 'reward', safeReturnNodeId: 'residence.arrival' },
   { nodeId: 'transition.dream-return', label: '转场 · 归途（纯白）', kind: 'page', pageId: 'transition-dream', milestoneId: 'return-home', safeReturnNodeId: 'residence.arrival' },
   { nodeId: 'residence.original-position', label: '驻地 · 原位置', kind: 'milestone', pageId: 'residence-main', milestoneId: 'original-position', safeReturnNodeId: 'residence.arrival' },
+  { nodeId: 'creation.map-editor', label: '创作 · 地图编辑器', kind: 'page', pageId: 'map-editor', safeReturnNodeId: 'residence.arrival' },
+  { nodeId: 'creation.asset-library', label: '创作 · 素材库', kind: 'page', pageId: 'asset-library', safeReturnNodeId: 'residence.arrival' },
+  { nodeId: 'creation.research-bench', label: '创作 · 研究台', kind: 'page', pageId: 'research-bench', safeReturnNodeId: 'residence.arrival' },
 ]
 
 export function getJourneyNode(nodeId: string): ShellJourneyNode | undefined {
@@ -224,6 +227,26 @@ export const JOURNEY_EDGES: readonly ShellJourneyEdge[] = [
     transitionId: 'residence.exit-to-title', fromNodeId: 'residence.arrival', toNodeId: 'menu.title',
     intentId: 'residence.exit', actionLabel: '驻地左上角「离开出租屋」', trigger: 'user-action',
     fallbackNodeId: 'residence.arrival',
+    motionIds: [], particleIds: [], advancedByMotion: false,
+  },
+  {
+    transitionId: 'creation.open-map-editor', fromNodeId: 'residence.original-position', toNodeId: 'creation.map-editor',
+    actionLabel: '控制面板「地图编辑器」', trigger: 'demo-control', fallbackNodeId: 'residence.arrival',
+    motionIds: [], particleIds: [], advancedByMotion: false,
+  },
+  {
+    transitionId: 'creation.open-asset-library', fromNodeId: 'creation.map-editor', toNodeId: 'creation.asset-library',
+    actionLabel: '创作页面「素材库」', trigger: 'demo-control', fallbackNodeId: 'creation.map-editor',
+    motionIds: [], particleIds: [], advancedByMotion: false,
+  },
+  {
+    transitionId: 'creation.open-research-bench', fromNodeId: 'creation.asset-library', toNodeId: 'creation.research-bench',
+    actionLabel: '创作页面「研究台」', trigger: 'demo-control', fallbackNodeId: 'creation.asset-library',
+    motionIds: [], particleIds: [], advancedByMotion: false,
+  },
+  {
+    transitionId: 'creation.return-to-game', fromNodeId: 'creation.research-bench', toNodeId: 'residence.arrival',
+    actionLabel: '创作页面「退出并返回」', trigger: 'safe-return', fallbackNodeId: 'residence.arrival',
     motionIds: [], particleIds: [], advancedByMotion: false,
   },
 ]
