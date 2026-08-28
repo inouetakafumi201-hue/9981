@@ -13,8 +13,8 @@
  * - 不发 RenderCommand
  */
 
-import type { MapData } from '../../../../play/map/types'
-import type { SpatialProjection, NodeView, EdgeView, EntityView, ClusterView } from '../spatial-view'
+import type { BuildingGroup, MapData, MapLayer } from '../../../../play/map/types'
+import type { SpatialProjection, NodeView, EdgeView, EntityView, ClusterView, BuildingGroupView } from '../spatial-view'
 import type { SpatialEntityStore } from '../stores/spatial-entity-store'
 import type { ClusterStore } from '../stores/cluster-store'
 import type { BuildingScopeStore } from '../building-scope-store'
@@ -38,6 +38,24 @@ export class ProjectionBuilder {
   build(): SpatialProjection {
     const { mapData, entities, clusters, buildingScope, revision } = this.deps
     const entitySnap = entities.current()
+    const sourceLayers: readonly MapLayer[] = 'layers' in mapData
+      ? (mapData as MapData & { readonly layers: readonly MapLayer[] }).layers
+      : mapData.floors.map((floor) => ({ id: `layer:floor:${floor}`, name: `${floor}F`, height: floor }))
+    const layers = sourceLayers.map((layer) => ({
+      id: layer.id,
+      name: layer.name ?? layer.id,
+      height: layer.height ?? 0,
+      opacity: 1,
+    }))
+    const sourceGroups: readonly BuildingGroup[] = 'buildingGroups' in mapData
+      ? (mapData as MapData & { readonly buildingGroups: readonly BuildingGroup[] }).buildingGroups
+      : []
+    const buildingGroups: BuildingGroupView[] = sourceGroups.map((group) => ({
+      id: group.id,
+      frame: { ...group.frame },
+      shell: group.shell,
+      floors: group.floors.map((floor) => ({ id: floor.id, ordinal: floor.ordinal, height: floor.height, image: floor.image, nodeIds: [...floor.nodes] })),
+    }))
     const nodeById = new Map(mapData.nodes.map((n) => [n.id, n]))
     const nodeViews: NodeView[] = mapData.nodes.map((node) => ({
       id: node.id,
@@ -83,12 +101,13 @@ export class ProjectionBuilder {
 
     return deepFreeze({
       revision,
-      layers: [],
+      layers,
       nodes: nodeViews,
       edges: edgeViews,
       entities: entityViews,
       clusters: clusterViews,
       tiles: [],
+      buildingGroups,
       buildingRenderMode: buildingScope.current().mode,
     })
   }

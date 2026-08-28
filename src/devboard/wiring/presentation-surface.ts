@@ -16,6 +16,13 @@ function freezeProjection(projection: SpatialProjection): Readonly<SpatialProjec
     entities: Object.freeze([...projection.entities]),
     clusters: Object.freeze([...projection.clusters]),
     tiles: Object.freeze([...projection.tiles]),
+    buildingGroups: projection.buildingGroups
+      ? Object.freeze(projection.buildingGroups.map((group) => Object.freeze({
+          ...group,
+          frame: Object.freeze({ ...group.frame }),
+          floors: Object.freeze(group.floors.map((floor) => Object.freeze({ ...floor, nodeIds: Object.freeze([...floor.nodeIds]) }))),
+        })))
+      : undefined,
   })
 }
 

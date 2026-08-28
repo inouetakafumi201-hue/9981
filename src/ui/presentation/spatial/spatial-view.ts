@@ -72,6 +72,21 @@ export interface TileView {
   readonly traversable: boolean;
 }
 
+export interface BuildingFloorView {
+  readonly id: string;
+  readonly ordinal: number;
+  readonly height: number;
+  readonly image: string | undefined;
+  readonly nodeIds: readonly string[];
+}
+
+export interface BuildingGroupView {
+  readonly id: string;
+  readonly frame: Readonly<{ x: number; y: number; width: number; height: number }>;
+  readonly shell: string;
+  readonly floors: readonly BuildingFloorView[];
+}
+
 /** 完整空间投影快照。 */
 export interface SpatialProjection {
   readonly revision: number;
@@ -81,6 +96,7 @@ export interface SpatialProjection {
   readonly entities: readonly EntityView[];
   readonly clusters: readonly ClusterView[];
   readonly tiles: readonly TileView[];
+  readonly buildingGroups?: readonly BuildingGroupView[];
   /** 建筑视野渲染模式：exterior / hover / transition / occupied */
   readonly buildingRenderMode: import('./building-scope-state').BuildingRenderMode;
 }

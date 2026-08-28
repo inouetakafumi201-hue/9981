@@ -11,6 +11,7 @@ const projection: SpatialProjection = {
   entities: [],
   clusters: [],
   tiles: [],
+  buildingGroups: [{ id: 'bg:1', frame: { x: 0, y: 0, width: 1, height: 1 }, shell: 'shell:test', floors: [{ id: 'bf:1', ordinal: 1, height: 2, image: undefined, nodeIds: [] }] }],
   buildingRenderMode: { kind: 'exterior' as const },
 }
 

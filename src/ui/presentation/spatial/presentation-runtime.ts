@@ -81,7 +81,7 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
   // 不会因为 current() === null 而把第一条命令判为 stale。
   projection.commit({
     revision: 0,
-    layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [],
+    layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingGroups: [],
     buildingRenderMode: { kind: 'exterior' as const },
   })
   const executor = new RenderCommandExecutor(projection)
