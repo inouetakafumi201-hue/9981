@@ -488,6 +488,10 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
 
   const handleAddFloor = () => {
     playSfx('click')
+    if (building.floors.length >= 3) {
+      toast('每个建筑组最多支持 3 层', 'error')
+      return
+    }
     const nextOrdinal = (building.floors.at(-1)?.ordinal ?? 0) + 1
     const nextHeight = (building.floors.at(-1)?.height ?? 0) + 2
     addBuildingFloor(building.id, {
@@ -517,10 +521,20 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
     const file = event.target.files?.[0]
     const targetFloorId = event.currentTarget.getAttribute('data-target-floor')
     if (!file || !targetFloorId) return
-    const uploaded = await uploadPngFile(file)
-    setBuildingFloorImage(building.id, targetFloorId, uploaded.dataUrl)
-    toast(`已设置楼层图幅：${file.name}`, 'ok')
-    event.currentTarget.value = ''
+    try {
+      const uploaded = await uploadPngFile(file)
+      const frameRatio = building.frame.width / building.frame.height
+      const imageRatio = uploaded.width / uploaded.height
+      if (Math.abs(frameRatio - imageRatio) / frameRatio > 0.01) {
+        throw new Error(`图幅比例 ${uploaded.width}:${uploaded.height} 与建筑范围 ${Math.round(building.frame.width)}:${Math.round(building.frame.height)} 不一致`)
+      }
+      setBuildingFloorImage(building.id, targetFloorId, uploaded.dataUrl)
+      toast(`已设置楼层图幅：${file.name}`, 'ok')
+    } catch (error) {
+      toast(error instanceof Error ? error.message : '楼层图幅读取失败', 'error')
+    } finally {
+      event.currentTarget.value = ''
+    }
   }
 
   const handleBindPortal = (floorId: string) => () => {
@@ -553,10 +567,11 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
         >
           {building.id}
         </button>
-        <span className="font-mono text-muted-foreground">{building.floors.length} 层</span>
+        <span className="font-mono text-muted-foreground">{building.floors.length}/3 层</span>
       </div>
       <div className="mt-1 flex flex-col gap-1 pl-2 text-[10px] text-muted-foreground">
         <span>外壳 · {building.shell}</span>
+        <span>范围 · {Math.round(building.frame.width)} × {Math.round(building.frame.height)}</span>
         {building.floors.map((floor) => (
           <div
             key={floor.id}
@@ -605,17 +620,25 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
                   移除
                 </button>
                 {portalInput?.from === floor.id ? (
-                  <input
+                  <select
                     autoFocus
-                    placeholder="to (floor id)"
+                    aria-label="选择门户目标楼层"
                     value={portalInput.to}
-                    onChange={(e) => setPortalInput({ ...portalInput, to: e.target.value })}
-                    onBlur={() => portalInput.to && handleBindPortal(floor.id)()}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && portalInput.to) handleBindPortal(floor.id)()
+                    onChange={(event) => {
+                      const to = event.target.value
+                      setPortalInput({ ...portalInput, to })
+                      if (to) {
+                        bindBuildingPortal(building.id, { from: floor.id, to, def: portalInput.def })
+                        setPortalInput(null)
+                      }
                     }}
                     className="rounded bg-panel px-1.5 py-0.5 text-[9px] text-foreground"
-                  />
+                  >
+                    <option value="">选择目标楼层</option>
+                    {building.floors.filter((target) => target.id !== floor.id).map((target) => (
+                      <option key={target.id} value={target.id}>{target.ordinal}F · {target.id}</option>
+                    ))}
+                  </select>
                 ) : null}
               </div>
             ) : null}
@@ -624,9 +647,10 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
       </div>
       <button
         onClick={handleAddFloor}
+        disabled={building.floors.length >= 3}
         data-ctx="add-building-floor"
         data-building-id={building.id}
-        className="mt-2 flex w-full items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-primary"
+        className="mt-2 flex w-full items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
       >
         <IconPlus width={12} height={12} />
         新增楼层

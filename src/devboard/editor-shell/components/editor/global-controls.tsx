@@ -29,6 +29,7 @@ function isTyping(): boolean {
 const TOOL_KEYS: Record<string, Mode> = {
   v: 'select',
   n: 'place',
+  b: 'building',
   e: 'edge',
   i: 'sample',
   p: 'playtest',

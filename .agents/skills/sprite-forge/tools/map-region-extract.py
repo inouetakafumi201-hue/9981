@@ -20,9 +20,29 @@ def _box(value: Any) -> tuple[int,int,int,int]:
     return x,y,w,h
 
 def _anchor(a: Any, bbox: tuple[int,int,int,int]) -> dict[str,Any]:
-    if isinstance(a, dict) and "x" in a and "y" in a:
-        return {"x": int(a["x"]), "y": int(a["y"]), "kind": a.get("kind", "unknown")}
-    raise ValueError("anchor requires x and y")
+    if not isinstance(a, dict) or "x" not in a or "y" not in a:
+        raise ValueError("anchor requires x and y")
+    x, y = int(a["x"]), int(a["y"])
+    bx, by, bw, bh = bbox
+    if not (bx <= x < bx + bw and by <= y < by + bh):
+        raise ValueError(f"anchor {(x, y)} outside bbox")
+    return {"x": x, "y": y, "kind": a.get("kind", "unknown")}
+
+def _normalized_frame(value: Any, bbox: tuple[int,int,int,int], image_size: tuple[int,int]) -> dict[str,float]:
+    if not isinstance(value, dict) or any(key not in value for key in ("x", "y", "width", "height")):
+        raise ValueError("normalized_frame requires x, y, width and height")
+    frame = {key: float(value[key]) for key in ("x", "y", "width", "height")}
+    if not all(0 <= frame[key] <= 1 for key in frame) or frame["width"] <= 0 or frame["height"] <= 0:
+        raise ValueError("normalized_frame values must be in 0..1 with positive size")
+    if frame["x"] + frame["width"] > 1 or frame["y"] + frame["height"] > 1:
+        raise ValueError("normalized_frame must stay inside source")
+    x, y, w, h = bbox
+    iw, ih = image_size
+    expected = {"x": x / iw, "y": y / ih, "width": w / iw, "height": h / ih}
+    tolerance = max(1 / iw, 1 / ih) / 2 + 1e-9
+    if any(abs(frame[key] - expected[key]) > tolerance for key in frame):
+        raise ValueError("normalized_frame does not match bbox/source dimensions")
+    return frame
 
 def validate(data: dict[str,Any], image_size: tuple[int,int] | None = None) -> list[str]:
     errors=[]; warnings_=[]
@@ -50,9 +70,14 @@ def validate(data: dict[str,Any], image_size: tuple[int,int] | None = None) -> l
             if image_size and (b[0]+b[2]>image_size[0] or b[1]+b[3]>image_size[1]): errors.append(f"regions[{i}] bbox outside source")
             if not r.get("building_group"): errors.append(f"regions[{i}] building_group is required")
             if r.get("shell") is None or r.get("floor") is None: errors.append(f"regions[{i}] shell and floor branches are required")
-            if not r.get("normalized_frame"): errors.append(f"regions[{i}] normalized_frame is required")
+            if not r.get("normalized_frame"):
+                errors.append(f"regions[{i}] normalized_frame is required")
+            elif image_size:
+                _normalized_frame(r["normalized_frame"], b, image_size)
             for key in ("entrance_anchors","stair_anchors"):
-                for a in r.get(key,[]): _anchor(a,b)
+                anchors = r.get(key, [])
+                if not isinstance(anchors, list): raise ValueError(f"{key} must be an array")
+                for a in anchors: _anchor(a,b)
             if r.get("text_detected") or r.get("dynamic_objects_detected"): warnings_.append(f"regions[{i}] contains prohibited content; review author pass")
             if "text_detected" not in r: warnings_.append(f"regions[{i}] text QC cannot reliably determine output")
             if "dynamic_objects_detected" not in r: warnings_.append(f"regions[{i}] dynamic-object QC cannot reliably determine output")
@@ -82,11 +107,10 @@ def author_pass(data:dict[str,Any], out:Path)->None:
     # The compositing mask is the contract: pixels outside every region must
     # remain byte-identical to the source, including alpha.
     diff=ImageChops.difference(result,base)
-    outside=ImageChops.difference(diff, Image.new("RGBA", base.size, (0,0,0,0)))
-    for y in range(base.height):
-        for x in range(base.width):
-            if mask.getpixel((x,y)) == 0 and result.getpixel((x,y)) != base.getpixel((x,y)):
-                raise AssertionError(f"author-pass changed pixel outside mask at {(x,y)}")
+    outside_mask = ImageChops.invert(mask)
+    outside = Image.composite(diff, Image.new("RGBA", base.size, (0,0,0,0)), outside_mask)
+    if outside.getbbox() is not None:
+        raise AssertionError(f"author-pass changed pixels outside mask: {outside.getbbox()}")
     out.parent.mkdir(parents=True,exist_ok=True); result.save(out)
 
 def main()->None:

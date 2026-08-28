@@ -13,6 +13,7 @@ import {
   addBuildingFloor,
   setBuildingFloorImage,
   setBuildingFloorOrdinal,
+  updateBuildingGroupFrame,
   bindBuildingPortal,
   removeBuildingFloor,
   __test_setDoc,
@@ -87,16 +88,16 @@ describe('building-group editor ops', () => {
     expect(f.ordinal).toBe(1)
   })
 
-  it('bindBuildingPortal 追加门户，from/to/def 原样保存', () => {
-    const id = addBuildingGroup({ x: 0, y: 0, width: 100, height: 100 })
-    const floor = addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [], frame: { x: 0, y: 0, width: 100, height: 100 } })
-    const pid = bindBuildingPortal(id, { from: floor!, to: 'stair:down', def: 'portal:default' })
+  it('bindBuildingPortal 仅追加有效的楼层间门户', () => {
+    const id = addBuildingGroup({ x: 0, y: 0, width: 100, height: 100 })!
+    const from = addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [] })!
+    const to = addBuildingFloor(id, { ordinal: 2, height: 2, nodes: [] })!
+    expect(bindBuildingPortal(id, { from, to: from, def: 'portal:default' })).toBeNull()
+    expect(bindBuildingPortal(id, { from, to: 'missing', def: 'portal:default' })).toBeNull()
+    const pid = bindBuildingPortal(id, { from, to, def: 'portal:default' })
     expect(pid).toBeTruthy()
-    const doc = __test_getDoc()
-    const portal = doc.buildingGroups![0]!.portals[0]!
-    expect(portal.from).toBe(floor)
-    expect(portal.to).toBe('stair:down')
-    expect(portal.def).toBe('portal:default')
+    const portal = __test_getDoc().buildingGroups![0]!.portals[0]!
+    expect(portal).toMatchObject({ from, to, def: 'portal:default' })
   })
 
   it('楼层不存在时 addBuildingFloor / bindBuildingPortal 返回 null 且不修改文档', () => {
@@ -117,6 +118,34 @@ describe('building-group editor ops', () => {
     const doc = __test_getDoc()
     const floors = doc.buildingGroups![0]!.floors
     expect(floors.map((f) => f.id)).toEqual([f2])
+  })
+
+  it('限制为三层并拒绝全局重复 floor.id', () => {
+    const first = addBuildingGroup({ x: 0, y: 0, width: 100, height: 80 })!
+    const second = addBuildingGroup({ x: 200, y: 0, width: 100, height: 80 })!
+    expect(addBuildingFloor(first, { id: 'floor-global', ordinal: 1, height: 0, nodes: [] })).toBe('floor-global')
+    expect(addBuildingFloor(second, { id: 'floor-global', ordinal: 1, height: 0, nodes: [] })).toBeNull()
+    expect(addBuildingFloor(first, { ordinal: 2, height: 2, nodes: [] })).toBeTruthy()
+    expect(addBuildingFloor(first, { ordinal: 3, height: 4, nodes: [] })).toBeTruthy()
+    expect(addBuildingFloor(first, { ordinal: 4, height: 6, nodes: [] })).toBeNull()
+    expect(__test_getDoc().buildingGroups![0]!.floors).toHaveLength(3)
+  })
+
+  it('更新建筑 frame 会级联同步全部楼层', () => {
+    const id = addBuildingGroup({ x: 0, y: 0, width: 100, height: 80 })!
+    addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [], frame: { x: 9, y: 9, width: 1, height: 1 } })
+    const frame = { x: 20, y: 30, width: 240, height: 120 }
+    updateBuildingGroupFrame(id, frame)
+    expect(__test_getDoc().buildingGroups![0]!.floors[0]!.frame).toEqual(frame)
+  })
+
+  it('删除楼层时同步清理引用它的门户', () => {
+    const id = addBuildingGroup({ x: 0, y: 0, width: 100, height: 80 })!
+    const from = addBuildingFloor(id, { ordinal: 1, height: 0, nodes: [] })!
+    const to = addBuildingFloor(id, { ordinal: 2, height: 2, nodes: [] })!
+    bindBuildingPortal(id, { from, to, def: 'portal:default' })
+    removeBuildingFloor(id, to)
+    expect(__test_getDoc().buildingGroups![0]!.portals).toHaveLength(0)
   })
 
   it('旧地图（无 buildingGroups）导出 roundtrip 不产出建筑组字段', () => {

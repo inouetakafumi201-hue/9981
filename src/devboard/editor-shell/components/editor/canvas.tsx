@@ -55,6 +55,7 @@ import {
   simplifyEdgeHiddenRuns,
   straightenEdgeSegment,
   addScene,
+  addBuildingGroup,
   addEdge,
   updateObstruction,
   updateTerrain,
@@ -83,6 +84,7 @@ const TOOLS: { id: Mode; key: string; label: string; icon: typeof IconSelect }[]
   [
     { id: 'select', key: 'V', label: '选择', icon: IconSelect },
     { id: 'place', key: 'N', label: '放置场景', icon: IconPlace },
+    { id: 'building', key: 'B', label: '建筑组', icon: IconPlace },
     { id: 'edge', key: 'E', label: '拉边', icon: IconEdge },
     { id: 'sample', key: 'I', label: '取样', icon: IconSample },
     { id: 'playtest', key: 'P', label: '测试运行', icon: IconPlay },
@@ -136,6 +138,7 @@ function Toolbar() {
 function Legend() {
   const items = [
     { label: '场景框', el: <span className="h-3.5 w-5 rounded-[2px] border border-dashed border-primary/80 bg-primary/10" /> },
+    { label: '建筑组', el: <span className="h-3.5 w-5 border border-dashed border-primary/70 bg-primary/5" /> },
     { label: '高光点', el: <span className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" /> },
     { label: '连线', el: <span className="h-[2px] w-6 bg-edge" /> },
     { label: '选中', el: <span className="h-3.5 w-5 rounded-[2px] border border-edge-selected bg-edge-selected/15" /> },
@@ -168,6 +171,7 @@ function Legend() {
 type Drag =
   | { kind: 'pan'; last: Vec }
   | { kind: 'place'; start: Vec }
+  | { kind: 'building'; start: Vec }
   | { kind: 'marquee'; start: Vec }
   | { kind: 'move'; last: Vec; moved: boolean }
   | { kind: 'waypoint'; edgeId: string; index: number; moved: boolean }
@@ -644,6 +648,11 @@ export function Canvas() {
             return { type: 'transition', id: e.id }
         }
       }
+      // building groups are presentation branches and have their own hit target
+      for (let i = (d.buildingGroups ?? []).length - 1; i >= 0; i--) {
+        const building = d.buildingGroups?.[i]
+        if (building && pointInRect(w, building.frame)) return { type: 'building', id: building.id }
+      }
       // highlight points (take priority over the box body they sit inside)
       for (let i = d.sceneNodes.length - 1; i >= 0; i--) {
         const n = d.sceneNodes[i]
@@ -750,6 +759,12 @@ export function Canvas() {
 
       if (mode === 'place') {
         dragRef.current = { kind: 'place', start: w }
+        setPreview({ place: { x: w.x, y: w.y, width: 0, height: 0 } })
+        return
+      }
+
+      if (mode === 'building') {
+        dragRef.current = { kind: 'building', start: w }
         setPreview({ place: { x: w.x, y: w.y, width: 0, height: 0 } })
         return
       }
@@ -865,6 +880,7 @@ export function Canvas() {
           break
         }
         case 'place':
+        case 'building':
           setPreview({ place: rectFromDrag(drag.start, w) })
           break
         case 'marquee': {
@@ -945,6 +961,19 @@ export function Canvas() {
             } else {
               playSfx('error')
               flashDiscard()
+            }
+          }
+          setPreview({})
+          setMode('select')
+          break
+        }
+        case 'building': {
+          const rect = rectFromDrag(drag.start, w)
+          if (rect.width > 20 && rect.height > 20) {
+            const id = addBuildingGroup(rect)
+            if (id) {
+              selectOne('building', id)
+              playSfx('success')
             }
           }
           setPreview({})
@@ -1311,21 +1340,42 @@ export function Canvas() {
         {/* building group frames: independent branch bounds, never merged into scene boxes */}
         {(doc.buildingGroups ?? []).map((building) => {
           const selected = selIds.has(building.id)
+          const previewFloor = [...building.floors].sort((a, b) => a.ordinal - b.ordinal)[0]
           return (
-            <rect
-              key={`building-${building.id}`}
-              x={building.frame.x}
-              y={building.frame.y}
-              width={building.frame.width}
-              height={building.frame.height}
-              fill="none"
-              stroke={selected ? 'var(--accent)' : 'var(--primary)'}
-              strokeDasharray="8 5"
-              strokeWidth={selected ? 3 : 2}
-              opacity={selected ? 0.9 : 0.45}
-              pointerEvents="none"
-              data-building-group={building.id}
-            />
+            <g key={`building-${building.id}`} data-building-group={building.id} pointerEvents="none">
+              {previewFloor?.image ? (
+                <image
+                  href={previewFloor.image}
+                  x={building.frame.x}
+                  y={building.frame.y}
+                  width={building.frame.width}
+                  height={building.frame.height}
+                  preserveAspectRatio="xMidYMid meet"
+                  opacity={selected ? 0.72 : 0.42}
+                />
+              ) : null}
+              <rect
+                x={building.frame.x}
+                y={building.frame.y}
+                width={building.frame.width}
+                height={building.frame.height}
+                fill={previewFloor?.image ? 'none' : 'color-mix(in srgb, var(--primary) 6%, transparent)'}
+                stroke={selected ? 'var(--accent)' : 'var(--primary)'}
+                strokeDasharray="8 5"
+                strokeWidth={selected ? 3 : 2}
+                opacity={selected ? 0.95 : 0.62}
+                vectorEffect="non-scaling-stroke"
+              />
+              <text
+                x={building.frame.x + 8}
+                y={building.frame.y + 18}
+                fill={selected ? 'var(--accent)' : 'var(--primary)'}
+                fontSize={12}
+                fontWeight={700}
+              >
+                {`${building.id} · ${building.floors.length}/3 层`}
+              </text>
+            </g>
           )
         })}
 

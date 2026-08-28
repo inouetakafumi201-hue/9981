@@ -10,7 +10,7 @@
 
 export const WORLD = { w: 1600, h: 1000 }
 
-export type Mode = 'select' | 'place' | 'edge' | 'sample' | 'playtest'
+export type Mode = 'select' | 'place' | 'building' | 'edge' | 'sample' | 'playtest'
 
 export type Scale = 'large' | 'medium' | 'small'
 

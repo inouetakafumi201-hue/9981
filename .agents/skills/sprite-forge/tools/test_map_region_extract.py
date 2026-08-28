@@ -40,7 +40,7 @@ def test_extract_preserves_rectangular_size_and_pixels(tmp_path: Path) -> None:
             "bbox": [8, 10, 12, 7],
             "shell": {},
             "floor": {},
-            "normalized_frame": {"width": 12, "height": 7},
+            "normalized_frame": {"x": 0.2, "y": 1 / 3, "width": 0.3, "height": 7 / 30},
             "entrance_anchors": [],
             "stair_anchors": [],
             "view": "top-down-plan",
@@ -101,7 +101,7 @@ def test_rejects_bbox_outside_source(tmp_path: Path) -> None:
             "bbox": [5, 5, 200, 200],
             "shell": {},
             "floor": {},
-            "normalized_frame": {"width": 200, "height": 200},
+            "normalized_frame": {"x": 0.5, "y": 0.5, "width": 0.5, "height": 0.5},
             "entrance_anchors": [],
             "stair_anchors": [],
             "view": "top-down-plan",
@@ -122,12 +122,12 @@ def test_rejects_duplicate_region_id(tmp_path: Path) -> None:
         "regions": [
             {
                 "id": "dup", "building_group": "g", "bbox": [0, 0, 4, 4],
-                "shell": {}, "floor": {}, "normalized_frame": {"width": 4, "height": 4},
+                "shell": {}, "floor": {}, "normalized_frame": {"x": 0, "y": 0, "width": 0.2, "height": 0.2},
                 "entrance_anchors": [], "stair_anchors": [], "view": "top-down-plan",
             },
             {
                 "id": "dup", "building_group": "g", "bbox": [8, 8, 4, 4],
-                "shell": {}, "floor": {}, "normalized_frame": {"width": 4, "height": 4},
+                "shell": {}, "floor": {}, "normalized_frame": {"x": 0.4, "y": 0.4, "width": 0.2, "height": 0.2},
                 "entrance_anchors": [], "stair_anchors": [], "view": "top-down-plan",
             },
         ],
@@ -142,6 +142,31 @@ def test_rejects_wrong_schema() -> None:
     d = {"schema": "wrong", "source": {"image": "x.png"}, "regions": []}
     errors = m.validate(d)
     assert any("schema" in e for e in errors)
+
+
+def test_rejects_normalized_frame_mismatch_and_anchor_outside() -> None:
+    m = _load_tool()
+    d = {
+        "schema": m.SCHEMA,
+        "source": {"image": "x.png"},
+        "regions": [
+            {
+                "id": "bad-frame", "building_group": "g", "bbox": [10, 10, 20, 10],
+                "shell": {}, "floor": {},
+                "normalized_frame": {"x": 0, "y": 0, "width": 0.2, "height": 0.1},
+                "entrance_anchors": [], "stair_anchors": [], "view": "top-down-plan",
+            },
+            {
+                "id": "bad-anchor", "building_group": "g", "bbox": [10, 10, 20, 10],
+                "shell": {}, "floor": {},
+                "normalized_frame": {"x": 0.1, "y": 0.1, "width": 0.2, "height": 0.1},
+                "entrance_anchors": [{"x": 31, "y": 12}], "stair_anchors": [], "view": "top-down-plan",
+            },
+        ],
+    }
+    errors = m.validate(d, (100, 100))
+    assert any("normalized_frame does not match" in error for error in errors)
+    assert any("anchor" in error and "outside" in error for error in errors)
 
 
 def test_author_pass_preserves_pixels_outside_mask(tmp_path: Path) -> None:
@@ -164,7 +189,7 @@ def test_author_pass_preserves_pixels_outside_mask(tmp_path: Path) -> None:
         "regions": [{
             "id": "r", "building_group": "g", "bbox": [2, 2, 4, 4],
             "shell": {}, "floor": {},
-            "normalized_frame": {"width": 4, "height": 4},
+            "normalized_frame": {"x": 0.125, "y": 0.125, "width": 0.25, "height": 0.25},
             "entrance_anchors": [], "stair_anchors": [],
             "view": "top-down-plan",
         }],

@@ -480,23 +480,41 @@ export function pulseElement(id: string, level?: 'error' | 'warning') {
  *  B3：落在其它场景的洞内、或同时压到两个不同场景 → 拒绝创建（返回
  *  `null`），并弹出对应 toast——调用方只需在收到 `null` 时播放错误反馈，
  *  不需要重复这套校验逻辑。 */
-export function addBuildingGroup(rect: BuildingFrame, shell = 'shell:default'): string {
+function validBuildingFrame(frame: BuildingFrame): boolean {
+  return [frame.x, frame.y, frame.width, frame.height].every(Number.isFinite)
+    && frame.width > 0
+    && frame.height > 0
+}
+
+export function addBuildingGroup(rect: BuildingFrame, shell = 'shell:default'): string | null {
+  if (!validBuildingFrame(rect)) {
+    toast('建筑组范围必须是有效的正尺寸矩形', 'error')
+    return null
+  }
   const group: BuildingGroup = { id: uid('bg'), frame: { ...rect }, shell, floors: [], portals: [] }
   setDoc({ ...state.doc, buildingGroups: [...(state.doc.buildingGroups ?? []), group] })
   return group.id
 }
 
 export function addBuildingFloor(groupId: string, floor: Omit<BuildingFloor, 'id'> & { id?: string }): string | null {
-  const group = (state.doc.buildingGroups ?? []).find((item) => item.id === groupId)
-  if (!group) return null
+  const groups = state.doc.buildingGroups ?? []
+  const group = groups.find((item) => item.id === groupId)
+  if (!group || group.floors.length >= 3) return null
   const id = floor.id ?? uid('bf')
-  const nextFloor: BuildingFloor = { ...floor, id, nodes: [...floor.nodes] }
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((item) => item.id === groupId ? { ...item, floors: [...item.floors, nextFloor] } : item) })
+  if (groups.some((item) => item.floors.some((candidate) => candidate.id === id))) return null
+  const nextFloor: BuildingFloor = { ...floor, id, nodes: [...floor.nodes], frame: { ...group.frame } }
+  setDoc({ ...state.doc, buildingGroups: groups.map((item) => item.id === groupId ? { ...item, floors: [...item.floors, nextFloor] } : item) })
   return id
 }
 
 export function updateBuildingGroupFrame(groupId: string, frame: BuildingFrame) {
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((group) => group.id === groupId ? { ...group, frame: { ...frame } } : group) })
+  if (!validBuildingFrame(frame)) return
+  setDoc({
+    ...state.doc,
+    buildingGroups: (state.doc.buildingGroups ?? []).map((group) => group.id === groupId
+      ? { ...group, frame: { ...frame }, floors: group.floors.map((floor) => ({ ...floor, frame: { ...frame } })) }
+      : group),
+  })
 }
 
 export function setBuildingGroupShell(groupId: string, shell: string) {
@@ -533,9 +551,13 @@ export function bindBuildingPortal(
   groupId: string,
   portal: { id?: string; from: string; to: string; def: string },
 ): string | null {
-  const group = (state.doc.buildingGroups ?? []).find((item) => item.id === groupId)
-  if (!group) return null
+  const groups = state.doc.buildingGroups ?? []
+  const group = groups.find((item) => item.id === groupId)
+  if (!group || portal.from === portal.to) return null
+  const allFloorIds = new Set(groups.flatMap((item) => item.floors.map((floor) => floor.id)))
+  if (!group.floors.some((floor) => floor.id === portal.from) || !allFloorIds.has(portal.to)) return null
   const id = portal.id ?? uid('bp')
+  if (groups.some((item) => item.portals.some((candidate) => candidate.id === id))) return null
   const next = { id, from: portal.from, to: portal.to, def: portal.def }
   setDoc({
     ...state.doc,
@@ -551,7 +573,11 @@ export function removeBuildingFloor(groupId: string, floorId: string) {
     ...state.doc,
     buildingGroups: (state.doc.buildingGroups ?? []).map((group) =>
       group.id === groupId
-        ? { ...group, floors: group.floors.filter((floor) => floor.id !== floorId) }
+        ? {
+            ...group,
+            floors: group.floors.filter((floor) => floor.id !== floorId),
+            portals: group.portals.filter((portal) => portal.from !== floorId && portal.to !== floorId),
+          }
         : group,
     ),
   })
