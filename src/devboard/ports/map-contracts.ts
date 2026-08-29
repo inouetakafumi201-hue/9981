@@ -26,10 +26,6 @@ export type {
   LegacyMapData,
   LegacyMapNode,
   MapDataDocument,
-  BuildingGroup,
-  BuildingFloor,
-  BuildingFrame,
-  BuildingPortal,
 } from '../../play/map/types';
 export {
   COORD_MIN,
@@ -63,7 +59,9 @@ export {
   findSnapTarget,
 } from '../../play/map/curve';
 export {
+  serializeMap,
   serializeMapData,
+  deserializeMap,
   parseMapData,
-  layerOpacity,
+  importLegacyMap,
 } from '../../play/map/serialize';

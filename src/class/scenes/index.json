@@ -212,11 +212,55 @@
       ],
       "optionalCapabilityIds": ["scene.capability.blocking"],
       "parameters": [
-        { "key": "endpoints", "description": "恰好两个天然场景端点引用；单向时按 [起点, 终点] 排列。", "required": true, "valueShape": "array<reference<natural-scene>>" },
+        { "key": "endpoints", "description": "恰好两个天然场景端点引用��单向时按 [起点, 终点] 排列。", "required": true, "valueShape": "array<reference<natural-scene>>" },
         { "key": "directionality", "description": "方向性，取自 transition-directionalities 值集；这是配置参数而非类型身份。", "required": true, "valueShape": "enum<transition-directionalities>" },
         { "key": "traversalConditionRefs", "description": "通行条件定义引用集合；具体判据取值由玩法层绑定。", "required": true, "valueShape": "array<reference>" },
         { "key": "blockingCapabilityRefs", "description": "阻挡能力引用集合。", "required": true, "valueShape": "array<reference<capability>>" }
       ],
+      "kernelOps": ["link.create", "link.destroy"]
+    },
+    {
+      "id": "d:transition/door",
+      "name": "门",
+      "description": "同一 zone 内的双向门过渡。",
+      "defKind": "link",
+      "semanticFamily": "transition",
+      "abstract": false,
+      "parent": "transition.class.scene_link",
+      "parameters": [{ "key": "directionality", "description": "默认方向。", "required": true, "valueShape": "enum<transition-directionalities>", "value": "bidirectional" }],
+      "kernelOps": ["link.create", "link.destroy"]
+    },
+    {
+      "id": "d:transition/stairs",
+      "name": "楼梯",
+      "description": "同一 zone 内的双向楼梯过渡。",
+      "defKind": "link",
+      "semanticFamily": "transition",
+      "abstract": false,
+      "parent": "transition.class.scene_link",
+      "parameters": [{ "key": "directionality", "description": "默认方向。", "required": true, "valueShape": "enum<transition-directionalities>", "value": "bidirectional" }],
+      "kernelOps": ["link.create", "link.destroy"]
+    },
+    {
+      "id": "d:transition/climb-up",
+      "name": "攀爬上行",
+      "description": "同一 zone 内的单向攀爬过渡。",
+      "defKind": "link",
+      "semanticFamily": "transition",
+      "abstract": false,
+      "parent": "transition.class.scene_link",
+      "parameters": [{ "key": "directionality", "description": "默认方向。", "required": true, "valueShape": "enum<transition-directionalities>", "value": "one-way-up" }],
+      "kernelOps": ["link.create", "link.destroy"]
+    },
+    {
+      "id": "d:transition/jump-down",
+      "name": "跳下",
+      "description": "同一 zone 内的单向下落过渡。",
+      "defKind": "link",
+      "semanticFamily": "transition",
+      "abstract": false,
+      "parent": "transition.class.scene_link",
+      "parameters": [{ "key": "directionality", "description": "默认方向。", "required": true, "valueShape": "enum<transition-directionalities>", "value": "one-way-down" }],
       "kernelOps": ["link.create", "link.destroy"]
     }
   ],
@@ -243,7 +287,7 @@
     },
     {
       "id": "scene.capability.personal_vacant_ground",
-      "name": "个人空旷地能力",
+      "name": "个人空���地能力",
       "description": "声明大场景与中场景向单个进场实体开放的个人空旷地微型场景接口：实体可移动到空旷地从而创建只有自己在其中的微型场景。小场景不具备该能力，其空旷地入口复用共享微型场景。",
       "parameters": [
         { "key": "personalMicroSceneRefs", "description": "由该场景的空旷地入口创建的个人微型场景引用集合。", "required": true, "valueShape": "array<reference<micro-scene>>" },

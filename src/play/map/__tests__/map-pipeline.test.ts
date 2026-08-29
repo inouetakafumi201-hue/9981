@@ -148,62 +148,9 @@ describe('地图校验：能证伪每条规则的反向用例', () => {
     expect(findings[0]?.correction).toContain('3');
   });
 
-  it('拒绝不存在的上级场景', () => {
-    const data = map({ nodes: [node('a', { parent: 'ghost' })] });
-    expect(codesOf(validateMapStructure(data))).toEqual(['MAP_PARENT_NOT_FOUND']);
-  });
-
-  it('拒绝非法的场景嵌套：大场景不能直接装小场景', () => {
-    const data = map({
-      nodes: [
-        node('big', { scale: 'large' }),
-        node('tiny', { scale: 'small', parent: 'big' }),
-      ],
-    });
-    const findings = validateMapStructure(data);
-    expect(codesOf(findings)).toEqual(['MAP_ILLEGAL_SCENE_NESTING']);
-    expect(findings[0]?.correction).toContain('中场景');
-  });
-
-  it('拒绝把任何东西装进小场景——它是最小一级天然场景', () => {
-    const data = map({
-      nodes: [
-        node('tiny', { scale: 'small' }),
-        node('inner', { scale: 'small', parent: 'tiny' }),
-      ],
-    });
-    const findings = validateMapStructure(data);
-    expect(codesOf(findings)).toEqual(['MAP_ILLEGAL_SCENE_NESTING']);
-    expect(findings[0]?.correction).toContain('不能再包含下级场景');
-  });
-
-  it('接受合法嵌套：大 → 中 → 小', () => {
-    const data = map({
-      nodes: [
-        node('big', { scale: 'large' }),
-        node('mid', { scale: 'medium', parent: 'big' }),
-        node('tiny', { scale: 'small', parent: 'mid' }),
-      ],
-    });
+  it('MapNode 不再表达父子嵌套，场景拓扑只由边表达', () => {
+    const data = map({ nodes: [node('big', { scale: 'large' }), node('small', { scale: 'small' })] });
     expect(validateMapStructure(data)).toEqual([]);
-  });
-
-  it('拒绝父子环，且每个环只报一次', () => {
-    const data = map({
-      nodes: [
-        node('a', { scale: 'large', parent: 'c' }),
-        node('b', { scale: 'medium', parent: 'a' }),
-        node('c', { scale: 'small', parent: 'b' }),
-      ],
-    });
-    const findings = validateMapStructure(data);
-    expect(findings.filter((f) => f.code === 'MAP_PARENT_CYCLE')).toHaveLength(1);
-    expect(findings.find((f) => f.code === 'MAP_PARENT_CYCLE')?.message).toContain('→');
-  });
-
-  it('拒绝自指父级——长度为 1 的环也是环', () => {
-    const data = map({ nodes: [node('a', { parent: 'a' })] });
-    expect(codesOf(validateMapStructure(data))).toContain('MAP_PARENT_CYCLE');
   });
 
   it('拒绝端点不存在的连接', () => {
@@ -218,7 +165,7 @@ describe('地图校验：能证伪每条规则的反向用例', () => {
 
   // 这里曾经有两条 MAP_WEIGHT_OUT_OF_SCALE 的测试（代价超限、代价非整数），随 MapEdge.weight
   // 一起删除。通行代价属于门户类型（走廊 1 AP、门锁 2 AP、跳窗 0 AP……见 L2/03 门户系统一节），
-  // 不是地图作者逐边填的数——否则同一类楼梯会在不同地图里代价不同。作者只选 def。
+  // 不是地图作者���边填的数——否则同一类楼梯会在不同地图里代价不同。作者只选 def。
   // 反向守卫在下面「编译产物里不出现 weight」：谁把逐边 weight 加回来，那条会红。
 
   it('拒绝没吸附上的曲线端点——浮点缝隙会让运行期判出端点不存在', () => {

@@ -28,12 +28,10 @@ export type CompileResult =
  * PrefabDef 内部用 key 而非 Id 标识节点，`buildKeyToIdMap` 在 spawn 时才分配真实 Id。
  * 地图节点 id 直接充当 key：它们在一张地图内已被校验为唯一，正好满足 key 的要求。
  *
- * L-07 透传：`parent` 经 props 传入 PrefabDef，`prefab.spawn` 读 props.parent 传给 createNodeShape。
  */
 function nodeSpecOf(node: CanonicalMapNode): { key: string; def: string; props?: Record<string, Expr> } {
   const props: Record<string, Expr> = { scale: node.scale };
   if (node.name !== undefined) props['name'] = node.name;
-  if (node.parent !== undefined) props['parent'] = node.parent;
   return { key: node.id, def: node.def, props };
 }
 
@@ -88,7 +86,7 @@ function entitySpecOf(placement: MapPlacement): {
  * 必须保持无 IO 才能在属性测试里被高频调用。调用方负责在发布前另外跑那一层。
  */
 export function compileMap(map: MapDataDocument, prefabId?: string): CompileResult {
-  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
+  const canonical = map.schemaVersion === '3.0' ? map : normalizeMapDocument(map);
   const findings = validateMapStructure(canonical);
   const errors = findings.filter((finding) => finding.severity === 'error');
   if (errors.length > 0) return { ok: false, diagnostics: findings };
@@ -113,7 +111,7 @@ export function compileMap(map: MapDataDocument, prefabId?: string): CompileResu
  * 做离线推演——例如编辑器的"试玩"要回答"从出生点能不能走到目标"，不必起一局真游戏。
  */
 export function adjacencyOf(map: MapDataDocument): ReadonlyMap<string, readonly string[]> {
-  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
+  const canonical = map.schemaVersion === '3.0' ? map : normalizeMapDocument(map);
   const adjacency = new Map<string, string[]>();
   for (const node of canonical.nodes) adjacency.set(node.id, []);
   for (const edge of canonical.edges) {
@@ -134,7 +132,7 @@ export function adjacencyOf(map: MapDataDocument): ReadonlyMap<string, readonly 
  * "有没有一片区域和主体完全没有连线"，而不是"能不能单向抵达"。
  */
 export function connectedGroups(map: MapDataDocument): readonly (readonly string[])[] {
-  const canonical = map.schemaVersion === '2.0' ? map : normalizeMapDocument(map);
+  const canonical = map.schemaVersion === '3.0' ? map : normalizeMapDocument(map);
   const undirected = new Map<string, string[]>();
   for (const node of canonical.nodes) undirected.set(node.id, []);
   for (const edge of canonical.edges) {

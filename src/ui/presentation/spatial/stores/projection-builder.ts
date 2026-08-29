@@ -24,7 +24,6 @@ export interface ProjectionBuilderDeps {
   readonly mapData: MapData
   readonly entities: SpatialEntityStore
   readonly clusters: ClusterStore
-  readonly buildingScope: BuildingScopeStore
   readonly revision: number
 }
 
@@ -36,7 +35,7 @@ export class ProjectionBuilder {
   }
 
   build(): SpatialProjection {
-    const { mapData, entities, clusters, buildingScope, revision } = this.deps
+    const { mapData, entities, clusters, revision } = this.deps
     const entitySnap = entities.current()
     const nodeById = new Map(mapData.nodes.map((n) => [n.id, n]))
     const nodeViews: NodeView[] = mapData.nodes.map((node) => ({
@@ -46,7 +45,6 @@ export class ProjectionBuilder {
       scale: node.scale,
       name: node.name,
       floor: node.floor ?? 0,
-      layerId: node.parent,
     }))
 
     const edgeViews: EdgeView[] = mapData.edges.map((edge) => ({
@@ -89,7 +87,6 @@ export class ProjectionBuilder {
       entities: entityViews,
       clusters: clusterViews,
       tiles: [],
-      buildingRenderMode: buildingScope.current().mode,
     })
   }
 }

@@ -26,7 +26,6 @@ export interface Vec2 {
 export interface ObstructionSpec {
   readonly shape: 'box' | 'circle' | 'polygon';
   readonly bounds?: readonly Vec2[];
-  readonly height?: number;
 }
 
 /** 过渡窗口的样条过渡点（平滑样条的外插补充定位点）。 */
@@ -87,21 +86,8 @@ export interface MapNode {
   readonly scale: SceneScale;
   /** 归一化坐标，渲染用。删掉它拓扑依然完整。 */
   readonly at: Vec2;
-  /** 所在楼层。同一底图上的地面层为 0。 */
+  /** Legacy v1 的楼层号；canonical v3 使用 layerId + 可空高度排序值。 */
   readonly floor: number;
-  /**
-   * 上级天然场景 id。缺省表示顶层。
-   *
-   * ⚠️ 未接通（见 docs/L3_玩法层/07_地图生产管线.md 第五节）：`PrefabDef.nodes[]` 没有 parent
-   * 字段，`prefab.spawn` 建节点时不传，所以运行期所有场景都是平的。校验器仍然完整检查层级
-   * （MAP_PARENT_NOT_FOUND / MAP_ILLEGAL_SCENE_NESTING / MAP_PARENT_CYCLE）——那些检查本身
-   * 是对的，只是它们守的字段目前到不了运行期。
-   *
-   * 这不是小洞：L2/03 的距离公式建立在「同一天然场景 / 跨天然场景」之上，微型场景也靠
-   * `Node.parent` 挂载（micro-scene.ts），`graph.ts` 按 parent 查子节点。层级塌平，距离模型
-   * 就没有依据。`node.create` 本来接受 parent——只有预制结构这条批量路径表达不出来。
-   */
-  readonly parent?: string;
   /** 玩家可见名称。`playerFacing` 的节点必须有。 */
   readonly name?: string;
 }
@@ -114,7 +100,7 @@ export interface MapNode {
  * 数值由该门户类型在基类层声明——否则同一类楼梯会在不同地图里代价不同，平衡数值就散了。
  *
  * 曲线更不参与代价：`metrics.ts` 的代价是 `link.weight * node.weight` 相乘，玩家可见刻度受
- * 宪法 1-5 约束，而作者画一条绕远的路不该因此变成 weight=47。本文件不 import curve.ts，
+ * 宪法 1-5 约束，��作者画一条绕远的路不该因此变成 weight=47。本文件不 import curve.ts，
  * 这条由依赖结构保证。
  *
  * ⚠️ 未接通（见 docs/L3_玩法层/07_地图生产管线.md 第五节）：`PrefabDef.links[]` 没有 weight
@@ -217,34 +203,27 @@ export interface LayerTransform {
   readonly ty: number;
 }
 
-/**
- * 一个图层（L.1/L.2/L.10）。`height` 可空：
- * - 填数值 → 参与透视，同图内参与透视的 height 必须唯一（L.2 去重）；
- * - 留空 → 三界外独立层，无透视关系，可多个，且恒不透明（L.3）。
- */
+/** Zone 是互相独立的地图区域，不承载几何高度关系。 */
 export interface MapLayer {
   readonly id: string;
   readonly name?: string;
-  readonly height?: number;
   readonly backdrop?: LayerBackdrop;
   readonly transform?: LayerTransform;
+  /** 未来有限视野扩展点；缺省等同 all。 */
+  readonly visibilityScope?: 'all' | 'party' | 'self';
 }
 
-/**
- * Canonical 地图：以 `layers` 列表 + 节点 `layerId` 引用表达层级。
- * `schemaVersion` 升到 `'2.0'`，不携带 legacy `floor` / `floors` 字段。
- */
+/** Canonical v3：layers 是 zone 列表；不携带 legacy floors。 */
 export interface CanonicalMapData extends Omit<MapData, 'floors' | 'nodes' | 'schemaVersion'> {
-  readonly schemaVersion: '2.0';
+  readonly schemaVersion: '3.0';
   readonly layers: readonly MapLayer[];
   readonly nodes: readonly CanonicalMapNode[];
-  /** Optional presentation branch; never compiled into PrefabDef. */
-  readonly buildingGroups?: readonly BuildingGroup[];
 }
 
-/** Canonical 节点：用 `layerId` 引用 `CanonicalMapData.layers` 中的唯一图层。 */
-export interface CanonicalMapNode extends Omit<MapNode, 'layerId' | 'floor'> {
+/** Canonical 节点：layerId 选择 zone，floor 仅用于 zone 内高度排序。 */
+export interface CanonicalMapNode extends Omit<MapNode, 'floor'> {
   readonly layerId: string;
+  readonly floor: number | null;
 }
 
 /**
@@ -261,69 +240,8 @@ export interface LegacyMapNode extends Omit<MapNode, 'floor'> {
   readonly floor: number;
 }
 
-/** 规范化入口的输入文档：legacy v1 或 canonical v2 均可。 */
+/** 规范化入口的输入文档：legacy v1 或 canonical v3。 */
 export type MapDataDocument = LegacyMapData | CanonicalMapData;
-
-/** 建筑组的归一化地图框（表现定位数据，不进入引擎拓扑）。 */
-export interface BuildingFrame {
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-}
-
-/** 建筑组内楼层；height/ordinal 只在所属建筑组命名空间内解释。 */
-export interface BuildingFloor {
-  readonly id: string;
-  readonly ordinal: number;
-  readonly height: number;
-  readonly nodes: readonly string[];
-  readonly image?: string;
-  readonly frame?: BuildingFrame;
-}
-
-/** 建筑组门户：建筑内部楼层间的表现/空间引用。 */
-export interface BuildingPortal {
-  readonly id: string;
-  readonly from: string;
-  readonly to: string;
-  readonly def: string;
-}
-
-/** canonical 建筑组分支；主地图 layers 与建筑楼层严格分离。 */
-export interface BuildingGroup {
-  readonly id: string;
-  readonly frame: BuildingFrame;
-  readonly shell: string;
-  readonly floors: readonly BuildingFloor[];
-  readonly portals: readonly BuildingPortal[];
-} 
-
-function cloneBuildingFrame(frame: BuildingFrame): BuildingFrame {
-  return { x: frame.x, y: frame.y, width: frame.width, height: frame.height };
-}
-
-function normalizeBuildingGroups(groups: readonly BuildingGroup[] | undefined): readonly BuildingGroup[] | undefined {
-  if (groups === undefined) return undefined;
-  return groups.map((group) => ({
-    id: group.id,
-    frame: cloneBuildingFrame(group.frame),
-    shell: group.shell,
-    floors: group.floors.map((floor) => ({
-      id: floor.id,
-      ordinal: floor.ordinal,
-      height: floor.height,
-      nodes: [...floor.nodes],
-      ...(floor.image !== undefined ? { image: floor.image } : {}),
-      ...(floor.frame !== undefined ? { frame: cloneBuildingFrame(floor.frame) } : {}),
-    })),
-    portals: group.portals.map((portal) => ({ ...portal })),
-  }));
-}
-
-export interface CanonicalBuildingMapData extends CanonicalMapData {
-  readonly buildingGroups: readonly BuildingGroup[];
-}
 
 /** Expr 判别键。放置覆写的键名撞上其中任何一个都必须被拒绝。 */
 export const EXPR_DISCRIMINANT_KEYS: readonly string[] = ['path', 'op', 'call', 'q', 'var'];
@@ -333,13 +251,8 @@ export function deriveLayerId(floor: number): string {
   return `layer:floor:${floor}`;
 }
 
-/** 独立层 height 统一写成 undefined；其余数值原样保留。 */
-export function normalizeLayerHeight(height: number | null | undefined): number | undefined {
-  return height ?? undefined;
-}
-
-/** Canonical/legacy 节点层引用统一入口：优先 layerId，否则回退 floor。 */
-export function normalizeNodeLayerRef(node: { readonly layerId?: string; readonly floor?: number }): string {
+/** Canonical/legacy 节点 zone 引用统一入口。 */
+export function normalizeNodeLayerRef(node: { readonly layerId?: string; readonly floor?: number | null }): string {
   return node.layerId ?? deriveLayerId(node.floor ?? 0);
 }
 
@@ -364,20 +277,13 @@ function cloneLayerTransform(transform: LayerTransform): LayerTransform {
   };
 }
 
-function normalizeMapLayer(layer: {
-  readonly id: string;
-  readonly name?: string;
-  readonly height?: number | null;
-  readonly backdrop?: LayerBackdrop;
-  readonly transform?: LayerTransform;
-}): MapLayer {
-  const height = normalizeLayerHeight(layer.height);
+function normalizeMapLayer(layer: MapLayer & { readonly height?: number }): MapLayer {
   return {
     id: layer.id,
     ...(layer.name !== undefined ? { name: layer.name } : {}),
-    ...(height !== undefined ? { height } : {}),
     ...(layer.backdrop !== undefined ? { backdrop: cloneLayerBackdrop(layer.backdrop) } : {}),
     ...(layer.transform !== undefined ? { transform: cloneLayerTransform(layer.transform) } : {}),
+    ...(layer.visibilityScope !== undefined ? { visibilityScope: layer.visibilityScope } : {}),
   };
 }
 
@@ -396,15 +302,13 @@ function normalizeMapNodeBase(node: {
   readonly def: string;
   readonly scale: SceneScale;
   readonly at: Vec2;
-  readonly parent?: string;
   readonly name?: string;
-}): Pick<MapNode, 'id' | 'def' | 'scale' | 'at' | 'parent' | 'name'> {
+}): Pick<MapNode, 'id' | 'def' | 'scale' | 'at' | 'name'> {
   return {
     id: node.id,
     def: node.def,
     scale: node.scale,
     at: clonePoint(node.at),
-    ...(node.parent !== undefined ? { parent: node.parent } : {}),
     ...(node.name !== undefined ? { name: node.name } : {}),
   };
 }
@@ -413,6 +317,7 @@ function normalizeCanonicalNode(node: CanonicalMapNode): CanonicalMapNode {
   return {
     ...normalizeMapNodeBase(node),
     layerId: normalizeNodeLayerRef(node),
+    floor: node.floor ?? null,
   };
 }
 
@@ -420,6 +325,7 @@ function normalizeLegacyNode(node: LegacyMapNode): CanonicalMapNode {
   return {
     ...normalizeMapNodeBase(node),
     layerId: normalizeNodeLayerRef(node),
+    floor: node.floor,
   };
 }
 
@@ -427,7 +333,6 @@ function normalizeObstruction(spec: ObstructionSpec): ObstructionSpec {
   return {
     shape: spec.shape,
     ...(spec.bounds !== undefined ? { bounds: spec.bounds.map(clonePoint) } : {}),
-    ...(spec.height !== undefined ? { height: spec.height } : {}),
   };
 }
 
@@ -474,7 +379,7 @@ function legacyFloors(document: LegacyMapData): readonly number[] {
 }
 
 function normalizeLegacyLayers(document: LegacyMapData): readonly MapLayer[] {
-  return legacyFloors(document).map((floor) => normalizeMapLayer({ id: deriveLayerId(floor), height: floor }));
+  return legacyFloors(document).map((floor) => normalizeMapLayer({ id: deriveLayerId(floor), name: `Zone ${floor}` }));
 }
 
 function normalizeCanonicalLayers(layers: readonly MapLayer[]): readonly MapLayer[] {
@@ -489,31 +394,16 @@ function normalizeLegacyNodes(nodes: readonly LegacyMapNode[]): readonly Canonic
   return nodes.map((node) => normalizeLegacyNode(node));
 }
 
-/** 把 legacy floor 文档或 canonical layer 文档统一成 canonical MapData。 */
+/** v1 → v3 单向迁移；canonical 输入保持 zone 顺序并清洗旧字段。 */
 export function normalizeMapDocument(document: MapDataDocument): CanonicalMapData {
-  if (document.schemaVersion === '2.0') {
-    return {
-      schemaVersion: '2.0',
-      id: document.id,
-      name: document.name,
-      backdrop: normalizeMapBackdrop(document.backdrop),
-      layers: normalizeCanonicalLayers(document.layers),
-      nodes: normalizeCanonicalNodes(document.nodes),
-      edges: document.edges.map(normalizeMapEdge),
-      placements: document.placements.map(normalizeMapPlacement),
-      ...(normalizeBuildingGroups(document.buildingGroups) !== undefined
-        ? { buildingGroups: normalizeBuildingGroups(document.buildingGroups) }
-        : {}),
-    };
-  }
-
+  const canonical = document.schemaVersion === '3.0';
   return {
-    schemaVersion: '2.0',
+    schemaVersion: '3.0',
     id: document.id,
     name: document.name,
     backdrop: normalizeMapBackdrop(document.backdrop),
-    layers: normalizeLegacyLayers(document),
-    nodes: normalizeLegacyNodes(document.nodes),
+    layers: canonical ? normalizeCanonicalLayers(document.layers) : normalizeLegacyLayers(document),
+    nodes: canonical ? normalizeCanonicalNodes(document.nodes) : normalizeLegacyNodes(document.nodes),
     edges: document.edges.map(normalizeMapEdge),
     placements: document.placements.map(normalizeMapPlacement),
   };
