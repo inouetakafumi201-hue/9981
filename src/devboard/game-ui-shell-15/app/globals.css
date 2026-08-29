@@ -1,6 +1,17 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+
+/* 任务队列使用无轨道滚动，避免浏览器原生滑块改变面板宽度并触发整屏抖动。 */
+.bench-job-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+
+.bench-job-list::-webkit-scrollbar {
+  display: none;
+}
 @source '../../editor-shell/components/**/*.{ts,tsx}';
 @source '../../editor-shell/lib/**/*.{ts,tsx}';
 

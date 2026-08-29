@@ -53,7 +53,7 @@ export function BenchJobStrip() {
         <span className="font-sans text-[12px] font-bold text-[color:var(--cyan)]">研究任务</span>
         <span className="font-sans text-[11px] tabular-nums text-[color:var(--lib-dim)]">{jobs.length} 项</span>
       </div>
-      <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto">
+      <div className="bench-job-list flex flex-1 flex-col gap-1.5 overflow-y-auto">
         {jobs.length === 0 && <span className="font-sans text-[11px] text-[color:var(--lib-dim)]">暂无进行中的研究</span>}
         {jobs.map((j) => (
           <JobStripCard key={j.id} job={j} />
@@ -407,7 +407,7 @@ function DoneStatus({ job, onClaim }: { job: SynthesisJob; onClaim: () => void }
         >
           收下成品
         </motion.button>
-        {/* 绘制贴图：收下成品 → 关闭研究台 → 跳素材库选中该成品 → 自动打开像素
+        {/* ��制贴图：收下成品 → 关闭研究台 → 跳素材库选中该成品 → 自动打开像素
             绘制器（Spec §八「研究台合成完成」）。真实成品尚未接入独立 id
             （§9.2 债务 1，占位期用 baseMaterialId 承接底图对象），接线后改为
             job.resultMaterialId。 */}
