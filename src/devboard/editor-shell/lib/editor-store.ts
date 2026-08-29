@@ -22,7 +22,6 @@ import {
   boxesOfScene,
   sceneGroupBBox,
   recomputeAggregation,
-  overlayOpacity,
   foreignSceneIdsTouchedByRect,
   foreignSceneIdsTouchedByGroup,
   computeHoleCells,
@@ -42,9 +41,6 @@ import {
   type EdgePoint,
   type Scale,
   type MapData,
-  type BuildingGroup,
-  type BuildingFloor,
-  type BuildingFrame,
 } from './map-types'
 import { rdp } from './geometry'
 import { canonicalToEditorDoc, editorDocToCanonical } from './map-bridge'
@@ -121,8 +117,8 @@ function seedDoc(): MapDoc {
   const groundLayerId = 'ly_ground'
   const roofLayerId = 'ly_roof'
   const layers: Layer[] = [
-    { id: groundLayerId, name: '地面层', height: 0 },
-    { id: roofLayerId, name: '车顶层', height: 1 },
+    { id: groundLayerId, name: '地面层' },
+    { id: roofLayerId, name: '车顶覆盖层' },
   ]
 
   const platformBox: SceneBox = {
@@ -200,7 +196,6 @@ function seedDoc(): MapDoc {
     obstructions: [],
     terrains: [],
     placements: [],
-    buildingGroups: [],
   }
 
   const edges: Edge[] = [
@@ -427,16 +422,6 @@ export function addLayer(name: string) {
   setState({ currentLayerId: layer.id })
 }
 export function updateLayer(id: string, patch: Partial<Layer>) {
-  // 高度冲突：另一层已经填了相同数值时拒绝写入
-  if (patch.height != null) {
-    const conflict = state.doc.layers.some(
-      (l) => l.id !== id && l.height === patch.height,
-    )
-    if (conflict) {
-      toast('该高度已被其它图层占用，请换一个数值', 'error')
-      return false
-    }
-  }
   setDoc({
     ...state.doc,
     layers: state.doc.layers.map((l) => (l.id === id ? { ...l, ...patch } : l)),
@@ -455,15 +440,6 @@ export function removeLayer(id: string) {
   setDoc({ ...state.doc, layers, sceneNodes })
   if (state.currentLayerId === id) setState({ currentLayerId: fallbackId })
 }
-/** 两个图层间的跨层透明度（供 canvas 渲染用），只是 overlayOpacity 的便捷包装 */
-export function layerOpacity(layerId: string): number {
-  const cur = state.doc.layers.find((l) => l.id === state.currentLayerId)
-  const target = state.doc.layers.find((l) => l.id === layerId)
-  if (!cur || !target) return 1
-  if (target.id === cur.id) return 1
-  return overlayOpacity(cur, target)
-}
-
 /* ---------------- pulse (diagnostic focus) ---------------- */
 export function pulseElement(id: string, level?: 'error' | 'warning') {
   setState({ pulse: { id, n: Date.now(), level } })
@@ -480,83 +456,6 @@ export function pulseElement(id: string, level?: 'error' | 'warning') {
  *  B3：落在其它场景的洞内、或同时压到两个不同场景 → 拒绝创建（返回
  *  `null`），并弹出对应 toast——调用方只需在收到 `null` 时播放错误反馈，
  *  不需要重复这套校验逻辑。 */
-export function addBuildingGroup(rect: BuildingFrame, shell = 'shell:default'): string {
-  const group: BuildingGroup = { id: uid('bg'), frame: { ...rect }, shell, floors: [], portals: [] }
-  setDoc({ ...state.doc, buildingGroups: [...(state.doc.buildingGroups ?? []), group] })
-  return group.id
-}
-
-export function addBuildingFloor(groupId: string, floor: Omit<BuildingFloor, 'id'> & { id?: string }): string | null {
-  const group = (state.doc.buildingGroups ?? []).find((item) => item.id === groupId)
-  if (!group) return null
-  const id = floor.id ?? uid('bf')
-  const nextFloor: BuildingFloor = { ...floor, id, nodes: [...floor.nodes] }
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((item) => item.id === groupId ? { ...item, floors: [...item.floors, nextFloor] } : item) })
-  return id
-}
-
-export function updateBuildingGroupFrame(groupId: string, frame: BuildingFrame) {
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((group) => group.id === groupId ? { ...group, frame: { ...frame } } : group) })
-}
-
-export function setBuildingGroupShell(groupId: string, shell: string) {
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((group) => group.id === groupId ? { ...group, shell } : group) })
-}
-
-export function setBuildingFloorFrame(groupId: string, floorId: string, frame: BuildingFrame) {
-  setDoc({ ...state.doc, buildingGroups: (state.doc.buildingGroups ?? []).map((group) => group.id === groupId ? { ...group, floors: group.floors.map((floor) => floor.id === floorId ? { ...floor, frame: { ...frame } } : floor) } : group) })
-}
-
-export function setBuildingFloorImage(groupId: string, floorId: string, image: string) {
-  setDoc({
-    ...state.doc,
-    buildingGroups: (state.doc.buildingGroups ?? []).map((group) =>
-      group.id === groupId
-        ? { ...group, floors: group.floors.map((floor) => floor.id === floorId ? { ...floor, image } : floor) }
-        : group,
-    ),
-  })
-}
-
-export function setBuildingFloorOrdinal(groupId: string, floorId: string, ordinal: number) {
-  setDoc({
-    ...state.doc,
-    buildingGroups: (state.doc.buildingGroups ?? []).map((group) =>
-      group.id === groupId
-        ? { ...group, floors: group.floors.map((floor) => floor.id === floorId ? { ...floor, ordinal } : floor) }
-        : group,
-    ),
-  })
-}
-
-export function bindBuildingPortal(
-  groupId: string,
-  portal: { id?: string; from: string; to: string; def: string },
-): string | null {
-  const group = (state.doc.buildingGroups ?? []).find((item) => item.id === groupId)
-  if (!group) return null
-  const id = portal.id ?? uid('bp')
-  const next = { id, from: portal.from, to: portal.to, def: portal.def }
-  setDoc({
-    ...state.doc,
-    buildingGroups: (state.doc.buildingGroups ?? []).map((item) =>
-      item.id === groupId ? { ...item, portals: [...item.portals, next] } : item,
-    ),
-  })
-  return id
-}
-
-export function removeBuildingFloor(groupId: string, floorId: string) {
-  setDoc({
-    ...state.doc,
-    buildingGroups: (state.doc.buildingGroups ?? []).map((group) =>
-      group.id === groupId
-        ? { ...group, floors: group.floors.filter((floor) => floor.id !== floorId) }
-        : group,
-    ),
-  })
-}
-
 export function addScene(rect: {
   x: number
   y: number
@@ -710,13 +609,13 @@ export function updateScene(
   patch: Partial<SceneNode & SceneBox>,
   history = true,
 ) {
-  const { name, scale, layerId, parent, def, ...geo } = patch as Partial<SceneNode> &
+  const { name, scale, layerId, floor, def, ...geo } = patch as Partial<SceneNode> &
     Partial<SceneBox>
   const nodePatch: Partial<SceneNode> = {}
   if (name !== undefined) nodePatch.name = name
   if (scale !== undefined) nodePatch.scale = scale
   if (layerId !== undefined) nodePatch.layerId = layerId
-  if (parent !== undefined) nodePatch.parent = parent
+  if (floor !== undefined) nodePatch.floor = floor
   if (def !== undefined) nodePatch.def = def
   if (Object.keys(nodePatch).length) updateSceneNode(id, nodePatch, history)
   if (Object.keys(geo).length) {
@@ -1221,7 +1120,7 @@ export function addLayerFromImage(opts: {
   const layer: Layer = {
     id: layerId,
     name,
-    // 全屏底图默认放在 height 0 参与透视；局部贴纸做成独立层(height 空)
+    // 全屏底图默认放在 height 0 参与透��；局部贴纸做成独立层(height 空)
     height: opts.category === '全屏' ? 0 : undefined,
     backdrop: {
       image: opts.dataUrl,
@@ -1259,7 +1158,6 @@ export function newBlankMap() {
     obstructions: [],
     terrains: [],
     placements: [],
-    buildingGroups: [],
   }
   past.length = 0
   future.length = 0
@@ -1395,7 +1293,7 @@ export function validate(doc: MapDoc): Diagnostic[] {
   return out
 }
 
-/* ---------------- export (B11 — canonical v2) ---------------- */
+/* ---------------- export (D-084 — canonical v3 single Zone) ---------------- */
 export function buildMapData(doc: MapDoc): MapData {
   const nx = (v: number) => +(v / WORLD.w).toFixed(4)
   const ny = (v: number) => +(v / WORLD.h).toFixed(4)
@@ -1411,24 +1309,10 @@ export function buildMapData(doc: MapDoc): MapData {
   })
 
   return {
-    schemaVersion: '2.0',
+    schemaVersion: '3.0',
     id: doc.id,
     name: doc.name,
-    layers: doc.layers.map((l) => ({ id: l.id, name: l.name, height: l.height, backdrop: l.backdrop, transform: l.transform })),
-    buildingGroups: doc.buildingGroups?.map((group) => ({
-      id: group.id,
-      frame: { x: nx(group.frame.x), y: ny(group.frame.y), width: nx(group.frame.width), height: ny(group.frame.height) },
-      shell: group.shell,
-      floors: group.floors.map((floor) => ({
-        id: floor.id,
-        ordinal: floor.ordinal,
-        height: floor.height,
-        nodes: [...floor.nodes],
-        ...(floor.image !== undefined ? { image: floor.image } : {}),
-        ...(floor.frame !== undefined ? { frame: { x: nx(floor.frame.x), y: ny(floor.frame.y), width: nx(floor.frame.width), height: ny(floor.frame.height) } } : {}),
-      })),
-      portals: group.portals.map((portal) => ({ ...portal })),
-    })),
+    layers: doc.layers.map((l) => ({ id: l.id, name: l.name, backdrop: l.backdrop, transform: l.transform })),
     nodes: doc.sceneNodes.map((n) => {
       const anchor = nodeAnchor(n.id, doc)
       return {
@@ -1436,7 +1320,7 @@ export function buildMapData(doc: MapDoc): MapData {
         name: n.name,
         scale: n.scale,
         layerId: n.layerId,
-        parent: n.parent,
+        floor: n.floor ?? null,
         def: n.def,
         at: { x: nx(anchor.x), y: ny(anchor.y) },
       }

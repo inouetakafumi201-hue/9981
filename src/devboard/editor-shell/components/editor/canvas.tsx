@@ -65,7 +65,6 @@ import {
   applySampleToScene,
   toast,
   flyTo,
-  layerOpacity,
   type Camera,
 } from '@editor/lib/editor-store'
 import {
@@ -1193,8 +1192,7 @@ export function Canvas() {
             : 'default'
 
   const nodeById = new Map(doc.sceneNodes.map((n) => [n.id, n]))
-  const opacityForLayer = (layerId: string) =>
-    layerId === currentLayerId ? 1 : layerOpacity(layerId)
+  const opacityForLayer = (_layerId: string) => 1
 
   // B3：空洞全填——按 sceneId 分组的洞格子，仅在成员框集合变化时重算
   const holeCells = useMemo(() => computeHoleCells(doc), [doc.sceneBoxes])
@@ -1308,26 +1306,6 @@ export function Canvas() {
           />
         ))}
 
-        {/* building group frames: independent branch bounds, never merged into scene boxes */}
-        {(doc.buildingGroups ?? []).map((building) => {
-          const selected = selIds.has(building.id)
-          return (
-            <rect
-              key={`building-${building.id}`}
-              x={building.frame.x}
-              y={building.frame.y}
-              width={building.frame.width}
-              height={building.frame.height}
-              fill="none"
-              stroke={selected ? 'var(--accent)' : 'var(--primary)'}
-              strokeDasharray="8 5"
-              strokeWidth={selected ? 3 : 2}
-              opacity={selected ? 0.9 : 0.45}
-              pointerEvents="none"
-              data-building-group={building.id}
-            />
-          )
-        })}
 
         {/* edges */}
         {doc.edges.map((e) => (

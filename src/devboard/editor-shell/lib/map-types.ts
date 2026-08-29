@@ -16,7 +16,6 @@ export type Scale = 'large' | 'medium' | 'small'
 
 export type ElementType =
   | 'scene'
-  | 'building'
   | 'edge'
   | 'obstruction'
   | 'terrain'
@@ -60,11 +59,10 @@ export interface LayerTransform {
   ty: number
 }
 
-/** 图层。`height` 留空表示独立层——不参与跨层透明度叠加公式，恒不透明。 */
+/** 当前 Zone 内的背景/覆盖图层，不表达楼层或空间切换。 */
 export interface Layer {
   id: string
   name: string
-  height?: number
   /** 全屏底图：拉伸铺满整张图。局部贴纸用 backdrop + transform 承载。 */
   backdrop?: LayerBackdrop
   transform?: LayerTransform
@@ -79,8 +77,8 @@ export interface SceneNode {
   name: string
   scale: Scale
   layerId: string
-  /** 上级场景节点 id（用于 large→medium→small 的软约束嵌套） */
-  parent?: string
+  /** Zone 内可空高度排序值。 */
+  floor?: number | null
   def?: string
   at: Vec
 }
@@ -190,13 +188,12 @@ export interface MapData {
     backdrop?: LayerBackdrop
     transform?: LayerTransform
   }>
-  buildingGroups?: BuildingGroup[]
   nodes: Array<{
     id: string
     name: string
     scale: Scale
     layerId: string
-    parent?: string
+    floor: number | null
     def?: string
     at: Vec
   }>
@@ -288,15 +285,6 @@ export function nodeAnchor(nodeId: string, doc: MapDoc): Vec {
   const bbox = sceneGroupBBox(boxes)
   if (bbox) return { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 }
   return node.at
-}
-
-/** 图层系统的跨层透明度公式（B4）：两侧都填了 `height` 时，高度差每差 1
- *  透明度降 10%（`clamp(1 - |Δheight| * 0.1, 0, 1)`）；只要有一侧是"独立层"
- *  （`height` 留空），就不参与这套叠加换算，恒不透明——独立层���间互不透视。 */
-export function overlayOpacity(a: Layer, b: Layer): number {
-  if (a.height == null || b.height == null) return 1
-  const delta = Math.abs(a.height - b.height)
-  return Math.min(1, Math.max(0, 1 - delta * 0.1))
 }
 
 function rectsOverlap(

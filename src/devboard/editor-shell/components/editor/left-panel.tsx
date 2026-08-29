@@ -1,17 +1,14 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { IconFolder, IconEye, IconEyeOff, IconPlus, IconChevronLeft, IconChevronRight, IconImage } from './icons'
 import { HoloScan, HoloStatic } from './fx'
 import { playSfx } from '@editor/lib/sound'
 import {
   SCALE_LABEL,
   nodeAnchor,
-  overlayOpacity,
   type SceneNode,
   type Layer,
-  type BuildingGroup,
-  type BuildingFloor,
 } from '@editor/lib/map-types'
 import {
   useEditor,
@@ -20,14 +17,8 @@ import {
   flyTo,
   setCurrentLayer,
   addLayer,
-  updateLayer,
   toast,
   addLayerFromImage,
-  addBuildingFloor,
-  setBuildingFloorImage,
-  setBuildingFloorOrdinal,
-  bindBuildingPortal,
-  removeBuildingFloor,
 } from '@editor/lib/editor-store'
 import { uploadPngFile, type UploadCategory } from '@editor/lib/file-upload'
 
@@ -135,48 +126,13 @@ function SceneCard({
 
 function LayerRow({
   layer,
-  otherLayers,
   count,
   active,
 }: {
   layer: Layer
-  /** 除自己外的其它图层，用于高度冲突校验（B4：两个参与透视的图层不能填
-   *  相同高度值——空值="独立层"不参与透视，天然不冲突）。 */
-  otherLayers: Layer[]
   count: number
   active: boolean
 }) {
-  const [draft, setDraft] = useState<string>(layer.height != null ? String(layer.height) : '')
-  const [err, setErr] = useState(false)
-
-  useEffect(() => {
-    setDraft(layer.height != null ? String(layer.height) : '')
-    setErr(false)
-  }, [layer.height])
-
-  function commit() {
-    if (draft.trim() === '') {
-      setErr(false)
-      updateLayer(layer.id, { height: undefined })
-      return
-    }
-    const n = Number(draft)
-    if (!Number.isFinite(n)) {
-      setErr(true)
-      playSfx('error')
-      return
-    }
-    const conflict = otherLayers.some((l) => l.height === n)
-    if (conflict) {
-      setErr(true)
-      playSfx('error')
-      toast(`高度 ${n} 已被其它图层占用，透视图层高度必须唯一`, 'error')
-      return
-    }
-    setErr(false)
-    updateLayer(layer.id, { height: n })
-  }
-
   return (
     <div
       style={
@@ -208,22 +164,6 @@ function LayerRow({
           {count} 场景
         </span>
       </button>
-      {/* 高度数字输入：留空 = 独立层，不参与跨层透视换算 */}
-      <input
-        type="number"
-        value={draft}
-        placeholder="独立层"
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
-        }}
-        onClick={(e) => e.stopPropagation()}
-        title="高度（留空 = 独立层，不与其它图层叠加透视）"
-        className={`hud-field chamfer-sm chamfer w-16 px-1.5 py-1 text-center text-[11px] focus:outline-none focus:ring-1 ${
-          err ? 'ring-1 ring-error text-error' : 'focus:ring-primary'
-        }`}
-      />
       <button
         onClick={() => {
           playSfx('toggle')
@@ -310,7 +250,6 @@ function LayerUploadButton() {
 export function LeftPanel() {
   const scenes = useEditor((s) => s.doc.sceneNodes)
   const layers = useEditor((s) => s.doc.layers)
-  const buildingGroups = useEditor((s) => s.doc.buildingGroups ?? [])
   const selection = useEditor((s) => s.selection)
   const currentLayerId = useEditor((s) => s.currentLayerId)
   const currentLayer = layers.find((l) => l.id === currentLayerId)
@@ -381,25 +320,10 @@ export function LeftPanel() {
         </div>
       </section>
 
-      {/* 建筑组分支 */}
-      <section className="rise-in border-b border-border" style={{ animationDelay: '90ms' }}>
-        <SectionHeader
-          title="建筑组"
-          extra={<span className="font-mono text-[11px] text-muted-foreground">{buildingGroups.length}</span>}
-        />
-        <div className="flex flex-col gap-2 px-3 pb-3">
-          {buildingGroups.length === 0 ? (
-            <p className="px-1 py-2 text-[11px] text-muted-foreground">在画布框选区域以创建建筑组。</p>
-          ) : buildingGroups.map((building) => (
-            <BuildingGroupCard key={building.id} building={building} />
-          ))}
-        </div>
-      </section>
-
-      {/* 图层与高度 */}
+      {/* Zone 内图层 */}
       <section className="rise-in border-b border-border" style={{ animationDelay: '110ms' }}>
         <SectionHeader
-          title="图层与高度"
+          title="Zone 图层"
           extra={
             <span className="font-mono text-[11px] text-muted-foreground">
               当前:{' '}
@@ -407,27 +331,11 @@ export function LeftPanel() {
             </span>
           }
         />
-        {/* 注记条（B4）：当前图层名 / 可见层数 / 与当前图层相邻透明度 */}
-        {currentLayer && (
-          <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-3 font-mono text-[10.5px] text-muted-foreground">
-            <span>
-              可见 <span className="text-foreground/80">{layers.length}</span>/{layers.length} 层
-            </span>
-            {layers
-              .filter((l) => l.id !== currentLayer.id)
-              .map((l) => (
-                <span key={l.id}>
-                  ↔{l.name} {Math.round(overlayOpacity(currentLayer, l) * 100)}%
-                </span>
-              ))}
-          </div>
-        )}
         <div className="flex flex-col gap-2 px-3 pb-4">
           {layers.map((layer) => (
             <LayerRow
               key={layer.id}
               layer={layer}
-              otherLayers={layers.filter((l) => l.id !== layer.id)}
               count={scenes.filter((s) => s.layerId === layer.id).length}
               active={layer.id === currentLayerId}
             />
@@ -481,7 +389,8 @@ export function LeftPanel() {
   )
 }
 
-function BuildingGroupCard({ building }: { building: BuildingGroup }) {
+/* D-084: 建筑组编辑器已移除；跨 Zone 移动由显式 edge 类型表达。
+function RemovedBuildingGroupCard() {
   const fileRef = useRef<HTMLInputElement | null>(null)
   const [portalInput, setPortalInput] = useState<{ from: string; to: string; def: string } | null>(null)
   const [selectedFloorId, setSelectedFloorId] = useState<string | null>(null)
@@ -641,3 +550,4 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
     </div>
   )
 }
+*/
