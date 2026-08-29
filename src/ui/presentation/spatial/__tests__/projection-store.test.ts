@@ -10,7 +10,6 @@ const projection = (revision: number): SpatialProjection => ({
   entities: [],
   clusters: [],
   tiles: [],
-  buildingRenderMode: { kind: 'exterior' as const },
 })
 
 describe('SpatialProjectionStore (R1, R13)', () => {

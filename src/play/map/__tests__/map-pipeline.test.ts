@@ -380,7 +380,7 @@ describe('地图校验：跨目录引用', () => {
       nodes: [node('a'), node('b')],
       edges: [edge('e', 'a', 'b', { def: 'd:transition/wormhole' })],
     });
-    expect(codesOf(validateMapAgainstClasses(data, index))).toEqual(['MAP_UNKNOWN_TRANSITION_DEF']);
+    expect(codesOf(validateMapAgainstClasses(data, index))).toEqual(['MAP_EDGE_DEF_UNREGISTERED']);
   });
 
   it('拒绝不可放置的实例，并解释依附类要去工作台装插槽', () => {

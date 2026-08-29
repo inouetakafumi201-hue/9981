@@ -42,7 +42,6 @@ const buildProjection = (): SpatialProjection => ({
     },
   ],
   tiles: [],
-  buildingRenderMode: { kind: 'exterior' as const },
 })
 
 describe('R12 FocusTraversal', () => {
@@ -98,8 +97,7 @@ describe('R12 FocusTraversal', () => {
       revision: 1, layers: [], nodes: [
         { id: 'no_name', def: 'd', at: { x: 0, y: 0 }, scale: 'small', name: undefined, floor: 0, layerId: undefined },
       ], edges: [], entities: [], clusters: [], tiles: [],
-      buildingRenderMode: { kind: 'exterior' as const },
-    }
+        }
     const targets = t.compute(projection)
     expect(targets[0]?.label).toBe('no_name')
   })

@@ -52,12 +52,12 @@ function publishLayerOf(node: NodeLayerRef, ordered: readonly MapLayer[]): strin
  *
  * devboard 的 layer 列表是权威图层（name/height/backdrop/transform）。这里把列出的图层直接作为
  * canonical `layers`，节点根据 floor 就近归类到所列图层（带显式 layerId 的节点用其引用），产出
- * canonical v2 文档——不经过 legacy floor 派生层，故不会出现 deriveLayerId 的 `layer:floor:N` 层。
+   * canonical v3 文档，不再输出 parent 或 layer height。
  */
 function canonicalizeForPublish(bundle: ExportBundle): ReturnType<typeof normalizeMapDocument> {
   const ordered = bundle.layers;
   return normalizeMapDocument({
-    schemaVersion: '2.0',
+    schemaVersion: '3.0',
     id: bundle.map.id,
     name: bundle.map.name,
     backdrop: bundle.map.backdrop,
@@ -67,9 +67,9 @@ function canonicalizeForPublish(bundle: ExportBundle): ReturnType<typeof normali
       def: node.def,
       scale: node.scale,
       at: node.at,
-      ...(node.parent !== undefined ? { parent: node.parent } : {}),
       ...(node.name !== undefined ? { name: node.name } : {}),
       layerId: publishLayerOf(node, ordered),
+      floor: node.floor ?? null,
     })),
     edges: bundle.map.edges,
     placements: bundle.map.placements,
@@ -80,7 +80,6 @@ function canonicalizeForPublish(bundle: ExportBundle): ReturnType<typeof normali
 function serializeLayer(layer: MapLayer): Record<string, unknown> {
   const record: Record<string, unknown> = { id: layer.id };
   if (layer.name !== undefined) record['name'] = layer.name;
-  if (layer.height !== undefined) record['height'] = layer.height;
   if (layer.backdrop !== undefined) {
     record['backdrop'] = {
       image: layer.backdrop.image,
@@ -117,7 +116,7 @@ export function serializeMapPublish(bundle: ExportBundle): string {
       scale: node.scale,
       at: { x: node.at.x, y: node.at.y },
       layerId: node.layerId,
-      ...(node.parent !== undefined ? { parent: node.parent } : {}),
+      floor: node.floor,
       ...(node.name !== undefined ? { name: node.name } : {}),
     })),
     edges: canonical.edges,

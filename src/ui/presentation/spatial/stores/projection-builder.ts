@@ -17,7 +17,6 @@ import type { MapData } from '../../../../play/map/types'
 import type { SpatialProjection, NodeView, EdgeView, EntityView, ClusterView } from '../spatial-view'
 import type { SpatialEntityStore } from '../stores/spatial-entity-store'
 import type { ClusterStore } from '../stores/cluster-store'
-import type { BuildingScopeStore } from '../building-scope-store'
 import { deepFreeze } from '../stores/projection-store'
 
 export interface ProjectionBuilderDeps {
@@ -45,6 +44,7 @@ export class ProjectionBuilder {
       scale: node.scale,
       name: node.name,
       floor: node.floor ?? 0,
+      layerId: undefined,
     }))
 
     const edgeViews: EdgeView[] = mapData.edges.map((edge) => ({

@@ -34,7 +34,7 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
   const nodes: CanonicalMapNode[] = doc.sceneNodes.map((node) => ({
     id: node.id, def: node.def ?? nodeDefOf(node.scale), scale: node.scale,
     at: { x: nx(node.at.x), y: ny(node.at.y) }, layerId: node.layerId,
-    floor: Number.isFinite(node.floor) ? node.floor : null,
+    floor: null,
     ...(node.name !== undefined ? { name: node.name } : {}),
   }))
   const edges: MapEdge[] = doc.edges.map((edge) => ({

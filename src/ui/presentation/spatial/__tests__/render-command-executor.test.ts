@@ -22,14 +22,14 @@ describe('RenderCommandExecutor (R5, R13)', () => {
 
   it('returns stale when the source revision is older', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     expect(exec.submit(cmd({ sourceRevision: 3 }))).toBe('stale')
   })
 
   it('accepts a fresh command', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     expect(exec.submit(cmd({ sourceRevision: 5 }))).toBe('accepted')
     expect(exec.activeSize()).toBe(1)
@@ -37,7 +37,7 @@ describe('RenderCommandExecutor (R5, R13)', () => {
 
   it('removes the command on terminal outcome', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     exec.submit(cmd({ sourceRevision: 5 }))
     exec.resolve('c1', 'completed')
@@ -46,7 +46,7 @@ describe('RenderCommandExecutor (R5, R13)', () => {
 
   it('cancels and removes a command', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     exec.submit(cmd({ sourceRevision: 5 }))
     exec.cancel('c1')
@@ -55,7 +55,7 @@ describe('RenderCommandExecutor (R5, R13)', () => {
 
   it('ignores terminal outcomes on a cancelled command', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     exec.submit(cmd({ sourceRevision: 5 }))
     exec.cancel('c1')
@@ -65,7 +65,7 @@ describe('RenderCommandExecutor (R5, R13)', () => {
 
   it('cancels all on dispose', () => {
     const store = new SpatialProjectionStore()
-    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [], buildingRenderMode: { kind: 'exterior' as const } })
+    store.commit({ revision: 5, layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [] })
     const exec = new RenderCommandExecutor(store)
     exec.submit(cmd({ sourceRevision: 5, commandId: 'a' }))
     exec.submit(cmd({ sourceRevision: 5, commandId: 'b' }))

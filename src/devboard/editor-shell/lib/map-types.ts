@@ -159,35 +159,6 @@ export interface Placement {
   y: number
 }
 
-/** Editor-local building branch. Frames use world coordinates; the bridge normalizes them. */
-export interface BuildingFrame {
-  x: number
-  y: number
-  width: number
-  height: number
-}
-export interface BuildingFloor {
-  id: string
-  ordinal: number
-  height: number
-  nodes: string[]
-  image?: string
-  frame?: BuildingFrame
-}
-export interface BuildingPortal {
-  id: string
-  from: string
-  to: string
-  def: string
-}
-export interface BuildingGroup {
-  id: string
-  frame: BuildingFrame
-  shell: string
-  floors: BuildingFloor[]
-  portals: BuildingPortal[]
-}
-
 export interface MapDoc {
   id: string
   name: string
@@ -201,8 +172,6 @@ export interface MapDoc {
   obstructions: Obstruction[]
   terrains: Terrain[]
   placements: Placement[]
-  /** Presentation-only building branches, independent from main map layers. */
-  buildingGroups?: BuildingGroup[]
 }
 
 export interface Selectable {
@@ -210,15 +179,14 @@ export interface Selectable {
   id: string
 }
 
-/** 导出用的归一化 JSON 结构 — canonical v2（B11） */
+/** 导出用的归一化 JSON 结构 — canonical v3 单 Zone。 */
 export interface MapData {
-  schemaVersion: '2.0'
+  schemaVersion: '3.0'
   id: string
   name: string
   layers: Array<{
     id: string
     name: string
-    height?: number
     backdrop?: LayerBackdrop
     transform?: LayerTransform
   }>

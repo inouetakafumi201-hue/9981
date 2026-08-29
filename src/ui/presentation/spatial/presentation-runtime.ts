@@ -26,8 +26,6 @@ import { RenderCommandExecutor } from './commands/render-command-executor'
 import { MoveChoreographer } from './choreography/move-choreographer'
 import { ProjectionBuilder } from './stores/projection-builder'
 import { DisposableStack } from './disposable'
-import { BuildingScopeStore } from './building-scope-store'
-import type { BuildingScopeAction, BuildingScopeState } from './building-scope-state'
 import type { MapData } from '../../../../src/play/map/types'
 import { DEFAULT_ACCESSIBILITY, isMoveDegraded, type AccessibilityConfig } from './accessibility-config'
 import type { RenderCommand } from './render-command-api'
@@ -43,7 +41,6 @@ export interface PresentationRuntime {
   readonly projection: SpatialProjectionStore
   readonly choreographer: MoveChoreographer
   readonly executor: RenderCommandExecutor
-  readonly buildingScope: BuildingScopeStore
   readonly isDisposed: () => boolean
   readonly accessibility: AccessibilityConfig
 
@@ -52,12 +49,6 @@ export interface PresentationRuntime {
 
   /** 触发一次投影快照重建（外层在合适时机调用） */
   rebuildProjection(): void
-
-  /** Building-scope action 派发入口（UI hover/enter/exit） */
-  dispatchBuildingScope(action: BuildingScopeAction): void
-
-  /** Building-scope 当前状态（read-only） */
-  buildingScopeState(): BuildingScopeState
 
   /** 销毁，释放全部订阅 */
   dispose(): void
@@ -73,7 +64,6 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
 
   const entities = new SpatialEntityStore()
   const clusters = new ClusterStore()
-  const buildingScope = new BuildingScopeStore()
   const bridge = new EventBridge({ entities, clusters })
 
   const projection = new SpatialProjectionStore()
@@ -82,7 +72,6 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
   projection.commit({
     revision: 0,
     layers: [], nodes: [], edges: [], entities: [], clusters: [], tiles: [],
-    buildingRenderMode: { kind: 'exterior' as const },
   })
   const executor = new RenderCommandExecutor(projection)
   const choreographer = new MoveChoreographer({ projection, mode: 'single' })
@@ -134,7 +123,7 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
   })
 
   // R9: 注册所有可释放资源，dispose() 时链式释放
-  const disposables = new DisposableStack([entities, clusters, projection, executor, buildingScope])
+  const disposables = new DisposableStack([entities, clusters, projection, executor])
   const isDisposed = (): boolean => disposables.isDisposed
 
   // R11: 渲染策略，向下传播
@@ -146,7 +135,6 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
     projection,
     choreographer,
     executor,
-    buildingScope,
     isDisposed,
     accessibility,
 
@@ -157,16 +145,8 @@ export function createPresentationRuntime(deps: PresentationRuntimeDeps): Presen
 
     rebuildProjection() {
       if (disposables.isDisposed) return
-      const builder = new ProjectionBuilder({ mapData, entities, clusters, buildingScope, revision: bridge.revision })
+      const builder = new ProjectionBuilder({ mapData, entities, clusters, revision: bridge.revision })
       projection.commit(builder.build())
-    },
-
-    dispatchBuildingScope(action) {
-      buildingScope.dispatch(action)
-    },
-
-    buildingScopeState() {
-      return buildingScope.current().state
     },
 
     dispose() {

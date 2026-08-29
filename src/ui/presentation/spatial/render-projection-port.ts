@@ -37,7 +37,7 @@ export function nodeFromMapNode(node: MapData['nodes'][0], _mapData: MapData): N
     scale: node.scale,
     name: node.name,
     floor: node.floor ?? 0,
-    layerId: node.parent, // 使用 parent 作为 layerId（地图中尚未有正式 layerId 字段）
+    layerId: undefined,
   };
 }
 
@@ -96,7 +96,7 @@ export function entitiesFromSemanticProjection(
       entityId: entity.entityId,
       viewToken: `view:${entity.entityId}`,
       definitionId: mapNode?.def,
-      locationNodeId: mapNode?.parent,
+      locationNodeId: undefined,
       posture: entity.posture,
       statusIds: entity.statusIds ?? [],
       resources,
@@ -130,7 +130,6 @@ export function createSpatialProjection(
     edges: Object.freeze([...edges]),
     entities: Object.freeze([...entities]),
     clusters: [] as readonly ClusterView[],
-    buildingRenderMode: { kind: 'exterior' as const },
     tiles: [] as readonly TileView[],
   });
 }
