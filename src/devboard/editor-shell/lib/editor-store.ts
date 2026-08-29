@@ -1102,10 +1102,8 @@ export function importMapJson(json: string): boolean {
 }
 
 /**
- * 从上传的 PNG 新建一个图层。
- * - 全屏：整张地图被该图铺满（backdrop 拉伸），仍可叠加别的局部图层。
- * - 局部：等比放入，可移动/缩放（backdrop + transform），作为一个独立图层。
- * 无论当前文档是否空图层都追加为新图层；若文档尚无任何图层则作为第一个全屏图层。
+ * 将上传的 PNG 导入当前 Zone。
+ * 局部导入是当前 Zone 的增量视觉优化，不创建新的 Zone/layer。
  */
 export function addLayerFromImage(opts: {
   dataUrl: string
@@ -1114,29 +1112,31 @@ export function addLayerFromImage(opts: {
   name?: string
   category: '全屏' | '局部'
 }) {
-  const layerId = uid('ly')
-  const name = opts.name || '图层'
-  const existing = state.doc.layers
-
-  const layer: Layer = {
-    id: layerId,
+  const currentId = state.currentLayerId ?? state.doc.layers[0]?.id
+  if (!currentId) {
+    toast('请先创建一个 Zone，再导入 PNG', 'error')
+    return
+  }
+  const current = state.doc.layers.find((layer) => layer.id === currentId)
+  if (!current) {
+    toast('当前 Zone 不存在，无法导入 PNG', 'error')
+    return
+  }
+  const name = opts.name || current.name
+  const transform = opts.category === '局部'
+    ? (() => {
+        const W = WORLD.w * 0.5
+        const H = (W * opts.pixelHeight) / Math.max(1, opts.pixelWidth)
+        return { scaleX: W / WORLD.w, scaleY: H / WORLD.h, tx: 0, ty: 0 }
+      })()
+    : undefined
+  const updated: Layer = {
+    ...current,
     name,
-    // 全屏底图默认放在 height 0 参与透��；局部贴纸做成独立层(height 空)
-    height: opts.category === '全屏' ? 0 : undefined,
-    backdrop: {
-      image: opts.dataUrl,
-      pixelWidth: opts.pixelWidth,
-      pixelHeight: opts.pixelHeight,
-    },
+    backdrop: { image: opts.dataUrl, pixelWidth: opts.pixelWidth, pixelHeight: opts.pixelHeight },
+    ...(transform ? { transform } : { transform: undefined }),
   }
-  if (opts.category === '局部') {
-    // 局部贴纸等比放入：以原始宽高比在世界里铺一张（1/4 宽），可后续移动缩放。
-    const W = WORLD.w * 0.5
-    const H = (W * opts.pixelHeight) / Math.max(1, opts.pixelWidth)
-    layer.transform = { scaleX: W / WORLD.w, scaleY: H / WORLD.h, tx: 0, ty: 0 }
-  }
-
-  const next = { ...state.doc, layers: [...existing, layer] }
+  const next = { ...state.doc, layers: state.doc.layers.map((layer) => layer.id === currentId ? updated : layer) }
   past.length = 0
   future.length = 0
   setState({
@@ -1144,7 +1144,7 @@ export function addLayerFromImage(opts: {
     diagnostics: validate(next),
     currentLayerId: layerId,
   })
-  toast(opts.category === '全屏' ? `已添加全屏底图图层「${name}」` : `已添加局部贴纸图层「${name}」`, 'ok')
+  toast(opts.category === '全屏' ? `已更新当前 Zone 底图「${name}」` : `已更新当前 Zone 局部视觉「${name}」`, 'ok')
 }
 
 export function newBlankMap() {

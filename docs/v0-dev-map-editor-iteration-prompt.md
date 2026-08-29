@@ -88,7 +88,7 @@
 
 ### 2.2 Catmull-Rom 样条（已正确，保留）
 
-- 曲线绝对穿过所有必经点（非贝塞尔控制点在外；全程只叫"样条线"，不叫贝塞尔）
+- 曲线绝对穿过所有必经点（非贝塞尔控制点在���；全程只叫"样条线"，不叫贝塞尔）
 - 拉弯即追加隐藏样条点（`pushKnot`，Fire-and-Forget，无上限；隐藏点不可见、不可选中、不可二次编辑）
 - 只有松手点吸附节点中心，中间点永不吸附
 - 直线段 `path` 为空数组时按线性插值渲染；非空即切换 Catmull-Rom 逐段穿过样本点
@@ -103,20 +103,20 @@
 
 ---
 
-## 三、图层切换与透明度（上次完全漏掉，必须完整补充）
+## 三、Zone 切换与 PNG 资源（权威）
 
-### 3.1 图层是什么
+### 3.1 Zone 是什么（替代旧楼层图层模型）
 
-- 图层是「楼层/高度」的容器，一个图层一个 `height`
-- **参与透视**的图层：`height` 填一个数值（可为 0，如地面层 height=0）；不同参与透视图层的 height **不能重复**
+- Zone 几乎等同于 layer，是同一份 MapData 中的独立地图区域；每个 Zone 可绑定自己的 PNG。
+- **参与透视**的图层��`height` 填一个数值（可为 0，如地面层 height=0）；不同参与透视图层的 height **不能重复**
 - **独立**的图层：`height` 留空（可多个互相独立、无透视关系），恒不透明
 
 ### 3.2 左栏图层行交互（必须��整）
 
 每行图层：
 - 左：图层名 + 青色亮点
-- 右：**高度数字输入框**（可清空 = 独立层）
-- 点击图层行 = **切换当前图层**
+- 右：Zone 资源状态；不显示高度数字输入框。
+- 点击 Zone 行 = 切换当前 Zone；其他 Zone 不渲染、不编辑。
 - 图层高度输入：填数字则参与透视；清空则独立
 - 高度冲突时提示「参与透视的图层高度不可重复」并拒绝
 
@@ -155,7 +155,7 @@ opacity = clamp(1 − |Δheight| × 0.1, 0, 1)
 
 **选中场景（节点+高光点）时**：
 - 名称输入框（改节点 name）
-- 尺度下拉（大/中/小）
+- 尺���下拉（大/中/小）
 - X / Y 数字输入框（改锚点坐标，归一化 0-1）
 - 楼层数字框（改节点 floor，自动登记进 map.floors）
 - 上级场景框（parent，可留空 = 顶层；下拉选择存在的节点 id。合法嵌套：large→medium→small，small 不可再含下级）
@@ -284,19 +284,18 @@ opacity = clamp(1 − |Δheight| × 0.1, 0, 1)
 
 ## 十、补充的真实数据模型（用这个替换你推测的）
 
-真实导出是 **canonical v2**（`schemaVersion: '2.0'`，`layers[]` + 节点 `layerId`，**不写 legacy `floors`/`floor`**；legacy v1 只在导入边界经 `normalizeMapDocument` 规范化）。所有坐标是 `[0,1]` 归一化：
+真实导出是 **canonical v3**（`schemaVersion: '3.0'`，`layers[]` 作为 Zone 集合 + 节点 `layerId` + nullable `floor`；每个 Zone 可绑定独立 PNG，运行时一次只激活一个 Zone）。legacy v1 只在导入边界经 `normalizeMapDocument` 规范化。所有坐标是 `[0,1]` 归一化：
 
 ```typescript
 interface MapData {                       // CanonicalMapData
-  schemaVersion: '2.0';
+  schemaVersion: '3.0';
   id: string;                             // 玩家命名 + 随机 key
   name: string;
   backdrop: { image: string; pixelWidth: number; pixelHeight: number; tileRows: number; tileCols: number };
-  layers: Array<{                         // 图层（权威）
+  layers: Array<{                         // Zone（几乎等同 layer；一次只激活一个）
     id: string;                           // 稳定命名
     name?: string;
-    height?: number;                      // 可空；填数值=参与透视（去重），留空=独立层
-    backdrop?: { image: string; pixelWidth: number; pixelHeight: number };
+    backdrop?: { image: string; pixelWidth: number; pixelHeight: number }; // Zone PNG
     transform?: { scaleX: number; scaleY: number; tx: number; ty: number };
   }>;
 
@@ -305,8 +304,8 @@ interface MapData {                       // CanonicalMapData
     def: string;                          // 如 'd:scene/yard'
     scale: 'large' | 'medium' | 'small';
     at: { x: number; y: number };         // 归一化坐标 = 高光点位置
-    layerId: string;                      // 引用 layers[].id（编辑内部以 floor 为轴，导出时按图层就近归类）
-    parent?: string;                      // 上级场景 id；留空=顶层。已定义+已校验（3 条码），运行期未接通
+    layerId: string;                      // 引用 layers[].id；每个节点只属于一个 Zone
+    floor: number | null;                  // 当前 Zone 内相对高度排序，不推导跨 Zone 方向
     name?: string;                        // '月台' 等
   }>;
 
@@ -316,6 +315,7 @@ interface MapData {                       // CanonicalMapData
     a: string;                            // 起点节点 id
     b: string;                            // 终点节点 id
     directionality: 'bidirectional' | 'unidirectional' | 'one-way-up' | 'one-way-down';
+    interaction?: 'move' | 'attack' | 'perception'; // 跨 Zone 仅允许 move
     path: Array<{ x: number; y: number }>;// 折线，首=起点锚点尾=终点锚点；空数组=直线
     transitionWindow?: { control: Array<{ x: number; y: number }> };  // 仅双向连接有意义
     visualObstruction?: { shape: 'box' | 'circle' | 'polygon'; bounds?: Array<Vec2>; height?: number };
@@ -344,7 +344,7 @@ interface MapData {                       // CanonicalMapData
 1. **先修数据模型**：节点是点（at）+ 场景框是显示边界，把「场景框=节点」的错误认知改掉
 2. **加高光点**：每个节点中心渲染青色锚点，作为连线起点/终点
 3. **加场景框聚合/合并/空洞/粘连**：涂鸦式几何（如果工程量过大，至少把「点击场景框选中整个场景 + 高光点自动算中心」做对）
-4. **补图层切换与透明度公式**：图层行点击切换 + overlayOpacity 透明度 + 裁剪（当前层全彩、下层半透明、更高层淡显）
+4. **补 Zone 切换与资源绑定**：Zone 行点击切换；当前 Zone 单独显示 PNG、节点和可编辑元素；其他 Zone 不叠加、不参与编辑
 5. **补诊断列表点击定位 + correction 悬浮 + 红/黄脉冲**
 6. **补遮挡框点击选中 + 语义锚点 + 过渡窗口独立拖拽**
 
