@@ -40,13 +40,14 @@ describe('MapData v3 zone contract', () => {
     expect(codes({ ...canonical(), nodes: [{ id: 'a', def: 'd:scene/room', scale: 'medium', at: { x: 0.2, y: 0.3 }, layerId: 'missing', floor: null }] })).toContain('MAP_LAYER_REF_NOT_FOUND');
   });
 
-  it('rejects cross-zone edges and missing concrete defs', () => {
+  it('allows cross-zone movement but rejects cross-zone interaction semantics', () => {
     const map: CanonicalMapData = {
       ...canonical(),
       layers: [{ id: 'zone:a' }, { id: 'zone:b' }],
       nodes: [canonical().nodes[0]!, { ...canonical().nodes[0]!, id: 'b', layerId: 'zone:b' }],
-      edges: [{ id: 'e', def: '', a: 'a', b: 'b', directionality: 'bidirectional', path: [{ x: 0.2, y: 0.3 }, { x: 0.2, y: 0.3 }] }],
+        edges: [{ id: 'e', def: 'd:transition/door', a: 'a', b: 'b', directionality: 'bidirectional', interaction: 'move', path: [{ x: 0.2, y: 0.3 }, { x: 0.2, y: 0.3 }] }],
     };
-    expect(codes(map)).toEqual(expect.arrayContaining(['MAP_CROSS_ZONE_INTERACTION_FORBIDDEN', 'MAP_EDGE_DEF_UNREGISTERED']));
+    expect(codes(map)).not.toContain('MAP_CROSS_ZONE_INTERACTION_FORBIDDEN');
+    expect(codes({ ...map, edges: [{ ...map.edges[0]!, interaction: 'attack' }] })).toContain('MAP_CROSS_ZONE_INTERACTION_FORBIDDEN');
   });
 });

@@ -59,7 +59,7 @@ export interface LayerTransform {
   ty: number
 }
 
-/** 当前 Zone 内的背景/覆盖图层，不表达楼层或空间切换。 */
+/** Zone 几乎等同于 layer：地图包中的独立视觉区域；画布一次只显示当前 Zone，不表达同时叠加。 */
 export interface Layer {
   id: string
   name: string
@@ -117,6 +117,8 @@ export interface Edge {
   from: string
   to: string
   directionality: EdgeDirectionality
+  /** 跨 Zone 仅允许移动；旧文档未声明时按移动兼容。 */
+  interaction?: 'move' | 'attack' | 'perception'
   /** 必经点，世界坐标，含首尾端点（渲染时端点会被 nodeAnchor 覆盖，此处
    *  仅作初值/回退）；中间为折点。Catmull-Rom 穿过全部点。
    *  中间点可能带 hidden 标记（见 EdgePoint） */
@@ -202,6 +204,7 @@ export interface MapData {
     from: string
     to: string
     directionality: EdgeDirectionality
+    interaction?: 'move' | 'attack' | 'perception'
     path: Vec[]
     transitionWindow?: Vec
     visualObstruction?: string[]
@@ -276,7 +279,7 @@ export function sceneGroupBBox(boxes: SceneBox[]): {
 }
 
 /** 高光点：优先用聚合外接矩形中心；若该节点没有任何成员框（极端情况），
- *  回退到节点上手动存的 `at`。这是全部连线端点、悬停/选中锚点的唯一权威
+ *  回退��节点上手动存的 `at`。这是全部连线端点、悬停/选中锚点的唯一权威
  *  来源——不要在别处再手写"取矩形中心"的逻辑。 */
 export function nodeAnchor(nodeId: string, doc: MapDoc): Vec {
   const node = doc.sceneNodes.find((n) => n.id === nodeId)

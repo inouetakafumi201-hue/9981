@@ -635,6 +635,7 @@ export function addEdge(fromId: string, toId: string, points: Vec[]): string {
     from: fromId,
     to: toId,
     directionality: 'bidirectional',
+    interaction: 'move',
     points: pts.length >= 2 ? pts : [fromAnchor, toAnchor],
     semanticAnchor: 'neutral',
   }

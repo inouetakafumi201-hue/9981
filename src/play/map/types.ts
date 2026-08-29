@@ -113,6 +113,8 @@ export interface MapEdge {
   readonly a: string;
   readonly b: string;
   readonly directionality: Directionality;
+  /** 跨 Zone 连接的交付语义；省略时兼容旧数据并按移动处理。 */
+  readonly interaction?: 'move' | 'attack' | 'perception';
   /**
    * 手绘曲线，归一化坐标。至少两点，首尾分别贴合 a、b 的节点坐标。
    * 直接喂给运动核做沿路动画；为空时渲染层退化为直线。
@@ -143,7 +145,7 @@ export interface MapPlacement {
    * 放置参数覆写。值是字面量。
    *
    * 键名不得与 Expr 判别键（`path`/`op`/`call`/`q`/`var`）相同：`PrefabDef.entities[].overrides`
-   * 的类型是 `Record<string, Expr>`，而 `Expr` 是**非判别联合**——含这些键名的字面对象会被
+   * 的类型是 `Record<string, Expr>`，而 `Expr` 是**非判别联合**——含这些键名��字面对象会被
    * 求值器误读为 Expr 节点而不是数据（该歧义在 `kernel/state/expr-types.ts` 中已注明）。
    * `path` 尤其危险，它是地图语境下极自然的字段名。
    */
@@ -203,7 +205,7 @@ export interface LayerTransform {
   readonly ty: number;
 }
 
-/** Zone 是互相独立的地图区域，不承载几何高度关系。 */
+/** Zone 几乎等同于 layer：同一地图包中的独立视觉区域；运行时一次只激活一个 Zone，不承载几何高度关系。 */
 export interface MapLayer {
   readonly id: string;
   readonly name?: string;
@@ -349,6 +351,7 @@ function normalizeMapEdge(edge: MapEdge): MapEdge {
     a: edge.a,
     b: edge.b,
     directionality: edge.directionality,
+    ...(edge.interaction !== undefined ? { interaction: edge.interaction } : {}),
     path: edge.path.map(clonePoint),
     ...(edge.visualObstruction !== undefined ? { visualObstruction: normalizeObstruction(edge.visualObstruction) } : {}),
     ...(edge.physicalObstruction !== undefined ? { physicalObstruction: normalizeObstruction(edge.physicalObstruction) } : {}),

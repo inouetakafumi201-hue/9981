@@ -40,6 +40,7 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
   const edges: MapEdge[] = doc.edges.map((edge) => ({
     id: edge.id, def: edge.def ?? DEFAULT_EDGE_DEF, a: edge.from, b: edge.to,
     directionality: edge.directionality as Directionality,
+    ...(edge.interaction !== undefined ? { interaction: edge.interaction } : {}),
     path: edge.points.map((point) => ({ x: nx(point.x), y: ny(point.y) })),
     ...(edge.semanticAnchor !== undefined ? { semanticAnchor: edge.semanticAnchor === 'highland' ? 'high' : edge.semanticAnchor === 'lowland' ? 'low' : 'neutral' } : {}),
   }))
@@ -63,6 +64,7 @@ export function canonicalToEditorDoc(map: CanonicalMapData): MapDoc {
   const edges: Edge[] = map.edges.flatMap((edge) => ids.has(edge.a) && ids.has(edge.b) ? [{
     id: edge.id, from: edge.a, to: edge.b, def: edge.def,
     directionality: edge.directionality as Edge['directionality'],
+    ...(edge.interaction !== undefined ? { interaction: edge.interaction } : {}),
     points: edge.path.map((point) => ({ x: wx(point.x), y: wy(point.y) })),
     ...(edge.semanticAnchor ? { semanticAnchor: edge.semanticAnchor === 'high' ? 'highland' : edge.semanticAnchor === 'low' ? 'lowland' : 'neutral' } : {}),
   }] : [])

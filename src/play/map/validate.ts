@@ -70,7 +70,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
   const canonicalShape = hasCanonicalLayerFields(map);
   const floors = new Set(mapView.floors ?? []);
 
-  // 图层契约（canonical layers/layerId）：canonical 与 legacy 冲突、layerId 唯一、height 规则等。
+  // Zone 契约（layers/layerId）：canonical 与 legacy 冲突、Zone id 唯一、floor 规则等。
   // legacy 楼层声明检查走 validateLegacyFloorDeclaration（逐节点一条），避免同一条诊断出现两次。
   if (!canonicalShape) {
     findings.push(...validateLegacyFloorDeclaration(map, floors));
@@ -122,7 +122,14 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
     if (map.schemaVersion === '3.0') {
       const a = map.nodes.find((node) => node.id === edge.a);
       const b = map.nodes.find((node) => node.id === edge.b);
-      if (a && b && a.layerId !== b.layerId) findings.push({ code: 'MAP_CROSS_ZONE_INTERACTION_FORBIDDEN', severity: 'error', path, subject: edge.id, message: '连接不能跨 zone。', correction: '仅连接同一 zone 内的节点。' });
+      if (a && b && a.layerId !== b.layerId && edge.interaction !== 'move') findings.push({
+        code: 'MAP_CROSS_ZONE_INTERACTION_FORBIDDEN',
+        severity: 'error',
+        path: `${path}/interaction`,
+        subject: edge.id,
+        message: `连接「${edge.id}」跨 Zone，但交付语义是「${edge.interaction ?? '未声明'}」。`,
+        correction: '跨 Zone 只允许 move；攻击、感知等语义必须改为 Zone 内连接。',
+      });
     }
     if (seenEdgeIds.has(edge.id)) {
       findings.push({
