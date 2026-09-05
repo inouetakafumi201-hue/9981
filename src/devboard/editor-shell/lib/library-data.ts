@@ -12,6 +12,7 @@
    青色辉光、灯火类叠暖色辉光，在同一套像素资源上还原「像素前景 + 暖光全息」。
    ========================================================================= */
 
+import type { MaterialPlacementMode, RuntimeEntityRef } from '../../../meta-state/types'
 import type { MaterialCategory } from './materials'
 import { CATEGORIES, tileStyle } from './materials'
 
@@ -70,7 +71,11 @@ export type MaterialSource = 'standard' | 'ugc' | 'craft'
 export interface MaterialMeta {
   id: string
   name: string
+  /** 八类逻辑素材分类，不是视觉筛选猜测值。 */
   category: MaterialCategory
+  /** 装饰恒为 presentation-only；其他素材放置时可自动降级。 */
+  defaultPlacementMode?: MaterialPlacementMode
+  runtimeEntityRef?: RuntimeEntityRef
   quality: Quality
   owned: boolean
   source: MaterialSource
@@ -164,7 +169,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'locker_7f3a',
     name: '储物柜',
-    category: '装置',
+    category: '机关装置',
     quality: 3,
     owned: true,
     source: 'standard',
@@ -182,7 +187,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'sensor_light_02',
     name: '感应灯',
-    category: '照明',
+    category: '装饰',
     quality: 2,
     owned: false,
     source: 'standard',
@@ -200,7 +205,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'bench_a1',
     name: '长椅',
-    category: '陈设',
+    category: '装饰',
     quality: 1,
     owned: true,
     source: 'standard',
@@ -218,7 +223,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'dream_beacon',
     name: '梦能灯塔',
-    category: '装置',
+    category: '机关装置',
     quality: 5,
     owned: true,
     source: 'craft',
@@ -236,7 +241,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'echo_altar',
     name: '回响祭坛',
-    category: '交互',
+    category: '机关装置',
     quality: 4,
     owned: false,
     source: 'ugc',
@@ -254,7 +259,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'gear_assembly',
     name: '齿轮组件',
-    category: '装置',
+    category: '机关装置',
     quality: 4,
     owned: true,
     source: 'craft',
@@ -272,7 +277,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'dream_shard',
     name: '梦境碎片',
-    category: '线索',
+    category: '物品',
     quality: 3,
     owned: false,
     source: 'standard',
@@ -290,7 +295,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'signal_lamp',
     name: '信号灯',
-    category: '交互',
+    category: '机关装置',
     quality: 2,
     owned: true,
     source: 'standard',
@@ -308,7 +313,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'faded_signpost',
     name: '褪色路牌',
-    category: '线索',
+    category: '物品',
     quality: 1,
     owned: false,
     source: 'ugc',
@@ -326,7 +331,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'tattered_curtain',
     name: '破旧布帘',
-    category: '遮挡',
+    category: '容器',
     quality: 1,
     owned: true,
     source: 'standard',
@@ -343,23 +348,22 @@ const FEATURED: MaterialMeta[] = [
   },
 ]
 
-/** 用 6 分类词库派生更多条目，把目录撑到多页量级（星标/角标/品级轮换分布） */
+/** 用八类逻辑词库派生更多条目，把目录撑到多页量级。 */
 const NAMES: Record<MaterialCategory, string[]> = {
-  装置: ['控制台', '配电箱', '通风口', '水管阀', '监控杆', '发电机', '售货机', '安检门', '广播塔', '维修梯', '闸机'],
-  照明: ['应急灯', '壁灯', '射灯', '荧光管', '探照灯', '烛台', '霓虹牌', '地脚灯', '手电', '灯箱', '吊灯'],
-  陈设: ['书架', '餐桌', '衣柜', '地毯', '盆栽', '窗帘', '挂钟', '画框', '床铺', '沙发', '柜台'],
-  交互: ['拉杆', '按钮台', '密码锁', '对讲机', '电话', '开关箱', '感应门', '售票机', '终端', '手轮', '踏板'],
-  线索: ['便签', '血迹', '脚印', '照片', '录音带', '日记', '钥匙', '票根', '涂鸦', '残页', '档案'],
-  遮挡: ['木箱', '铁栏', '屏风', '货架', '幕布', '集装箱', '路障', '沙袋', '隔断', '铁皮', '卷帘'],
+  'AI 单位': ['巡逻无人机', '安保机器人', '搜救机蜂', '自动炮塔', '维修傀儡'],
+  NPC: ['站务员', '商人', '医生', '维修师', '守卫'],
+  载具: ['轨道车', '装甲车', '升降平台', '运输车', '叉车'],
+  容器: ['木箱', '储物柜', '货架', '保险柜', '补给箱'],
+  物品: ['便签', '照片', '录音带', '日记', '钥匙'],
+  机关装置: ['控制台', '配电箱', '水管阀', '发电机', '密码锁'],
+  装饰: ['应急灯', '长椅', '地毯', '盆栽', '海报'],
+  过渡场景: ['楼梯', '安全门', '通风管', '电梯', '舱门'],
 }
 
 const CAT_TILES: Record<MaterialCategory, number[]> = {
-  装置: [0, 15, 44, 52, 63, 13, 33, 43],
-  照明: [14, 20, 59, 60, 36, 39],
-  陈设: [23, 48, 49, 54, 51, 25],
-  交互: [12, 45, 50, 38, 22, 37],
-  线索: [17, 29, 30, 61, 32, 28],
-  遮挡: [16, 5, 10, 58, 24, 42, 11, 26],
+  'AI 单位': [2, 3, 4, 5], NPC: [6, 7, 8, 9], 载具: [10, 11, 12, 13],
+  容器: [16, 5, 10, 58], 物品: [17, 29, 30, 61], 机关装置: [0, 15, 44, 52],
+  装饰: [14, 20, 23, 48], 过渡场景: [24, 25, 26, 27],
 }
 
 const SOURCE_CYCLE: MaterialSource[] = ['standard', 'standard', 'standard', 'ugc', 'craft', 'standard']
@@ -385,6 +389,7 @@ function derive(): MaterialMeta[] {
           id: `${cat}_${round}_${i}`,
           name: round === 0 ? name : `${name}·变体${round}`,
           category: cat,
+          defaultPlacementMode: cat === '装饰' ? 'presentation-only' : 'native',
           quality,
           owned,
           source,
@@ -395,7 +400,7 @@ function derive(): MaterialMeta[] {
           weakness: source === 'craft' && n % 3 === 0 ? '弱点：结构易碎' : null,
           equippedTokens: tokensFrom(mask, n + 13),
           tile,
-          glow: cat === '线索' && i % 4 === 0 ? 'cyan' : cat === '照明' && i % 3 === 0 ? 'warm' : null,
+          glow: cat === '物品' && i % 4 === 0 ? 'cyan' : cat === '装饰' && i % 3 === 0 ? 'warm' : null,
           desc: `${name}——梦境场景常用的${cat}预制体，可直接拖入画布布置。`,
           freeRemaining: limitedFree ? `${(n % 14) + 1}天${(n % 12) + 1}小时` : null,
         })

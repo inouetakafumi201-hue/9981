@@ -98,7 +98,9 @@ export function compileMap(map: MapDataDocument, prefabId?: string): CompileResu
     kind: 'prefab',
     nodes: canonical.nodes.map(nodeSpecOf),
     links: canonical.edges.map(linkSpecOf),
-    entities: canonical.placements.map(entitySpecOf),
+    entities: canonical.placements
+      .filter((placement) => placement.placementMode !== 'presentation-only')
+      .map(entitySpecOf),
   };
 
   return {

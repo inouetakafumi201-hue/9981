@@ -32,6 +32,9 @@ export interface ObstructionSpec {
 /** 过渡窗口的样条过渡点（平滑样条的外插补充定位点）。 */
 export interface TransitionWindowPoints {
   readonly control: readonly Vec2[];
+  /** 直接绑定的过渡场景素材；旧地图可缺省并由诊断提示补齐。 */
+  readonly materialId?: string;
+  readonly logicCategory?: '过渡场景';
 }
 
 /**
@@ -129,7 +132,7 @@ export interface MapNode {
 /**
  * 一条过渡连接。
  *
- * **本类型故意没有 `weight` 字段。** 通行代价属于门户类型（走廊 1 AP、门锁 2 AP、跳窗 0 AP……
+ * **本类型故意没有 `weight` 字段��** 通行代价属于门户类型（走廊 1 AP、门锁 2 AP、跳窗 0 AP……
  * 见 docs/L2_基类层/03_空间系统.md 门户系统一节），不是地图作者逐边填的数。作者选 `def`，
  * 数值由该门户类型在基类层声明——否则同一类楼梯会在不同地图里代价不同，平衡数值就散了。
  *
@@ -168,11 +171,18 @@ export interface MapEdge {
  * 过地图边界一律内联而非引用（见 06_创作系统与产权 第四节），所以这里没有"引用外部实例库"的
  * 字段——`def` 与 `overrides` 合起来就是快照本身，地图自包含。
  */
+export type MapMaterialLogicCategory = 'AI 单位' | 'NPC' | '载具' | '容器' | '物品' | '机关装置' | '装饰' | '过渡场景';
+export type MapMaterialPlacementMode = 'native' | 'presentation-only';
+
 export interface MapPlacement {
   readonly id: string;
-  /** 宿主节点 id。 */
+  /** 宿主节点 id；场景外仅表现素材为空字符串。 */
   readonly at: string;
   readonly def: string;
+  readonly logicCategory?: MapMaterialLogicCategory;
+  readonly placementMode?: MapMaterialPlacementMode;
+  /** 表现坐标；用于恢复场景外素材的编辑位置。 */
+  readonly position?: Vec2;
   /**
    * 放置参数覆写。值是字面量。
    *
@@ -482,6 +492,8 @@ function normalizeObstruction(spec: ObstructionSpec): ObstructionSpec {
 function normalizeTransitionWindow(window: TransitionWindowPoints): TransitionWindowPoints {
   return {
     control: window.control.map(clonePoint),
+    ...(window.materialId !== undefined ? { materialId: window.materialId } : {}),
+    ...(window.logicCategory !== undefined ? { logicCategory: window.logicCategory } : {}),
   };
 }
 
@@ -505,6 +517,9 @@ function normalizeMapPlacement(placement: MapPlacement): MapPlacement {
     id: placement.id,
     at: placement.at,
     def: placement.def,
+    ...(placement.logicCategory !== undefined ? { logicCategory: placement.logicCategory } : {}),
+    ...(placement.placementMode !== undefined ? { placementMode: placement.placementMode } : {}),
+    ...(placement.position !== undefined ? { position: clonePoint(placement.position) } : {}),
     ...(placement.overrides !== undefined ? { overrides: { ...placement.overrides } } : {}),
     ...(placement.temporaryFree !== undefined ? { temporaryFree: placement.temporaryFree } : {}),
   };

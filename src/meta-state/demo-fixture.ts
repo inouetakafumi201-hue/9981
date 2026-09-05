@@ -12,6 +12,8 @@ export function createDemoMetaStateStore(): MetaStateStore {
     textureAssetRef: assetRefForView('asset:demo-locker', 'world-top-down'),
     quality: 1 as const,
     displayCategory: '装置' as const,
+    logicCategory: '容器' as const,
+    defaultPlacementMode: 'native' as const,
   }
   const state: MetaState = {
     identities: { [identity.id]: identity },
