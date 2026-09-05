@@ -352,7 +352,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         severity: 'error',
         path,
         subject: edge.id,
-        message: `连接「${edge.id}」的两个端点是同一个�������点。`,
+        message: `连接「${edge.id}」的两个端点是同一个���������点。`,
         correction: '自环没有通行含义。把一端接到别的节点，或删掉这条连接。',
       });
     } else if (endpointsExist) {
@@ -415,6 +415,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
       });
     }
     findings.push(...validateEdgeDataFields(edge, path));
+    findings.push(...validateLegacyTransitionWindow(edge, path, nodeById));
     findings.push(...validateTransitionInstances(edge, path, nodeById));
     // 曲线自身的校验（点数、坐标范围、首尾吸附），反向用例命中的正是这些。
     findings.push(...validateEdgePath(map as MapData, index, nodeById));
@@ -662,6 +663,30 @@ function validateEdgeDataFields(edge: MapEdge, path: string): readonly MapDiagno
   return findings;
 }
 
+function validateLegacyTransitionWindow(
+  edge: MapEdge,
+  path: string,
+  nodeById: ReadonlyMap<string, MapNode>,
+): readonly MapDiagnostic[] {
+  const window = edge.transitionWindow
+  if (window === undefined || edge.transitionInstances?.length || !window.materialId) return []
+  const control = window.control[0]
+  const fromNode = nodeById.get(edge.a)
+  const toNode = nodeById.get(edge.b)
+  if (control === undefined || fromNode === undefined || toNode === undefined) return []
+  const fromDistance = distance(control, fromNode.at)
+  const toDistance = distance(control, toNode.at)
+  if (Math.abs(fromDistance - toDistance) >= 1e-9) return []
+  return [{
+    code: 'MAP_TRANSITION_LEGACY_AMBIGUOUS',
+    severity: 'warning',
+    path: `${path}/transitionWindow/control/0`,
+    subject: edge.id,
+    message: `旧过渡窗口「${edge.id}」到两端距离相同，无法确定应绑定哪一侧。`,
+    correction: '把控制点拖近起点或终点，或直接改用新的端点过渡实例格式。',
+  }]
+}
+
 function validateTransitionInstances(
   edge: MapEdge,
   path: string,
@@ -703,11 +728,27 @@ function validateTransitionInstances(
         message: `过渡实例「${instance.id}」没有素材身份。`, correction: '选择一个逻辑分类为“过渡场景”的素材。',
       });
     }
-    if (!instance.microSceneId.trim() || !nodeById.has(instance.microSceneId)) {
+    const microScene = instance.microSceneId.trim() ? nodeById.get(instance.microSceneId) : undefined;
+    if (microScene === undefined) {
       findings.push({
         code: 'MAP_TRANSITION_MICRO_SCENE_MISSING', severity: 'error', path: `${instancePath}/microSceneId`, subject: edge.id,
         message: `过渡实例「${instance.id}」引用的微型场景不存在。`, correction: '重新绑定端点，让编辑器自动创建或复用微型场景。',
       });
+    } else {
+      const expectedParent = instance.endpoint === 'from' ? edge.a : instance.endpoint === 'to' ? edge.b : undefined;
+      if (microScene.def !== 'd:scene/micro-transition' || microScene.scale !== 'small' || microScene.parent !== expectedParent) {
+        findings.push({
+          code: 'MAP_TRANSITION_MICRO_SCENE_INVALID', severity: 'error', path: `${instancePath}/microSceneId`, subject: edge.id,
+          message: `过渡实例「${instance.id}」引用的节点不是合法的端点微型场景。`, correction: '让微型场景使用 d:scene/micro-transition、小尺度，并挂到对应端点场景下。',
+        });
+      }
+      const endpointNode = expectedParent === undefined ? undefined : nodeById.get(expectedParent);
+      if (endpointNode !== undefined && distance(instance.position, endpointNode.at) > SNAP_TOLERANCE) {
+        findings.push({
+          code: 'MAP_TRANSITION_POSITION_NOT_SNAPPED', severity: 'error', path: `${instancePath}/position`, subject: edge.id,
+          message: `过渡实例「${instance.id}」的位置没有吸附到${instance.endpoint === 'from' ? '起点' : '终点'}。`, correction: '把位置重置为对应端点坐标，不要把过渡实例放在边的中段。',
+        });
+      }
     }
     if (!isNormalized(instance.position)) {
       findings.push({

@@ -241,7 +241,12 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
     const legacyWindow = e.transitionWindow?.materialId !== undefined && !e.transitionInstances?.length ? e.transitionWindow : undefined
     const control = legacyWindow?.control[0]
     const legacyEndpoint = control && fromNode && toNode
-      ? (Math.hypot(control.x - fromNode.at.x / WORLD.w, control.y - fromNode.at.y / WORLD.h) <= Math.hypot(control.x - toNode.at.x / WORLD.w, control.y - toNode.at.y / WORLD.h) ? 'from' : 'to')
+      ? (() => {
+          const fromDistance = Math.hypot(control.x - fromNode.at.x / WORLD.w, control.y - fromNode.at.y / WORLD.h)
+          const toDistance = Math.hypot(control.x - toNode.at.x / WORLD.w, control.y - toNode.at.y / WORLD.h)
+          if (Math.abs(fromDistance - toDistance) < 1e-9) return undefined
+          return fromDistance < toDistance ? 'from' : 'to'
+        })()
       : undefined
     const migratedInstances = control && legacyWindow && legacyEndpoint
       ? [{
@@ -307,7 +312,7 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
     return [edge]
   })
 
-  // 场景框：按节点锚点生成一个默认矩形，让节点在画布上有可视实体。
+  // 场景框：按节点���点生成一个默认矩形，让节点在画布上有可视实体。
   const sceneBoxes = sceneNodes.map((n, i) => {
     const w = n.scale === 'large' ? 200 : n.scale === 'medium' ? 140 : 90
     const h = n.scale === 'large' ? 120 : n.scale === 'medium' ? 84 : 56
