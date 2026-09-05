@@ -249,6 +249,24 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
       });
     }
 
+    if (node.frame !== undefined) {
+      const frame = node.frame;
+      const valid = Number.isFinite(frame.x) && Number.isFinite(frame.y)
+        && Number.isFinite(frame.width) && Number.isFinite(frame.height)
+        && frame.x >= 0 && frame.y >= 0 && frame.width > 0 && frame.height > 0
+        && frame.x + frame.width <= 1 && frame.y + frame.height <= 1;
+      if (!valid) {
+        findings.push({
+          code: 'MAP_INVALID_SCENE_FRAME',
+          severity: 'error',
+          path: `${path}/frame`,
+          subject: node.id,
+          message: `节点「${node.name ?? node.id}」的场景框必须是归一化坐标 [0,1] 范围内的正矩形。`,
+          correction: '确保场景框的 x, y, width, height 为有限数字，且完全落在 0 到 1 范围内并具有正面积。',
+        });
+      }
+    }
+
     // canonical 节点用 layerId（validateLayerContract 守）；legacy 节点的楼层声明检查
     // 已由 validateLegacyFloorDeclaration 提前整体报出（每个未声明节点一条），节点循环
     // 内不再重复报，避免同一条诊断出现两次。
@@ -334,7 +352,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         severity: 'error',
         path,
         subject: edge.id,
-        message: `连接「${edge.id}」的两个端点是同一个节点。`,
+        message: `连接「${edge.id}」的两个端点是同一个�����点。`,
         correction: '自环没有通行含义。把一端接到别的节点，或删掉这条连接。',
       });
     } else if (endpointsExist) {
@@ -386,6 +404,16 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         });
       }
     }
+    if (edge.transitionWindow !== undefined && !edge.transitionWindow.materialId) {
+      findings.push({
+        code: 'MAP_TRANSITION_MATERIAL_REQUIRED',
+        severity: 'error',
+        path: `${path}/transitionWindow/materialId`,
+        subject: edge.id,
+        message: `连接「${edge.id}」的过渡窗口没有绑定过渡场景素材。`,
+        correction: '从素材库把“过渡场景”分类素材拖到这条连线上。',
+      });
+    }
     findings.push(...validateEdgeDataFields(edge, path));
     // 曲线自身的校验（点数、坐标范围、首尾吸附），反向用例命中的正是这些。
     findings.push(...validateEdgePath(map as MapData, index, nodeById));
@@ -427,7 +455,20 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
     }
     seenPlacementIds.add(placement.id);
 
-    if (!nodeById.has(placement.at)) {
+    if (placement.logicCategory === '过渡场景') {
+      findings.push({
+        code: 'MAP_TRANSITION_AS_PLACEMENT', severity: 'error', path: `${path}/logicCategory`, subject: placement.id,
+        message: `过渡场景素材「${placement.id}」被错误保存为普通 placement。`,
+        correction: '删除该 placement，并把过渡场景素材直接拖到地图连线上。',
+      });
+    }
+    if (placement.logicCategory === '装饰' && placement.placementMode !== 'presentation-only') {
+      findings.push({
+        code: 'MAP_DECORATION_MUST_BE_PRESENTATION_ONLY', severity: 'error', path: `${path}/placementMode`, subject: placement.id,
+        message: `装饰素材「${placement.id}」不能声明原生玩法逻辑。`, correction: '把 placementMode 改为 presentation-only。',
+      });
+    }
+    if (!nodeById.has(placement.at) && placement.placementMode !== 'presentation-only') {
       findings.push({
         code: 'MAP_PLACEMENT_HOST_NOT_FOUND',
         severity: 'error',
@@ -448,7 +489,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         message: `放置「${placement.id}」的覆写用了保留键名「${key}」。`,
         correction:
           `${EXPR_DISCRIMINANT_KEYS.join('、')} 这几个键名会被表达式求值器当成表达式而不是数据，`
-          + `导致个值被静默误解。换一个名字，例如「${key}Value」。`,
+          + `导致这个值被静默误解。换一个名字，例如「${key}Value」。`,
       });
     }
   });
@@ -719,10 +760,10 @@ function hasCanonicalLayerFields(map: MapDataDocument): boolean {
  * Canonical 图层契约校验（MapData floor→layers 契约扩展，Task 2）。
  * 只对 canonical 形状（`layers` / `node.layerId`）生效。校验项：
  * - layer id 必填且唯一；
- * - node.layerId 必须命中 `layers` 中的唯一图层；
+ * - node.layerId 必须命中 `layers` 中的唯���图层；
  * - 参与透视（填了 height）的 height 必须有限、非负；
  * - 参与透视的 height 不能重复（同图内）；
- * - legacy `floor` / `floors` 字段不可与 canonical 并存（冲突拒绝）。
+ * - legacy `floor` / `floors` 字段不可与 canonical 并存��冲突拒绝）。
  * legacy floor 形态（schemaVersion '1.0'）不由此校验处理——它在导入边界就被规范化。
  */
 export function validateLayerContract(map: MapDataDocument): readonly MapDiagnostic[] {
