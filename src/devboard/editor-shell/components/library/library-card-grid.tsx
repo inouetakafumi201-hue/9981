@@ -169,7 +169,7 @@ function Card({ asset, selected }: { asset: MaterialMeta; selected: boolean }) {
 
         {/* 悬停气泡（名称/类别/品级） */}
         <div className="pointer-events-none absolute left-1/2 top-1 z-20 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-black/90 px-2 py-1 font-sans text-[11px] text-[color:var(--lib-text)] opacity-0 shadow-lg ring-1 ring-[color:var(--lib-line)] transition-opacity group-hover:opacity-100">
-          {asset.name} · {asset.category}
+          {asset.name} · {asset.category} · {asset.category === '装饰' ? '仅表现' : asset.category === '过渡场景' ? '绑定连线' : '原生逻辑'}
         </div>
 
         {/* 名称 + 分类 */}
