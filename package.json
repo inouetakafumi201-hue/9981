@@ -16,6 +16,7 @@
     "audit:icons": "node scripts/audit-icon-semantics.mjs",
     "asset:generate": "node scripts/asset-pipeline/generate-sample-map.mjs",
     "asset:pipeline": "tsx scripts/asset-pipeline/validate-and-compile.mjs",
+    "asset:components": "node scripts/asset-pipeline/batch-component-pipeline.mjs",
     "asset:v2": "python3 .agents/skills/sprite-forge/tools/asset-pipeline-v2.py",
     "asset:view": "node scripts/asset-pipeline/map-to-mermaid.mjs",
     "asset:register-characters": "node scripts/asset-pipeline/register-character-assets.mjs",
