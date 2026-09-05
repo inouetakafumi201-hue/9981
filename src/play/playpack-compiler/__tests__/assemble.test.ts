@@ -14,15 +14,26 @@ import { PlaypackLoader } from '../../../core/kernel/schedule/playpack';
 import { DefRegistry } from '../../../core/kernel/state/def';
 
 function makeInput(overrides?: Partial<PlaypackInput>): PlaypackInput {
+  const manifests = new Map(overrides?.manifests ?? []);
+  for (const [path, source] of [...manifests]) {
+    try {
+      const map = JSON.parse(source) as { id?: string; nodes?: readonly { id: string }[]; kind?: string };
+      if (map.kind !== 'map-play' && map.id && Array.isArray(map.nodes)) {
+        manifests.set(`${path}.map-play.json`, JSON.stringify({
+          schemaVersion: '2.0', kind: 'map-play', mapPlayId: `map-play:${map.id}`, mapId: map.id,
+          mapDataEntryId: path, entryNodeId: map.nodes[0]?.id ?? 'missing',
+          capabilities: { rules: [], conditions: [], actions: [], states: [], outcomes: [], presentations: [] },
+          localState: [], rules: [], timelines: [], outcomes: [],
+        }));
+      }
+    } catch {
+      // Invalid JSON is handled by compiler tests.
+    }
+  }
   return {
-    id: 'test-pack-001',
-    name: '测试玩法包',
-    version: '1.0.0',
-    manifests: new Map(),
-    assets: new Map(),
-    source: 'llm-generated',
-    creatorSteamId: 'test-steam-id',
-    ...overrides,
+    id: 'test-pack-001', name: '测试玩法包', version: '1.0.0',
+    assets: new Map(), source: 'llm-generated', creatorSteamId: 'test-steam-id', ...overrides,
+    manifests,
   };
 }
 
@@ -209,6 +220,7 @@ describe('compileToPlaypackDef', () => {
         },
       ],
       maps: [],
+      mapPlays: [],
       referencedClassIds: new Set(),
       diagnostics: [],
       complexityScore: 0,
@@ -227,6 +239,7 @@ describe('compileToPlaypackDef', () => {
         { path: 'items/x.json', category: 'items', document: { id: 'x-1', kind: 'bogus-kind' } },
       ],
       maps: [],
+      mapPlays: [],
       referencedClassIds: new Set(),
       diagnostics: [],
       complexityScore: 0,
@@ -249,6 +262,7 @@ describe('compileToPlaypackDef', () => {
         { path: 'weapons/w.json', category: 'weapons', document: { id: 'w-1' } },
       ],
       maps: [],
+      mapPlays: [],
       referencedClassIds: new Set(),
       diagnostics: [],
       complexityScore: 0,
@@ -267,6 +281,7 @@ describe('compileToPlaypackDef', () => {
       input: makeInput(),
       profiles: [],
       maps: [{ path: 'maps/m.json', data: {}, prefab: null }],
+      mapPlays: [],
       referencedClassIds: new Set(),
       diagnostics: [],
       complexityScore: 0,
@@ -297,6 +312,7 @@ describe('compileToPlaypackDef', () => {
     input: makeInput(),
     profiles: [],
     maps: [],
+    mapPlays: [],
     referencedClassIds: new Set(),
     diagnostics: [],
     complexityScore: 0,

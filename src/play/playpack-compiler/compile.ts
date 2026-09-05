@@ -22,11 +22,11 @@ import type { PlayProfile } from '../profiles/catalog';
 import { auditNumericOwnership, type NumericFinding } from '../types/numeric-classification';
 import { compileMap } from '../map/compile';
 import { validateMapStructure, type MapDiagnostic } from '../map/validate';
-import type { MapData } from '../map/types';
+import type { MapData, MapDataDocument } from '../map/types';
+import { compileMapPlayProgram, parseMapPlayFile, type MapPlayFileV2 } from '../content/map-play-file';
 import { calculateComplexityScore } from './complexity';
 import type {
   CompileOptions,
-  CompiledPlaypack,
   ParsedMap,
   ParsedProfile,
   PlaypackCompileResult,
@@ -46,7 +46,7 @@ export async function compile(
   input: PlaypackInput,
   options: CompileOptions = {},
 ): Promise<PlaypackCompileResult> {
-  const { fullAudit = true, allowUnpublishedMaps = false, targetEnv = 'both' } = options;
+  const { fullAudit = true, allowUnpublishedMaps: _allowUnpublishedMaps = false, targetEnv: _targetEnv = 'both', mapPlayRegistries } = options;
   const diagnostics: PlaypackDiagnostic[] = [];
 
   // ---- 阶段 1：解析 JSON 清单 ----
@@ -79,11 +79,28 @@ export async function compile(
   // 规则与逻辑）。用引擎严格解码链（StrictJsonCodec → decodePlaypack）校验，失败即拒。
   const profiles: ParsedProfile[] = [];
   const maps: ParsedMap[] = [];
+  const mapPlayFiles: { readonly path: string; readonly file: MapPlayFileV2 }[] = [];
   let playpackDef: PlaypackDef | null = null;
 
   for (const [path, document] of parsedManifests) {
+    // MapPlay 必须先于 profile/map 分类；每张地图只读取一个完整 2.0 文件。
+    if (isMapPlayDocument(document)) {
+      const parsed = parseMapPlayFile(document);
+      if (!parsed.ok) {
+        diagnostics.push(...parsed.diagnostics.map((item) => ({
+          code: item.code,
+          severity: 'error' as const,
+          file: path,
+          path: item.path,
+          message: item.message,
+          correction: item.correction,
+          autoFixable: false,
+        })));
+      } else {
+        mapPlayFiles.push({ path, file: parsed.value });
+      }
     // 推断类型：路径前缀或顶层字段
-    if (isPlaypackManifestPath(path) || isPlaypackDocument(document)) {
+    } else if (isPlaypackManifestPath(path) || isPlaypackDocument(document)) {
       if (playpackDef !== null) {
         diagnostics.push({
           code: 'PLAYPACK_MULTIPLE_MANIFESTS',
@@ -241,12 +258,57 @@ export async function compile(
     }
   }
 
+  // 3.3 MapPlay 2.0：每张可运行地图必须精确绑定一个完整文件。
+  const compiledMapPlays: import('./types').ParsedMapPlay[] = [];
+  for (const mapEntry of compiledMaps) {
+    const map = mapEntry.data as MapDataDocument;
+    const matches = mapPlayFiles.filter((entry) => entry.file.mapId === map.id);
+    if (matches.length !== 1) {
+      diagnostics.push({
+        code: matches.length === 0 ? 'MAP_PLAY_REQUIRED' : 'MAP_PLAY_MULTIPLE_FOR_MAP',
+        severity: 'error',
+        file: mapEntry.path,
+        message: matches.length === 0
+          ? `地图 ${map.id} 缺少唯一 MapPlay 2.0 文件。`
+          : `地图 ${map.id} 匹配到 ${matches.length} 个 MapPlay 文件。`,
+        correction: '每张地图提供且只提供一个完整的 kind="map-play"、schemaVersion="2.0" JSON 文件。',
+        autoFixable: false,
+      });
+      continue;
+    }
+    const match = matches[0]!;
+    const result = compileMapPlayProgram(match.file, {
+      map,
+      mapDataEntryId: mapEntry.path,
+      ...(mapPlayRegistries !== undefined ? { registered: mapPlayRegistries } : {}),
+    });
+    if (!result.ok) {
+      diagnostics.push(...result.diagnostics.map((item) => ({
+        code: item.code,
+        severity: 'error' as const,
+        file: match.path,
+        path: item.path,
+        message: item.message,
+        correction: item.correction,
+        autoFixable: false,
+      })));
+      continue;
+    }
+    compiledMapPlays.push({ path: match.path, file: match.file, program: result.program });
+  }
+  for (const entry of mapPlayFiles) {
+    if (!compiledMaps.some((mapEntry) => (mapEntry.data as MapDataDocument).id === entry.file.mapId)) {
+      diagnostics.push({ code: 'MAP_PLAY_ORPHAN', severity: 'error', file: entry.path, message: `MapPlay 指向不存在或未通过编译的地图：${entry.file.mapId}`, correction: '修正 mapId，或加入对应且有效的 MapData。', autoFixable: false });
+    }
+  }
+
   // ---- 阶段 4：计算复杂度评分 ----
-  // 自定义规则数：playpack 清单（若有）里的 rule/action def 数；无清单时为 0（不再硬编码）。
+  // 自定义规则数：playpack 清单与地图专属规则的合计。
   const complexityScore = calculateComplexityScore({
     profileCount: profiles.length,
     mapCount: compiledMaps.length,
-    customRuleCount: playpackDef !== null ? countPlaypackDefs(playpackDef) : 0,
+    customRuleCount: (playpackDef !== null ? countPlaypackDefs(playpackDef) : 0)
+      + compiledMapPlays.reduce((total, entry) => total + entry.program.rules.length, 0),
   });
 
   // ---- 阶段 5：收集引用的基类 id（供审核系统使用） ----
@@ -286,6 +348,7 @@ export async function compile(
       input,
       profiles,
       maps: compiledMaps,
+      mapPlays: compiledMapPlays,
       referencedClassIds,
       diagnostics,
       complexityScore,
@@ -345,6 +408,11 @@ function isPlaypackDocument(doc: JsonValue): boolean {
 /** playpack 清单里 rule/action def 的数量（复杂度评分的 customRuleCount 输入）。 */
 function countPlaypackDefs(playpack: PlaypackDef): number {
   return playpack.defs.filter((def) => def.kind === 'rule' || def.kind === 'action').length;
+}
+
+function isMapPlayDocument(doc: JsonValue): boolean {
+  const record = asRecord(doc);
+  return record !== null && record['kind'] === 'map-play';
 }
 
 function isProfileDocument(doc: JsonValue): boolean {

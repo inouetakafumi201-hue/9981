@@ -44,7 +44,7 @@ export interface MapBundle {
   readonly manifestEntryId: string
   readonly mapDataEntryId: string
   readonly visualAssetEntryIds: readonly string[]
-  readonly mapPlayEntryId?: string
+  readonly mapPlayEntryId: string
   readonly entryNodeId?: string
 }
 

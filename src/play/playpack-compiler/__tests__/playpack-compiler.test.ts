@@ -6,16 +6,31 @@
 import { describe, expect, it } from 'vitest';
 import { compile, suggestPriceTier, type PlaypackInput } from '../index';
 
-function makeInput(overrides?: Partial<PlaypackInput>): PlaypackInput {
+function mapPlayFor(map: { id: string; nodes: readonly { id: string }[] }, mapPath: string, suffix = '') {
   return {
-    id: 'test-pack-001',
-    name: '测试玩法包',
-    version: '1.0.0',
-    manifests: new Map(),
-    assets: new Map(),
-    source: 'llm-generated',
-    creatorSteamId: 'test-steam-id',
-    ...overrides,
+    schemaVersion: '2.0', kind: 'map-play', mapPlayId: `map-play:${map.id}${suffix}`,
+    mapId: map.id, mapDataEntryId: mapPath, entryNodeId: map.nodes[0]?.id ?? 'missing',
+    capabilities: { rules: [], conditions: [], actions: [], states: [], outcomes: [], presentations: [] },
+    localState: [], rules: [], timelines: [], outcomes: [],
+  };
+}
+
+function makeInput(overrides?: Partial<PlaypackInput>): PlaypackInput {
+  const manifests = new Map(overrides?.manifests ?? []);
+  for (const [path, source] of [...manifests]) {
+    try {
+      const value = JSON.parse(source) as { id?: string; nodes?: readonly { id: string }[]; kind?: string };
+      if (value.kind !== 'map-play' && value.id && Array.isArray(value.nodes)) {
+        manifests.set(`${path}.map-play.json`, JSON.stringify(mapPlayFor(value as { id: string; nodes: readonly { id: string }[] }, path)));
+      }
+    } catch {
+      // Invalid JSON belongs to the compiler parse-error tests.
+    }
+  }
+  return {
+    id: 'test-pack-001', name: '测试玩法包', version: '1.0.0',
+    assets: new Map(), source: 'llm-generated', creatorSteamId: 'test-steam-id', ...overrides,
+    manifests,
   };
 }
 
@@ -156,7 +171,28 @@ describe('玩法包编译器', () => {
       if (result.ok) {
         expect(result.artifact.maps).toHaveLength(1);
         expect(result.artifact.maps[0]?.prefab).toBeDefined();
+        expect(result.artifact.mapPlays).toHaveLength(1);
+        expect(result.artifact.mapPlays[0]?.program.mapId).toBe('map-001');
+        expect(Object.isFrozen(result.artifact.mapPlays[0]?.program)).toBe(true);
       }
+    });
+
+    it('地图缺少 MapPlay 2.0 时拒绝编译', async () => {
+      const mapData = { schemaVersion: '1.0', id: 'map-missing', name: '缺玩法', backdrop: { image: 'm.svg', pixelWidth: 100, pixelHeight: 100, tileRows: 1, tileCols: 1 }, floors: [0], nodes: [{ id: 'n1', def: 'scene.class.room', scale: 'small', at: { x: 0.5, y: 0.5 }, floor: 0 }], edges: [], placements: [] };
+      const input = makeInput({ manifests: new Map([['maps/missing.json', JSON.stringify(mapData)]]), source: 'player-uploaded' });
+      (input.manifests as Map<string, string>).delete('maps/missing.json.map-play.json');
+      const result = await compile(input);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.diagnostics.map((item) => item.code)).toContain('MAP_PLAY_REQUIRED');
+    });
+
+    it('同一地图存在多个 MapPlay 时拒绝编译', async () => {
+      const mapData = { schemaVersion: '1.0', id: 'map-double', name: '双玩法', backdrop: { image: 'm.svg', pixelWidth: 100, pixelHeight: 100, tileRows: 1, tileCols: 1 }, floors: [0], nodes: [{ id: 'n1', def: 'scene.class.room', scale: 'small', at: { x: 0.5, y: 0.5 }, floor: 0 }], edges: [], placements: [] };
+      const input = makeInput({ manifests: new Map([['maps/double.json', JSON.stringify(mapData)]]), source: 'player-uploaded' });
+      (input.manifests as Map<string, string>).set('maps/double.second.json', JSON.stringify(mapPlayFor(mapData, 'maps/double.json', ':second')));
+      const result = await compile(input);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.diagnostics.map((item) => item.code)).toContain('MAP_PLAY_MULTIPLE_FOR_MAP');
     });
 
     it('地图结构错误阻止编译', async () => {

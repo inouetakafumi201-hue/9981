@@ -105,6 +105,13 @@ const UGC_SHELTER_MAP = JSON.stringify({
   placements: [],
 });
 
+const UGC_SHELTER_MAP_PLAY = JSON.stringify({
+  schemaVersion: '2.0', kind: 'map-play', mapPlayId: 'map-play:ugc-shelter', mapId: 'ugc-shelter',
+  mapDataEntryId: 'maps/ugc_shelter.json', entryNodeId: 'n1',
+  capabilities: { rules: [], conditions: [], actions: [], states: [], outcomes: [], presentations: [] },
+  localState: [], rules: [], timelines: [], outcomes: [],
+});
+
 function makeUploadedInput(
   manifests: ReadonlyMap<string, string>,
   overrides?: Partial<PlaypackInput>,
@@ -165,6 +172,7 @@ describe('uploaded 玩法包全链路（D-081 / L0 第十四条，B2）', () => 
         ['weapons/ugc_blade.json', UGC_WEAPON_PROFILE],
         ['items/ugc_medkit.json', UGC_ITEM_PROFILE],
         ['maps/ugc_shelter.json', UGC_SHELTER_MAP],
+        ['maps/ugc_shelter.map-play.json', UGC_SHELTER_MAP_PLAY],
       ]), { id: 'playpack:play.ugc-map-shelter' });
 
       const result = await compile(input);
@@ -202,6 +210,7 @@ describe('uploaded 玩法包全链路（D-081 / L0 第十四条，B2）', () => 
         ['weapons/ugc_blade.json', UGC_WEAPON_PROFILE],
         ['items/ugc_medkit.json', UGC_ITEM_PROFILE],
         ['maps/ugc_shelter.json', UGC_SHELTER_MAP],
+        ['maps/ugc_shelter.map-play.json', UGC_SHELTER_MAP_PLAY],
       ]), { id: 'playpack:play.ugc-map-shelter' });
       const result = await compile(input);
       expect(result.ok).toBe(true);

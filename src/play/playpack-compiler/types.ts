@@ -55,6 +55,11 @@ export interface CompileOptions {
 
   /** 目标环境。默认 'both'。 */
   readonly targetEnv?: 'singleplayer' | 'multiplayer' | 'both';
+
+  /** 装载环境已登记的 MapPlay 能力；提供时执行跨注册表完整性校验。 */
+  readonly mapPlayRegistries?: Partial<{
+    [K in keyof import('../content/map-play-file').MapPlayCapabilities]: ReadonlySet<string>
+  }>;
 }
 
 /** 编译结果。 */
@@ -72,6 +77,9 @@ export interface CompiledPlaypack {
 
   /** 编译产物：解析后的地图列表（如果有）。 */
   readonly maps: readonly ParsedMap[];
+
+  /** 每张已编译地图唯一对应的 MapPlay 2.0 程序。 */
+  readonly mapPlays: readonly ParsedMapPlay[];
 
   /** 编译产物：引用的基类层 id 全集。 */
   readonly referencedClassIds: ReadonlySet<string>;
@@ -129,6 +137,13 @@ export interface ParsedMap {
 
   /** 编译产物：PrefabDef（已深冻结）。 */
   readonly prefab: unknown; // PrefabDef，避免循环依赖
+}
+
+/** 与一张地图一一绑定的 MapPlay 2.0 编译产物。 */
+export interface ParsedMapPlay {
+  readonly path: string;
+  readonly file: import('../content/map-play-file').MapPlayFileV2;
+  readonly program: import('../content/map-play-file').MapPlayProgram;
 }
 
 /** 玩法包诊断。 */

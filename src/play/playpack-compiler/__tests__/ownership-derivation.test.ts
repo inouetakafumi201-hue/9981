@@ -72,6 +72,13 @@ const SHELTER_MAP = JSON.stringify({
   placements: [],
 });
 
+const SHELTER_MAP_PLAY = JSON.stringify({
+  schemaVersion: '2.0', kind: 'map-play', mapPlayId: 'map-play:ugc-plain-shelter',
+  mapId: 'ugc-plain-shelter', mapDataEntryId: 'maps/plain-shelter.json', entryNodeId: 'n1',
+  capabilities: { rules: [], conditions: [], actions: [], states: [], outcomes: [], presentations: [] },
+  localState: [], rules: [], timelines: [], outcomes: [],
+});
+
 async function compileArtifact(input: PlaypackInput): Promise<CompiledPlaypack> {
   const result = await compile(input);
   if (!result.ok) {
@@ -151,6 +158,7 @@ describe('装配桥数值归属自动派生（P1）', () => {
       manifests: new Map([
         ['weapons/plain-blade.json', PLAIN_WEAPON],
         ['maps/plain-shelter.json', SHELTER_MAP],
+        ['maps/plain-shelter.map-play.json', SHELTER_MAP_PLAY],
       ]),
     }));
     const playpack = compileToPlaypackDef(artifact);
