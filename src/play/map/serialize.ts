@@ -95,14 +95,31 @@ function serializeEdge(edge: CanonicalMapData['edges'][number]): Record<string, 
       ...(edge.transitionWindow.logicCategory !== undefined ? { logicCategory: edge.transitionWindow.logicCategory } : {}),
     };
   }
+  if (edge.transitionInstances !== undefined) {
+    record['transitionInstances'] = edge.transitionInstances.map((instance) => ({
+      id: instance.id,
+      edgeId: instance.edgeId,
+      endpoint: instance.endpoint,
+      materialId: instance.materialId,
+      microSceneId: instance.microSceneId,
+      position: { x: instance.position.x, y: instance.position.y },
+      ...(instance.sharedParamsRef !== undefined ? { sharedParamsRef: instance.sharedParamsRef } : {}),
+      ...(instance.effect !== undefined ? { effect: instance.effect } : {}),
+    }));
+  }
+  if (edge.transitionParams !== undefined) record['transitionParams'] = edge.transitionParams;
   if (edge.semanticAnchor !== undefined) record['semanticAnchor'] = edge.semanticAnchor;
   return record;
 }
 
 function serializePlacement(placement: CanonicalMapData['placements'][number]): Record<string, unknown> {
   const record: Record<string, unknown> = { id: placement.id, at: placement.at, def: placement.def };
+  if (placement.hostSceneId !== undefined) record['hostSceneId'] = placement.hostSceneId;
   if (placement.logicCategory !== undefined) record['logicCategory'] = placement.logicCategory;
   if (placement.placementMode !== undefined) record['placementMode'] = placement.placementMode;
+  if (placement.activation !== undefined) record['activation'] = placement.activation;
+  if (placement.hostCapabilities !== undefined) record['hostCapabilities'] = [...placement.hostCapabilities];
+  if (placement.tokenIds !== undefined) record['tokenIds'] = [...placement.tokenIds];
   if (placement.position !== undefined) record['position'] = { x: placement.position.x, y: placement.position.y };
   if (placement.overrides !== undefined) record['overrides'] = placement.overrides;
   if (placement.temporaryFree !== undefined) record['temporaryFree'] = placement.temporaryFree;

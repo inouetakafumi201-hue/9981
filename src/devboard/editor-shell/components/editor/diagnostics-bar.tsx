@@ -115,11 +115,12 @@ export function DiagnosticsBar() {
   )
   const degIssue = diagnostics.some((d) => d.id.startsWith('deg'))
   const obIssue = diagnostics.some((d) => d.id.startsWith('ob'))
-  const transitionCount = doc.edges.filter((e) => e.transitionWindow).length
+  const transitionCount = doc.edges.reduce((count, edge) => count + (edge.transitionInstances?.length ?? 0), 0)
+  const logicalNodeCount = doc.sceneNodes.filter((node) => node.def !== 'd:scene/micro-transition').length
   const complexity =
-    doc.sceneNodes.length + doc.edges.length > 18
+    logicalNodeCount + doc.edges.length > 18
       ? '高'
-      : doc.sceneNodes.length + doc.edges.length > 9
+      : logicalNodeCount + doc.edges.length > 9
         ? '中'
         : '低'
 
@@ -237,7 +238,7 @@ export function DiagnosticsBar() {
           />
         </div>
         <div className="flex flex-col gap-3">
-          <Metric label="过渡窗口" value={`${transitionCount} 个已配置`} />
+          <Metric label="过渡端点实例" value={`${transitionCount} 个已配置`} />
           <Metric
             label="遮挡框"
             value={
@@ -252,7 +253,7 @@ export function DiagnosticsBar() {
           <Metric label="素材放置" value={`${doc.placements.length} 个实例`} />
           <Metric
             label="性能预估"
-            value={`节点 ${doc.sceneNodes.length} / 边 ${doc.edges.length} / 复杂度 ${complexity}`}
+            value={`节点 ${logicalNodeCount} / 边 ${doc.edges.length} / 复杂度 ${complexity}`}
           />
         </div>
       </div>

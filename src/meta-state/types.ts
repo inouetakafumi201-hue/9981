@@ -20,6 +20,28 @@ export type MaterialLogicCategory =
 
 /** native 会实例化玩法实体；presentation-only 只参与表现与渲染。 */
 export type MaterialPlacementMode = 'native' | 'presentation-only'
+export type MaterialActivation = 'native' | 'free-decoration'
+export type MaterialHostCapability =
+  | 'AI 单位'
+  | 'NPC'
+  | '载具'
+  | '容器'
+  | '物品'
+  | '机关装置'
+  | '装饰'
+  | '过渡场景'
+
+export interface MaterialBoundary {
+  readonly logicCategory: MaterialLogicCategory
+  readonly placementMode: MaterialPlacementMode
+  readonly hostCapability: MaterialHostCapability
+  readonly accepts: readonly TokenCategory[]
+}
+
+export interface TokenAcceptsResult {
+  readonly accepted: boolean
+  readonly reason?: string
+}
 
 export interface AssetRef {
   readonly manifestId: string

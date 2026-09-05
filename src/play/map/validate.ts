@@ -352,7 +352,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         severity: 'error',
         path,
         subject: edge.id,
-        message: `连接「${edge.id}」的两个端点是同一个�����点。`,
+        message: `连接「${edge.id}」的两个端点是同一个�������点。`,
         correction: '自环没有通行含义。把一端接到别的节点，或删掉这条连接。',
       });
     } else if (endpointsExist) {
@@ -415,6 +415,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
       });
     }
     findings.push(...validateEdgeDataFields(edge, path));
+    findings.push(...validateTransitionInstances(edge, path, nodeById));
     // 曲线自身的校验（点数、坐标范围、首尾吸附），反向用例命中的正是这些。
     findings.push(...validateEdgePath(map as MapData, index, nodeById));
   });
@@ -462,10 +463,22 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         correction: '删除该 placement，并把过渡场景素材直接拖到地图连线上。',
       });
     }
-    if (placement.logicCategory === '装饰' && placement.placementMode !== 'presentation-only') {
+    if (placement.logicCategory === '装饰' && (placement.placementMode !== 'presentation-only' || placement.activation === 'native')) {
       findings.push({
         code: 'MAP_DECORATION_MUST_BE_PRESENTATION_ONLY', severity: 'error', path: `${path}/placementMode`, subject: placement.id,
-        message: `装饰素材「${placement.id}」不能声明原生玩法逻辑。`, correction: '把 placementMode 改为 presentation-only。',
+        message: `装饰素材「${placement.id}」不能声明原生玩法逻辑。`, correction: '把 activation 改为 free-decoration，并把 placementMode 改为 presentation-only。',
+      });
+    }
+    if (placement.activation === 'free-decoration' && placement.placementMode !== 'presentation-only') {
+      findings.push({
+        code: 'MAP_FREE_DECORATION_MODE_MISMATCH', severity: 'error', path: `${path}/activation`, subject: placement.id,
+        message: `仅表现素材「${placement.id}」的放置模式不一致。`, correction: '仅表现素材必须使用 free-decoration + presentation-only。',
+      });
+    }
+    if (placement.activation === 'native' && !nodeById.has(placement.hostSceneId ?? placement.at)) {
+      findings.push({
+        code: 'MAP_NATIVE_HOST_NOT_FOUND', severity: 'error', path: `${path}/hostSceneId`, subject: placement.id,
+        message: `原生素材「${placement.id}」没有有效的天然场景宿主。`, correction: '把素材移入天然场景框，或让它降级为 free-decoration。',
       });
     }
     if (!nodeById.has(placement.at) && placement.placementMode !== 'presentation-only') {
@@ -476,6 +489,22 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         subject: placement.id,
         message: `放置「${placement.id}」挂在节点「${placement.at}」上，但这个节点不存在。`,
         correction: '把它挂到一个存在的节点上，或删掉这次放置。',
+      });
+    }
+
+    if (placement.tokenIds !== undefined) {
+      const tokenIds = placement.tokenIds;
+      if (new Set(tokenIds).size !== tokenIds.length || tokenIds.some((tokenId) => !tokenId.trim())) {
+        findings.push({
+          code: 'MAP_INVALID_TOKEN_IDS', severity: 'error', path: `${path}/tokenIds`, subject: placement.id,
+          message: `素材实例「${placement.id}」的词条列表包含重复或空 id。`, correction: '每个词条实例 id 必须是非空且唯一的字符串。',
+        });
+      }
+    }
+    if (placement.hostCapabilities !== undefined && placement.logicCategory !== undefined && !placement.hostCapabilities.includes(placement.logicCategory)) {
+      findings.push({
+        code: 'MAP_HOST_CAPABILITY_MISMATCH', severity: 'error', path: `${path}/hostCapabilities`, subject: placement.id,
+        message: `素材实例「${placement.id}」的宿主能力快照与逻辑分类不一致。`, correction: '重新从素材身份重算宿主能力，不要在编辑器里手动改身份。',
       });
     }
 
@@ -633,6 +662,63 @@ function validateEdgeDataFields(edge: MapEdge, path: string): readonly MapDiagno
   return findings;
 }
 
+function validateTransitionInstances(
+  edge: MapEdge,
+  path: string,
+  nodeById: ReadonlyMap<string, MapNode>,
+): readonly MapDiagnostic[] {
+  const findings: MapDiagnostic[] = [];
+  const instances = edge.transitionInstances ?? [];
+  if (instances.length > 2) {
+    findings.push({
+      code: 'MAP_TRANSITION_INSTANCE_LIMIT', severity: 'error', path: `${path}/transitionInstances`, subject: edge.id,
+      message: `连线「${edge.id}」拥有 ${instances.length} 个过渡场景实例，超过两端上限。`, correction: '每条连线最多放置起点、终点各一个过渡场景实例。',
+    });
+  }
+  const endpoints = new Set<string>();
+  instances.forEach((instance, index) => {
+    const instancePath = `${path}/transitionInstances/${index}`;
+    if (instance.edgeId !== edge.id) {
+      findings.push({
+        code: 'MAP_TRANSITION_EDGE_MISMATCH', severity: 'error', path: `${instancePath}/edgeId`, subject: edge.id,
+        message: `过渡实例「${instance.id}」引用了错误的连线。`, correction: '让过渡实例的 edgeId 与所在连线 id 一致。',
+      });
+    }
+    if (instance.endpoint !== 'from' && instance.endpoint !== 'to') {
+      findings.push({
+        code: 'MAP_TRANSITION_ENDPOINT_INVALID', severity: 'error', path: `${instancePath}/endpoint`, subject: edge.id,
+        message: `过渡实例「${instance.id}」没有合法的端点侧。`, correction: '端点侧只能是 from 或 to。',
+      });
+    } else if (endpoints.has(instance.endpoint)) {
+      findings.push({
+        code: 'MAP_TRANSITION_ENDPOINT_DUPLICATE', severity: 'error', path: `${instancePath}/endpoint`, subject: edge.id,
+        message: `连线「${edge.id}」的${instance.endpoint === 'from' ? '起点' : '终点'}已经有过渡场景。`, correction: '替换已有实例，或把新实例放到另一端。',
+      });
+    } else {
+      endpoints.add(instance.endpoint);
+    }
+    if (!instance.materialId.trim()) {
+      findings.push({
+        code: 'MAP_TRANSITION_MATERIAL_REQUIRED', severity: 'error', path: `${instancePath}/materialId`, subject: edge.id,
+        message: `过渡实例「${instance.id}」没有素材身份。`, correction: '选择一个逻辑分类为“过渡场景”的素材。',
+      });
+    }
+    if (!instance.microSceneId.trim() || !nodeById.has(instance.microSceneId)) {
+      findings.push({
+        code: 'MAP_TRANSITION_MICRO_SCENE_MISSING', severity: 'error', path: `${instancePath}/microSceneId`, subject: edge.id,
+        message: `过渡实例「${instance.id}」引用的微型场景不存在。`, correction: '重新绑定端点，让编辑器自动创建或复用微型场景。',
+      });
+    }
+    if (!isNormalized(instance.position)) {
+      findings.push({
+        code: 'MAP_TRANSITION_POSITION_OUT_OF_RANGE', severity: 'error', path: `${instancePath}/position`, subject: edge.id,
+        message: `过渡实例「${instance.id}」的位置不在地图范围内。`, correction: '把过渡实例吸附到连线端点，并保存归一化坐标。',
+      });
+    }
+  });
+  return findings;
+}
+
 /** 遮挡规格（visualObstruction/physicalObstruction 共用）的校验。 */
 function validateObstruction(
   spec: { shape?: unknown; height?: unknown; bounds?: unknown },
@@ -728,7 +814,7 @@ function hasLegacyFloorFields(map: MapDataDocument): boolean {
   return candidates.floors !== undefined || candidates.nodes.some((node) => typeof node.floor === 'number');
 }
 
-/** legacy floor 形态（schemaVersion '1.0'）的楼层声明检查：每个节点的 floor 必须命中 floors 声明。 */
+/** legacy floor 形态（schemaVersion '1.0'）的楼层声明检查：每个节点的 floor 必须命�� floors 声明。 */
 function validateLegacyFloorDeclaration(
   map: MapDataDocument,
   floors: ReadonlySet<number>,

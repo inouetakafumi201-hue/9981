@@ -123,11 +123,24 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
       b: e.to,
       directionality: toDirectionality(e),
       path: e.points.map((p) => ({ x: nx(p.x), y: ny(p.y) })),
-      ...(e.transitionWindow !== undefined ? {
+      ...(e.transitionWindow !== undefined && !e.transitionInstances?.length ? {
         transitionWindow: {
           control: [{ x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y) }],
           ...(e.transitionWindow.materialId !== undefined ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}),
         },
+      } : {}),
+      ...(e.transitionInstances?.length ? {
+        transitionInstances: e.transitionInstances.map((instance) => ({
+          id: instance.id,
+          edgeId: instance.edgeId,
+          endpoint: instance.endpoint,
+          materialId: instance.materialId,
+          microSceneId: instance.microSceneId,
+          position: { x: nx(instance.x), y: ny(instance.y) },
+          ...(instance.sharedParamsRef !== undefined ? { sharedParamsRef: instance.sharedParamsRef } : {}),
+          ...(instance.effect !== undefined ? { effect: instance.effect } : {}),
+        })),
+        ...(e.transitionParams !== undefined ? { transitionParams: e.transitionParams } : {}),
       } : {}),
       ...(e.semanticAnchor !== undefined
         ? { semanticAnchor: (e.semanticAnchor === 'highland' ? 'high' : e.semanticAnchor === 'lowland' ? 'low' : 'neutral') as 'high' | 'low' | 'neutral' }
@@ -138,10 +151,14 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
 
   const placements: MapPlacement[] = doc.placements.map((p) => ({
     id: p.id,
-    at: p.sceneId,
+    at: p.hostSceneId ?? p.sceneId,
+    ...(p.hostSceneId !== undefined ? { hostSceneId: p.hostSceneId } : {}),
     def: p.materialId,
     ...(p.logicCategory !== undefined ? { logicCategory: p.logicCategory } : {}),
     ...(p.placementMode !== undefined ? { placementMode: p.placementMode } : {}),
+    ...(p.activation !== undefined ? { activation: p.activation } : {}),
+    ...(p.hostCapabilities !== undefined ? { hostCapabilities: p.hostCapabilities } : {}),
+    ...(p.tokenIds !== undefined ? { tokenIds: p.tokenIds } : {}),
     position: { x: nx(p.x), y: ny(p.y) },
   }))
 
@@ -203,7 +220,7 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
   const layerOf = (layerId: string) =>
     layers.find((l) => l.id === layerId)?.id ?? layers[0]?.id ?? 'ly_0'
 
-  const sceneNodes: SceneNode[] = canonical.nodes.map((n, i) => {
+  let sceneNodes: SceneNode[] = canonical.nodes.map((n, i) => {
     const node: SceneNode = {
       id: n.id,
       name: n.name ?? `场景 ${i + 1}`,
@@ -219,6 +236,52 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
   const nodeIds = new Set(sceneNodes.map((n) => n.id))
   const edges: Edge[] = canonical.edges.flatMap((e) => {
     if (!nodeIds.has(e.a) || !nodeIds.has(e.b)) return []
+    const fromNode = sceneNodes.find((node) => node.id === e.a)
+    const toNode = sceneNodes.find((node) => node.id === e.b)
+    const legacyWindow = e.transitionWindow?.materialId !== undefined && !e.transitionInstances?.length ? e.transitionWindow : undefined
+    const control = legacyWindow?.control[0]
+    const legacyEndpoint = control && fromNode && toNode
+      ? (Math.hypot(control.x - fromNode.at.x / WORLD.w, control.y - fromNode.at.y / WORLD.h) <= Math.hypot(control.x - toNode.at.x / WORLD.w, control.y - toNode.at.y / WORLD.h) ? 'from' : 'to')
+      : undefined
+    const migratedInstances = control && legacyWindow && legacyEndpoint
+      ? [{
+          id: `tw_migrated_${e.id}`,
+          edgeId: e.id,
+          endpoint: legacyEndpoint as 'from' | 'to',
+          materialId: legacyWindow.materialId as string,
+          microSceneId: `ms_transition_${e.id}_${legacyEndpoint}`,
+          x: wx(control.x),
+          y: wy(control.y),
+          sharedParamsRef: `edge:${e.id}:transition`,
+          effect: {},
+        }]
+      : []
+    const transitionInstances = e.transitionInstances?.length
+      ? e.transitionInstances.map((instance) => ({
+          id: instance.id,
+          edgeId: instance.edgeId,
+          endpoint: instance.endpoint,
+          materialId: instance.materialId,
+          microSceneId: instance.microSceneId,
+          x: wx(instance.position.x),
+          y: wy(instance.position.y),
+          ...(instance.sharedParamsRef !== undefined ? { sharedParamsRef: instance.sharedParamsRef } : {}),
+          ...(instance.effect !== undefined ? { effect: { ...instance.effect } } : {}),
+        }))
+      : migratedInstances
+    for (const instance of migratedInstances) {
+      if (sceneNodes.some((node) => node.id === instance.microSceneId)) continue
+      const host = instance.endpoint === 'from' ? fromNode : toNode
+      sceneNodes.push({
+        id: instance.microSceneId,
+        name: `${host?.name ?? '场景'}·过渡微场景·${instance.endpoint === 'from' ? '起点' : '终点'}`,
+        scale: 'small',
+        layerId: host?.layerId ?? layers[0]?.id ?? 'ly_0',
+        parent: host?.id,
+        def: 'd:scene/micro-transition',
+        at: { x: instance.x, y: instance.y },
+      })
+    }
     const edge: Edge = {
       id: e.id,
       from: e.a,
@@ -231,6 +294,10 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
           y: wy(e.transitionWindow.control[0].y),
           ...(e.transitionWindow.materialId !== undefined ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}),
         },
+      } : {}),
+      ...(transitionInstances.length ? {
+        transitionInstances,
+        ...(e.transitionParams !== undefined ? { transitionParams: { ...e.transitionParams } } : {}),
       } : {}),
       ...(e.semanticAnchor !== undefined
         ? { semanticAnchor: (e.semanticAnchor === 'high' ? 'highland' : e.semanticAnchor === 'low' ? 'lowland' : 'neutral') as 'highland' | 'lowland' | 'neutral' }
@@ -273,11 +340,15 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
     return [{
       id: p.id,
       materialId: p.def,
-      sceneId: host?.id ?? '',
+      sceneId: p.hostSceneId ?? p.at,
+      ...(p.hostSceneId !== undefined ? { hostSceneId: p.hostSceneId } : {}),
       x: p.position ? wx(p.position.x) : (host?.at.x ?? 0),
       y: p.position ? wy(p.position.y) : (host?.at.y ?? 0),
       ...(p.logicCategory !== undefined ? { logicCategory: p.logicCategory } : {}),
       ...(p.placementMode !== undefined ? { placementMode: p.placementMode } : {}),
+      ...(p.activation !== undefined ? { activation: p.activation } : {}),
+      ...(p.hostCapabilities !== undefined ? { hostCapabilities: [...p.hostCapabilities] } : {}),
+      ...(p.tokenIds !== undefined ? { tokenIds: [...p.tokenIds] } : {}),
     }]
   })
 

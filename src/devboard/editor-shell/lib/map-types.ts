@@ -8,7 +8,12 @@
      `at` 由聚合外接矩形中心自动重算，不再随一个框的几何字面存储。
    ========================================================================= */
 
-import type { MaterialLogicCategory, MaterialPlacementMode } from '../../../meta-state/types'
+import type {
+  MaterialActivation,
+  MaterialHostCapability,
+  MaterialLogicCategory,
+  MaterialPlacementMode,
+} from '../../../meta-state/types'
 
 export const WORLD = { w: 1600, h: 1000 }
 
@@ -115,6 +120,21 @@ export const DIRECTIONALITY_LABEL: Record<EdgeDirectionality, string> = {
   'one-way-down': '单向·高到低',
 }
 
+export type TransitionEndpoint = 'from' | 'to'
+
+export interface TransitionInstance {
+  id: string
+  edgeId: string
+  endpoint: TransitionEndpoint
+  materialId: string
+  microSceneId: string
+  x: number
+  y: number
+  /** 边级共享参数引用；两端实例只各自拥有 effect。 */
+  sharedParamsRef?: string
+  effect?: Record<string, unknown>
+}
+
 export interface Edge {
   id: string
   /** 引用 SceneNode.id（不再是矩形 id） */
@@ -125,7 +145,11 @@ export interface Edge {
    *  仅作初值/回退）；中间为折点。Catmull-Rom 穿过全部点。
    *  中间点可能带 hidden 标记（见 EdgePoint） */
   points: EdgePoint[]
-  /** 过渡窗口直接绑定过渡场景素材，不生成普通 placement。 */
+  /** 过渡场景端点实例；每条边最多 from/to 各一个。 */
+  transitionInstances?: TransitionInstance[]
+  /** 边级共享参数，供两侧过渡场景共同读取。 */
+  transitionParams?: Record<string, unknown>
+  /** 旧单窗口字段，仅作为导入迁移输入，不再由新操作写入。 */
   transitionWindow?: Vec & { materialId?: string; logicCategory?: '过渡场景' }
   /** 语义锚点：高地/洼地/中性，仅影响边中点的可视化装饰，不接入玩法逻辑 */
   semanticAnchor?: 'highland' | 'lowland' | 'neutral'
@@ -156,12 +180,18 @@ export interface Terrain {
 export interface Placement {
   id: string
   materialId: string
-  /** 场景外仅表现素材为空字符串。 */
+  /** 场景外仅表现素材为空字符串。旧字段 sceneId 保留用于导入兼容。 */
   sceneId: string
+  hostSceneId?: string
+  activation?: MaterialActivation
   x: number
   y: number
   logicCategory?: MaterialLogicCategory
   placementMode?: MaterialPlacementMode
+  /** 宿主能力快照仅用于编辑器即时反馈，导出时可由素材身份重算。 */
+  hostCapabilities?: MaterialHostCapability[]
+  /** 词条只挂在素材实例上，不写回素材目录。 */
+  tokenIds?: string[]
 }
 
 /** Editor-local building branch. Frames use world coordinates; the bridge normalizes them. */
@@ -244,6 +274,17 @@ export interface MapData {
     directionality: EdgeDirectionality
     path: Vec[]
     transitionWindow?: Vec & { materialId?: string; logicCategory?: '过渡场景' }
+    transitionInstances?: Array<{
+      id: string
+      edgeId: string
+      endpoint: TransitionEndpoint
+      materialId: string
+      microSceneId: string
+      position: Vec
+      sharedParamsRef?: string
+      effect?: Record<string, unknown>
+    }>
+    transitionParams?: Record<string, unknown>
     visualObstruction?: string[]
     physicalObstruction?: string[]
     semanticAnchor?: 'highland' | 'lowland' | 'neutral'
@@ -272,10 +313,14 @@ export interface MapData {
     id: string
     materialId: string
     sceneId: string
+    hostSceneId?: string
     x: number
     y: number
     logicCategory?: MaterialLogicCategory
     placementMode?: MaterialPlacementMode
+    activation?: MaterialActivation
+    hostCapabilities?: MaterialHostCapability[]
+    tokenIds?: string[]
     overrides?: Record<string, unknown>
     temporaryFree?: boolean
   }>
@@ -481,7 +526,7 @@ export interface HoleCell {
   size: number
 }
 
-/** 空洞全填（B3）：对每个由 ≥2 个矩形拼成的场景聚合，在其外接矩形内按
+/** 空洞全填（B3）：对每个由 ≥2 个矩形拼成的场景聚合，在其外接矩形���按
  *  `gridSize` 世界单位光栅化，再从网格边界向内 flood-fill 未被任何成员框
  *  覆盖的格子——凡是flood-fill 无法从边界到达的未覆盖格，就是被完全包围
  *  在场景内部的"洞"（例如口字形拼接围出的天井）。只用于视觉高亮 + 阻止在

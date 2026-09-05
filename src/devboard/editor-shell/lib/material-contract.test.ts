@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { parseMapData, serializeMapData, type CanonicalMapData } from '../../ports/map-contracts'
 import { canonicalToEditorDoc, editorDocToCanonical } from './map-bridge'
-import { getState, importMapData, placeMaterialAtPoint } from './editor-store'
+import { attachTokenToPlacement, getState, importMapData, placeMaterialAtPoint } from './editor-store'
 import { CATEGORIES, LEGACY_CATEGORY_MIGRATION, MATERIALS } from './materials'
 
 const BASE_MAP: CanonicalMapData = {
@@ -48,24 +48,42 @@ describe('八类逻辑素材契约', () => {
     expect(getState().doc.placements[0]).toMatchObject({ sceneId: 'a', logicCategory: 'NPC', placementMode: 'native' })
   })
 
-  it('过渡场景直绑边且不创建 placement', () => {
-    placeMaterialAtPoint(materialId('过渡场景'), { x: 800, y: 500 })
+  it('过渡场景绑定连线端点且不创建 placement', () => {
+    const result = placeMaterialAtPoint(materialId('过渡场景'), { x: 400, y: 500 })
+    expect(result.kind).toBe('transition')
     expect(getState().doc.placements).toHaveLength(0)
-    expect(getState().doc.edges[0]?.transitionWindow).toMatchObject({ logicCategory: '过渡场景' })
+    expect(getState().doc.edges[0]?.transitionInstances).toMatchObject([{ endpoint: 'from', materialId: expect.any(String) }])
+    expect(getState().doc.sceneNodes.some((node) => node.parent === 'a' && node.def === 'd:scene/micro-transition')).toBe(true)
   })
 
-  it('普通素材落在边上不会误绑过渡窗口', () => {
+  it('每条连线每端最多一个过渡实例', () => {
+    placeMaterialAtPoint(materialId('过渡场景'), { x: 400, y: 500 })
+    placeMaterialAtPoint(materialId('过渡场景'), { x: 1200, y: 500 })
+    const rejected = placeMaterialAtPoint(materialId('过渡场景'), { x: 400, y: 500 })
+    expect(rejected.kind).toBe('rejected')
+    expect(getState().doc.edges[0]?.transitionInstances).toHaveLength(2)
+  })
+
+  it('普通素材落在边上不会误绑过渡实例', () => {
     placeMaterialAtPoint(materialId('物品'), { x: 800, y: 500 })
-    expect(getState().doc.edges[0]?.transitionWindow).toBeUndefined()
-    expect(getState().doc.placements[0]).toMatchObject({ placementMode: 'presentation-only', logicCategory: '物品' })
+    expect(getState().doc.edges[0]?.transitionInstances).toBeUndefined()
+    expect(getState().doc.placements[0]).toMatchObject({ placementMode: 'presentation-only', activation: 'free-decoration', logicCategory: '物品' })
   })
 
-  it('canonical round-trip 不丢失分类、放置模式和过渡素材引用', () => {
+  it('非法词条在写入前拒绝且不污染实例', () => {
+    const result = placeMaterialAtPoint(materialId('容器'), { x: 400, y: 500 })
+    expect(result.id).toBeDefined()
+    const before = getState().doc.placements[0]?.tokenIds
+    expect(attachTokenToPlacement(result.id ?? '', 'tk_attr_0', '属性')).toBe(false)
+    expect(getState().doc.placements[0]?.tokenIds).toEqual(before)
+  })
+
+  it('canonical round-trip 不丢失分类、激活状态和过渡实例', () => {
     placeMaterialAtPoint(materialId('物品'), { x: 800, y: 100 })
-    placeMaterialAtPoint(materialId('过渡场景'), { x: 800, y: 500 })
+    placeMaterialAtPoint(materialId('过渡场景'), { x: 400, y: 500 })
     const canonical = editorDocToCanonical(getState().doc)
     const restored = canonicalToEditorDoc(parseMapData(serializeMapData(canonical)))
-    expect(restored.placements[0]).toMatchObject({ logicCategory: '物品', placementMode: 'presentation-only' })
-    expect(restored.edges[0]?.transitionWindow).toMatchObject({ logicCategory: '过渡场景' })
+    expect(restored.placements[0]).toMatchObject({ logicCategory: '物品', placementMode: 'presentation-only', activation: 'free-decoration' })
+    expect(restored.edges[0]?.transitionInstances).toMatchObject([{ endpoint: 'from', materialId: expect.any(String) }])
   })
 })

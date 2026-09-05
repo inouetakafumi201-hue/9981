@@ -29,12 +29,24 @@ export interface ObstructionSpec {
   readonly height?: number;
 }
 
-/** 过渡窗口的样条过渡点（平滑样条的外插补充定位点）。 */
+/** 过渡窗口的样条过渡点（平滑样条的外插补充定位点）。旧地图导入兼容。 */
 export interface TransitionWindowPoints {
   readonly control: readonly Vec2[];
-  /** 直接绑定的过渡场景素材；旧地图可缺省并由诊断提示补齐。 */
   readonly materialId?: string;
   readonly logicCategory?: '过渡场景';
+}
+
+export type TransitionEndpoint = 'from' | 'to';
+
+export interface TransitionInstance {
+  readonly id: string;
+  readonly edgeId: string;
+  readonly endpoint: TransitionEndpoint;
+  readonly materialId: string;
+  readonly microSceneId: string;
+  readonly position: Vec2;
+  readonly sharedParamsRef?: string;
+  readonly effect?: Readonly<Record<string, unknown>>;
 }
 
 /**
@@ -159,8 +171,12 @@ export interface MapEdge {
   readonly visualObstruction?: ObstructionSpec;
   /** 物理遮挡规格（如路障）：影响通行判定。与门户 def 的 blocking 分离。 */
   readonly physicalObstruction?: ObstructionSpec;
-  /** 过渡窗口样条过渡点：渲染层用于绘制进/出的动画窗口。 */
+  /** 旧单窗口字段，仅作为导入迁移输入。 */
   readonly transitionWindow?: TransitionWindowPoints;
+  /** 连线两端的过渡场景实例；每个端点最多一个。 */
+  readonly transitionInstances?: readonly TransitionInstance[];
+  /** 两侧实例共享的边级参数。 */
+  readonly transitionParams?: Readonly<Record<string, unknown>>;
   /** 语义锚点（高低地）：影响战术语义，不参与代价。 */
   readonly semanticAnchor?: 'high' | 'low' | 'neutral';
 }
@@ -173,14 +189,20 @@ export interface MapEdge {
  */
 export type MapMaterialLogicCategory = 'AI 单位' | 'NPC' | '载具' | '容器' | '物品' | '机关装置' | '装饰' | '过渡场景';
 export type MapMaterialPlacementMode = 'native' | 'presentation-only';
+export type MapMaterialActivation = 'native' | 'free-decoration';
 
 export interface MapPlacement {
   readonly id: string;
   /** 宿主节点 id；场景外仅表现素材为空字符串。 */
   readonly at: string;
+  readonly hostSceneId?: string;
   readonly def: string;
   readonly logicCategory?: MapMaterialLogicCategory;
   readonly placementMode?: MapMaterialPlacementMode;
+  readonly activation?: MapMaterialActivation;
+  readonly hostCapabilities?: readonly MapMaterialLogicCategory[];
+  /** 词条只属于此素材实例。 */
+  readonly tokenIds?: readonly string[];
   /** 表现坐标；用于恢复场景外素材的编辑位置。 */
   readonly position?: Vec2;
   /**
@@ -508,6 +530,19 @@ function normalizeMapEdge(edge: MapEdge): MapEdge {
     ...(edge.visualObstruction !== undefined ? { visualObstruction: normalizeObstruction(edge.visualObstruction) } : {}),
     ...(edge.physicalObstruction !== undefined ? { physicalObstruction: normalizeObstruction(edge.physicalObstruction) } : {}),
     ...(edge.transitionWindow !== undefined ? { transitionWindow: normalizeTransitionWindow(edge.transitionWindow) } : {}),
+    ...(edge.transitionInstances !== undefined ? {
+      transitionInstances: edge.transitionInstances.map((instance) => ({
+        id: instance.id,
+        edgeId: instance.edgeId,
+        endpoint: instance.endpoint,
+        materialId: instance.materialId,
+        microSceneId: instance.microSceneId,
+        position: clonePoint(instance.position),
+        ...(instance.sharedParamsRef !== undefined ? { sharedParamsRef: instance.sharedParamsRef } : {}),
+        ...(instance.effect !== undefined ? { effect: { ...instance.effect } } : {}),
+      })),
+    } : {}),
+    ...(edge.transitionParams !== undefined ? { transitionParams: { ...edge.transitionParams } } : {}),
     ...(edge.semanticAnchor !== undefined ? { semanticAnchor: edge.semanticAnchor } : {}),
   };
 }
@@ -516,9 +551,13 @@ function normalizeMapPlacement(placement: MapPlacement): MapPlacement {
   return {
     id: placement.id,
     at: placement.at,
+    ...(placement.hostSceneId !== undefined ? { hostSceneId: placement.hostSceneId } : {}),
     def: placement.def,
     ...(placement.logicCategory !== undefined ? { logicCategory: placement.logicCategory } : {}),
     ...(placement.placementMode !== undefined ? { placementMode: placement.placementMode } : {}),
+    ...(placement.activation !== undefined ? { activation: placement.activation } : {}),
+    ...(placement.hostCapabilities !== undefined ? { hostCapabilities: [...placement.hostCapabilities] } : {}),
+    ...(placement.tokenIds !== undefined ? { tokenIds: [...placement.tokenIds] } : {}),
     ...(placement.position !== undefined ? { position: clonePoint(placement.position) } : {}),
     ...(placement.overrides !== undefined ? { overrides: { ...placement.overrides } } : {}),
     ...(placement.temporaryFree !== undefined ? { temporaryFree: placement.temporaryFree } : {}),
