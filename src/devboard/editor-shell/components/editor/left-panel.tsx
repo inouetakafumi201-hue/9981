@@ -29,7 +29,7 @@ import {
   bindBuildingPortal,
   removeBuildingFloor,
 } from '@editor/lib/editor-store'
-import { uploadPngFile, type UploadCategory } from '@editor/lib/file-upload'
+import { uploadImageFile, type UploadCategory } from '@editor/lib/file-upload'
 
 function SectionHeader({
   title,
@@ -257,7 +257,7 @@ function Keycap({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** PNG 上传为图层：全屏底图（铺满）或局部贴纸（等比缩放可移动）。 */
+/** SVG / PNG 上传为图层：全屏底图（铺满）或局部贴纸（等比缩放可移动）。 */
 function LayerUploadButton() {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
@@ -268,20 +268,20 @@ function LayerUploadButton() {
         className="mt-1 flex w-full items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-primary/80 transition-colors hover:text-primary"
       >
         <IconImage width={12} height={12} />
-        上传底图（全屏 / 局部）
+        上传底图（SVG / PNG）
       </button>
       <input
         ref={inputRef}
         type="file"
-        accept=".png,image/png"
+        accept=".svg,.png,image/svg+xml,image/png"
         className="hidden"
         onChange={async (e) => {
           const file = e.target.files?.[0]
           e.target.value = ''
           if (!file) return
-          let loaded: ReturnType<typeof Object.assign>
+          let loaded: Awaited<ReturnType<typeof uploadImageFile>>
           try {
-            loaded = await uploadPngFile(file)
+            loaded = await uploadImageFile(file)
           } catch (err) {
             playSfx('error')
             toast(`上传失败：${err instanceof Error ? err.message : String(err)}`, 'error')
@@ -289,7 +289,7 @@ function LayerUploadButton() {
           }
           // 选择类别：全屏（铺满整图）或局部（等比贴纸）
           const category: UploadCategory = window.confirm(
-            '作为「全屏底图层」（铺满整张地图）？\n点「取消」则作为「局部贴纸图层」（等比缩放，可移动/缩放）。',
+            `已加载 ${loaded.format.toUpperCase()} 图幅 (${loaded.width}×${loaded.height})。\n作为「全屏底图层」（铺满整张地图）？\n点「取消」则作为「局部贴纸图层」（等比缩放，可移动/缩放）。`,
           )
             ? '全屏'
             : '局部'
@@ -297,7 +297,7 @@ function LayerUploadButton() {
             dataUrl: loaded.dataUrl,
             pixelWidth: loaded.width,
             pixelHeight: loaded.height,
-            name: file.name.replace(/\.png$/i, '') || '图层',
+            name: file.name.replace(/\.(svg|png)$/i, '') || '图层',
             category,
           })
           playSfx('success')
@@ -517,7 +517,7 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
     const file = event.target.files?.[0]
     const targetFloorId = event.currentTarget.getAttribute('data-target-floor')
     if (!file || !targetFloorId) return
-    const uploaded = await uploadPngFile(file)
+    const uploaded = await uploadImageFile(file)
     setBuildingFloorImage(building.id, targetFloorId, uploaded.dataUrl)
     toast(`已设置楼层图幅：${file.name}`, 'ok')
     event.currentTarget.value = ''
@@ -634,7 +634,7 @@ function BuildingGroupCard({ building }: { building: BuildingGroup }) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/png"
+        accept=".svg,.png,image/svg+xml,image/png"
         onChange={handleFile}
         className="hidden"
       />
