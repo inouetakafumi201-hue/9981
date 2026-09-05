@@ -64,6 +64,14 @@ function serializeNode(node: CanonicalMapData['nodes'][number]): Record<string, 
     at: { x: node.at.x, y: node.at.y },
     layerId: node.layerId,
   };
+  if (node.frame !== undefined) {
+    record['frame'] = {
+      x: node.frame.x,
+      y: node.frame.y,
+      width: node.frame.width,
+      height: node.frame.height,
+    };
+  }
   if (node.parent !== undefined) record['parent'] = node.parent;
   if (node.name !== undefined) record['name'] = node.name;
   return record;

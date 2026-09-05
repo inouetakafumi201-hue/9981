@@ -74,6 +74,24 @@ export const ADMITTED_CHILD_SCALES: Readonly<Record<SceneScale, readonly SceneSc
 export type Directionality = 'bidirectional' | 'unidirectional' | 'one-way-down' | 'one-way-up';
 
 /**
+ * 天然场景框：归一化矩形，由地图作者在 MapData 中明确标注，运行期只读，不得按场景尺度或图标推测。
+ */
+export interface SceneFrame {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** 判定点是否落在场景框矩形范围内。 */
+export function containsPoint(frame: SceneFrame, point: Vec2): boolean {
+  return point.x >= frame.x
+    && point.x <= frame.x + frame.width
+    && point.y >= frame.y
+    && point.y <= frame.y + frame.height;
+}
+
+/**
  * 一个天然场景节点。
  *
  * `def` 是要实例化的基类层 Def id；`scale` 是连接数与嵌套规则所依据的尺度。两者都留在数据里
@@ -87,6 +105,8 @@ export interface MapNode {
   readonly scale: SceneScale;
   /** 归一化坐标，渲染用。删掉它拓扑依然完整。 */
   readonly at: Vec2;
+  /** 天然场景框（归一化矩形，作者显式标注，运行期只读）。 */
+  readonly frame?: SceneFrame;
   /** 所在楼层。同一底图上的地面层为 0。 */
   readonly floor: number;
   /**
@@ -422,14 +442,16 @@ function normalizeMapNodeBase(node: {
   readonly def: string;
   readonly scale: SceneScale;
   readonly at: Vec2;
+  readonly frame?: SceneFrame;
   readonly parent?: string;
   readonly name?: string;
-}): Pick<MapNode, 'id' | 'def' | 'scale' | 'at' | 'parent' | 'name'> {
+}): Pick<MapNode, 'id' | 'def' | 'scale' | 'at' | 'frame' | 'parent' | 'name'> {
   return {
     id: node.id,
     def: node.def,
     scale: node.scale,
     at: clonePoint(node.at),
+    ...(node.frame !== undefined ? { frame: { x: node.frame.x, y: node.frame.y, width: node.frame.width, height: node.frame.height } } : {}),
     ...(node.parent !== undefined ? { parent: node.parent } : {}),
     ...(node.name !== undefined ? { name: node.name } : {}),
   };
