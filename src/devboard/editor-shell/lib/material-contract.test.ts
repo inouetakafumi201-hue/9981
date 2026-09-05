@@ -86,4 +86,40 @@ describe('八类逻辑素材契约', () => {
     expect(restored.placements[0]).toMatchObject({ logicCategory: '物品', placementMode: 'presentation-only', activation: 'free-decoration' })
     expect(restored.edges[0]?.transitionInstances).toMatchObject([{ endpoint: 'from', materialId: expect.any(String) }])
   })
+
+  it('旧单窗口能按最近端点迁移为微型场景实例', () => {
+    const edge = BASE_MAP.edges[0]
+    if (!edge) throw new Error('测试地图缺少边')
+    const restored = canonicalToEditorDoc({
+      ...BASE_MAP,
+      edges: [{
+        ...edge,
+        transitionWindow: {
+          control: [{ x: 0.25, y: 0.5 }],
+          materialId: materialId('过渡场景'),
+          logicCategory: '过渡场景',
+        },
+      }],
+    })
+    expect(restored.edges[0]?.transitionInstances).toMatchObject([{ endpoint: 'from', microSceneId: 'ms_transition_edge_from' }])
+    expect(restored.sceneNodes).toContainEqual(expect.objectContaining({ id: 'ms_transition_edge_from', parent: 'a', def: 'd:scene/micro-transition' }))
+  })
+
+  it('旧单窗口落在两端正中时不静默伪造端点', () => {
+    const edge = BASE_MAP.edges[0]
+    if (!edge) throw new Error('测试地图缺少边')
+    const restored = canonicalToEditorDoc({
+      ...BASE_MAP,
+      edges: [{
+        ...edge,
+        transitionWindow: {
+          control: [{ x: 0.5, y: 0.5 }],
+          materialId: materialId('过渡场景'),
+          logicCategory: '过渡场景',
+        },
+      }],
+    })
+    expect(restored.edges[0]?.transitionInstances).toBeUndefined()
+    expect(restored.edges[0]?.transitionWindow).toMatchObject({ materialId: expect.any(String) })
+  })
 })
