@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "2.0",
+  "id": "sample-door-slanted-45",
+  "lane": "component",
+  "componentType": "environment",
+  "description": "斜向地铁闸门",
+  "status": "ready",
+  "states": ["closed", "cracked", "open"],
+  "frames": [
+    {
+      "name": "closed",
+      "file": "frames/closed.png",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "name": "cracked",
+      "file": "frames/cracked.png",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "name": "open",
+      "file": "frames/open.png",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "width": 64,
+      "height": 64
+    }
+  ],
+  "qc": {
+    "status": "passed",
+    "checks": [
+      {
+        "check": "frame_count",
+        "passed": true,
+        "details": "Expected 3 frames, got 3"
+      },
+      {
+        "check": "no_empty_frame",
+        "passed": true,
+        "details": "All frames contain valid pixels"
+      },
+      {
+        "check": "checksum_integrity",
+        "passed": true,
+        "details": "SHA256 verified for all 3 frames"
+      }
+    ]
+  },
+  "provenance": {
+    "jobId": "job-sample-door-slanted-45",
+    "tool": "sprite-forge-v2",
+    "generatedAt": "2026-09-05T00:00:00.000Z",
+    "referenceCrop": "crops/door_subway_45.png"
+  }
+}
