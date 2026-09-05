@@ -141,12 +141,30 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
       });
     }
 
+    if (node.frame !== undefined) {
+      const frame = node.frame;
+      const valid = Number.isFinite(frame.x) && Number.isFinite(frame.y)
+        && Number.isFinite(frame.width) && Number.isFinite(frame.height)
+        && frame.x >= 0 && frame.y >= 0 && frame.width > 0 && frame.height > 0
+        && frame.x + frame.width <= 1 && frame.y + frame.height <= 1;
+      if (!valid) {
+        findings.push({
+          code: 'MAP_INVALID_SCENE_FRAME',
+          severity: 'error',
+          path: `${path}/frame`,
+          subject: node.id,
+          message: `节点「${node.name ?? node.id}」的场景框必须是归一化坐标 [0,1] 范围内的正矩形。`,
+          correction: '确保场景框的 x, y, width, height 为有限数字，且完全落在 0 到 1 范围内并具有正面积。',
+        });
+      }
+    }
+
     // canonical 节点用 layerId（validateLayerContract 守）；legacy 节点的楼层声明检查
     // 已由 validateLegacyFloorDeclaration 提前整体报出（每个未声明节点一条），节点循环
     // 内不再重复报，避免同一条诊断出现两次。
   });
 
-  // ---- 父子嵌套 -----------------------------------------------------------
+  // ---- 父子嵌�� -----------------------------------------------------------
   for (const [index, node] of map.nodes.entries()) {
     if (node.parent === undefined) continue;
     const path = `/nodes/${index}/parent`;
@@ -338,7 +356,7 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         message: `放置「${placement.id}」的覆写用了保留键名「${key}」。`,
         correction:
           `${EXPR_DISCRIMINANT_KEYS.join('、')} 这几个键名会被表达式求值器当成表达式而不是数据，`
-          + `导致这个值被静默误解。换一个名字，例如「${key}Value」。`,
+          + `导致��个值被静默误解。换一个名字，例如「${key}Value」。`,
       });
     }
   });
