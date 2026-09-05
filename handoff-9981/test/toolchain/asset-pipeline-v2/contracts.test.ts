@@ -165,8 +165,9 @@ describe('素材生成管线 v2: 原生组件占位切片 (Crop-to-Sprite) 数�
     const canonical = normalizeMapDocument(mapData);
     expect(canonical.placeholderBoxes).toBeDefined();
     expect(canonical.placeholderBoxes?.length).toBe(1);
-    expect(canonical.placeholderBoxes?.[0].id).toBe('door_subway_45');
-    expect(canonical.placeholderBoxes?.[0].spriteRef).toBe('d:item/door_subway_45');
+    const firstBox = canonical.placeholderBoxes?.[0];
+    expect(firstBox?.id).toBe('door_subway_45');
+    expect(firstBox?.spriteRef).toBe('d:item/door_subway_45');
 
     const findings = validateMapStructure(canonical);
     expect(findings).toEqual([]);
