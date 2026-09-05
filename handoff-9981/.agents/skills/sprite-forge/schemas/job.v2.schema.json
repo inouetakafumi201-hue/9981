@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wakeup.engine/schemas/job.v2.schema.json",
+  "title": "SpriteForgeJobV2",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "lane",
+    "description",
+    "states",
+    "rawTarget",
+    "outDir",
+    "status",
+    "prompt",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "jobId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "lane": {
+      "type": "string",
+      "enum": ["component", "character", "symbol", "backdrop"]
+    },
+    "componentType": {
+      "type": "string",
+      "enum": [
+        "weapon-melee",
+        "weapon-ranged",
+        "weapon-firearm",
+        "item-consumable",
+        "item-tool",
+        "item-equipment",
+        "device",
+        "environment"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "perspective": {
+      "type": "string",
+      "enum": ["front view", "front-top axonometric view"]
+    },
+    "referenceCrop": {
+      "type": "string"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rawTarget": {
+      "type": "string"
+    },
+    "outDir": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["awaiting-generation", "raw-ready", "complete", "failed"]
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "postProcess": {
+      "type": "object",
+      "properties": {
+        "purifyTolerance": { "type": "number" },
+        "targetSize": { "type": "integer" },
+        "gridRows": { "type": "integer" },
+        "gridCols": { "type": "integer" }
+      }
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

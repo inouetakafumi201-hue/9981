@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "2.0",
+  "description": "WakeUp Component Types and Perspective Rules Fact Source v2",
+  "types": [
+    {
+      "id": "weapon-melee",
+      "name": "近战武器",
+      "perspective": "front-top axonometric view",
+      "primaryColor": "coral",
+      "colorSpec": "Primary: CORAL (warm orange-red) for melee attack identity. Secondary: dark steel gray, worn leather grip. Highlight: silver edge.",
+      "description": "近战冷兵器与破坏工具，强调动作感与打击面"
+    },
+    {
+      "id": "weapon-ranged",
+      "name": "远程武器",
+      "perspective": "front-top axonometric view",
+      "primaryColor": "purple",
+      "colorSpec": "Primary: PURPLE accent (long-range / relationship constraint). Secondary: matte dark gray composite, tan strap. Highlight: silver.",
+      "description": "弓弩、投掷类远程武器"
+    },
+    {
+      "id": "weapon-firearm",
+      "name": "枪械武器",
+      "perspective": "front-top axonometric view",
+      "primaryColor": "gunmetal-orange",
+      "colorSpec": "Primary: gunmetal gray-blue with ORANGE accent (consumes AP / ammo). Secondary: dark polymer, brass casing detail. Highlight: silver slide.",
+      "description": "热兵器、枪械与爆炸物发射装置"
+    },
+    {
+      "id": "item-consumable",
+      "name": "消耗品",
+      "perspective": "front view",
+      "primaryColor": "green-orange",
+      "colorSpec": "Primary: GREEN (positive / safe / free) or ORANGE (consumption). Secondary: white bandage / amber liquid / paper wrap. Highlight: bright green accent.",
+      "description": "药剂、食物、燃料等一次性或有耐久的消耗物品"
+    },
+    {
+      "id": "item-tool",
+      "name": "工具",
+      "perspective": "front view",
+      "primaryColor": "orange-yellow",
+      "colorSpec": "Primary: ORANGE (action / in-progress) or YELLOW (senses / attention). Secondary: black rubber grip, steel. Highlight: silver.",
+      "description": "钥匙、撬棍、扳手、探测器等用于检定或交互的手持工具"
+    },
+    {
+      "id": "item-equipment",
+      "name": "装备",
+      "perspective": "front view",
+      "primaryColor": "blue",
+      "colorSpec": "Primary: BLUE (tech / exhaustion-adjacent utility). Secondary: gray fabric, dark straps. Highlight: cyan-blue edge.",
+      "description": "护甲、头盔、腰带、背包等单人佩戴装备"
+    },
+    {
+      "id": "device",
+      "name": "装置设施",
+      "perspective": "front-top axonometric view",
+      "primaryColor": "offwhite-blue",
+      "colorSpec": "Primary: off-white gray (interactive-but-state-bound) with BLUE tech accent. Secondary: dark screen, metal casing. Highlight: white edge glow when active.",
+      "description": "配电箱、终端机、监控雷达、研究台等可交互装置"
+    },
+    {
+      "id": "environment",
+      "name": "环境原生组件",
+      "perspective": "front-top axonometric view",
+      "primaryColor": "muted-gray-brown",
+      "colorSpec": "Primary: muted low-saturation gray/brown matching the sketch-line background, with clear hard silhouette. Secondary: wood / concrete / metal. Highlight: subtle.",
+      "description": "门、闸机、箱柜、落地掩体等固定环境建筑或底图原生组件"
+    }
+  ],
+  "perspectiveRules": {
+    "itemLanes": [
+      "item-consumable",
+      "item-tool",
+      "item-equipment"
+    ],
+    "itemPerspective": "front view",
+    "itemPerspectiveDescription": "眼平直接正交正视图，强调物品清晰剪影与细节，无俯仰角度、无三维倾斜深度、无侧立面、无透视消失点",
+    "spatialLanes": [
+      "weapon-melee",
+      "weapon-ranged",
+      "weapon-firearm",
+      "device",
+      "environment"
+    ],
+    "spatialPerspective": "front-top axonometric view",
+    "spatialPerspectiveDescription": "正面高位斜测轴：顶部与前部可见，侧部与后部隐藏，固定常规斜角，正交投影"
+  }
+}

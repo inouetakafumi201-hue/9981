@@ -1,0 +1,2159 @@
+{
+  "schemaVersion": "2.0",
+  "description": "WakeUp 304 Game-Icons Semantic Vocabulary Index",
+  "totalCount": 304,
+  "categories": [
+    "device",
+    "combat",
+    "environment",
+    "defense",
+    "abstract",
+    "dream",
+    "attribute",
+    "hazard",
+    "clue",
+    "mobility",
+    "ranged",
+    "time",
+    "social",
+    "relation",
+    "tool",
+    "resource",
+    "status",
+    "action",
+    "consumable",
+    "medical",
+    "check",
+    "energy"
+  ],
+  "icons": [
+    {
+      "id": "3d-glasses",
+      "name": "立体视镜",
+      "category": "device",
+      "usage": "透视、增强视觉",
+      "sourceSvg": "src/svg-game-icons/game-icons--3d-glasses.svg"
+    },
+    {
+      "id": "3d-hammer",
+      "name": "锤击",
+      "category": "combat",
+      "usage": "近战重击、敲击动作",
+      "sourceSvg": "src/svg-game-icons/game-icons--3d-hammer.svg"
+    },
+    {
+      "id": "3d-stairs",
+      "name": "阶梯",
+      "category": "environment",
+      "usage": "层级、上升通道",
+      "sourceSvg": "src/svg-game-icons/game-icons--3d-stairs.svg"
+    },
+    {
+      "id": "abdominal-armor",
+      "name": "腹甲",
+      "category": "defense",
+      "usage": "部位防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--abdominal-armor.svg"
+    },
+    {
+      "id": "abstract-005",
+      "name": "珍宝/馈赠",
+      "category": "abstract",
+      "usage": "双手捧宝石——被珍视的持有物；用于「稀有素材」「守护之物」「馈赠/祝福」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-005.svg"
+    },
+    {
+      "id": "abstract-010",
+      "name": "体制齿轮",
+      "category": "abstract",
+      "usage": "齿轮中的人——被系统裹挟的个体；用于「规则/体制」「身不由己」「轮转中的身份」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-010.svg"
+    },
+    {
+      "id": "abstract-018",
+      "name": "锚定导流仪",
+      "category": "abstract",
+      "usage": "未来登记机——**世界观物品**（与现实锚定/导流相关）；用于梦境装置、锚定物",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-018.svg"
+    },
+    {
+      "id": "abstract-021",
+      "name": "轮转",
+      "category": "abstract",
+      "usage": "轮子——循环推进；用于「循环」「驱动」「进程」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-021.svg"
+    },
+    {
+      "id": "abstract-024",
+      "name": "梦境漩涡",
+      "category": "abstract",
+      "usage": "迷幻连环圈——梦境循环/漩涡；用于「循环梦境」「侵蚀加深」「螺旋下坠」",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-024.svg"
+    },
+    {
+      "id": "abstract-030",
+      "name": "锁定瞄准",
+      "category": "abstract",
+      "usage": "四条准星——精确瞄准；用于「锁定目标」「精确打击」「聚焦」",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-030.svg"
+    },
+    {
+      "id": "abstract-045",
+      "name": "中转转换",
+      "category": "abstract",
+      "usage": "方套圆中转仪——分流/转换站；用于「转换」「中转」「分流」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-045.svg"
+    },
+    {
+      "id": "abstract-055",
+      "name": "梦境录像带",
+      "category": "abstract",
+      "usage": "胶卷带圆圈——梦境记忆载体；用于「梦境记录」「记忆」「回溯」",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-055.svg"
+    },
+    {
+      "id": "abstract-084",
+      "name": "天文观测",
+      "category": "abstract",
+      "usage": "向天雷达——天文观测/扫描；用于「探测」「观测」「监听」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-084.svg"
+    },
+    {
+      "id": "abstract-114",
+      "name": "知识书库",
+      "category": "abstract",
+      "usage": "书堆——知识积累；用于「知识」「学习」「资料库」语义",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-114.svg"
+    },
+    {
+      "id": "abstract-117",
+      "name": "梦境破坏器",
+      "category": "abstract",
+      "usage": "手提收音机——**世界观高能武器**（破坏梦境）；用于「唤醒」「梦境瓦解」「清除」",
+      "sourceSvg": "src/svg-game-icons/game-icons--abstract-117.svg"
+    },
+    {
+      "id": "ace",
+      "name": "王牌",
+      "category": "dream",
+      "usage": "顶级、关键牌",
+      "sourceSvg": "src/svg-game-icons/game-icons--ace.svg"
+    },
+    {
+      "id": "achievement",
+      "name": "成就",
+      "category": "attribute",
+      "usage": "成就、里程碑",
+      "sourceSvg": "src/svg-game-icons/game-icons--achievement.svg"
+    },
+    {
+      "id": "achilles-heel",
+      "name": "弱点",
+      "category": "hazard",
+      "usage": "致命弱点、突破口",
+      "sourceSvg": "src/svg-game-icons/game-icons--achilles-heel.svg"
+    },
+    {
+      "id": "acoustic-megaphone",
+      "name": "噪音源",
+      "category": "clue",
+      "usage": "声响、警报、吸引注意",
+      "sourceSvg": "src/svg-game-icons/game-icons--acoustic-megaphone.svg"
+    },
+    {
+      "id": "acrobatic",
+      "name": "杂技",
+      "category": "mobility",
+      "usage": "灵活、闪转",
+      "sourceSvg": "src/svg-game-icons/game-icons--acrobatic.svg"
+    },
+    {
+      "id": "aerial-signal",
+      "name": "空中信号",
+      "category": "attribute",
+      "usage": "信号、呼叫、联络",
+      "sourceSvg": "src/svg-game-icons/game-icons--aerial-signal.svg"
+    },
+    {
+      "id": "aero-bike",
+      "name": "飞行载具",
+      "category": "mobility",
+      "usage": "快速载具、飞行",
+      "sourceSvg": "src/svg-game-icons/game-icons--aero-bike.svg"
+    },
+    {
+      "id": "aerodynamic-harpoon",
+      "name": "鱼叉",
+      "category": "ranged",
+      "usage": "远程投掷、捕获",
+      "sourceSvg": "src/svg-game-icons/game-icons--aerodynamic-harpoon.svg"
+    },
+    {
+      "id": "aerosol",
+      "name": "喷雾/毒雾",
+      "category": "hazard",
+      "usage": "泛化：气雾攻击、雾化药剂、毒雾区域",
+      "sourceSvg": "src/svg-game-icons/game-icons--aerosol.svg"
+    },
+    {
+      "id": "air-force",
+      "name": "空中支援",
+      "category": "combat",
+      "usage": "泛化：制空权、空袭、高空威胁",
+      "sourceSvg": "src/svg-game-icons/game-icons--air-force.svg"
+    },
+    {
+      "id": "airplane-arrival",
+      "name": "到达",
+      "category": "mobility",
+      "usage": "泛化：抵达、登陆、传送落点",
+      "sourceSvg": "src/svg-game-icons/game-icons--airplane-arrival.svg"
+    },
+    {
+      "id": "airplane-departure",
+      "name": "出发",
+      "category": "mobility",
+      "usage": "泛化：启程、出发、传送起点",
+      "sourceSvg": "src/svg-game-icons/game-icons--airplane-departure.svg"
+    },
+    {
+      "id": "ak47",
+      "name": "突击步枪",
+      "category": "ranged",
+      "usage": "突击火力",
+      "sourceSvg": "src/svg-game-icons/game-icons--ak47.svg"
+    },
+    {
+      "id": "ak47u",
+      "name": "突击步枪·短款",
+      "category": "ranged",
+      "usage": "突击火力、紧凑型",
+      "sourceSvg": "src/svg-game-icons/game-icons--ak47u.svg"
+    },
+    {
+      "id": "alarm-clock",
+      "name": "闹钟",
+      "category": "time",
+      "usage": "定时、预警",
+      "sourceSvg": "src/svg-game-icons/game-icons--alarm-clock.svg"
+    },
+    {
+      "id": "alien-skull",
+      "name": "异星骸",
+      "category": "dream",
+      "usage": "异质存在、未知威胁",
+      "sourceSvg": "src/svg-game-icons/game-icons--alien-skull.svg"
+    },
+    {
+      "id": "all-for-one",
+      "name": "万众一心",
+      "category": "social",
+      "usage": "团队协同",
+      "sourceSvg": "src/svg-game-icons/game-icons--all-for-one.svg"
+    },
+    {
+      "id": "all-seeing-eye",
+      "name": "全视之眼",
+      "category": "clue",
+      "usage": "全域侦查、洞察",
+      "sourceSvg": "src/svg-game-icons/game-icons--all-seeing-eye.svg"
+    },
+    {
+      "id": "allied-star",
+      "name": "同盟",
+      "category": "social",
+      "usage": "友军、同盟",
+      "sourceSvg": "src/svg-game-icons/game-icons--allied-star.svg"
+    },
+    {
+      "id": "alligator-clip",
+      "name": "鳄鱼夹",
+      "category": "device",
+      "usage": "连接、夹持",
+      "sourceSvg": "src/svg-game-icons/game-icons--alligator-clip.svg"
+    },
+    {
+      "id": "american-football-helmet",
+      "name": "头盔",
+      "category": "defense",
+      "usage": "头部防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--american-football-helmet.svg"
+    },
+    {
+      "id": "ammo-box",
+      "name": "弹药箱",
+      "category": "ranged",
+      "usage": "弹药补给",
+      "sourceSvg": "src/svg-game-icons/game-icons--ammo-box.svg"
+    },
+    {
+      "id": "amplitude",
+      "name": "波形",
+      "category": "attribute",
+      "usage": "**泛化：波/信号/波动**——音波、心电、传感",
+      "sourceSvg": "src/svg-game-icons/game-icons--amplitude.svg"
+    },
+    {
+      "id": "amputation",
+      "name": "截肢",
+      "category": "combat",
+      "usage": "致残、永久损伤",
+      "sourceSvg": "src/svg-game-icons/game-icons--amputation.svg"
+    },
+    {
+      "id": "anarchy",
+      "name": "混乱",
+      "category": "relation",
+      "usage": "失序、无政府",
+      "sourceSvg": "src/svg-game-icons/game-icons--anarchy.svg"
+    },
+    {
+      "id": "anatomy",
+      "name": "解剖",
+      "category": "attribute",
+      "usage": "体质、弱点分析",
+      "sourceSvg": "src/svg-game-icons/game-icons--anatomy.svg"
+    },
+    {
+      "id": "anchor",
+      "name": "锚定",
+      "category": "environment",
+      "usage": "锚点、固定、绑定",
+      "sourceSvg": "src/svg-game-icons/game-icons--anchor.svg"
+    },
+    {
+      "id": "ancient-ruins",
+      "name": "遗迹",
+      "category": "environment",
+      "usage": "远古、探索地",
+      "sourceSvg": "src/svg-game-icons/game-icons--ancient-ruins.svg"
+    },
+    {
+      "id": "ancient-sword",
+      "name": "古剑",
+      "category": "combat",
+      "usage": "古老近战武器、传说武器",
+      "sourceSvg": "src/svg-game-icons/game-icons--ancient-sword.svg"
+    },
+    {
+      "id": "android-mask",
+      "name": "机械面具",
+      "category": "dream",
+      "usage": "机械、伪装",
+      "sourceSvg": "src/svg-game-icons/game-icons--android-mask.svg"
+    },
+    {
+      "id": "angel-wings",
+      "name": "天使之翼",
+      "category": "dream",
+      "usage": "祝福、庇护",
+      "sourceSvg": "src/svg-game-icons/game-icons--angel-wings.svg"
+    },
+    {
+      "id": "anti-aircraft-gun",
+      "name": "防空炮",
+      "category": "ranged",
+      "usage": "对空反制",
+      "sourceSvg": "src/svg-game-icons/game-icons--anti-aircraft-gun.svg"
+    },
+    {
+      "id": "antibody",
+      "name": "抗体",
+      "category": "defense",
+      "usage": "免疫、抗性",
+      "sourceSvg": "src/svg-game-icons/game-icons--antibody.svg"
+    },
+    {
+      "id": "anticlockwise-rotation",
+      "name": "逆旋",
+      "category": "mobility",
+      "usage": "逆转、回退",
+      "sourceSvg": "src/svg-game-icons/game-icons--anticlockwise-rotation.svg"
+    },
+    {
+      "id": "anubis",
+      "name": "审判",
+      "category": "dream",
+      "usage": "死亡、审判",
+      "sourceSvg": "src/svg-game-icons/game-icons--anubis.svg"
+    },
+    {
+      "id": "anvil",
+      "name": "铁砧",
+      "category": "tool",
+      "usage": "锻造、打造",
+      "sourceSvg": "src/svg-game-icons/game-icons--anvil.svg"
+    },
+    {
+      "id": "apc",
+      "name": "重装载具",
+      "category": "combat",
+      "usage": "泛化：装甲运兵、重装运输、铁壁冲锋",
+      "sourceSvg": "src/svg-game-icons/game-icons--apc.svg"
+    },
+    {
+      "id": "apple-core",
+      "name": "果核",
+      "category": "resource",
+      "usage": "残余、消耗品残余",
+      "sourceSvg": "src/svg-game-icons/game-icons--apple-core.svg"
+    },
+    {
+      "id": "archer",
+      "name": "弓手",
+      "category": "ranged",
+      "usage": "弓箭远程",
+      "sourceSvg": "src/svg-game-icons/game-icons--archer.svg"
+    },
+    {
+      "id": "arm-sling",
+      "name": "吊臂带",
+      "category": "status",
+      "usage": "泛化：伤后束缚、恢复中、行动受限",
+      "sourceSvg": "src/svg-game-icons/game-icons--arm-sling.svg"
+    },
+    {
+      "id": "armor-cuisses",
+      "name": "腿甲",
+      "category": "defense",
+      "usage": "腿部防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--armor-cuisses.svg"
+    },
+    {
+      "id": "armor-upgrade",
+      "name": "护甲升级",
+      "category": "defense",
+      "usage": "强化防御",
+      "sourceSvg": "src/svg-game-icons/game-icons--armor-upgrade.svg"
+    },
+    {
+      "id": "armored-pants",
+      "name": "装甲裤",
+      "category": "defense",
+      "usage": "下身防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--armored-pants.svg"
+    },
+    {
+      "id": "arrest",
+      "name": "拘禁",
+      "category": "relation",
+      "usage": "控制、逮捕",
+      "sourceSvg": "src/svg-game-icons/game-icons--arrest.svg"
+    },
+    {
+      "id": "arrow-flights",
+      "name": "箭羽",
+      "category": "ranged",
+      "usage": "远程弹药、追踪",
+      "sourceSvg": "src/svg-game-icons/game-icons--arrow-flights.svg"
+    },
+    {
+      "id": "arrow-wings",
+      "name": "箭翼",
+      "category": "ranged",
+      "usage": "疾射、加速箭",
+      "sourceSvg": "src/svg-game-icons/game-icons--arrow-wings.svg"
+    },
+    {
+      "id": "arrows-shield",
+      "name": "箭盾",
+      "category": "defense",
+      "usage": "防远程",
+      "sourceSvg": "src/svg-game-icons/game-icons--arrows-shield.svg"
+    },
+    {
+      "id": "artillery-shell",
+      "name": "炮弹",
+      "category": "combat",
+      "usage": "重型轰击、支援火力",
+      "sourceSvg": "src/svg-game-icons/game-icons--artillery-shell.svg"
+    },
+    {
+      "id": "attached-shield",
+      "name": "持盾",
+      "category": "defense",
+      "usage": "持盾防御",
+      "sourceSvg": "src/svg-game-icons/game-icons--attached-shield.svg"
+    },
+    {
+      "id": "audio-cassette",
+      "name": "磁带",
+      "category": "device",
+      "usage": "录音、记忆载体",
+      "sourceSvg": "src/svg-game-icons/game-icons--audio-cassette.svg"
+    },
+    {
+      "id": "auto-repair",
+      "name": "自动修复",
+      "category": "action",
+      "usage": "修复、恢复",
+      "sourceSvg": "src/svg-game-icons/game-icons--auto-repair.svg"
+    },
+    {
+      "id": "autogun",
+      "name": "自动炮",
+      "category": "ranged",
+      "usage": "自动火力、炮塔",
+      "sourceSvg": "src/svg-game-icons/game-icons--autogun.svg"
+    },
+    {
+      "id": "axe-swing",
+      "name": "挥斧",
+      "category": "combat",
+      "usage": "斧类近战、重劈",
+      "sourceSvg": "src/svg-game-icons/game-icons--axe-swing.svg"
+    },
+    {
+      "id": "bandit",
+      "name": "强盗",
+      "category": "relation",
+      "usage": "劫掠者、敌人",
+      "sourceSvg": "src/svg-game-icons/game-icons--bandit.svg"
+    },
+    {
+      "id": "banknote",
+      "name": "钞票",
+      "category": "resource",
+      "usage": "货币",
+      "sourceSvg": "src/svg-game-icons/game-icons--banknote.svg"
+    },
+    {
+      "id": "barrel",
+      "name": "木桶",
+      "category": "resource",
+      "usage": "容器、遮挡",
+      "sourceSvg": "src/svg-game-icons/game-icons--barrel.svg"
+    },
+    {
+      "id": "barrier",
+      "name": "屏障",
+      "category": "defense",
+      "usage": "阻挡、隔离",
+      "sourceSvg": "src/svg-game-icons/game-icons--barrier.svg"
+    },
+    {
+      "id": "basketball-jersey",
+      "name": "球队身份",
+      "category": "social",
+      "usage": "团队、阵营身份",
+      "sourceSvg": "src/svg-game-icons/game-icons--basketball-jersey.svg"
+    },
+    {
+      "id": "battery-0",
+      "name": "电量空",
+      "category": "resource",
+      "usage": "能源耗尽",
+      "sourceSvg": "src/svg-game-icons/game-icons--battery-0.svg"
+    },
+    {
+      "id": "battery-100",
+      "name": "电量满",
+      "category": "resource",
+      "usage": "能源充足",
+      "sourceSvg": "src/svg-game-icons/game-icons--battery-100.svg"
+    },
+    {
+      "id": "battery-pack",
+      "name": "电池组",
+      "category": "resource",
+      "usage": "能源储备",
+      "sourceSvg": "src/svg-game-icons/game-icons--battery-pack.svg"
+    },
+    {
+      "id": "battle-gear",
+      "name": "战斗装备",
+      "category": "resource",
+      "usage": "武装、出征准备",
+      "sourceSvg": "src/svg-game-icons/game-icons--battle-gear.svg"
+    },
+    {
+      "id": "batwing-emblem",
+      "name": "蝠翼徽章",
+      "category": "dream",
+      "usage": "黑暗象征、夜",
+      "sourceSvg": "src/svg-game-icons/game-icons--batwing-emblem.svg"
+    },
+    {
+      "id": "bayonet",
+      "name": "刺刀",
+      "category": "combat",
+      "usage": "枪械近战、突刺",
+      "sourceSvg": "src/svg-game-icons/game-icons--bayonet.svg"
+    },
+    {
+      "id": "belt",
+      "name": "腰带",
+      "category": "resource",
+      "usage": "装备挂载",
+      "sourceSvg": "src/svg-game-icons/game-icons--belt.svg"
+    },
+    {
+      "id": "belt-armor",
+      "name": "腰带甲",
+      "category": "defense",
+      "usage": "腰部防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--belt-armor.svg"
+    },
+    {
+      "id": "biceps",
+      "name": "力量",
+      "category": "attribute",
+      "usage": "力量属性",
+      "sourceSvg": "src/svg-game-icons/game-icons--biceps.svg"
+    },
+    {
+      "id": "blast",
+      "name": "爆轰",
+      "category": "combat",
+      "usage": "爆炸伤害、冲击",
+      "sourceSvg": "src/svg-game-icons/game-icons--blast.svg"
+    },
+    {
+      "id": "blunderbuss",
+      "name": "火铳",
+      "category": "ranged",
+      "usage": "霰弹枪类、散射",
+      "sourceSvg": "src/svg-game-icons/game-icons--blunderbuss.svg"
+    },
+    {
+      "id": "boarding-pass",
+      "name": "通行凭证",
+      "category": "resource",
+      "usage": "通行权、许可",
+      "sourceSvg": "src/svg-game-icons/game-icons--boarding-pass.svg"
+    },
+    {
+      "id": "bolt-cutter",
+      "name": "断线钳",
+      "category": "tool",
+      "usage": "破坏锁具",
+      "sourceSvg": "src/svg-game-icons/game-icons--bolt-cutter.svg"
+    },
+    {
+      "id": "bolter-gun",
+      "name": "爆弹枪",
+      "category": "ranged",
+      "usage": "重口径枪械",
+      "sourceSvg": "src/svg-game-icons/game-icons--bolter-gun.svg"
+    },
+    {
+      "id": "bowman",
+      "name": "弓手",
+      "category": "ranged",
+      "usage": "远程射手",
+      "sourceSvg": "src/svg-game-icons/game-icons--bowman.svg"
+    },
+    {
+      "id": "briefcase",
+      "name": "公文包",
+      "category": "resource",
+      "usage": "任务物品、文件",
+      "sourceSvg": "src/svg-game-icons/game-icons--briefcase.svg"
+    },
+    {
+      "id": "broken-arrow",
+      "name": "断箭",
+      "category": "hazard",
+      "usage": "泛化：任务中断、信号丢失、计划失败",
+      "sourceSvg": "src/svg-game-icons/game-icons--broken-arrow.svg"
+    },
+    {
+      "id": "broken-shield",
+      "name": "破盾",
+      "category": "defense",
+      "usage": "防御失效",
+      "sourceSvg": "src/svg-game-icons/game-icons--broken-shield.svg"
+    },
+    {
+      "id": "brute",
+      "name": "蛮力",
+      "category": "attribute",
+      "usage": "蛮力、莽撞",
+      "sourceSvg": "src/svg-game-icons/game-icons--brute.svg"
+    },
+    {
+      "id": "bubbling-flask",
+      "name": "炼金瓶",
+      "category": "consumable",
+      "usage": "炼金药剂、实验",
+      "sourceSvg": "src/svg-game-icons/game-icons--bubbling-flask.svg"
+    },
+    {
+      "id": "bullets",
+      "name": "弹药",
+      "category": "ranged",
+      "usage": "弹药储备",
+      "sourceSvg": "src/svg-game-icons/game-icons--bullets.svg"
+    },
+    {
+      "id": "bullseye",
+      "name": "靶心",
+      "category": "ranged",
+      "usage": "精确命中、弱点击中",
+      "sourceSvg": "src/svg-game-icons/game-icons--bullseye.svg"
+    },
+    {
+      "id": "bully-minion",
+      "name": "爪牙",
+      "category": "relation",
+      "usage": "喽啰、走狗",
+      "sourceSvg": "src/svg-game-icons/game-icons--bully-minion.svg"
+    },
+    {
+      "id": "burning-dot",
+      "name": "灼烧",
+      "category": "status",
+      "usage": "持续灼烧",
+      "sourceSvg": "src/svg-game-icons/game-icons--burning-dot.svg"
+    },
+    {
+      "id": "caduceus",
+      "name": "医杖",
+      "category": "medical",
+      "usage": "医疗、治愈",
+      "sourceSvg": "src/svg-game-icons/game-icons--caduceus.svg"
+    },
+    {
+      "id": "cannister",
+      "name": "罐",
+      "category": "resource",
+      "usage": "容器、储罐",
+      "sourceSvg": "src/svg-game-icons/game-icons--cannister.svg"
+    },
+    {
+      "id": "car-door",
+      "name": "车门",
+      "category": "environment",
+      "usage": "载具入口、车辆",
+      "sourceSvg": "src/svg-game-icons/game-icons--car-door.svg"
+    },
+    {
+      "id": "car-key",
+      "name": "载具钥匙",
+      "category": "tool",
+      "usage": "启动载具",
+      "sourceSvg": "src/svg-game-icons/game-icons--car-key.svg"
+    },
+    {
+      "id": "chainsaw",
+      "name": "电锯",
+      "category": "combat",
+      "usage": "破坏性近战、切割",
+      "sourceSvg": "src/svg-game-icons/game-icons--chainsaw.svg"
+    },
+    {
+      "id": "chest",
+      "name": "宝箱",
+      "category": "resource",
+      "usage": "战利品、收藏",
+      "sourceSvg": "src/svg-game-icons/game-icons--chest.svg"
+    },
+    {
+      "id": "chewed-heart",
+      "name": "噬心",
+      "category": "status",
+      "usage": "侵蚀、被吞噬",
+      "sourceSvg": "src/svg-game-icons/game-icons--chewed-heart.svg"
+    },
+    {
+      "id": "cluster-bomb",
+      "name": "集束炸弹",
+      "category": "combat",
+      "usage": "范围轰炸、多段伤害",
+      "sourceSvg": "src/svg-game-icons/game-icons--cluster-bomb.svg"
+    },
+    {
+      "id": "cobra",
+      "name": "毒蛇",
+      "category": "dream",
+      "usage": "毒、潜伏威胁",
+      "sourceSvg": "src/svg-game-icons/game-icons--cobra.svg"
+    },
+    {
+      "id": "colt-m1911",
+      "name": "柯尔特手枪",
+      "category": "ranged",
+      "usage": "手枪类、速射",
+      "sourceSvg": "src/svg-game-icons/game-icons--colt-m1911.svg"
+    },
+    {
+      "id": "coma",
+      "name": "昏迷",
+      "category": "status",
+      "usage": "失能、长昏迷",
+      "sourceSvg": "src/svg-game-icons/game-icons--coma.svg"
+    },
+    {
+      "id": "confrontation",
+      "name": "对峙",
+      "category": "social",
+      "usage": "遭遇、摊牌",
+      "sourceSvg": "src/svg-game-icons/game-icons--confrontation.svg"
+    },
+    {
+      "id": "convince",
+      "name": "说服",
+      "category": "social",
+      "usage": "交涉、劝服",
+      "sourceSvg": "src/svg-game-icons/game-icons--convince.svg"
+    },
+    {
+      "id": "credits-currency",
+      "name": "信用货币",
+      "category": "resource",
+      "usage": "信用、交易",
+      "sourceSvg": "src/svg-game-icons/game-icons--credits-currency.svg"
+    },
+    {
+      "id": "crossed-swords",
+      "name": "对决",
+      "category": "combat",
+      "usage": "战斗遭遇、PVP、决斗",
+      "sourceSvg": "src/svg-game-icons/game-icons--crossed-swords.svg"
+    },
+    {
+      "id": "crucifix",
+      "name": "十字架",
+      "category": "dream",
+      "usage": "信仰、庇护",
+      "sourceSvg": "src/svg-game-icons/game-icons--crucifix.svg"
+    },
+    {
+      "id": "curling-vines",
+      "name": "藤蔓",
+      "category": "environment",
+      "usage": "缠绕、自然生长",
+      "sourceSvg": "src/svg-game-icons/game-icons--curling-vines.svg"
+    },
+    {
+      "id": "cut-palm",
+      "name": "割掌",
+      "category": "hazard",
+      "usage": "献祭、创伤",
+      "sourceSvg": "src/svg-game-icons/game-icons--cut-palm.svg"
+    },
+    {
+      "id": "cycle",
+      "name": "循环",
+      "category": "mobility",
+      "usage": "循环、周期",
+      "sourceSvg": "src/svg-game-icons/game-icons--cycle.svg"
+    },
+    {
+      "id": "cz-skorpion",
+      "name": "蝎式冲锋枪",
+      "category": "ranged",
+      "usage": "冲锋枪类",
+      "sourceSvg": "src/svg-game-icons/game-icons--cz-skorpion.svg"
+    },
+    {
+      "id": "deadly-strike",
+      "name": "致命一击",
+      "category": "combat",
+      "usage": "暴击、处决",
+      "sourceSvg": "src/svg-game-icons/game-icons--deadly-strike.svg"
+    },
+    {
+      "id": "death-zone",
+      "name": "死亡区",
+      "category": "combat",
+      "usage": "致命区域、禁区",
+      "sourceSvg": "src/svg-game-icons/game-icons--death-zone.svg"
+    },
+    {
+      "id": "decapitation",
+      "name": "斩首",
+      "category": "combat",
+      "usage": "处决、致命终结",
+      "sourceSvg": "src/svg-game-icons/game-icons--decapitation.svg"
+    },
+    {
+      "id": "despair",
+      "name": "绝望",
+      "category": "status",
+      "usage": "士气崩溃、负面心智",
+      "sourceSvg": "src/svg-game-icons/game-icons--despair.svg"
+    },
+    {
+      "id": "dice-twenty-faces-twenty",
+      "name": "D20",
+      "category": "check",
+      "usage": "大型检定、命运骰",
+      "sourceSvg": "src/svg-game-icons/game-icons--dice-twenty-faces-twenty.svg"
+    },
+    {
+      "id": "discussion",
+      "name": "讨论",
+      "category": "social",
+      "usage": "交流、商量",
+      "sourceSvg": "src/svg-game-icons/game-icons--discussion.svg"
+    },
+    {
+      "id": "disintegrate",
+      "name": "湮灭",
+      "category": "combat",
+      "usage": "即死、分解、消除",
+      "sourceSvg": "src/svg-game-icons/game-icons--disintegrate.svg"
+    },
+    {
+      "id": "dodging",
+      "name": "闪避",
+      "category": "mobility",
+      "usage": "闪避、规避",
+      "sourceSvg": "src/svg-game-icons/game-icons--dodging.svg"
+    },
+    {
+      "id": "drama-masks",
+      "name": "面具",
+      "category": "social",
+      "usage": "伪装、表演、身份",
+      "sourceSvg": "src/svg-game-icons/game-icons--drama-masks.svg"
+    },
+    {
+      "id": "drink-me",
+      "name": "药水",
+      "category": "consumable",
+      "usage": "变身药水、神秘饮品",
+      "sourceSvg": "src/svg-game-icons/game-icons--drink-me.svg"
+    },
+    {
+      "id": "duration",
+      "name": "持续",
+      "category": "time",
+      "usage": "状态持续、时长",
+      "sourceSvg": "src/svg-game-icons/game-icons--duration.svg"
+    },
+    {
+      "id": "dynamite",
+      "name": "炸药",
+      "category": "combat",
+      "usage": "爆破、拆墙",
+      "sourceSvg": "src/svg-game-icons/game-icons--dynamite.svg"
+    },
+    {
+      "id": "embrassed-energy",
+      "name": "拥抱能量",
+      "category": "energy",
+      "usage": "**泛化：汲取/吸收/接纳能量**（字面=拥抱能量）",
+      "sourceSvg": "src/svg-game-icons/game-icons--embrassed-energy.svg"
+    },
+    {
+      "id": "encirclement",
+      "name": "包围",
+      "category": "relation",
+      "usage": "围困、合围",
+      "sourceSvg": "src/svg-game-icons/game-icons--encirclement.svg"
+    },
+    {
+      "id": "encrypted-channel",
+      "name": "加密信道",
+      "category": "device",
+      "usage": "秘密通讯、保密",
+      "sourceSvg": "src/svg-game-icons/game-icons--encrypted-channel.svg"
+    },
+    {
+      "id": "energise",
+      "name": "充能",
+      "category": "energy",
+      "usage": "恢复能量",
+      "sourceSvg": "src/svg-game-icons/game-icons--energise.svg"
+    },
+    {
+      "id": "ent-mouth",
+      "name": "树人",
+      "category": "environment",
+      "usage": "自然古老存在",
+      "sourceSvg": "src/svg-game-icons/game-icons--ent-mouth.svg"
+    },
+    {
+      "id": "entry-door",
+      "name": "入口门",
+      "category": "environment",
+      "usage": "通道、入口",
+      "sourceSvg": "src/svg-game-icons/game-icons--entry-door.svg"
+    },
+    {
+      "id": "envelope",
+      "name": "信封",
+      "category": "resource",
+      "usage": "信息、信件",
+      "sourceSvg": "src/svg-game-icons/game-icons--envelope.svg"
+    },
+    {
+      "id": "evil-book",
+      "name": "魔典",
+      "category": "dream",
+      "usage": "禁忌知识",
+      "sourceSvg": "src/svg-game-icons/game-icons--evil-book.svg"
+    },
+    {
+      "id": "expand",
+      "name": "展开",
+      "category": "action",
+      "usage": "展开、扩展",
+      "sourceSvg": "src/svg-game-icons/game-icons--expand.svg"
+    },
+    {
+      "id": "expense",
+      "name": "支出",
+      "category": "resource",
+      "usage": "消耗、花费",
+      "sourceSvg": "src/svg-game-icons/game-icons--expense.svg"
+    },
+    {
+      "id": "explosive-materials",
+      "name": "易爆物",
+      "category": "combat",
+      "usage": "危险物标记、弹药原料",
+      "sourceSvg": "src/svg-game-icons/game-icons--explosive-materials.svg"
+    },
+    {
+      "id": "extra-time",
+      "name": "加时",
+      "category": "time",
+      "usage": "延长时间、额外回合",
+      "sourceSvg": "src/svg-game-icons/game-icons--extra-time.svg"
+    },
+    {
+      "id": "falling",
+      "name": "坠落",
+      "category": "mobility",
+      "usage": "坠落、失足",
+      "sourceSvg": "src/svg-game-icons/game-icons--falling.svg"
+    },
+    {
+      "id": "fallout-shelter",
+      "name": "避难所",
+      "category": "environment",
+      "usage": "安全区、庇护",
+      "sourceSvg": "src/svg-game-icons/game-icons--fallout-shelter.svg"
+    },
+    {
+      "id": "fangs",
+      "name": "獠牙",
+      "category": "status",
+      "usage": "撕咬、野兽威胁",
+      "sourceSvg": "src/svg-game-icons/game-icons--fangs.svg"
+    },
+    {
+      "id": "fast-backward-button",
+      "name": "快退",
+      "category": "time",
+      "usage": "回退、撤销",
+      "sourceSvg": "src/svg-game-icons/game-icons--fast-backward-button.svg"
+    },
+    {
+      "id": "fast-forward-button",
+      "name": "快进",
+      "category": "time",
+      "usage": "加速、跳过",
+      "sourceSvg": "src/svg-game-icons/game-icons--fast-forward-button.svg"
+    },
+    {
+      "id": "film-strip",
+      "name": "胶片",
+      "category": "device",
+      "usage": "影像、记录",
+      "sourceSvg": "src/svg-game-icons/game-icons--film-strip.svg"
+    },
+    {
+      "id": "finger-print",
+      "name": "指纹",
+      "category": "clue",
+      "usage": "身份、痕迹",
+      "sourceSvg": "src/svg-game-icons/game-icons--finger-print.svg"
+    },
+    {
+      "id": "fire",
+      "name": "烈焰",
+      "category": "combat",
+      "usage": "火焰、燃烧状态",
+      "sourceSvg": "src/svg-game-icons/game-icons--fire.svg"
+    },
+    {
+      "id": "fire-bomb",
+      "name": "燃烧弹",
+      "category": "combat",
+      "usage": "范围燃烧、纵火",
+      "sourceSvg": "src/svg-game-icons/game-icons--fire-bomb.svg"
+    },
+    {
+      "id": "fire-zone",
+      "name": "火区",
+      "category": "combat",
+      "usage": "燃烧区域、持续火焰伤害",
+      "sourceSvg": "src/svg-game-icons/game-icons--fire-zone.svg"
+    },
+    {
+      "id": "first-aid-kit",
+      "name": "急救箱",
+      "category": "consumable",
+      "usage": "急救",
+      "sourceSvg": "src/svg-game-icons/game-icons--first-aid-kit.svg"
+    },
+    {
+      "id": "fishing-net",
+      "name": "渔网",
+      "category": "tool",
+      "usage": "捕捉、困住",
+      "sourceSvg": "src/svg-game-icons/game-icons--fishing-net.svg"
+    },
+    {
+      "id": "flash-grenade",
+      "name": "闪光弹",
+      "category": "combat",
+      "usage": "致盲、干扰",
+      "sourceSvg": "src/svg-game-icons/game-icons--flash-grenade.svg"
+    },
+    {
+      "id": "flashlight",
+      "name": "手电筒",
+      "category": "device",
+      "usage": "照明、侦查",
+      "sourceSvg": "src/svg-game-icons/game-icons--flashlight.svg"
+    },
+    {
+      "id": "footprint",
+      "name": "足迹",
+      "category": "clue",
+      "usage": "痕迹、追踪",
+      "sourceSvg": "src/svg-game-icons/game-icons--footprint.svg"
+    },
+    {
+      "id": "frozen-block",
+      "name": "冰冻",
+      "category": "status",
+      "usage": "冻结、无法行动",
+      "sourceSvg": "src/svg-game-icons/game-icons--frozen-block.svg"
+    },
+    {
+      "id": "gamepad",
+      "name": "手柄",
+      "category": "device",
+      "usage": "控制、操纵",
+      "sourceSvg": "src/svg-game-icons/game-icons--gamepad.svg"
+    },
+    {
+      "id": "gas-mask",
+      "name": "防毒面具",
+      "category": "defense",
+      "usage": "毒气防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--gas-mask.svg"
+    },
+    {
+      "id": "gas-stove",
+      "name": "燃气灶",
+      "category": "device",
+      "usage": "火源、烹饪",
+      "sourceSvg": "src/svg-game-icons/game-icons--gas-stove.svg"
+    },
+    {
+      "id": "giant",
+      "name": "体型",
+      "category": "attribute",
+      "usage": "大体型、压制",
+      "sourceSvg": "src/svg-game-icons/game-icons--giant.svg"
+    },
+    {
+      "id": "gladius",
+      "name": "短剑",
+      "category": "combat",
+      "usage": "短兵近战",
+      "sourceSvg": "src/svg-game-icons/game-icons--gladius.svg"
+    },
+    {
+      "id": "gps",
+      "name": "定位",
+      "category": "device",
+      "usage": "导航、追踪",
+      "sourceSvg": "src/svg-game-icons/game-icons--gps.svg"
+    },
+    {
+      "id": "growth",
+      "name": "成长",
+      "category": "attribute",
+      "usage": "成长、发育",
+      "sourceSvg": "src/svg-game-icons/game-icons--growth.svg"
+    },
+    {
+      "id": "gun-stock",
+      "name": "枪托",
+      "category": "ranged",
+      "usage": "枪械部件、改装",
+      "sourceSvg": "src/svg-game-icons/game-icons--gun-stock.svg"
+    },
+    {
+      "id": "gunshot",
+      "name": "枪伤",
+      "category": "combat",
+      "usage": "射击伤害、命中结算",
+      "sourceSvg": "src/svg-game-icons/game-icons--gunshot.svg"
+    },
+    {
+      "id": "half-dead",
+      "name": "濒死",
+      "category": "status",
+      "usage": "濒死状态",
+      "sourceSvg": "src/svg-game-icons/game-icons--half-dead.svg"
+    },
+    {
+      "id": "hand-bag",
+      "name": "手提包",
+      "category": "resource",
+      "usage": "随身物资",
+      "sourceSvg": "src/svg-game-icons/game-icons--hand-bag.svg"
+    },
+    {
+      "id": "handcuffs",
+      "name": "手铐",
+      "category": "relation",
+      "usage": "束缚、拘禁",
+      "sourceSvg": "src/svg-game-icons/game-icons--handcuffs.svg"
+    },
+    {
+      "id": "hazard-sign",
+      "name": "危险标志",
+      "category": "clue",
+      "usage": "警告、禁区",
+      "sourceSvg": "src/svg-game-icons/game-icons--hazard-sign.svg"
+    },
+    {
+      "id": "hazmat-suit",
+      "name": "防护服",
+      "category": "defense",
+      "usage": "环境防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--hazmat-suit.svg"
+    },
+    {
+      "id": "healing-shield",
+      "name": "治疗护盾",
+      "category": "defense",
+      "usage": "护盾+回复",
+      "sourceSvg": "src/svg-game-icons/game-icons--healing-shield.svg"
+    },
+    {
+      "id": "hearing-disabled",
+      "name": "失聪",
+      "category": "status",
+      "usage": "感官丧失",
+      "sourceSvg": "src/svg-game-icons/game-icons--hearing-disabled.svg"
+    },
+    {
+      "id": "heavy-bullets",
+      "name": "重弹",
+      "category": "ranged",
+      "usage": "高伤弹药、破甲弹",
+      "sourceSvg": "src/svg-game-icons/game-icons--heavy-bullets.svg"
+    },
+    {
+      "id": "heavy-lightning",
+      "name": "重雷",
+      "category": "combat",
+      "usage": "雷电重击、天罚",
+      "sourceSvg": "src/svg-game-icons/game-icons--heavy-lightning.svg"
+    },
+    {
+      "id": "high-kick",
+      "name": "高踢",
+      "category": "combat",
+      "usage": "踢击技能",
+      "sourceSvg": "src/svg-game-icons/game-icons--high-kick.svg"
+    },
+    {
+      "id": "high-punch",
+      "name": "重拳",
+      "category": "combat",
+      "usage": "重拳技能",
+      "sourceSvg": "src/svg-game-icons/game-icons--high-punch.svg"
+    },
+    {
+      "id": "hourglass",
+      "name": "沙漏",
+      "category": "time",
+      "usage": "时间流逝、倒计时",
+      "sourceSvg": "src/svg-game-icons/game-icons--hourglass.svg"
+    },
+    {
+      "id": "house",
+      "name": "房屋",
+      "category": "environment",
+      "usage": "建筑、驻地",
+      "sourceSvg": "src/svg-game-icons/game-icons--house.svg"
+    },
+    {
+      "id": "hypodermic-test",
+      "name": "注射器",
+      "category": "consumable",
+      "usage": "注射、实验",
+      "sourceSvg": "src/svg-game-icons/game-icons--hypodermic-test.svg"
+    },
+    {
+      "id": "ice-cube",
+      "name": "冰块",
+      "category": "status",
+      "usage": "冰霜状态",
+      "sourceSvg": "src/svg-game-icons/game-icons--ice-cube.svg"
+    },
+    {
+      "id": "inner-self",
+      "name": "内在自我",
+      "category": "attribute",
+      "usage": "心智、真我",
+      "sourceSvg": "src/svg-game-icons/game-icons--inner-self.svg"
+    },
+    {
+      "id": "inverted-dice-1",
+      "name": "骰点1",
+      "category": "check",
+      "usage": "低点、失败",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-1.svg"
+    },
+    {
+      "id": "inverted-dice-2",
+      "name": "骰点2",
+      "category": "check",
+      "usage": "检定点数",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-2.svg"
+    },
+    {
+      "id": "inverted-dice-3",
+      "name": "骰点3",
+      "category": "check",
+      "usage": "检定点数",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-3.svg"
+    },
+    {
+      "id": "inverted-dice-4",
+      "name": "骰点4",
+      "category": "check",
+      "usage": "检定点数",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-4.svg"
+    },
+    {
+      "id": "inverted-dice-5",
+      "name": "骰点5",
+      "category": "check",
+      "usage": "检定点数",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-5.svg"
+    },
+    {
+      "id": "inverted-dice-6",
+      "name": "骰点6",
+      "category": "check",
+      "usage": "高点、成功",
+      "sourceSvg": "src/svg-game-icons/game-icons--inverted-dice-6.svg"
+    },
+    {
+      "id": "invisible",
+      "name": "隐形",
+      "category": "status",
+      "usage": "隐匿、潜行",
+      "sourceSvg": "src/svg-game-icons/game-icons--invisible.svg"
+    },
+    {
+      "id": "jigsaw-piece",
+      "name": "拼图块",
+      "category": "resource",
+      "usage": "碎片、部件、拼合",
+      "sourceSvg": "src/svg-game-icons/game-icons--jigsaw-piece.svg"
+    },
+    {
+      "id": "jump-across",
+      "name": "跳跃",
+      "category": "mobility",
+      "usage": "跨越、跳跃",
+      "sourceSvg": "src/svg-game-icons/game-icons--jump-across.svg"
+    },
+    {
+      "id": "kenku-head",
+      "name": "鸦人",
+      "category": "dream",
+      "usage": "情报、信使",
+      "sourceSvg": "src/svg-game-icons/game-icons--kenku-head.svg"
+    },
+    {
+      "id": "kevlar-vest",
+      "name": "防弹衣",
+      "category": "defense",
+      "usage": "弹道防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--kevlar-vest.svg"
+    },
+    {
+      "id": "key",
+      "name": "钥匙",
+      "category": "tool",
+      "usage": "解锁",
+      "sourceSvg": "src/svg-game-icons/game-icons--key.svg"
+    },
+    {
+      "id": "ladder",
+      "name": "梯子",
+      "category": "tool",
+      "usage": "攀爬、架设",
+      "sourceSvg": "src/svg-game-icons/game-icons--ladder.svg"
+    },
+    {
+      "id": "laptop",
+      "name": "终端",
+      "category": "device",
+      "usage": "信息终端",
+      "sourceSvg": "src/svg-game-icons/game-icons--laptop.svg"
+    },
+    {
+      "id": "lee-enfield",
+      "name": "栓动步枪",
+      "category": "ranged",
+      "usage": "步枪类、远射",
+      "sourceSvg": "src/svg-game-icons/game-icons--lee-enfield.svg"
+    },
+    {
+      "id": "leg-armor",
+      "name": "腿甲",
+      "category": "defense",
+      "usage": "腿部防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--leg-armor.svg"
+    },
+    {
+      "id": "light-backpack",
+      "name": "轻背包",
+      "category": "resource",
+      "usage": "携带、轻装",
+      "sourceSvg": "src/svg-game-icons/game-icons--light-backpack.svg"
+    },
+    {
+      "id": "locked-door",
+      "name": "锁门",
+      "category": "environment",
+      "usage": "封锁、未解锁",
+      "sourceSvg": "src/svg-game-icons/game-icons--locked-door.svg"
+    },
+    {
+      "id": "machine-gun",
+      "name": "机枪",
+      "category": "ranged",
+      "usage": "持续火力、压制",
+      "sourceSvg": "src/svg-game-icons/game-icons--machine-gun.svg"
+    },
+    {
+      "id": "machine-gun-magazine",
+      "name": "弹匣",
+      "category": "ranged",
+      "usage": "换弹、弹药量",
+      "sourceSvg": "src/svg-game-icons/game-icons--machine-gun-magazine.svg"
+    },
+    {
+      "id": "magic-portal",
+      "name": "传送门",
+      "category": "environment",
+      "usage": "传送、梦境门",
+      "sourceSvg": "src/svg-game-icons/game-icons--magic-portal.svg"
+    },
+    {
+      "id": "magnet",
+      "name": "磁铁",
+      "category": "tool",
+      "usage": "吸引、吸附",
+      "sourceSvg": "src/svg-game-icons/game-icons--magnet.svg"
+    },
+    {
+      "id": "magnifying-glass",
+      "name": "放大镜",
+      "category": "clue",
+      "usage": "调查、观察",
+      "sourceSvg": "src/svg-game-icons/game-icons--magnifying-glass.svg"
+    },
+    {
+      "id": "mantrap",
+      "name": "捕人陷阱",
+      "category": "hazard",
+      "usage": "陷阱、伏击",
+      "sourceSvg": "src/svg-game-icons/game-icons--mantrap.svg"
+    },
+    {
+      "id": "match-head",
+      "name": "火柴",
+      "category": "consumable",
+      "usage": "火源、点燃",
+      "sourceSvg": "src/svg-game-icons/game-icons--match-head.svg"
+    },
+    {
+      "id": "medical-pack",
+      "name": "医疗包",
+      "category": "consumable",
+      "usage": "治疗包",
+      "sourceSvg": "src/svg-game-icons/game-icons--medical-pack.svg"
+    },
+    {
+      "id": "metal-detector",
+      "name": "金属探测器",
+      "category": "tool",
+      "usage": "探测",
+      "sourceSvg": "src/svg-game-icons/game-icons--metal-detector.svg"
+    },
+    {
+      "id": "microchip",
+      "name": "芯片",
+      "category": "device",
+      "usage": "科技核心",
+      "sourceSvg": "src/svg-game-icons/game-icons--microchip.svg"
+    },
+    {
+      "id": "microscope",
+      "name": "显微镜",
+      "category": "tool",
+      "usage": "微观观察",
+      "sourceSvg": "src/svg-game-icons/game-icons--microscope.svg"
+    },
+    {
+      "id": "miner",
+      "name": "采集",
+      "category": "tool",
+      "usage": "采集、挖矿",
+      "sourceSvg": "src/svg-game-icons/game-icons--miner.svg"
+    },
+    {
+      "id": "minigun",
+      "name": "迷你炮",
+      "category": "ranged",
+      "usage": "重型连射",
+      "sourceSvg": "src/svg-game-icons/game-icons--minigun.svg"
+    },
+    {
+      "id": "miracle-medecine",
+      "name": "神药",
+      "category": "consumable",
+      "usage": "奇迹治疗、珍稀药品",
+      "sourceSvg": "src/svg-game-icons/game-icons--miracle-medecine.svg"
+    },
+    {
+      "id": "missile-launcher",
+      "name": "导弹发射器",
+      "category": "ranged",
+      "usage": "远程重火力",
+      "sourceSvg": "src/svg-game-icons/game-icons--missile-launcher.svg"
+    },
+    {
+      "id": "money-stack",
+      "name": "钱堆",
+      "category": "resource",
+      "usage": "财富、储备",
+      "sourceSvg": "src/svg-game-icons/game-icons--money-stack.svg"
+    },
+    {
+      "id": "monkey-wrench",
+      "name": "扳手",
+      "category": "tool",
+      "usage": "维修、调整",
+      "sourceSvg": "src/svg-game-icons/game-icons--monkey-wrench.svg"
+    },
+    {
+      "id": "mountaintop",
+      "name": "山顶",
+      "category": "environment",
+      "usage": "制高点、目标点",
+      "sourceSvg": "src/svg-game-icons/game-icons--mountaintop.svg"
+    },
+    {
+      "id": "move",
+      "name": "移动",
+      "category": "mobility",
+      "usage": "移动动作",
+      "sourceSvg": "src/svg-game-icons/game-icons--move.svg"
+    },
+    {
+      "id": "muscle-fat",
+      "name": "肥胖",
+      "category": "status",
+      "usage": "**泛化：体型/笨重/负重**（字面=脂肪）",
+      "sourceSvg": "src/svg-game-icons/game-icons--muscle-fat.svg"
+    },
+    {
+      "id": "muscle-up",
+      "name": "强化",
+      "category": "attribute",
+      "usage": "强化、提升",
+      "sourceSvg": "src/svg-game-icons/game-icons--muscle-up.svg"
+    },
+    {
+      "id": "musket",
+      "name": "火枪",
+      "category": "ranged",
+      "usage": "旧式步枪、单发",
+      "sourceSvg": "src/svg-game-icons/game-icons--musket.svg"
+    },
+    {
+      "id": "nailed-foot",
+      "name": "钉足",
+      "category": "mobility",
+      "usage": "定身、困足",
+      "sourceSvg": "src/svg-game-icons/game-icons--nailed-foot.svg"
+    },
+    {
+      "id": "nuclear",
+      "name": "核爆",
+      "category": "combat",
+      "usage": "终极威胁、末日级",
+      "sourceSvg": "src/svg-game-icons/game-icons--nuclear.svg"
+    },
+    {
+      "id": "occupy",
+      "name": "占领",
+      "category": "relation",
+      "usage": "占据、控制",
+      "sourceSvg": "src/svg-game-icons/game-icons--occupy.svg"
+    },
+    {
+      "id": "oil-drum",
+      "name": "油桶",
+      "category": "resource",
+      "usage": "燃料、易爆容器",
+      "sourceSvg": "src/svg-game-icons/game-icons--oil-drum.svg"
+    },
+    {
+      "id": "on-sight",
+      "name": "目击",
+      "category": "clue",
+      "usage": "发现、目睹",
+      "sourceSvg": "src/svg-game-icons/game-icons--on-sight.svg"
+    },
+    {
+      "id": "on-target",
+      "name": "命中",
+      "category": "ranged",
+      "usage": "命中判定、瞄准完成",
+      "sourceSvg": "src/svg-game-icons/game-icons--on-target.svg"
+    },
+    {
+      "id": "open-folder",
+      "name": "档案",
+      "category": "resource",
+      "usage": "资料、档案",
+      "sourceSvg": "src/svg-game-icons/game-icons--open-folder.svg"
+    },
+    {
+      "id": "open-treasure-chest",
+      "name": "开启的宝箱",
+      "category": "resource",
+      "usage": "已获取、奖励已开",
+      "sourceSvg": "src/svg-game-icons/game-icons--open-treasure-chest.svg"
+    },
+    {
+      "id": "oppression",
+      "name": "压迫",
+      "category": "relation",
+      "usage": "压制、高压",
+      "sourceSvg": "src/svg-game-icons/game-icons--oppression.svg"
+    },
+    {
+      "id": "overdose",
+      "name": "过量",
+      "category": "status",
+      "usage": "药物过量、副作用",
+      "sourceSvg": "src/svg-game-icons/game-icons--overdose.svg"
+    },
+    {
+      "id": "padlock",
+      "name": "挂锁",
+      "category": "tool",
+      "usage": "锁定",
+      "sourceSvg": "src/svg-game-icons/game-icons--padlock.svg"
+    },
+    {
+      "id": "padlock-open",
+      "name": "开锁",
+      "category": "tool",
+      "usage": "解锁动作",
+      "sourceSvg": "src/svg-game-icons/game-icons--padlock-open.svg"
+    },
+    {
+      "id": "paint-roller",
+      "name": "油漆滚筒",
+      "category": "tool",
+      "usage": "涂装、覆盖、重绘",
+      "sourceSvg": "src/svg-game-icons/game-icons--paint-roller.svg"
+    },
+    {
+      "id": "panzerfaust",
+      "name": "铁拳",
+      "category": "ranged",
+      "usage": "反装甲武器",
+      "sourceSvg": "src/svg-game-icons/game-icons--panzerfaust.svg"
+    },
+    {
+      "id": "parachute",
+      "name": "降落伞",
+      "category": "mobility",
+      "usage": "缓降、空降",
+      "sourceSvg": "src/svg-game-icons/game-icons--parachute.svg"
+    },
+    {
+      "id": "pause-button",
+      "name": "暂停",
+      "category": "time",
+      "usage": "暂停、中断",
+      "sourceSvg": "src/svg-game-icons/game-icons--pause-button.svg"
+    },
+    {
+      "id": "pay-money",
+      "name": "付款",
+      "category": "resource",
+      "usage": "支付、购买",
+      "sourceSvg": "src/svg-game-icons/game-icons--pay-money.svg"
+    },
+    {
+      "id": "perspective-dice-six-faces-random",
+      "name": "透视骰",
+      "category": "check",
+      "usage": "随机、未知结果",
+      "sourceSvg": "src/svg-game-icons/game-icons--perspective-dice-six-faces-random.svg"
+    },
+    {
+      "id": "pierced-body",
+      "name": "穿刺",
+      "category": "combat",
+      "usage": "贯穿伤害、破甲",
+      "sourceSvg": "src/svg-game-icons/game-icons--pierced-body.svg"
+    },
+    {
+      "id": "pill",
+      "name": "药丸",
+      "category": "consumable",
+      "usage": "药物、胶囊",
+      "sourceSvg": "src/svg-game-icons/game-icons--pill.svg"
+    },
+    {
+      "id": "poker-hand",
+      "name": "手牌",
+      "category": "check",
+      "usage": "手牌、赌局",
+      "sourceSvg": "src/svg-game-icons/game-icons--poker-hand.svg"
+    },
+    {
+      "id": "police-officer-head",
+      "name": "执法者",
+      "category": "relation",
+      "usage": "秩序、权威",
+      "sourceSvg": "src/svg-game-icons/game-icons--police-officer-head.svg"
+    },
+    {
+      "id": "power-lightning",
+      "name": "雷击",
+      "category": "combat",
+      "usage": "雷电技能、充能放电",
+      "sourceSvg": "src/svg-game-icons/game-icons--power-lightning.svg"
+    },
+    {
+      "id": "prayer",
+      "name": "祈祷",
+      "category": "social",
+      "usage": "仪式、信仰",
+      "sourceSvg": "src/svg-game-icons/game-icons--prayer.svg"
+    },
+    {
+      "id": "progression",
+      "name": "进度",
+      "category": "time",
+      "usage": "进度、推进",
+      "sourceSvg": "src/svg-game-icons/game-icons--progression.svg"
+    },
+    {
+      "id": "protection-glasses",
+      "name": "护目镜",
+      "category": "defense",
+      "usage": "眼部防护",
+      "sourceSvg": "src/svg-game-icons/game-icons--protection-glasses.svg"
+    },
+    {
+      "id": "pull",
+      "name": "拉拽",
+      "category": "mobility",
+      "usage": "牵引、拉近",
+      "sourceSvg": "src/svg-game-icons/game-icons--pull.svg"
+    },
+    {
+      "id": "punch",
+      "name": "拳击",
+      "category": "combat",
+      "usage": "基础近战",
+      "sourceSvg": "src/svg-game-icons/game-icons--punch.svg"
+    },
+    {
+      "id": "punch-blast",
+      "name": "拳风",
+      "category": "combat",
+      "usage": "范围近战、气浪",
+      "sourceSvg": "src/svg-game-icons/game-icons--punch-blast.svg"
+    },
+    {
+      "id": "push",
+      "name": "推",
+      "category": "mobility",
+      "usage": "推动、推开",
+      "sourceSvg": "src/svg-game-icons/game-icons--push.svg"
+    },
+    {
+      "id": "pyromaniac",
+      "name": "纵火狂",
+      "category": "status",
+      "usage": "火焰狂热、自燃倾向",
+      "sourceSvg": "src/svg-game-icons/game-icons--pyromaniac.svg"
+    },
+    {
+      "id": "quick-slash",
+      "name": "快斩",
+      "category": "combat",
+      "usage": "快速连击、先手攻击",
+      "sourceSvg": "src/svg-game-icons/game-icons--quick-slash.svg"
+    },
+    {
+      "id": "quicksand",
+      "name": "流沙",
+      "category": "mobility",
+      "usage": "减速、困陷",
+      "sourceSvg": "src/svg-game-icons/game-icons--quicksand.svg"
+    },
+    {
+      "id": "recycle",
+      "name": "回收",
+      "category": "action",
+      "usage": "回收、再利用",
+      "sourceSvg": "src/svg-game-icons/game-icons--recycle.svg"
+    },
+    {
+      "id": "revolver",
+      "name": "左轮手枪",
+      "category": "ranged",
+      "usage": "手枪、备用武器",
+      "sourceSvg": "src/svg-game-icons/game-icons--revolver.svg"
+    },
+    {
+      "id": "robber-mask",
+      "name": "劫匪面罩",
+      "category": "relation",
+      "usage": "伪装、犯罪",
+      "sourceSvg": "src/svg-game-icons/game-icons--robber-mask.svg"
+    },
+    {
+      "id": "rolling-dices",
+      "name": "掷骰",
+      "category": "check",
+      "usage": "检定开始",
+      "sourceSvg": "src/svg-game-icons/game-icons--rolling-dices.svg"
+    },
+    {
+      "id": "rope-coil",
+      "name": "绳圈",
+      "category": "resource",
+      "usage": "绳索、捆绑、攀登",
+      "sourceSvg": "src/svg-game-icons/game-icons--rope-coil.svg"
+    },
+    {
+      "id": "save-arrow",
+      "name": "保存",
+      "category": "action",
+      "usage": "保存、存档",
+      "sourceSvg": "src/svg-game-icons/game-icons--save-arrow.svg"
+    },
+    {
+      "id": "sergeant",
+      "name": "指挥者",
+      "category": "relation",
+      "usage": "军官、指挥",
+      "sourceSvg": "src/svg-game-icons/game-icons--sergeant.svg"
+    },
+    {
+      "id": "shadow-follower",
+      "name": "影随者",
+      "category": "environment",
+      "usage": "潜行跟随、暗影",
+      "sourceSvg": "src/svg-game-icons/game-icons--shadow-follower.svg"
+    },
+    {
+      "id": "shaking-hands",
+      "name": "握手",
+      "category": "social",
+      "usage": "合作、协议",
+      "sourceSvg": "src/svg-game-icons/game-icons--shaking-hands.svg"
+    },
+    {
+      "id": "shield-bash",
+      "name": "盾击",
+      "category": "combat",
+      "usage": "盾牌攻击",
+      "sourceSvg": "src/svg-game-icons/game-icons--shield-bash.svg"
+    },
+    {
+      "id": "shield-bounces",
+      "name": "盾反弹",
+      "category": "defense",
+      "usage": "防御反击",
+      "sourceSvg": "src/svg-game-icons/game-icons--shield-bounces.svg"
+    },
+    {
+      "id": "shield-disabled",
+      "name": "护盾失效",
+      "category": "defense",
+      "usage": "破防状态",
+      "sourceSvg": "src/svg-game-icons/game-icons--shield-disabled.svg"
+    },
+    {
+      "id": "shining-heart",
+      "name": "闪光之心",
+      "category": "status",
+      "usage": "勇气、真心",
+      "sourceSvg": "src/svg-game-icons/game-icons--shining-heart.svg"
+    },
+    {
+      "id": "shiny-purse",
+      "name": "钱包",
+      "category": "resource",
+      "usage": "随身财富",
+      "sourceSvg": "src/svg-game-icons/game-icons--shiny-purse.svg"
+    },
+    {
+      "id": "silenced",
+      "name": "消音",
+      "category": "ranged",
+      "usage": "隐蔽射击、无声行动",
+      "sourceSvg": "src/svg-game-icons/game-icons--silenced.svg"
+    },
+    {
+      "id": "skeleton-key",
+      "name": "万能钥匙",
+      "category": "tool",
+      "usage": "通用解锁",
+      "sourceSvg": "src/svg-game-icons/game-icons--skeleton-key.svg"
+    },
+    {
+      "id": "skills",
+      "name": "技能",
+      "category": "attribute",
+      "usage": "技能属性",
+      "sourceSvg": "src/svg-game-icons/game-icons--skills.svg"
+    },
+    {
+      "id": "snatch",
+      "name": "抢夺",
+      "category": "relation",
+      "usage": "夺取、抢走",
+      "sourceSvg": "src/svg-game-icons/game-icons--snatch.svg"
+    },
+    {
+      "id": "steak",
+      "name": "食物",
+      "category": "resource",
+      "usage": "食物、补给",
+      "sourceSvg": "src/svg-game-icons/game-icons--steak.svg"
+    },
+    {
+      "id": "steering-wheel",
+      "name": "方向盘",
+      "category": "device",
+      "usage": "驾驶、掌控",
+      "sourceSvg": "src/svg-game-icons/game-icons--steering-wheel.svg"
+    },
+    {
+      "id": "stethoscope",
+      "name": "听诊器",
+      "category": "device",
+      "usage": "诊断、检测",
+      "sourceSvg": "src/svg-game-icons/game-icons--stethoscope.svg"
+    },
+    {
+      "id": "stick-grenade",
+      "name": "手雷",
+      "category": "combat",
+      "usage": "投掷爆炸物",
+      "sourceSvg": "src/svg-game-icons/game-icons--stick-grenade.svg"
+    },
+    {
+      "id": "stop-sign",
+      "name": "停止",
+      "category": "time",
+      "usage": "禁止、停下",
+      "sourceSvg": "src/svg-game-icons/game-icons--stop-sign.svg"
+    },
+    {
+      "id": "strongbox",
+      "name": "保险箱",
+      "category": "resource",
+      "usage": "安全存放、贵重",
+      "sourceSvg": "src/svg-game-icons/game-icons--strongbox.svg"
+    },
+    {
+      "id": "stun-grenade",
+      "name": "眩晕弹",
+      "category": "combat",
+      "usage": "范围眩晕、控场",
+      "sourceSvg": "src/svg-game-icons/game-icons--stun-grenade.svg"
+    },
+    {
+      "id": "swiss-army-knife",
+      "name": "瑞士军刀",
+      "category": "tool",
+      "usage": "多功能工具",
+      "sourceSvg": "src/svg-game-icons/game-icons--swiss-army-knife.svg"
+    },
+    {
+      "id": "switch-weapon",
+      "name": "切换武器",
+      "category": "ranged",
+      "usage": "换武器动作",
+      "sourceSvg": "src/svg-game-icons/game-icons--switch-weapon.svg"
+    },
+    {
+      "id": "sword-break",
+      "name": "断刃",
+      "category": "combat",
+      "usage": "武器损坏、缴械",
+      "sourceSvg": "src/svg-game-icons/game-icons--sword-break.svg"
+    },
+    {
+      "id": "sword-clash",
+      "name": "兵刃交击",
+      "category": "combat",
+      "usage": "格挡、招架",
+      "sourceSvg": "src/svg-game-icons/game-icons--sword-clash.svg"
+    },
+    {
+      "id": "sword-in-stone",
+      "name": "石中剑",
+      "category": "combat",
+      "usage": "天命、传说、拔剑",
+      "sourceSvg": "src/svg-game-icons/game-icons--sword-in-stone.svg"
+    },
+    {
+      "id": "sword-smithing",
+      "name": "铸剑",
+      "category": "combat",
+      "usage": "锻造、打造武器",
+      "sourceSvg": "src/svg-game-icons/game-icons--sword-smithing.svg"
+    },
+    {
+      "id": "telescope",
+      "name": "望远镜",
+      "category": "tool",
+      "usage": "远视、观察",
+      "sourceSvg": "src/svg-game-icons/game-icons--telescope.svg"
+    },
+    {
+      "id": "trophy-cup",
+      "name": "奖杯",
+      "category": "attribute",
+      "usage": "胜利、荣誉",
+      "sourceSvg": "src/svg-game-icons/game-icons--trophy-cup.svg"
+    },
+    {
+      "id": "twister",
+      "name": "旋风",
+      "category": "mobility",
+      "usage": "旋转位移、旋风攻击",
+      "sourceSvg": "src/svg-game-icons/game-icons--twister.svg"
+    },
+    {
+      "id": "upgrade",
+      "name": "升级",
+      "category": "action",
+      "usage": "升级、强化",
+      "sourceSvg": "src/svg-game-icons/game-icons--upgrade.svg"
+    },
+    {
+      "id": "vote",
+      "name": "表决",
+      "category": "social",
+      "usage": "投票、决议",
+      "sourceSvg": "src/svg-game-icons/game-icons--vote.svg"
+    },
+    {
+      "id": "vr-headset",
+      "name": "虚拟头盔",
+      "category": "device",
+      "usage": "沉浸、虚拟",
+      "sourceSvg": "src/svg-game-icons/game-icons--vr-headset.svg"
+    },
+    {
+      "id": "walk",
+      "name": "行走",
+      "category": "mobility",
+      "usage": "步行移动",
+      "sourceSvg": "src/svg-game-icons/game-icons--walk.svg"
+    },
+    {
+      "id": "walkie-talkie",
+      "name": "对讲机",
+      "category": "device",
+      "usage": "短距通讯",
+      "sourceSvg": "src/svg-game-icons/game-icons--walkie-talkie.svg"
+    },
+    {
+      "id": "wanted-reward",
+      "name": "悬赏",
+      "category": "relation",
+      "usage": "通缉、报酬",
+      "sourceSvg": "src/svg-game-icons/game-icons--wanted-reward.svg"
+    },
+    {
+      "id": "winchester-rifle",
+      "name": "猎枪",
+      "category": "ranged",
+      "usage": "**泛化：一切猎枪/步枪类**",
+      "sourceSvg": "src/svg-game-icons/game-icons--winchester-rifle.svg"
+    },
+    {
+      "id": "wind-slap",
+      "name": "风掌",
+      "category": "combat",
+      "usage": "推离、气浪控制",
+      "sourceSvg": "src/svg-game-icons/game-icons--wind-slap.svg"
+    },
+    {
+      "id": "wine-bottle",
+      "name": "酒瓶",
+      "category": "resource",
+      "usage": "饮品、酒类消耗",
+      "sourceSvg": "src/svg-game-icons/game-icons--wine-bottle.svg"
+    },
+    {
+      "id": "winged-leg",
+      "name": "飞腿",
+      "category": "mobility",
+      "usage": "机动强化",
+      "sourceSvg": "src/svg-game-icons/game-icons--winged-leg.svg"
+    },
+    {
+      "id": "wingfoot",
+      "name": "神行",
+      "category": "mobility",
+      "usage": "加速、疾行",
+      "sourceSvg": "src/svg-game-icons/game-icons--wingfoot.svg"
+    },
+    {
+      "id": "wireframe-globe",
+      "name": "全球范围",
+      "category": "device",
+      "usage": "**泛化：全球化/全局范围/全图**",
+      "sourceSvg": "src/svg-game-icons/game-icons--wireframe-globe.svg"
+    },
+    {
+      "id": "wisdom",
+      "name": "智慧",
+      "category": "attribute",
+      "usage": "智慧、洞察",
+      "sourceSvg": "src/svg-game-icons/game-icons--wisdom.svg"
+    },
+    {
+      "id": "wrapped-heart",
+      "name": "缠绕之心",
+      "category": "status",
+      "usage": "牵挂、执念束缚",
+      "sourceSvg": "src/svg-game-icons/game-icons--wrapped-heart.svg"
+    },
+    {
+      "id": "yin-yang",
+      "name": "阴阳",
+      "category": "dream",
+      "usage": "平衡、对立统一",
+      "sourceSvg": "src/svg-game-icons/game-icons--yin-yang.svg"
+    }
+  ]
+}

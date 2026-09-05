@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wakeup.engine/schemas/manifest.v2.schema.json",
+  "title": "SpriteForgeManifestV2",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "lane",
+    "status",
+    "states",
+    "frames",
+    "qc",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "lane": {
+      "type": "string",
+      "enum": ["component", "character", "symbol", "backdrop"]
+    },
+    "componentType": {
+      "type": "string",
+      "enum": [
+        "weapon-melee",
+        "weapon-ranged",
+        "weapon-firearm",
+        "item-consumable",
+        "item-tool",
+        "item-equipment",
+        "device",
+        "environment"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending-human-review", "ready", "rejected"]
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "sha256", "width", "height"],
+        "properties": {
+          "name": { "type": "string" },
+          "file": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "qc": {
+      "type": "object",
+      "required": ["status", "checks"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed"]
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["check", "passed"],
+            "properties": {
+              "check": { "type": "string" },
+              "passed": { "type": "boolean" },
+              "details": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["jobId", "tool", "generatedAt"],
+      "properties": {
+        "jobId": { "type": "string" },
+        "tool": { "type": "string" },
+        "generatedAt": { "type": "string" },
+        "referenceCrop": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
