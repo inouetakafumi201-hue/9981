@@ -205,7 +205,7 @@
     "durationModeField": "durationUnit",
     "stackModeField": "stackBehavior",
     "ownership": "玩法层",
-    "description": "持续模式与叠加模式的轴由基类层声明，具体模式选择与取值由玩法层在上列字段中提供。玩法层取值必须能解析到本目录声明的某个模式。"
+    "description": "持续模式与叠加模式的轴由基类层声明，具体模式选择与取值由玩法层在上列字段中提供。玩法层取值必须能解���到本目录声明的某个模式。"
   },
   "capabilities": [
     {
@@ -664,18 +664,6 @@
         "environmental"
       ],
       "description": "表示实体正承受环境辐射暴露的语义状态。"
-    },
-    {
-      "id": "status_traveling",
-      "name": "前往X",
-      "category": "environmental",
-      "type": "tag",
-      "tags": [
-        "movement",
-        "journey",
-        "transit"
-      ],
-      "description": "表示实体处于前往某个目的地过程中的语义状态。"
     },
     {
       "id": "status_aiming",

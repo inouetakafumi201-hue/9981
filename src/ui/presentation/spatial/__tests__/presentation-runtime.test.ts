@@ -173,4 +173,65 @@ describe('PresentationRuntime P6 端到端', () => {
 
     runtime.dispose()
   })
+
+  it('D-090: PresentationRuntime 接入 MovementSessionController 完整生命周期', () => {
+    let completedPlacement: unknown
+    const runtime = createPresentationRuntime({
+      mapData: testMap(),
+      movementDeps: {
+        onSessionCompleted: (_id, p) => { completedPlacement = p },
+      },
+    })
+
+    expect(runtime.movementSession).toBeDefined()
+    expect(runtime.movementSession.getState().status).toBe('idle')
+
+    runtime.startMovement({
+      entityId: 'e_player',
+      route: {
+        phases: [
+          {
+            kind: 'orca-interior',
+            points: [{ x: 0.1, y: 0.5 }, { x: 0.9, y: 0.5 }],
+            durationMs: 1000,
+            naturalSceneId: 'n_start',
+          },
+        ],
+        totalDistance: 0.8,
+      },
+      targetNaturalSceneId: 'n_end',
+      startPosition: { x: 0.1, y: 0.5 },
+    })
+
+    expect(runtime.movementSession.getState().status).toBe('moving')
+
+    runtime.pauseMovement()
+    expect(runtime.movementSession.getState().status).toBe('paused')
+
+    runtime.resumeMovement()
+    expect(runtime.movementSession.getState().status).toBe('moving')
+
+    runtime.noteMovementDisturbance()
+    expect(runtime.movementSession.getState().hasDisturbance).toBe(true)
+
+    // 推进 1000ms 到达终点
+    runtime.advanceMovement(1000, true)
+    expect(runtime.movementSession.getState().status).toBe('recovering')
+
+    // 完成恢复
+    runtime.finishMovementRecovery()
+    expect(runtime.movementSession.getState().status).toBe('awaiting-authority')
+
+    // feed 权威确认
+    runtime.feed({
+      type: 'after:entity.place',
+      payload: { entityId: 'e_player', previousNodeId: 'n_start', nodeId: 'n_end' },
+      revision: 5,
+    })
+
+    expect(runtime.movementSession.getState().status).toBe('completed')
+    expect(completedPlacement).toBeDefined()
+
+    runtime.dispose()
+  })
 })

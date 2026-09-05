@@ -13,6 +13,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/devboard/editor-shell/*"],
+      "@editor/*": ["src/devboard/editor-shell/*"],
       "@map/*": ["src/play/map/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
