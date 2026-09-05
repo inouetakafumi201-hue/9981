@@ -24,6 +24,7 @@ import {
   StatMobility,
 } from './library-icons'
 import { playSfx } from '@editor/lib/sound'
+import { CATEGORY_LABELS, placementModeLabel } from '@editor/lib/materials'
 import type { ComponentType, SVGProps } from 'react'
 import type { TokenSlot } from '@editor/lib/library-data'
 import { TiltCard } from '@editor/components/fx/tilt-card'
@@ -102,7 +103,9 @@ export function LibraryDetail({ asset }: { asset: MaterialMeta }) {
         {/* 名称 / 分类 */}
         <div className="mt-3 text-center">
           <h2 className="font-sans text-[24px] font-bold leading-tight text-[color:var(--lib-text)]">{asset.name}</h2>
-          <p className="font-sans text-[13px] text-[color:var(--lib-dim)]">{asset.category}</p>
+          <p className="font-sans text-[13px] text-[color:var(--lib-dim)]">
+            {CATEGORY_LABELS[asset.category]} · {placementModeLabel(asset.placementMode ?? 'free-decoration')}
+          </p>
         </div>
 
         {/* 五词条槽 */}

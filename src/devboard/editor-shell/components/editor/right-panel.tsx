@@ -14,6 +14,7 @@ import { playSfx } from '@editor/lib/sound'
 import {
   MATERIALS,
   CATEGORIES,
+  CATEGORY_LABELS,
   tileStyle,
   materialById,
   type MaterialCategory,
@@ -44,6 +45,7 @@ import {
   moveMaterialDrag,
   endMaterialDrag,
   addPlacement,
+  addTransitionSceneToEdge,
 } from '@editor/lib/editor-store'
 import {
   screenToWorld,
@@ -439,7 +441,8 @@ function PlacementInspector({ pl }: { pl: Placement }) {
             {mat?.name ?? '未知素材'}
           </div>
           <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground">
-            {mat?.category}
+            {mat?.category ? CATEGORY_LABELS[mat.category] : '未知'}
+            {mat && <span className="ml-2 text-muted-foreground">· {mat.category === 'decoration' ? '仅表现' : mat.category === 'transition-scene' ? '连线过渡' : pl.effectiveMode === 'free-decoration' ? '框外装饰态' : '场景逻辑'}</span>}
           </div>
         </div>
       </div>
@@ -600,9 +603,15 @@ function MaterialPalette() {
       dragging.current = false
       const drag = getState().dragMaterial
       const w = screenToWorld(ev.clientX, ev.clientY)
-      if (drag?.overScene && w) {
-        addPlacement(drag.materialId, drag.overScene, w)
-        playSfx('success')
+      if (drag && w) {
+        const material = materialById(drag.materialId)
+        const selectedEdge = getState().selection.find((item) => item.type === 'edge')
+        if (material?.category === 'transition-scene') {
+          if (selectedEdge && addTransitionSceneToEdge(drag.materialId, selectedEdge.id, w)) playSfx('success')
+        } else {
+          addPlacement(drag.materialId, drag.overScene ?? '', w)
+          playSfx('success')
+        }
       }
       endMaterialDrag()
     }
@@ -641,7 +650,7 @@ function MaterialPalette() {
                 active ? 'bg-primary/12 text-primary' : 'bg-panel-inset text-foreground/70 hover:bg-card'
               }`}
             >
-              {c}
+              {c === '全部' ? '全部' : CATEGORY_LABELS[c]}
             </button>
           )
         })}

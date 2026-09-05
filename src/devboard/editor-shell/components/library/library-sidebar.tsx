@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CATEGORIES } from '@editor/lib/materials'
+import { CATEGORIES, CATEGORY_LABELS } from '@editor/lib/materials'
 import { COLLECTION, SCOPE_ITEMS } from '@editor/lib/library-data'
 import { useLibApp, setScope, setCategory } from '@editor/lib/library-store'
 import { playSfx } from '@editor/lib/sound'
@@ -45,7 +45,7 @@ export function LibrarySidebar() {
             {CATEGORIES.map((c) => (
               <NavRow
                 key={c}
-                label={c}
+                label={CATEGORY_LABELS[c]}
                 active={category === c}
                 indicatorId="sidebar-category-indicator"
                 onClick={() => {

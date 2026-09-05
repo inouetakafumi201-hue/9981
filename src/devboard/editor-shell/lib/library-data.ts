@@ -12,8 +12,8 @@
    青色辉光、灯火类叠暖色辉光，在同一套像素资源上还原「像素前景 + 暖光全息」。
    ========================================================================= */
 
-import type { MaterialCategory } from './materials'
-import { CATEGORIES, tileStyle } from './materials'
+import type { MaterialCategory, LegacyMaterialTag } from './materials'
+import { CATEGORIES, CATEGORY_LABELS, CATEGORY_CONTRACT, tileStyle, categoryPlacementMode, legacyTagLabel } from './materials'
 
 export type { MaterialCategory }
 export { tileStyle }
@@ -71,6 +71,10 @@ export interface MaterialMeta {
   id: string
   name: string
   category: MaterialCategory
+  tags?: LegacyMaterialTag[]
+  adapterId?: string | null
+  parameterSchemaId?: string
+  placementMode?: 'scene-bound' | 'free-decoration' | 'edge-bound-transition'
   quality: Quality
   owned: boolean
   source: MaterialSource
@@ -164,7 +168,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'locker_7f3a',
     name: '储物柜',
-    category: '装置',
+    category: 'mechanism',
     quality: 3,
     owned: true,
     source: 'standard',
@@ -182,7 +186,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'sensor_light_02',
     name: '感应灯',
-    category: '照明',
+    category: 'decoration',
     quality: 2,
     owned: false,
     source: 'standard',
@@ -200,7 +204,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'bench_a1',
     name: '长椅',
-    category: '陈设',
+    category: 'decoration',
     quality: 1,
     owned: true,
     source: 'standard',
@@ -218,7 +222,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'dream_beacon',
     name: '梦能灯塔',
-    category: '装置',
+    category: 'mechanism',
     quality: 5,
     owned: true,
     source: 'craft',
@@ -236,7 +240,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'echo_altar',
     name: '回响祭坛',
-    category: '交互',
+    category: 'mechanism',
     quality: 4,
     owned: false,
     source: 'ugc',
@@ -254,7 +258,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'gear_assembly',
     name: '齿轮组件',
-    category: '装置',
+    category: 'mechanism',
     quality: 4,
     owned: true,
     source: 'craft',
@@ -272,7 +276,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'dream_shard',
     name: '梦境碎片',
-    category: '线索',
+    category: 'item',
     quality: 3,
     owned: false,
     source: 'standard',
@@ -290,7 +294,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'signal_lamp',
     name: '信号灯',
-    category: '交互',
+    category: 'mechanism',
     quality: 2,
     owned: true,
     source: 'standard',
@@ -302,13 +306,13 @@ const FEATURED: MaterialMeta[] = [
     equippedTokens: tokensFrom(0b00010, 11),
     tile: 36,
     glow: 'warm',
-    desc: '可被拉杆或密码锁联动的信号灯，红绿切换驱动场景的通行逻辑。',
+    desc: '可被拉杆��密码锁联动的信号灯，红绿切换驱动场景的通行逻辑。',
     freeRemaining: null,
   },
   {
     id: 'faded_signpost',
     name: '褪色路牌',
-    category: '线索',
+    category: 'item',
     quality: 1,
     owned: false,
     source: 'ugc',
@@ -326,7 +330,7 @@ const FEATURED: MaterialMeta[] = [
   {
     id: 'tattered_curtain',
     name: '破旧布帘',
-    category: '遮挡',
+    category: 'decoration',
     quality: 1,
     owned: true,
     source: 'standard',
@@ -345,21 +349,19 @@ const FEATURED: MaterialMeta[] = [
 
 /** 用 6 分类词库派生更多条目，把目录撑到多页量级（星标/角标/品级轮换分布） */
 const NAMES: Record<MaterialCategory, string[]> = {
-  装置: ['控制台', '配电箱', '通风口', '水管阀', '监控杆', '发电机', '售货机', '安检门', '广播塔', '维修梯', '闸机'],
-  照明: ['应急灯', '壁灯', '射灯', '荧光管', '探照灯', '烛台', '霓虹牌', '地脚灯', '手电', '灯箱', '吊灯'],
-  陈设: ['书架', '餐桌', '衣柜', '地毯', '盆栽', '窗帘', '挂钟', '画框', '床铺', '沙发', '柜台'],
-  交互: ['拉杆', '按钮台', '密码锁', '对讲机', '电话', '开关箱', '感应门', '售票机', '终端', '手轮', '踏板'],
-  线索: ['便签', '血迹', '脚印', '照片', '录音带', '日记', '钥匙', '票根', '涂鸦', '残页', '档案'],
-  遮挡: ['木箱', '铁栏', '屏风', '货架', '幕布', '集装箱', '路障', '沙袋', '隔断', '铁皮', '卷帘'],
+  'ai-unit': ['巡游影鸦', '守卫哨兵', '追迹兽'],
+  npc: ['月台管理员', '旧站商贩', '无名旅客'],
+  vehicle: ['梦轨列车', '悬浮车', '货运拖车'],
+  container: ['储物柜', '补给箱', '冷藏柜'],
+  item: ['梦境碎片', '旧钥匙', '能量电池'],
+  mechanism: ['控制台', '感应灯', '信号灯', '齿轮组件'],
+  decoration: ['长椅', '路牌', '破旧布帘', '盆栽'],
+  'transition-scene': ['月台过渡', '车厢切换', '梦境裂隙'],
 }
 
 const CAT_TILES: Record<MaterialCategory, number[]> = {
-  装置: [0, 15, 44, 52, 63, 13, 33, 43],
-  照明: [14, 20, 59, 60, 36, 39],
-  陈设: [23, 48, 49, 54, 51, 25],
-  交互: [12, 45, 50, 38, 22, 37],
-  线索: [17, 29, 30, 61, 32, 28],
-  遮挡: [16, 5, 10, 58, 24, 42, 11, 26],
+  'ai-unit': [0, 15, 44], npc: [13, 33, 43], vehicle: [52, 63, 14], container: [0, 16, 5],
+  item: [17, 29, 30], mechanism: [12, 45, 50, 38], decoration: [23, 48, 49, 54], 'transition-scene': [59, 60, 36],
 }
 
 const SOURCE_CYCLE: MaterialSource[] = ['standard', 'standard', 'standard', 'ugc', 'craft', 'standard']
@@ -385,6 +387,10 @@ function derive(): MaterialMeta[] {
           id: `${cat}_${round}_${i}`,
           name: round === 0 ? name : `${name}·变体${round}`,
           category: cat,
+          tags: [],
+          adapterId: CATEGORY_CONTRACT[cat].adapterId,
+          parameterSchemaId: CATEGORY_CONTRACT[cat].parameterSchemaId,
+          placementMode: categoryPlacementMode(cat, true),
           quality,
           owned,
           source,
@@ -406,7 +412,13 @@ function derive(): MaterialMeta[] {
   return out
 }
 
-export const MATERIALS_META: MaterialMeta[] = [...FEATURED, ...derive()]
+export const MATERIALS_META: MaterialMeta[] = [...FEATURED, ...derive()].map((material) => ({
+  ...material,
+  tags: material.tags ?? [],
+  adapterId: material.adapterId ?? CATEGORY_CONTRACT[material.category].adapterId,
+  parameterSchemaId: material.parameterSchemaId ?? CATEGORY_CONTRACT[material.category].parameterSchemaId,
+  placementMode: material.placementMode ?? categoryPlacementMode(material.category, true),
+}))
 
 export function materialMetaById(id: string): MaterialMeta | null {
   return MATERIALS_META.find((m) => m.id === id) ?? null
@@ -449,7 +461,7 @@ export function filteredMaterials(
   const scoped = opts.scope === 'owned' ? all.filter((m) => m.owned) : all
   const byCat = opts.category === '全部' ? scoped : scoped.filter((m) => m.category === opts.category)
   const q = opts.query.trim()
-  const byQuery = q ? byCat.filter((m) => m.name.includes(q) || m.category.includes(q)) : byCat
+  const byQuery = q ? byCat.filter((m) => m.name.includes(q) || CATEGORY_LABELS[m.category].includes(q) || (m.tags ?? []).some((tag) => legacyTagLabel(tag).includes(q))) : byCat
   return starredFirst(byQuery, opts.isStarred)
 }
 

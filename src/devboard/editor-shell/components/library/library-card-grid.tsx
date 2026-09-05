@@ -22,6 +22,7 @@ import { LibTile } from './library-tile'
 import { BadgeGroup } from './library-badges'
 import { BlueprintList } from './library-blueprints'
 import { playSfx } from '@editor/lib/sound'
+import { CATEGORY_LABELS } from '@editor/lib/materials'
 import { TiltCard } from '@editor/components/fx/tilt-card'
 import { WeightedButton } from '@editor/components/fx/weighted-button'
 
@@ -169,13 +170,13 @@ function Card({ asset, selected }: { asset: MaterialMeta; selected: boolean }) {
 
         {/* 悬停气泡（名称/类别/品级） */}
         <div className="pointer-events-none absolute left-1/2 top-1 z-20 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-black/90 px-2 py-1 font-sans text-[11px] text-[color:var(--lib-text)] opacity-0 shadow-lg ring-1 ring-[color:var(--lib-line)] transition-opacity group-hover:opacity-100">
-          {asset.name} · {asset.category}
+          {asset.name} · {CATEGORY_LABELS[asset.category]}
         </div>
 
         {/* 名称 + 分类 */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-2 pb-1.5 pt-4 text-center">
           <div className="truncate font-sans text-[13px] font-bold text-[color:var(--lib-text)]">{asset.name}</div>
-          <div className="font-sans text-[11px] text-[color:var(--lib-dim)]">{asset.category}</div>
+          <div className="font-sans text-[11px] text-[color:var(--lib-dim)]">{CATEGORY_LABELS[asset.category]}</div>
         </div>
       </button>
     </TiltCard>

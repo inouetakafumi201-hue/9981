@@ -27,6 +27,7 @@ import { Chip } from './library-badges'
 import { IconChevronUp, IconFilter } from './library-icons'
 import { ChevronDown, Search, X } from 'lucide-react'
 import { playSfx } from '@editor/lib/sound'
+import { CATEGORY_LABELS } from '@editor/lib/materials'
 
 /**
  * 底部快捷栏（§4.5）。
@@ -122,7 +123,7 @@ export function LibraryQuickbar() {
                 style={{ ['--hud-bc' as string]: 'var(--lib-line)' }}
               >
                 <IconFilter width={15} height={15} className="text-[color:var(--cyan)]" />
-                {cat}
+                {cat === '全部' ? '全部' : CATEGORY_LABELS[cat]}
                 <ChevronDown size={14} className={`ml-auto text-[color:var(--lib-dim)] transition-transform ${catOpen ? 'rotate-180' : ''}`} />
               </WeightedButton>
               <AnimatePresence>
@@ -147,7 +148,7 @@ export function LibraryQuickbar() {
                           c === cat ? 'text-[color:var(--cyan)]' : 'text-[color:var(--lib-text)]'
                         }`}
                       >
-                        {c}
+                        {c === '全部' ? '全部' : CATEGORY_LABELS[c]}
                       </button>
                     ))}
                   </motion.div>

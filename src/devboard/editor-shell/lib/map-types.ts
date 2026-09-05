@@ -125,6 +125,8 @@ export interface Edge {
   points: EdgePoint[]
   /** 过渡窗口——仅双向连接有意义，其它方向性下诊断会报 warning */
   transitionWindow?: Vec
+  /** 过渡场景素材直接成为该边的窗口，不进入 placements。 */
+  transitionSceneMaterialId?: string
   /** 语义锚点：高地/洼地/中性，仅影响边中点的可视化装饰，不接入玩法逻辑 */
   semanticAnchor?: 'highland' | 'lowland' | 'neutral'
   def?: string
@@ -151,12 +153,18 @@ export interface Terrain {
   rotation: number
 }
 
+export type PlacementEffectiveMode = 'scene-bound' | 'free-decoration'
+
 export interface Placement {
   id: string
   materialId: string
   sceneId: string
   x: number
   y: number
+  logicCategory?: string
+  effectiveMode?: PlacementEffectiveMode
+  runtimeAdapterId?: string | null
+  tags?: string[]
 }
 
 /** Editor-local building branch. Frames use world coordinates; the bridge normalizes them. */
@@ -239,6 +247,7 @@ export interface MapData {
     directionality: EdgeDirectionality
     path: Vec[]
     transitionWindow?: Vec
+    transitionSceneMaterialId?: string
     visualObstruction?: string[]
     physicalObstruction?: string[]
     semanticAnchor?: 'highland' | 'lowland' | 'neutral'
@@ -271,6 +280,10 @@ export interface MapData {
     y: number
     overrides?: Record<string, unknown>
     temporaryFree?: boolean
+    logicCategory?: string
+    effectiveMode?: PlacementEffectiveMode
+    runtimeAdapterId?: string | null
+    tags?: string[]
   }>
   metadata: {
     created: string

@@ -50,6 +50,7 @@ import { rdp } from './geometry'
 import { canonicalToEditorDoc, editorDocToCanonical } from './map-bridge'
 import type { CanonicalMapData } from '../../ports/map-contracts'
 import { parseMapData } from '../../ports/map-contracts'
+import { materialById, categoryPlacementMode, categoryContract } from './materials'
 
 export interface Camera {
   x: number
@@ -225,8 +226,9 @@ function seedDoc(): MapDoc {
       to: 'sc_rooftop',
       directionality: 'unidirectional',
       points: [nodeAnchor('sc_sleeper', doc0), nodeAnchor('sc_rooftop', doc0)],
-      transitionWindow: { x: 960, y: 700 },
-    },
+  transitionWindow: { x: 960, y: 700 },
+    transitionSceneMaterialId: 'transition-scene-0-月台过渡',
+  },
   ]
 
   return {
@@ -1000,9 +1002,28 @@ export function updateTerrain(
 /* ---------------- placement ---------------- */
 export function addPlacement(materialId: string, sceneId: string, at: Vec) {
   const id = uid('pl')
-  const pl: Placement = { id, materialId, sceneId, x: at.x, y: at.y }
+  const material = materialById(materialId)
+  const category = material?.category ?? 'decoration'
+  const insideScene = Boolean(sceneId)
+  const effectiveMode = categoryPlacementMode(category, insideScene)
+  const contract = categoryContract(category)
+  const pl: Placement = {
+    id, materialId, sceneId, x: at.x, y: at.y,
+    logicCategory: category,
+    effectiveMode,
+    runtimeAdapterId: effectiveMode === 'scene-bound' ? contract.adapterId : null,
+    tags: material?.tags,
+  }
   setDoc({ ...state.doc, placements: [...state.doc.placements, pl] })
   return id
+}
+
+export function addTransitionSceneToEdge(materialId: string, edgeId: string, at: Vec) {
+  const edge = state.doc.edges.find((item) => item.id === edgeId)
+  const material = materialById(materialId)
+  if (!edge || material?.category !== 'transition-scene') return false
+  updateEdge(edgeId, { transitionWindow: at, transitionSceneMaterialId: materialId })
+  return true
 }
 export function updatePlacement(
   id: string,
@@ -1364,8 +1385,14 @@ export function validate(doc: MapDoc): Diagnostic[] {
     })
   }
 
-  // 过渡窗口只对双向连接有意义
+  // 过渡窗口只对双向连接有意义，并且必须由过渡场景素材承载
   doc.edges.forEach((e) => {
+    if (e.transitionWindow && !e.transitionSceneMaterialId) {
+      out.push({ id: `transition-material-${e.id}`, level: 'error', message: '过渡窗口缺少过渡场景素材', correction: '从过渡场景分类拖到这条连线上', path: `edge/${e.id}`, target: { type: 'edge', id: e.id } })
+    }
+    if (e.transitionSceneMaterialId && materialById(e.transitionSceneMaterialId)?.category !== 'transition-scene') {
+      out.push({ id: `transition-category-${e.id}`, level: 'error', message: '只有过渡场景素材可以挂载到连线', correction: '更换为过渡场景分类素材', path: `edge/${e.id}`, target: { type: 'edge', id: e.id } })
+    }
     if (e.transitionWindow && e.directionality !== 'bidirectional') {
       out.push({
         id: `tw-${e.id}`,
@@ -1375,6 +1402,17 @@ export function validate(doc: MapDoc): Diagnostic[] {
         path: `edge/${e.id}`,
         target: { type: 'edge', id: e.id },
       })
+    }
+  })
+
+  doc.placements.forEach((placement) => {
+    const material = materialById(placement.materialId)
+    if (!material) return
+    if (material.category === 'transition-scene') {
+      out.push({ id: `transition-placement-${placement.id}`, level: 'error', message: '过渡场景不能作为普通素材放置', correction: '把它拖到地图连线上', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
+    }
+    if (!placement.sceneId && placement.effectiveMode !== 'free-decoration') {
+      out.push({ id: `decoration-placement-${placement.id}`, level: 'warning', message: '场景框外素材仅作为装饰，不载入逻辑', correction: '拖回场景框以恢复逻辑挂载', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
     }
   })
 
@@ -1450,6 +1488,7 @@ export function buildMapData(doc: MapDoc): MapData {
       transitionWindow: e.transitionWindow
         ? { x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y) }
         : undefined,
+      transitionSceneMaterialId: e.transitionSceneMaterialId,
       visualObstruction: visualByEdge.get(e.id),
       physicalObstruction: physicalByEdge.get(e.id),
       semanticAnchor: e.semanticAnchor,
@@ -1479,7 +1518,11 @@ export function buildMapData(doc: MapDoc): MapData {
       materialId: p.materialId,
       sceneId: p.sceneId,
       x: nx(p.x),
-      y: ny(p.y),
+      y: nx(p.y),
+      logicCategory: p.logicCategory,
+      effectiveMode: p.effectiveMode,
+      runtimeAdapterId: p.runtimeAdapterId,
+      tags: p.tags,
     })),
     metadata: { created: now, modified: now, author: 'WakeUp Editor' },
   }

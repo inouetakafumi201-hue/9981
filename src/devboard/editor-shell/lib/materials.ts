@@ -1,86 +1,104 @@
-/* =========================================================================
-   快捷素材库目录 — 70 个预制体，6 个分类
-   ========================================================================= */
+/* WakeUp 素材逻辑分类契约。旧语义分类只作为 tags，不再作为顶级逻辑分类。 */
 
 export type MaterialCategory =
-  | '装置'
-  | '照明'
-  | '陈设'
-  | '交互'
-  | '线索'
-  | '遮挡'
+  | 'ai-unit'
+  | 'npc'
+  | 'vehicle'
+  | 'container'
+  | 'item'
+  | 'mechanism'
+  | 'decoration'
+  | 'transition-scene'
+
+export type PlacementMode = 'scene-bound' | 'free-decoration' | 'edge-bound-transition'
+export type LegacyMaterialTag = 'device' | 'lighting' | 'furniture' | 'interactive' | 'clue' | 'occluder'
+
+export const CATEGORIES: MaterialCategory[] = [
+  'ai-unit', 'npc', 'vehicle', 'container', 'item', 'mechanism', 'decoration', 'transition-scene',
+]
+
+export const CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  'ai-unit': 'AI 单位', npc: 'NPC', vehicle: '载具', container: '容器', item: '物品',
+  mechanism: '机关装置', decoration: '装饰', 'transition-scene': '过渡场景',
+}
+
+export const CATEGORY_CONTRACT: Record<MaterialCategory, { adapterId: string | null; parameterSchemaId: string; placementMode: PlacementMode }> = {
+  'ai-unit': { adapterId: 'runtime.ai-unit', parameterSchemaId: 'inspector.ai-unit', placementMode: 'scene-bound' },
+  npc: { adapterId: 'runtime.npc', parameterSchemaId: 'inspector.npc', placementMode: 'scene-bound' },
+  vehicle: { adapterId: 'runtime.vehicle', parameterSchemaId: 'inspector.vehicle', placementMode: 'scene-bound' },
+  container: { adapterId: 'runtime.container', parameterSchemaId: 'inspector.container', placementMode: 'scene-bound' },
+  item: { adapterId: 'runtime.item', parameterSchemaId: 'inspector.item', placementMode: 'scene-bound' },
+  mechanism: { adapterId: 'runtime.mechanism', parameterSchemaId: 'inspector.mechanism', placementMode: 'scene-bound' },
+  decoration: { adapterId: null, parameterSchemaId: 'inspector.decoration', placementMode: 'free-decoration' },
+  'transition-scene': { adapterId: 'runtime.transition-scene', parameterSchemaId: 'inspector.transition-scene', placementMode: 'edge-bound-transition' },
+}
 
 export interface Material {
   id: string
   name: string
   category: MaterialCategory
-  /** 8×8 图集索引 */
+  tags: LegacyMaterialTag[]
   tile: number
 }
 
-export const CATEGORIES: MaterialCategory[] = [
-  '装置',
-  '照明',
-  '陈设',
-  '交互',
-  '线索',
-  '遮挡',
-]
-
 const NAMES: Record<MaterialCategory, string[]> = {
-  装置: ['储物柜', '控制台', '配电箱', '通风口', '水管阀', '监控杆', '发电机', '售货机', '安检门', '广播塔', '维修梯', '闸机'],
-  照明: ['感应灯', '应急灯', '吊灯', '射灯', '信号灯', '荧光管', '探照灯', '烛台', '霓虹牌', '地脚灯', '手电', '灯箱'],
-  陈设: ['长椅', '书架', '餐桌', '衣柜', '地毯', '盆栽', '窗帘', '钟表', '画框', '床铺', '沙发', '柜台'],
-  交互: ['信号灯', '拉杆', '按钮台', '密码锁', '对讲机', '电话', '开关箱', '感应门', '售票机', '终端', '手轮', '踏板'],
-  线索: ['便签', '血迹', '脚印', '照片', '录音带', '日记', '钥匙', '票根', '涂鸦', '碎片', '符号', '档案'],
-  遮挡: ['木箱', '铁栏', '屏风', '货架', '幕布', '集装箱', '路障', '沙袋', '隔断', '铁皮', '石墩', '卷帘'],
+  'ai-unit': ['巡游影鸦', '守卫哨兵', '追迹兽'],
+  npc: ['月台管理员', '旧站商贩', '无名旅客'],
+  vehicle: ['梦轨列车', '悬浮车', '货运拖车'],
+  container: ['储物柜', '补给箱', '冷藏柜'],
+  item: ['梦境碎片', '旧钥匙', '能量电池'],
+  mechanism: ['控制台', '感应灯', '信号灯', '齿轮组件'],
+  decoration: ['长椅', '路牌', '破旧布帘', '盆栽'],
+  'transition-scene': ['月台过渡', '车厢切换', '梦境裂隙'],
+}
+
+function tagsFor(category: MaterialCategory, index: number): LegacyMaterialTag[] {
+  if (category === 'decoration') return index % 2 ? ['furniture'] : ['occluder']
+  if (category === 'mechanism') return index % 2 ? ['interactive'] : ['device']
+  if (category === 'container') return ['device']
+  if (category === 'item') return ['clue']
+  return []
 }
 
 function buildCatalog(): Material[] {
-  const out: Material[] = []
+  const output: Material[] = []
   let tile = 0
-  CATEGORIES.forEach((cat) => {
-    NAMES[cat].forEach((name, i) => {
-      out.push({
-        id: `${cat}-${i}-${name}`,
-        name,
-        category: cat,
-        tile: tile % 64,
-      })
-      tile++
-    })
-  })
-  return out.slice(0, 70)
+  CATEGORIES.forEach((category) => NAMES[category].forEach((name, index) => {
+    output.push({ id: `${category}-${index}-${name}`, name, category, tags: tagsFor(category, index), tile: tile % 64 })
+    tile += 1
+  }))
+  return output
 }
 
-export const MATERIALS: Material[] = buildCatalog()
+export const MATERIALS = buildCatalog()
+export const MATERIALS_VERSION = 'logic-categories-v1'
+export const QUICK_MATERIALS = ['储物柜', '感应灯', '长椅', '信号灯', '梦境碎片', '破旧布帘', '控制台']
+  .map((name) => MATERIALS.find((material) => material.name === name)?.id ?? '')
 
-export function materialById(id: string): Material | undefined {
-  return MATERIALS.find((m) => m.id === id)
+export function materialById(id: string): Material | undefined { return MATERIALS.find((material) => material.id === id) }
+export function categoryLabel(category: MaterialCategory): string { return CATEGORY_LABELS[category] }
+export function categoryContract(category: MaterialCategory) { return CATEGORY_CONTRACT[category] }
+export function categoryPlacementMode(category: MaterialCategory, insideScene: boolean): PlacementMode {
+  if (category === 'transition-scene') return 'edge-bound-transition'
+  if (category === 'decoration' || !insideScene) return 'free-decoration'
+  return 'scene-bound'
 }
-
-/** 收藏栏默认展示的 7 个快捷素材 */
-export const QUICK_MATERIALS: string[] = [
-  MATERIALS.find((m) => m.name === '储物柜')!.id,
-  MATERIALS.find((m) => m.name === '感应灯')!.id,
-  MATERIALS.find((m) => m.name === '长椅')!.id,
-  MATERIALS.find((m) => m.name === '信号灯' && m.category === '交互')!.id,
-  MATERIALS.find((m) => m.name === '便签')!.id,
-  MATERIALS.find((m) => m.name === '木箱')!.id,
-  MATERIALS.find((m) => m.name === '控制台')!.id,
-]
+export function legacyTagLabel(tag: LegacyMaterialTag): string {
+  return { device: '装置', lighting: '照明', furniture: '陈设', interactive: '交互', clue: '线索', occluder: '遮挡' }[tag]
+}
+export function placementModeLabel(mode: PlacementMode): string {
+  return mode === 'scene-bound' ? '场景逻辑' : mode === 'free-decoration' ? '仅表现' : '连线过渡'
+}
+export function isTransitionCategory(category: MaterialCategory): boolean { return category === 'transition-scene' }
+export function isDecorationCategory(category: MaterialCategory): boolean { return category === 'decoration' }
+export function hasLogic(category: MaterialCategory): boolean { return category !== 'decoration' && category !== 'transition-scene' }
 
 const ATLAS = '/editor/material-atlas.png'
-const ATLAS_COLS = 8
-const ATLAS_ROWS = 8
-
 export function tileStyle(index: number): React.CSSProperties {
-  const col = index % ATLAS_COLS
-  const row = Math.floor(index / ATLAS_COLS)
+  const col = index % 8
+  const row = Math.floor(index / 8)
   return {
-    backgroundImage: `url(${ATLAS})`,
-    backgroundSize: `${ATLAS_COLS * 100}% ${ATLAS_ROWS * 100}%`,
-    backgroundPosition: `${(col / (ATLAS_COLS - 1)) * 100}% ${(row / (ATLAS_ROWS - 1)) * 100}%`,
-    imageRendering: 'pixelated',
+    backgroundImage: `url(${ATLAS})`, backgroundSize: '800% 800%',
+    backgroundPosition: `${(col / 7) * 100}% ${(row / 7) * 100}%`, imageRendering: 'pixelated',
   }
 }
