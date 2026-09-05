@@ -1,5 +1,13 @@
 import { MATERIALS, materialById, type Material } from './materials'
-import type { MaterialIdentity, MaterialLogicCategory, MaterialPlacementMode } from '../../../meta-state/types'
+import type {
+  MaterialActivation,
+  MaterialBoundary,
+  MaterialIdentity,
+  MaterialLogicCategory,
+  MaterialPlacementMode,
+  TokenAcceptsResult,
+  TokenCategory,
+} from '../../../meta-state/types'
 import { assetRefForView } from '../../../meta-state/asset-ref'
 
 function slug(name: string): string {
@@ -57,6 +65,60 @@ export function logicCategoryOf(identity: MaterialIdentity): MaterialLogicCatego
 
 export function defaultPlacementModeOf(identity: MaterialIdentity): MaterialPlacementMode {
   return logicCategoryOf(identity) === '装饰' ? 'presentation-only' : (identity.defaultPlacementMode ?? 'native')
+}
+
+const TOKEN_ACCEPTS: Readonly<Record<MaterialLogicCategory, readonly TokenCategory[]>> = {
+  'AI 单位': ['属性', '技能', '状态', '防御', '机动'],
+  NPC: ['属性', '技能', '状态', '防御', '机动'],
+  载具: ['属性', '技能', '防御', '机动'],
+  容器: ['状态', '防御'],
+  物品: ['属性', '技能'],
+  机关装置: ['技能', '状态'],
+  装饰: [],
+  过渡场景: [],
+}
+
+export function tokenCategoriesAcceptedBy(logicCategory: MaterialLogicCategory): readonly TokenCategory[] {
+  return TOKEN_ACCEPTS[logicCategory]
+}
+
+export function resolveMaterialBoundary(identity: MaterialIdentity): MaterialBoundary {
+  const logicCategory = logicCategoryOf(identity)
+  return {
+    logicCategory,
+    placementMode: defaultPlacementModeOf(identity),
+    hostCapability: logicCategory,
+    accepts: tokenCategoriesAcceptedBy(logicCategory),
+  }
+}
+
+export function resolvePlacementBoundary(
+  identity: MaterialIdentity,
+  hostSceneId: string | null,
+): { activation: MaterialActivation; placementMode: MaterialPlacementMode; hostSceneId: string } {
+  const boundary = resolveMaterialBoundary(identity)
+  const native = boundary.placementMode === 'native' && boundary.logicCategory !== '装饰' && hostSceneId !== null
+  return {
+    activation: native ? 'native' : 'free-decoration',
+    placementMode: native ? 'native' : 'presentation-only',
+    hostSceneId: native ? hostSceneId : '',
+  }
+}
+
+export function checkTokenAcceptance(
+  identity: MaterialIdentity,
+  tokenCategory: TokenCategory,
+  activation: MaterialActivation = 'native',
+): TokenAcceptsResult {
+  if (activation !== 'native') {
+    return { accepted: false, reason: '仅表现素材没有可挂载的玩法词条槽' }
+  }
+  const boundary = resolveMaterialBoundary(identity)
+  if (boundary.accepts.includes(tokenCategory)) return { accepted: true }
+  return {
+    accepted: false,
+    reason: `「${boundary.logicCategory}」宿主不接受${tokenCategory}词条`,
+  }
 }
 
 export const CANONICAL_MATERIALS = Object.freeze(MATERIALS.map(canonicalMaterialIdentity))

@@ -308,7 +308,8 @@ function LayerUploadButton() {
 }
 
 export function LeftPanel() {
-  const scenes = useEditor((s) => s.doc.sceneNodes)
+  const allScenes = useEditor((s) => s.doc.sceneNodes)
+  const scenes = allScenes.filter((scene) => scene.def !== 'd:scene/micro-transition')
   const layers = useEditor((s) => s.doc.layers)
   const buildingGroups = useEditor((s) => s.doc.buildingGroups ?? [])
   const selection = useEditor((s) => s.selection)

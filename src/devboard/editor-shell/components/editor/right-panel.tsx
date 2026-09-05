@@ -45,6 +45,7 @@ import {
   endMaterialDrag,
   edgeIdAtPoint,
   placeMaterialAtPoint,
+  removeTransitionInstances,
 } from '@editor/lib/editor-store'
 import {
   screenToWorld,
@@ -52,6 +53,7 @@ import {
   isOverCanvas,
 } from '@editor/lib/canvas-coords'
 import { openLibrary } from '@editor/lib/library-store'
+import { materialIdentityById, resolveMaterialBoundary } from '@editor/lib/material-adapter'
 
 /* ------------------------------------------------------------------ */
 /* shared UI                                                           */
@@ -334,24 +336,29 @@ function EdgeInspector({ edge }: { edge: Edge }) {
           折点 {Math.max(0, visiblePoints.length - 2)} 个 · 双击线段可拍直
         </span>
       </div>
-      <Field label="过渡窗">
+      <Field label="过渡场景">
         <Segmented
-          value={edge.transitionWindow ? 'on' : 'off'}
+          value={(edge.transitionInstances?.length ?? 0) > 0 ? 'on' : 'off'}
           onChange={(v) => {
             if (v === 'on') {
-              const mid = edge.points[Math.floor(edge.points.length / 2)]
-              if (!mid) return
-              updateEdge(edge.id, { transitionWindow: { x: mid.x, y: mid.y, materialId: 'material:楼梯:过渡场景', logicCategory: '过渡场景' } })
+              const endpoint = edge.points[0]
+              if (!endpoint) return
+              placeMaterialAtPoint('material:楼梯:过渡场景', endpoint)
             } else {
-              updateEdge(edge.id, { transitionWindow: undefined })
+              removeTransitionInstances(edge.id)
             }
           }}
           options={[
             { value: 'off', label: '无' },
-            { value: 'on', label: '启用' },
+            { value: 'on', label: '绑定起点' },
           ]}
         />
       </Field>
+      <div className="hud-field chamfer-sm chamfer px-3 py-1.5 text-[11px] text-muted-foreground">
+        {(edge.transitionInstances?.length ?? 0) === 0
+          ? '拖到连线端点，可分别绑定起点与终点。'
+          : `已绑定 ${edge.transitionInstances?.length ?? 0} / 2 个端点；边级参数共享，效果配置独立。`}
+      </div>
       <DeleteButton />
     </div>
   )
@@ -428,6 +435,9 @@ function TerrainInspector({ tr }: { tr: Terrain }) {
 
 function PlacementInspector({ pl }: { pl: Placement }) {
   const mat = materialById(pl.materialId)
+  const identity = materialIdentityById(pl.materialId)
+  const boundary = identity ? resolveMaterialBoundary(identity) : null
+  const activation = pl.activation ?? (pl.placementMode === 'native' ? 'native' : 'free-decoration')
   return (
     <div className="flex flex-col gap-2.5 px-4 pb-4">
       <div className="flex items-center gap-3">
@@ -440,9 +450,15 @@ function PlacementInspector({ pl }: { pl: Placement }) {
             {mat?.name ?? '未知素材'}
           </div>
           <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground">
-            {pl.logicCategory ?? mat?.category} · {pl.placementMode === 'presentation-only' ? '仅表现' : '原生逻辑'}
+            {pl.logicCategory ?? mat?.category} · {activation === 'free-decoration' ? '仅表现' : '原生逻辑'}
           </div>
         </div>
+      </div>
+      <div className="hud-field chamfer-sm chamfer flex flex-col gap-1.5 px-3 py-2 text-[11px] text-muted-foreground">
+        <div className="flex justify-between gap-3"><span>宿主</span><span className="font-mono text-foreground">{(pl.hostSceneId ?? pl.sceneId) || '场景外'}</span></div>
+        <div className="flex justify-between gap-3"><span>能力</span><span className="font-mono text-foreground">{boundary?.hostCapability ?? '未知'}</span></div>
+        <div className="flex justify-between gap-3"><span>词条槽</span><span className="font-mono text-foreground">{activation === 'native' ? boundary?.accepts.join('、') || '无' : '无'}</span></div>
+        <div className="flex justify-between gap-3"><span>已挂载</span><span className="font-mono text-foreground">{pl.tokenIds?.length ?? 0}</span></div>
       </div>
       <DeleteButton />
     </div>

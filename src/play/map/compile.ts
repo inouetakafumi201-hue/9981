@@ -14,7 +14,7 @@
  */
 import type { PrefabDef } from '../../core/kernel/topology/prefab';
 import type { Expr } from '../../core/kernel/state/expr-types';
-import type { MapDataDocument, MapEdge, MapPlacement, CanonicalMapNode, Directionality } from './types';
+import type { MapDataDocument, MapEdge, MapPlacement, CanonicalMapNode, Directionality, TransitionInstance } from './types';
 import { normalizeMapDocument } from './types';
 import { validateMapStructure } from './validate';
 import type { MapDiagnostic } from './validate';
@@ -30,10 +30,23 @@ export type CompileResult =
  *
  * L-07 透传：`parent` 经 props 传入 PrefabDef，`prefab.spawn` 读 props.parent 传给 createNodeShape。
  */
-function nodeSpecOf(node: CanonicalMapNode): { key: string; def: string; props?: Record<string, Expr> } {
+function nodeSpecOf(
+  node: CanonicalMapNode,
+  transitionBindings: ReadonlyMap<string, TransitionInstance>,
+  edgeParams: ReadonlyMap<string, Readonly<Record<string, unknown>>>,
+): { key: string; def: string; props?: Record<string, Expr> } {
   const props: Record<string, Expr> = { scale: node.scale };
   if (node.name !== undefined) props['name'] = node.name;
   if (node.parent !== undefined) props['parent'] = node.parent;
+  const transition = transitionBindings.get(node.id);
+  if (transition) {
+    props['transitionEdgeId'] = transition.edgeId;
+    props['transitionEndpoint'] = transition.endpoint;
+    props['transitionMaterialId'] = transition.materialId;
+    props['transitionEffect'] = (transition.effect ?? {}) as Expr;
+    const sharedParams = edgeParams.get(transition.edgeId);
+    if (sharedParams !== undefined) props['transitionSharedParams'] = sharedParams as Expr;
+  }
   return { key: node.id, def: node.def, props };
 }
 
@@ -72,6 +85,9 @@ function entitySpecOf(placement: MapPlacement): {
     overrides[key] = value as Expr;
   }
   if (placement.temporaryFree === true) overrides['temporaryFree'] = true;
+  if (placement.tokenIds !== undefined) overrides['tokenIds'] = [...placement.tokenIds] as unknown as Expr;
+  if (placement.activation !== undefined) overrides['activation'] = placement.activation;
+  if (placement.hostSceneId !== undefined) overrides['hostSceneId'] = placement.hostSceneId;
   return Object.keys(overrides).length > 0
     ? { at: placement.at, def: placement.def, overrides }
     : { at: placement.at, def: placement.def };
@@ -93,13 +109,20 @@ export function compileMap(map: MapDataDocument, prefabId?: string): CompileResu
   const errors = findings.filter((finding) => finding.severity === 'error');
   if (errors.length > 0) return { ok: false, diagnostics: findings };
 
+  const transitionBindings = new Map<string, TransitionInstance>();
+  const edgeParams = new Map<string, Readonly<Record<string, unknown>>>();
+  for (const edge of canonical.edges) {
+    if (edge.transitionParams !== undefined) edgeParams.set(edge.id, edge.transitionParams);
+    for (const instance of edge.transitionInstances ?? []) transitionBindings.set(instance.microSceneId, instance);
+  }
+
   const prefab: PrefabDef = {
     id: prefabId ?? `d:map/${map.id}`,
     kind: 'prefab',
-    nodes: canonical.nodes.map(nodeSpecOf),
+    nodes: canonical.nodes.map((node) => nodeSpecOf(node, transitionBindings, edgeParams)),
     links: canonical.edges.map(linkSpecOf),
     entities: canonical.placements
-      .filter((placement) => placement.placementMode !== 'presentation-only')
+      .filter((placement) => placement.activation !== 'free-decoration' && placement.placementMode !== 'presentation-only')
       .map(entitySpecOf),
   };
 

@@ -38,6 +38,8 @@ import {
   type Obstruction,
   type Terrain,
   type Placement,
+  type TransitionEndpoint,
+  type TransitionInstance,
   type Vec,
   type EdgePoint,
   type Scale,
@@ -47,10 +49,17 @@ import {
   type BuildingFrame,
 } from './map-types'
 import { pointInRotatedRect, pointToPolyline, rdp } from './geometry'
-import { canonicalizeMaterialId, materialIdentityById, logicCategoryOf, defaultPlacementModeOf } from './material-adapter'
+import {
+  canonicalizeMaterialId,
+  materialIdentityById,
+  resolveMaterialBoundary,
+  resolvePlacementBoundary,
+  checkTokenAcceptance,
+} from './material-adapter'
 import { canonicalToEditorDoc, editorDocToCanonical } from './map-bridge'
 import type { CanonicalMapData } from '../../ports/map-contracts'
 import { parseMapData } from '../../ports/map-contracts'
+import type { TokenCategory } from '../../../meta-state/types'
 
 export interface Camera {
   x: number
@@ -204,6 +213,16 @@ function seedDoc(): MapDoc {
     buildingGroups: [],
   }
 
+  const rooftopTransitionMicro: SceneNode = {
+    id: 'ms_transition_ed_3_to',
+    name: '车顶通道·过渡微场景·终点',
+    scale: 'small',
+    layerId: roofLayerId,
+    parent: 'sc_rooftop',
+    def: 'd:scene/micro-transition',
+    at: nodeAnchor('sc_rooftop', doc0),
+  }
+
   const edges: Edge[] = [
     {
       id: 'ed_1',
@@ -226,12 +245,24 @@ function seedDoc(): MapDoc {
       to: 'sc_rooftop',
       directionality: 'unidirectional',
       points: [nodeAnchor('sc_sleeper', doc0), nodeAnchor('sc_rooftop', doc0)],
-      transitionWindow: { x: 960, y: 700, materialId: 'material:楼梯:过渡场景', logicCategory: '过渡场景' },
+      transitionParams: { mode: 'shared' },
+      transitionInstances: [{
+        id: 'tw_ed_3_to',
+        edgeId: 'ed_3',
+        endpoint: 'to',
+        materialId: 'material:楼梯:过渡场景',
+        microSceneId: 'ms_transition_ed_3_to',
+        x: nodeAnchor('sc_rooftop', doc0).x,
+        y: nodeAnchor('sc_rooftop', doc0).y,
+        sharedParamsRef: 'edge:ed_3:transition',
+        effect: { direction: 'arrive' },
+      }],
     },
   ]
 
   return {
     ...doc0,
+    sceneNodes: [...doc0.sceneNodes, rooftopTransitionMicro],
     edges,
     obstructions: [
       {
@@ -747,7 +778,19 @@ export function addEdge(fromId: string, toId: string, points: Vec[]): string {
 export function updateEdge(id: string, patch: Partial<Edge>, history = true) {
   const next = {
     ...state.doc,
-    edges: state.doc.edges.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    edges: state.doc.edges.map((edge) => {
+      if (edge.id !== id) return edge
+      const updated = { ...edge, ...patch }
+      const transitionInstances = (updated.transitionInstances ?? []).filter((instance) => {
+        const hostNodeId = instance.endpoint === 'from' ? updated.from : updated.to
+        return state.doc.sceneNodes.some((node) => node.id === hostNodeId)
+      }).map((instance) => {
+        const hostNodeId = instance.endpoint === 'from' ? updated.from : updated.to
+        const position = nodeAnchor(hostNodeId, state.doc)
+        return { ...instance, x: position.x, y: position.y }
+      })
+      return { ...updated, transitionInstances }
+    }),
   }
   if (history) setDoc(next)
   else setDocLive(next)
@@ -792,7 +835,7 @@ export function deleteWaypoint(edgeId: string, index: number) {
 }
 
 /** 拉弯手势：拖动线体时连续追加隐藏点，让曲线跟手自由弯曲，而不产生一堆
- *  可见折点手柄。live（不入历史）——调用方需已在手势开始时 beginHistory()
+ *  可见折点手柄。live（不入历史）——���用方需已在手势开始时 beginHistory()
  *  一次。返回新插入点在 e.points 中的索引，供下一次追加时作为锚点。 */
 export function appendBendPoint(
   edgeId: string,
@@ -1017,6 +1060,53 @@ export function sceneIdForPlacement(at: Vec): string | null {
   return null
 }
 
+function transitionEndpointAtPoint(edge: Edge, at: Vec): { endpoint: TransitionEndpoint; position: Vec } | null {
+  const from = nodeAnchor(edge.from, state.doc)
+  const to = nodeAnchor(edge.to, state.doc)
+  const fromDistance = Math.hypot(at.x - from.x, at.y - from.y)
+  const toDistance = Math.hypot(at.x - to.x, at.y - to.y)
+  const endpoint = fromDistance <= toDistance ? 'from' : 'to'
+  const distance = Math.min(fromDistance, toDistance)
+  if (distance > 96) return null
+  return { endpoint, position: endpoint === 'from' ? from : to }
+}
+
+function transitionInstancesOf(edge: Edge): TransitionInstance[] {
+  if (edge.transitionInstances) return [...edge.transitionInstances]
+  if (!edge.transitionWindow?.materialId) return []
+  const endpoint = transitionEndpointAtPoint(edge, { x: edge.transitionWindow.x, y: edge.transitionWindow.y })
+  if (!endpoint) return []
+  return [{
+    id: uid('tw'),
+    edgeId: edge.id,
+    endpoint: endpoint.endpoint,
+    materialId: edge.transitionWindow.materialId,
+    microSceneId: `ms_transition_${edge.id}_${endpoint.endpoint}`,
+    x: endpoint.position.x,
+    y: endpoint.position.y,
+    sharedParamsRef: `edge:${edge.id}:transition`,
+    effect: {},
+  }]
+}
+
+function createTransitionMicroScene(edge: Edge, endpoint: TransitionEndpoint): { node: SceneNode; created: boolean } {
+  const hostNodeId = endpoint === 'from' ? edge.from : edge.to
+  const id = `ms_transition_${edge.id}_${endpoint}`
+  const existing = state.doc.sceneNodes.find((node) => node.id === id)
+  if (existing) return { node: existing, created: false }
+  const host = state.doc.sceneNodes.find((node) => node.id === hostNodeId)
+  const node: SceneNode = {
+    id,
+    name: `${host?.name ?? '场景'}·过渡微场景·${endpoint === 'from' ? '起点' : '终点'}`,
+    scale: 'small',
+    layerId: host?.layerId ?? state.doc.layers[0]?.id ?? 'ly_0',
+    parent: hostNodeId,
+    def: 'd:scene/micro-transition',
+    at: nodeAnchor(hostNodeId, state.doc),
+  }
+  return { node, created: true }
+}
+
 export function placeMaterialAtPoint(materialId: string, at: Vec): { kind: 'placement' | 'transition' | 'rejected'; id?: string } {
   const identity = materialIdentityById(materialId)
   if (!identity) {
@@ -1024,39 +1114,89 @@ export function placeMaterialAtPoint(materialId: string, at: Vec): { kind: 'plac
     return { kind: 'rejected' }
   }
   const canonicalId = canonicalizeMaterialId(materialId) ?? identity.id
-  const logicCategory = logicCategoryOf(identity)
+  const boundary = resolveMaterialBoundary(identity)
   const sceneId = sceneIdForPlacement(at)
 
-  if (logicCategory === '过渡场景') {
+  if (boundary.logicCategory === '过渡场景') {
     const edgeId = edgeIdAtPoint(at)
-    if (!edgeId) {
-      toast('过渡场景只能绑定到地图连线', 'warn')
+    const edge = edgeId ? state.doc.edges.find((candidate) => candidate.id === edgeId) : undefined
+    const endpoint = edge ? transitionEndpointAtPoint(edge, at) : null
+    if (!edge || !endpoint) {
+      toast('过渡场景必须拖到连线端点', 'warn')
       return { kind: 'rejected' }
     }
+    const instances = transitionInstancesOf(edge)
+    if (instances.some((instance) => instance.endpoint === endpoint.endpoint)) {
+      toast(`该连线${endpoint.endpoint === 'from' ? '起点' : '终点'}已有过渡场景`, 'warn')
+      return { kind: 'rejected' }
+    }
+    const microScene = createTransitionMicroScene(edge, endpoint.endpoint)
+    const instance: TransitionInstance = {
+      id: uid('tw'),
+      edgeId: edge.id,
+      endpoint: endpoint.endpoint,
+      materialId: canonicalId,
+      microSceneId: microScene.node.id,
+      x: endpoint.position.x,
+      y: endpoint.position.y,
+      sharedParamsRef: `edge:${edge.id}:transition`,
+      effect: {},
+    }
+    const nextEdges = state.doc.edges.map((candidate) => candidate.id === edge.id
+      ? {
+          ...candidate,
+          transitionWindow: undefined,
+          transitionParams: candidate.transitionParams ?? {},
+          transitionInstances: [...instances, instance],
+        }
+      : candidate)
     setDoc({
       ...state.doc,
-      edges: state.doc.edges.map((edge) => edge.id === edgeId
-        ? { ...edge, transitionWindow: { x: at.x, y: at.y, materialId: canonicalId, logicCategory: '过渡场景' } }
-        : edge),
+      sceneNodes: microScene.created ? [...state.doc.sceneNodes, microScene.node] : state.doc.sceneNodes,
+      edges: nextEdges,
     })
-    toast('已将过渡场景绑定到连线', 'ok')
-    return { kind: 'transition', id: edgeId }
+    toast(`已绑定过渡场景到连线${endpoint.endpoint === 'from' ? '起点' : '终点'}`, 'ok')
+    return { kind: 'transition', id: instance.id }
   }
 
+  const boundaryAtPoint = resolvePlacementBoundary(identity, sceneId)
   const id = uid('pl')
-  const placementMode = logicCategory === '装饰' || !sceneId ? 'presentation-only' : defaultPlacementModeOf(identity)
   const placement: Placement = {
     id,
     materialId: canonicalId,
-    sceneId: sceneId ?? '',
+    sceneId: boundaryAtPoint.hostSceneId,
+    hostSceneId: boundaryAtPoint.hostSceneId || undefined,
+    activation: boundaryAtPoint.activation,
     x: at.x,
     y: at.y,
-    logicCategory,
-    placementMode,
+    logicCategory: boundary.logicCategory,
+    placementMode: boundaryAtPoint.placementMode,
+    hostCapabilities: [boundary.hostCapability],
+    tokenIds: [],
   }
   setDoc({ ...state.doc, placements: [...state.doc.placements, placement] })
-  toast(placementMode === 'presentation-only' ? '已作为仅表现素材放置' : '已放置逻辑素材', 'ok')
+  toast(boundaryAtPoint.activation === 'free-decoration' ? '已作为仅表现素材放置' : '已放置逻辑素材', 'ok')
   return { kind: 'placement', id }
+}
+
+export function removeTransitionInstances(edgeId: string, endpoint?: TransitionEndpoint) {
+  const edge = state.doc.edges.find((candidate) => candidate.id === edgeId)
+  if (!edge) return
+  const removed = (edge.transitionInstances ?? []).filter((instance) => endpoint === undefined || instance.endpoint === endpoint)
+  if (!removed.length && !edge.transitionWindow) return
+  const removedIds = new Set(removed.map((instance) => instance.microSceneId))
+  const stillReferenced = new Set(state.doc.edges.flatMap((candidate) => candidate.transitionInstances ?? []).filter((instance) => !removed.includes(instance)).map((instance) => instance.microSceneId))
+  setDoc({
+    ...state.doc,
+    sceneNodes: state.doc.sceneNodes.filter((node) => !removedIds.has(node.id) || stillReferenced.has(node.id)),
+    edges: state.doc.edges.map((candidate) => candidate.id === edgeId
+      ? {
+          ...candidate,
+          transitionWindow: undefined,
+          transitionInstances: (candidate.transitionInstances ?? []).filter((instance) => endpoint !== undefined && instance.endpoint !== endpoint),
+        }
+      : candidate),
+  })
 }
 
 export function addPlacement(materialId: string, sceneId: string, at: Vec) {
@@ -1070,12 +1210,52 @@ export function updatePlacement(
 ) {
   const next = {
     ...state.doc,
-    placements: state.doc.placements.map((p) =>
-      p.id === id ? { ...p, ...patch } : p,
-    ),
+    placements: state.doc.placements.map((placement) => {
+      if (placement.id !== id) return placement
+      const materialId = patch.materialId ?? placement.materialId
+      const identity = materialIdentityById(materialId)
+      if (!identity) return placement
+      const at = { x: patch.x ?? placement.x, y: patch.y ?? placement.y }
+      const sceneId = sceneIdForPlacement(at)
+      const boundary = resolveMaterialBoundary(identity)
+      const placementBoundary = resolvePlacementBoundary(identity, sceneId)
+      const materialChanged = materialId !== placement.materialId
+      return {
+        ...placement,
+        ...patch,
+        materialId: canonicalizeMaterialId(materialId) ?? identity.id,
+        sceneId: placementBoundary.hostSceneId,
+        hostSceneId: placementBoundary.hostSceneId || undefined,
+        activation: placementBoundary.activation,
+        placementMode: placementBoundary.placementMode,
+        logicCategory: boundary.logicCategory,
+        hostCapabilities: [boundary.hostCapability],
+        tokenIds: materialChanged ? [] : [...(placement.tokenIds ?? [])],
+      }
+    }),
   }
   if (history) setDoc(next)
   else setDocLive(next)
+}
+
+export function attachTokenToPlacement(
+  placementId: string,
+  tokenId: string,
+  tokenCategory: TokenCategory,
+): boolean {
+  const placement = state.doc.placements.find((candidate) => candidate.id === placementId)
+  if (!placement) return false
+  const identity = materialIdentityById(placement.materialId)
+  if (!identity) return false
+  const activation = placement.activation ?? (placement.placementMode === 'native' ? 'native' : 'free-decoration')
+  const result = checkTokenAcceptance(identity, tokenCategory, activation)
+  if (!result.accepted) {
+    toast(result.reason ?? '该词条不能挂载到此素材', 'warn')
+    return false
+  }
+  if ((placement.tokenIds ?? []).includes(tokenId)) return true
+  updatePlacement(placementId, { tokenIds: [...(placement.tokenIds ?? []), tokenId] })
+  return true
 }
 
 /* ---------------- generic delete / duplicate ---------------- */
@@ -1084,11 +1264,13 @@ export function deleteSelection() {
   if (!sel.length) return
   const ids = new Set(sel.map((s) => s.id))
   const doc = state.doc
+  const removedEdges = doc.edges.filter((edge) => ids.has(edge.id) || ids.has(edge.from) || ids.has(edge.to))
+  const removedMicroSceneIds = new Set(removedEdges.flatMap((edge) => (edge.transitionInstances ?? []).map((instance) => instance.microSceneId)))
   const next: MapDoc = {
     ...doc,
     // 场景选中 id 是 SceneNode.id：删除该节点自身 + 它的全部成员框
-    sceneNodes: doc.sceneNodes.filter((n) => !ids.has(n.id)),
-    sceneBoxes: doc.sceneBoxes.filter((b) => !ids.has(b.sceneId)),
+    sceneNodes: doc.sceneNodes.filter((n) => !ids.has(n.id) && !removedMicroSceneIds.has(n.id)),
+    sceneBoxes: doc.sceneBoxes.filter((b) => !ids.has(b.sceneId) && !removedMicroSceneIds.has(b.sceneId)),
     edges: doc.edges.filter(
       (e) => !ids.has(e.id) && !ids.has(e.from) && !ids.has(e.to),
     ),
@@ -1333,6 +1515,10 @@ export function newBlankMap() {
 }
 
 /* ---------------- validation ---------------- */
+function isTransitionMicroScene(node: SceneNode): boolean {
+  return node.def === 'd:scene/micro-transition'
+}
+
 export function validate(doc: MapDoc): Diagnostic[] {
   const out: Diagnostic[] = []
 
@@ -1373,6 +1559,7 @@ export function validate(doc: MapDoc): Diagnostic[] {
   // 孤立场景（无任何连接）
   if (doc.sceneNodes.length > 1) {
     doc.sceneNodes.forEach((n) => {
+      if (isTransitionMicroScene(n) || degree.get(n.id)) return
       if (!degree.get(n.id)) {
         out.push({
           id: `iso-${n.id}`,
@@ -1423,35 +1610,48 @@ export function validate(doc: MapDoc): Diagnostic[] {
     })
   }
 
-  // 过渡窗口只对双向连接有意义
-  doc.edges.forEach((e) => {
-    if (e.transitionWindow && e.directionality !== 'bidirectional') {
+  doc.edges.forEach((edge) => {
+    if (edge.transitionWindow) {
       out.push({
-        id: `tw-${e.id}`,
+        id: `tw-legacy-${edge.id}`,
         level: 'warning',
-        message: '过渡窗口仅对双向连接有效，当前连接不是双向',
-        correction: '把该连接的方向性改为双向，或移除过渡窗口',
-        path: `edge/${e.id}`,
-        target: { type: 'edge', id: e.id },
+        message: '连线仍使用旧的单窗口过渡字段',
+        correction: '重新拖动过渡场景到连线端点，迁移为起点/终点实例',
+        path: `edge/${edge.id}/transitionWindow`,
+        target: { type: 'edge', id: edge.id },
       })
     }
-  })
-
-  doc.edges.forEach((edge) => {
-    if (edge.transitionWindow && !edge.transitionWindow.materialId) {
-      out.push({ id: `tw-material-${edge.id}`, level: 'error', message: '过渡窗口尚未绑定过渡场景素材', correction: '从快速素材库把“过渡场景”素材拖到该连线上', path: `edge/${edge.id}`, target: { type: 'edge', id: edge.id } })
+    const instances = edge.transitionInstances ?? []
+    if (instances.length > 2) {
+      out.push({ id: `tw-limit-${edge.id}`, level: 'error', message: '一条连线最多只能有两个过渡场景实例', correction: '每个端点各保留一个过渡场景实例', path: `edge/${edge.id}/transitionInstances`, target: { type: 'edge', id: edge.id } })
     }
+    const endpoints = new Set<string>()
+    instances.forEach((instance) => {
+      if (endpoints.has(instance.endpoint)) {
+        out.push({ id: `tw-endpoint-${instance.id}`, level: 'error', message: `连线${instance.endpoint === 'from' ? '起点' : '终点'}已重复绑定过渡场景`, correction: '删除重复实例，或把它移动到另一端', path: `edge/${edge.id}/transitionInstances/${instance.id}`, target: { type: 'edge', id: edge.id } })
+      }
+      endpoints.add(instance.endpoint)
+      if (!doc.sceneNodes.some((node) => node.id === instance.microSceneId && node.parent === (instance.endpoint === 'from' ? edge.from : edge.to))) {
+        out.push({ id: `tw-micro-${instance.id}`, level: 'error', message: '过渡场景引用的微型场景不存在或宿主不匹配', correction: '重新绑定该端点，让编辑器自动创建微型场景', path: `edge/${edge.id}/transitionInstances/${instance.id}`, target: { type: 'edge', id: edge.id } })
+      }
+    })
   })
 
   doc.placements.forEach((placement) => {
     if (placement.logicCategory === '过渡场景') {
       out.push({ id: `transition-placement-${placement.id}`, level: 'error', message: '过渡场景不能作为普通素材放置', correction: '删除该素材并直接拖到连线上', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
     }
-    if (placement.logicCategory === '装饰' && placement.placementMode !== 'presentation-only') {
-      out.push({ id: `decoration-mode-${placement.id}`, level: 'error', message: '装饰素材必须为仅表现', correction: '将放置模式改为 presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
+    if (placement.logicCategory === '装饰' && (placement.placementMode !== 'presentation-only' || placement.activation === 'native')) {
+      out.push({ id: `decoration-mode-${placement.id}`, level: 'error', message: '装饰素材必须为仅表现', correction: '将 activation 改为 free-decoration，并将放置模式改为 presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
     }
-    if (!placement.sceneId && placement.placementMode !== 'presentation-only') {
-      out.push({ id: `outside-mode-${placement.id}`, level: 'error', message: '场景外素材必须降级为仅表现', correction: '将素材移入天然场景框，或改为 presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
+    if (placement.activation === 'free-decoration' && placement.placementMode !== 'presentation-only') {
+      out.push({ id: `free-decoration-mode-${placement.id}`, level: 'error', message: '仅表现素材的激活状态与放置模式不一致', correction: '使用 free-decoration + presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
+    }
+    if ((placement.activation === 'native' || (!placement.activation && placement.placementMode === 'native')) && !placement.sceneId) {
+      out.push({ id: `outside-mode-${placement.id}`, level: 'error', message: '场景外素材必须降级为仅表现', correction: '将素材移入天然场景框，或改为 free-decoration', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
+    }
+    if (placement.hostCapabilities && placement.logicCategory && !placement.hostCapabilities.includes(placement.logicCategory)) {
+      out.push({ id: `host-capability-${placement.id}`, level: 'error', message: '素材实例的宿主能力快照与逻辑身份不一致', correction: '重新放置或移动素材，让宿主能力由素材适配器重算', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
     }
   })
 
@@ -1524,9 +1724,25 @@ export function buildMapData(doc: MapDoc): MapData {
       to: e.to,
       directionality: e.directionality,
       path: e.points.map((p) => ({ x: nx(p.x), y: ny(p.y) })),
-      transitionWindow: e.transitionWindow
-        ? { x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y), ...(e.transitionWindow.materialId ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}) }
-        : undefined,
+      ...(e.transitionInstances?.length ? {
+        transitionInstances: e.transitionInstances.map((instance) => ({
+          id: instance.id,
+          edgeId: instance.edgeId,
+          endpoint: instance.endpoint,
+          materialId: instance.materialId,
+          microSceneId: instance.microSceneId,
+          position: { x: nx(instance.x), y: ny(instance.y) },
+          ...(instance.sharedParamsRef !== undefined ? { sharedParamsRef: instance.sharedParamsRef } : {}),
+          ...(instance.effect !== undefined ? { effect: { ...instance.effect } } : {}),
+        })),
+        ...(e.transitionParams !== undefined ? { transitionParams: { ...e.transitionParams } } : {}),
+      } : e.transitionWindow ? {
+        transitionWindow: {
+          x: nx(e.transitionWindow.x),
+          y: ny(e.transitionWindow.y),
+          ...(e.transitionWindow.materialId ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}),
+        },
+      } : {}),
       visualObstruction: visualByEdge.get(e.id),
       physicalObstruction: physicalByEdge.get(e.id),
       semanticAnchor: e.semanticAnchor,
@@ -1555,10 +1771,14 @@ export function buildMapData(doc: MapDoc): MapData {
       id: p.id,
       materialId: p.materialId,
       sceneId: p.sceneId,
+      ...(p.hostSceneId !== undefined ? { hostSceneId: p.hostSceneId } : {}),
       x: nx(p.x),
       y: ny(p.y),
       logicCategory: p.logicCategory,
       placementMode: p.placementMode,
+      activation: p.activation,
+      hostCapabilities: p.hostCapabilities,
+      tokenIds: p.tokenIds,
     })),
     metadata: { created: now, modified: now, author: 'WakeUp Editor' },
   }

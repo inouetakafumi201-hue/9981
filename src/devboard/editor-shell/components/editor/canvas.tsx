@@ -74,6 +74,7 @@ import {
   sceneIdAtPoint,
   worldPerPixel,
 } from '@editor/lib/canvas-coords'
+import { materialIdentityById, resolveMaterialBoundary } from '@editor/lib/material-adapter'
 
 /* ------------------------------------------------------------------ */
 /*  Toolbar                                                            */
@@ -172,7 +173,7 @@ type Drag =
   | { kind: 'move'; last: Vec; moved: boolean }
   | { kind: 'waypoint'; edgeId: string; index: number; moved: boolean }
   | { kind: 'bend'; edgeId: string; index: number; last: Vec; moved: boolean }
-  | { kind: 'transition'; edgeId: string; moved: boolean }
+  | { kind: 'transition'; edgeId: string; endpoint: 'from' | 'to'; moved: boolean }
   | { kind: 'edge'; from: string; raw: Vec[] }
   | null
 
@@ -637,17 +638,19 @@ export function Canvas() {
         if (pointInRect(w, { x: p.x - 18, y: p.y - 18, width: 36, height: 36 }))
           return { type: 'placement', id: p.id }
       }
-      // transition windows
+      // transition endpoint instances
       for (const e of d.edges) {
-        if (e.transitionWindow) {
-          if (dist(w, e.transitionWindow) < TRANSITION_HIT_PX * wpp)
-            return { type: 'transition', id: e.id }
+        for (const instance of e.transitionInstances ?? []) {
+          if (dist(w, { x: instance.x, y: instance.y }) < TRANSITION_HIT_PX * wpp)
+            return { type: 'transition', id: `${e.id}:${instance.endpoint}` }
         }
+        if (e.transitionWindow && dist(w, e.transitionWindow) < TRANSITION_HIT_PX * wpp)
+          return { type: 'transition', id: `${e.id}:from` }
       }
       // highlight points (take priority over the box body they sit inside)
       for (let i = d.sceneNodes.length - 1; i >= 0; i--) {
         const n = d.sceneNodes[i]
-        if (!n) continue
+        if (!n || n.def === 'd:scene/micro-transition') continue
         const a = nodeAnchor(n.id, d)
         if (dist(w, a) < HIGHLIGHT_HIT_PX * wpp) return { type: 'scene', id: n.id }
       }
@@ -814,9 +817,12 @@ export function Canvas() {
       const hit = hitTest(w)
       if (hit) {
         if (hit.type === 'transition') {
-          beginHistory()
-          dragRef.current = { kind: 'transition', edgeId: hit.id, moved: false }
-          return
+          const [edgeId, endpoint] = hit.id.split(':')
+          if (edgeId && (endpoint === 'from' || endpoint === 'to')) {
+            beginHistory()
+            dragRef.current = { kind: 'transition', edgeId, endpoint, moved: false }
+            return
+          }
         }
         const already = selIds.has(hit.id)
         if (!already) {
@@ -902,7 +908,17 @@ export function Canvas() {
         }
         case 'transition': {
           drag.moved = true
-          updateEdge(drag.edgeId, { transitionWindow: w }, false)
+          const edge = getState().doc.edges.find((candidate) => candidate.id === drag.edgeId)
+          if (edge) {
+            const hostId = drag.endpoint === 'from' ? edge.from : edge.to
+            const anchor = nodeAnchor(hostId, getState().doc)
+            updateEdge(drag.edgeId, {
+              transitionInstances: (edge.transitionInstances ?? []).map((instance) => instance.endpoint === drag.endpoint
+                ? { ...instance, x: anchor.x, y: anchor.y }
+                : instance),
+              transitionWindow: undefined,
+            }, false)
+          }
           break
         }
         case 'edge': {
@@ -956,6 +972,7 @@ export function Canvas() {
           if (rect.width > 5 || rect.height > 5) {
             const next: { type: 'scene' | 'obstruction' | 'terrain' | 'placement'; id: string }[] = []
             for (const node of getState().doc.sceneNodes) {
+              if (node.def === 'd:scene/micro-transition') continue
               const boxes = boxesOfScene(node.id, getState().doc)
               if (boxes.some((box) => rectsOverlap(rect, rotatedRectAABB(box, box.rotation ?? 0)))) {
                 next.push({ type: 'scene', id: node.id })
@@ -1409,12 +1426,21 @@ export function Canvas() {
           )
         })}
 
-        {/* transition windows */}
-        {doc.edges.map((e) =>
-          e.transitionWindow ? (
+        {/* transition endpoint instances */}
+        {doc.edges.flatMap((e) => {
+          const instances = e.transitionInstances ?? (e.transitionWindow ? [{
+            id: `legacy-${e.id}`,
+            edgeId: e.id,
+            endpoint: 'from' as const,
+            materialId: e.transitionWindow.materialId ?? '',
+            microSceneId: '',
+            x: e.transitionWindow.x,
+            y: e.transitionWindow.y,
+          }] : [])
+          return instances.map((instance) => (
             <g
-              key={`tw-${e.id}`}
-              transform={`translate(${e.transitionWindow.x} ${e.transitionWindow.y}) rotate(45)`}
+              key={`tw-${e.id}-${instance.endpoint}`}
+              transform={`translate(${instance.x} ${instance.y})`}
               style={{ filter: 'drop-shadow(0 0 6px var(--transition))' }}
             >
               <rect
@@ -1429,9 +1455,12 @@ export function Canvas() {
                 vectorEffect="non-scaling-stroke"
                 className={selIds.has(e.id) ? '' : 'cursor-pointer'}
               />
+              <text x={0} y={4} textAnchor="middle" fill="var(--foreground)" fontSize={8} className="pointer-events-none select-none">
+                {instance.endpoint === 'from' ? '起' : '终'}
+              </text>
             </g>
-          ) : null,
-        )}
+          ))
+        })}
 
         {/* waypoints for the selected edge */}
         {singleEdgeSel &&
@@ -1506,11 +1535,17 @@ export function Canvas() {
           (() => {
             const gw = screenToWorld(dragMaterial.x, dragMaterial.y)
             if (!gw) return null
+            const identity = materialIdentityById(dragMaterial.materialId)
+            const boundary = identity ? resolveMaterialBoundary(identity) : null
+            const transitionDrop = boundary?.logicCategory === '过渡场景'
+            const rejected = transitionDrop && !dragMaterial.overEdge
+            const statusLabel = rejected ? '需拖到连线端点' : transitionDrop ? '端点绑定' : dragMaterial.overScene ? '原生逻辑' : '仅表现'
+            const stroke = rejected ? 'var(--error)' : transitionDrop ? 'var(--transition)' : 'var(--box-mask)'
             return (
               <g
                 transform={`translate(${gw.x} ${gw.y})`}
                 opacity={0.85}
-                style={{ filter: 'drop-shadow(0 0 8px var(--box-mask))' }}
+                style={{ filter: `drop-shadow(0 0 8px ${stroke})` }}
               >
                 <rect
                   x={-18}
@@ -1519,7 +1554,7 @@ export function Canvas() {
                   height={36}
                   rx={6}
                   fill="var(--panel)"
-                  stroke="var(--box-mask)"
+                  stroke={stroke}
                   strokeWidth={2}
                   strokeDasharray="5 4"
                   vectorEffect="non-scaling-stroke"
@@ -1533,6 +1568,9 @@ export function Canvas() {
                   fontWeight={800}
                 >
                   {getMaterialChar(dragMaterial.materialId)}
+                </text>
+                <text x={0} y={31} textAnchor="middle" fill={stroke} fontSize={8} className="pointer-events-none select-none">
+                  {statusLabel}
                 </text>
               </g>
             )
