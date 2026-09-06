@@ -100,30 +100,23 @@ def assert_valid(frames, states):
 
 
 def assert_prompt_contract(sc) -> None:
-    """断言组件生成提示词遵守全项目唯一视角契约（正面俯视视图）。
-
-    防止未来的改动把旧"正面斜投影/Cabinet/Cavalier/Among Us 类比"作为必须视角重新注入
-    发往图像模型的 prompt。`NO front face` 这类否定禁令是合法的（它是在禁立面，不是要求立面）。
-    跑挂=视角契约被破坏，需回归 docs/表现系统/01 §正面俯视视图。
-    """
-    # 这些词只允许出现在否定禁令里（NO ... / not sidelong）；一旦作为肯定要求出现即违规。
-    negatable = ["front face", "side face", "top face", "right side face",
-                 "three-quarter", "isometric", "oblique", "sidelong angled"]
-    # 下列词出现即违规（自身就是旧视角名或第三方案例），无合法肯定性用法。
-    forbidden_anywhere = ["front-facing", "cabinet", "cavalier", "among us", "slightly angled"]
+    """断言组件提示词固定为正面斜投影视图，且不借用第三方游戏作类比。"""
+    forbidden_examples = ["cabinet", "cavalier", "among us"]
     for context in ("map", "ui"):
-        p = sc.build_prompt("container", "wooden supply crate", ["closed", "open", "broken"], context=context)
-        low = p.lower()
-        assert "top-down plan view" in low, f"[{context}] 缺少固定口令 top-down plan view"
-        # 否定禁令必须带 NO 或 not（NO front face / not isometric 是在禁立面/角度，不是要求）
-        hits = [w for w in negatable if w in low and f"no {w}" not in low and f"not {w}" not in low]
-        assert not hits, f"[{context}] 视角 prompt 把立面/角度当作肯定要求: {hits}"
-        hits2 = [w for w in forbidden_anywhere if w in low]
-        assert not hits2, f"[{context}] 视角 prompt 混入被禁旧视角名/案例: {hits2}"
-        if context == "map":
-            assert "ground shadow" in low, f"[{context}] 缺少落地阴影（正面俯视表达贴地）"
-        assert "magenta" in low, f"[{context}] 缺少品红背景描述"
-        print(f"=== VIEW contract [{context}]: top-down plan view, forbidden={hits2 or 'none'} GATE PASS ===")
+        prompt = sc.build_prompt(
+            "container",
+            "wooden supply crate",
+            ["closed", "open", "broken"],
+            context=context,
+        )
+        lowered = prompt.lower()
+        assert "front-top axonometric" in lowered, f"[{context}] 缺少固定正面斜投影视角口令"
+        assert "top face" in lowered and "front face" in lowered, f"[{context}] 顶面/前立面要求不完整"
+        assert "no visible side face" in lowered or "never a side face" in lowered, f"[{context}] 未禁止侧面"
+        hits = [example for example in forbidden_examples if example in lowered]
+        assert not hits, f"[{context}] 视角 prompt 混入第三方游戏或旧投影案例: {hits}"
+        assert "magenta" in lowered, f"[{context}] 缺少品红背景描述"
+        print(f"=== VIEW contract [{context}]: front-top axonometric, forbidden={hits or 'none'} GATE PASS ===")
 
 
 def main() -> int:

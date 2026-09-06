@@ -137,9 +137,9 @@ COMPONENT_STYLE = (
     "no text, no labels, no numbers anywhere."
 )
 
-# 视角规则：全项目唯一视角 = 正面俯视视图（front-top axonometric view）。地图实体与背包/UI 图标
-# 统一同一视图——都必须保留顶部与前部的体积感；不能退回纯俯视或纯侧视。
-# 权威：docs/表现系统/01_图形化与UI.md §正面俯视视图、PLT-01、05_组件生成风格规范。
+# 视角规则：组件统一使用标准正面斜投影（front-top axonometric view）。地图实体与背包/UI 图标
+# 都保留顶部与前部的体积感；不能退回纯俯视、纯侧视，也不依赖第三方游戏作类比。
+# 权威：docs/表现系统/05_组件生成风格规范。
 VIEW_RULES = {
     "map": (
         "FRONT-TOP AXONOMETRIC VIEW ONLY: a conventional oblique front-top sprite. "
