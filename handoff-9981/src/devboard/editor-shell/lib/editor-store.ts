@@ -43,8 +43,7 @@ import {
   type Scale,
   type MapData,
 } from './map-types'
-import { pointInRotatedRect, pointToPolyline, rdp } from './geometry'
-import { canonicalizeMaterialId, materialIdentityById, logicCategoryOf, defaultPlacementModeOf } from './material-adapter'
+import { rdp } from './geometry'
 import { canonicalToEditorDoc, editorDocToCanonical } from './map-bridge'
 import type { CanonicalMapData } from '../../ports/map-contracts'
 import { parseMapData } from '../../ports/map-contracts'
@@ -104,7 +103,7 @@ interface State {
   pulse: { id: string; n: number; level?: 'error' | 'warning' } | null
   panelOpen: boolean
   toast: { id: number; text: string; tone: 'info' | 'ok' | 'warn' | 'error' } | null
-  dragMaterial: { materialId: string; x: number; y: number; overScene: string | null; overEdge: string | null } | null
+  dragMaterial: { materialId: string; x: number; y: number; overScene: string | null } | null
 }
 
 /* ---------------- id helper ---------------- */
@@ -222,7 +221,7 @@ function seedDoc(): MapDoc {
       to: 'sc_rooftop',
       directionality: 'unidirectional',
       points: [nodeAnchor('sc_sleeper', doc0), nodeAnchor('sc_rooftop', doc0)],
-      transitionWindow: { x: 960, y: 700, materialId: 'material:楼梯:过渡场景', logicCategory: '过渡场景' },
+      transitionWindow: { x: 960, y: 700 },
     },
   ]
 
@@ -262,11 +261,11 @@ let state: State = {
 
 /* ---------------- material drag (right panel -> canvas) ---------------- */
 export function startMaterialDrag(materialId: string, x: number, y: number) {
-  setState({ dragMaterial: { materialId, x, y, overScene: null, overEdge: null } })
+  setState({ dragMaterial: { materialId, x, y, overScene: null } })
 }
-export function moveMaterialDrag(x: number, y: number, overScene: string | null, overEdge: string | null = null) {
+export function moveMaterialDrag(x: number, y: number, overScene: string | null) {
   if (!state.dragMaterial) return
-  setState({ dragMaterial: { ...state.dragMaterial, x, y, overScene, overEdge } })
+  setState({ dragMaterial: { ...state.dragMaterial, x, y, overScene } })
 }
 export function endMaterialDrag() {
   setState({ dragMaterial: null })
@@ -918,69 +917,11 @@ export function updateTerrain(
 }
 
 /* ---------------- placement ---------------- */
-export function edgeIdAtPoint(at: Vec, tolerance = 28): string | null {
-  let nearest: { id: string; distance: number } | null = null
-  for (const edge of state.doc.edges) {
-    const points = [nodeAnchor(edge.from, state.doc), ...edge.points.slice(1, -1), nodeAnchor(edge.to, state.doc)]
-    const distance = pointToPolyline(at, points).distance
-    if (distance <= tolerance && (!nearest || distance < nearest.distance)) nearest = { id: edge.id, distance }
-  }
-  return nearest?.id ?? null
-}
-
-export function sceneIdForPlacement(at: Vec): string | null {
-  for (let index = state.doc.sceneBoxes.length - 1; index >= 0; index--) {
-    const box = state.doc.sceneBoxes[index]
-    if (box && pointInRotatedRect(at, box, box.rotation ?? 0)) return box.sceneId
-  }
-  return null
-}
-
-export function placeMaterialAtPoint(materialId: string, at: Vec): { kind: 'placement' | 'transition' | 'rejected'; id?: string } {
-  const identity = materialIdentityById(materialId)
-  if (!identity) {
-    toast('未知素材，无法放置', 'error')
-    return { kind: 'rejected' }
-  }
-  const canonicalId = canonicalizeMaterialId(materialId) ?? identity.id
-  const logicCategory = logicCategoryOf(identity)
-  const sceneId = sceneIdForPlacement(at)
-
-  if (logicCategory === '过渡场景') {
-    const edgeId = edgeIdAtPoint(at)
-    if (!edgeId) {
-      toast('过渡场景只能绑定到地图连线', 'warn')
-      return { kind: 'rejected' }
-    }
-    setDoc({
-      ...state.doc,
-      edges: state.doc.edges.map((edge) => edge.id === edgeId
-        ? { ...edge, transitionWindow: { x: at.x, y: at.y, materialId: canonicalId, logicCategory: '过渡场景' } }
-        : edge),
-    })
-    toast('已将过渡场景绑定到连线', 'ok')
-    return { kind: 'transition', id: edgeId }
-  }
-
-  const id = uid('pl')
-  const placementMode = logicCategory === '装饰' || !sceneId ? 'presentation-only' : defaultPlacementModeOf(identity)
-  const placement: Placement = {
-    id,
-    materialId: canonicalId,
-    sceneId: sceneId ?? '',
-    x: at.x,
-    y: at.y,
-    logicCategory,
-    placementMode,
-  }
-  setDoc({ ...state.doc, placements: [...state.doc.placements, placement] })
-  toast(placementMode === 'presentation-only' ? '已作为仅表现素材放置' : '已放置逻辑素材', 'ok')
-  return { kind: 'placement', id }
-}
-
 export function addPlacement(materialId: string, sceneId: string, at: Vec) {
-  const result = placeMaterialAtPoint(materialId, at)
-  return result.kind === 'placement' ? result.id : undefined
+  const id = uid('pl')
+  const pl: Placement = { id, materialId, sceneId, x: at.x, y: at.y }
+  setDoc({ ...state.doc, placements: [...state.doc.placements, pl] })
+  return id
 }
 export function updatePlacement(
   id: string,
@@ -1355,24 +1296,6 @@ export function validate(doc: MapDoc): Diagnostic[] {
     }
   })
 
-  doc.edges.forEach((edge) => {
-    if (edge.transitionWindow && !edge.transitionWindow.materialId) {
-      out.push({ id: `tw-material-${edge.id}`, level: 'error', message: '过渡窗口尚未绑定过渡场景素材', correction: '从快速素材库把“过渡场景”素材拖到该连线上', path: `edge/${edge.id}`, target: { type: 'edge', id: edge.id } })
-    }
-  })
-
-  doc.placements.forEach((placement) => {
-    if (placement.logicCategory === '过渡场景') {
-      out.push({ id: `transition-placement-${placement.id}`, level: 'error', message: '过渡场景不能作为普通素材放置', correction: '删除该素材并直接拖到连线上', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
-    }
-    if (placement.logicCategory === '装饰' && placement.placementMode !== 'presentation-only') {
-      out.push({ id: `decoration-mode-${placement.id}`, level: 'error', message: '装饰素材必须为仅表现', correction: '将放置模式改为 presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
-    }
-    if (!placement.sceneId && placement.placementMode !== 'presentation-only') {
-      out.push({ id: `outside-mode-${placement.id}`, level: 'error', message: '场景外素材必须降级为仅表现', correction: '将素材移入天然场景框，或改为 presentation-only', path: `placement/${placement.id}`, target: { type: 'placement', id: placement.id } })
-    }
-  })
-
   // 遮挡框未覆盖任何连线
   doc.obstructions.forEach((o) => {
     if (o.affectsEdges.length === 0) {
@@ -1429,7 +1352,7 @@ export function buildMapData(doc: MapDoc): MapData {
       directionality: e.directionality,
       path: e.points.map((p) => ({ x: nx(p.x), y: ny(p.y) })),
       transitionWindow: e.transitionWindow
-        ? { x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y), ...(e.transitionWindow.materialId ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}) }
+        ? { x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y) }
         : undefined,
       visualObstruction: visualByEdge.get(e.id),
       physicalObstruction: physicalByEdge.get(e.id),
@@ -1461,8 +1384,6 @@ export function buildMapData(doc: MapDoc): MapData {
       sceneId: p.sceneId,
       x: nx(p.x),
       y: ny(p.y),
-      logicCategory: p.logicCategory,
-      placementMode: p.placementMode,
     })),
     metadata: { created: now, modified: now, author: 'WakeUp Editor' },
   }

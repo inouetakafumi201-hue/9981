@@ -152,7 +152,7 @@ export interface MapEdge {
   readonly directionality: Directionality;
   /**
    * 手绘曲线，归一化坐标。至少两点，首尾分别贴合 a、b 的节点坐标。
-   * 直接喂给运动核做沿路动画；为空时渲染层退化为直线。
+   * 直接喂给运动核做沿路动画；为���时渲染层退化为直线。
    */
   readonly path: readonly Vec2[];
   /** 视觉遮挡规格（如墙、高草丛）：影响可见性渲染但不阻止通行。 */
@@ -166,7 +166,7 @@ export interface MapEdge {
 }
 
 /**
- * 一次实例放置：把仓库里的一个完整实例快照内联到某个节点上。
+ * 一次实例放置：��仓库里的一个完整实例快照内联到某个节点上。
  *
  * 过地图边界一律内联而非引用（见 06_创作系统与产权 第四节），所以这里没有"引用外部实例库"的
  * 字段——`def` 与 `overrides` 合起来就是快照本身，地图自包含。
@@ -292,8 +292,6 @@ export interface CanonicalMapData extends Omit<MapData, 'floors' | 'nodes' | 'sc
   readonly schemaVersion: '2.0';
   readonly layers: readonly MapLayer[];
   readonly nodes: readonly CanonicalMapNode[];
-  /** Optional presentation branch; never compiled into PrefabDef. */
-  readonly buildingGroups?: readonly BuildingGroup[];
   /** Optional placeholder boxes for Crop-to-Sprite workflow. */
   readonly placeholderBoxes?: readonly MapPlaceholderBox[];
 }
@@ -319,67 +317,6 @@ export interface LegacyMapNode extends Omit<MapNode, 'floor'> {
 
 /** 规范化入口的输入文档：legacy v1 或 canonical v2 均可。 */
 export type MapDataDocument = LegacyMapData | CanonicalMapData;
-
-/** 建筑组的归一化地图框（表现定位数据，不进入引擎拓扑）。 */
-export interface BuildingFrame {
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-}
-
-/** 建筑组内楼层；height/ordinal 只在所属建筑组命名空间内解释。 */
-export interface BuildingFloor {
-  readonly id: string;
-  readonly ordinal: number;
-  readonly height: number;
-  readonly nodes: readonly string[];
-  readonly image?: string;
-  readonly frame?: BuildingFrame;
-}
-
-/** 建筑组门户：建筑内部楼层间的表现/空间引用。 */
-export interface BuildingPortal {
-  readonly id: string;
-  readonly from: string;
-  readonly to: string;
-  readonly def: string;
-}
-
-/** canonical 建筑组分支；主地图 layers 与建筑楼层严格分离。 */
-export interface BuildingGroup {
-  readonly id: string;
-  readonly frame: BuildingFrame;
-  readonly shell: string;
-  readonly floors: readonly BuildingFloor[];
-  readonly portals: readonly BuildingPortal[];
-} 
-
-function cloneBuildingFrame(frame: BuildingFrame): BuildingFrame {
-  return { x: frame.x, y: frame.y, width: frame.width, height: frame.height };
-}
-
-function normalizeBuildingGroups(groups: readonly BuildingGroup[] | undefined): readonly BuildingGroup[] | undefined {
-  if (groups === undefined) return undefined;
-  return groups.map((group) => ({
-    id: group.id,
-    frame: cloneBuildingFrame(group.frame),
-    shell: group.shell,
-    floors: group.floors.map((floor) => ({
-      id: floor.id,
-      ordinal: floor.ordinal,
-      height: floor.height,
-      nodes: [...floor.nodes],
-      ...(floor.image !== undefined ? { image: floor.image } : {}),
-      ...(floor.frame !== undefined ? { frame: cloneBuildingFrame(floor.frame) } : {}),
-    })),
-    portals: group.portals.map((portal) => ({ ...portal })),
-  }));
-}
-
-export interface CanonicalBuildingMapData extends CanonicalMapData {
-  readonly buildingGroups: readonly BuildingGroup[];
-}
 
 /** Expr 判别键。放置覆写的键名撞上其中任何一个都必须被拒绝。 */
 export const EXPR_DISCRIMINANT_KEYS: readonly string[] = ['path', 'op', 'call', 'q', 'var'];
@@ -576,8 +513,18 @@ function normalizePlaceholderBoxes(
   return boxes.map(clonePlaceholderBox);
 }
 
+/** 建筑组已永久废弃；旧 JSON 只能显式清理后重新导入。 */
+export function assertNoDeprecatedBuildingGroups(document: unknown): void {
+  if (document !== null && typeof document === 'object'
+    && Object.prototype.hasOwnProperty.call(document, 'buildingGroups')) {
+    throw new Error('MAP_BUILDING_GROUP_DEPRECATED: buildingGroups is no longer supported. Remove the field and import again.');
+  }
+}
+
 /** 把 legacy floor 文档或 canonical layer 文档统一成 canonical MapData。 */
 export function normalizeMapDocument(document: MapDataDocument): CanonicalMapData {
+  assertNoDeprecatedBuildingGroups(document);
+
   const normalizedBoxes = normalizePlaceholderBoxes(document.placeholderBoxes);
   if (document.schemaVersion === '2.0') {
     return {
@@ -589,9 +536,6 @@ export function normalizeMapDocument(document: MapDataDocument): CanonicalMapDat
       nodes: normalizeCanonicalNodes(document.nodes),
       edges: document.edges.map(normalizeMapEdge),
       placements: document.placements.map(normalizeMapPlacement),
-      ...(normalizeBuildingGroups(document.buildingGroups) !== undefined
-        ? { buildingGroups: normalizeBuildingGroups(document.buildingGroups) }
-        : {}),
       ...(normalizedBoxes !== undefined ? { placeholderBoxes: normalizedBoxes } : {}),
     };
   }

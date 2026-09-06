@@ -8,8 +8,6 @@
      `at` 由聚合外接矩形中心自动重算，不再随一个框的几何字面存储。
    ========================================================================= */
 
-import type { MaterialLogicCategory, MaterialPlacementMode } from '../../../meta-state/types'
-
 export const WORLD = { w: 1600, h: 1000 }
 
 export type Mode = 'select' | 'place' | 'edge' | 'sample' | 'playtest'
@@ -124,8 +122,8 @@ export interface Edge {
    *  仅作初值/回退）；中间为折点。Catmull-Rom 穿过全部点。
    *  中间点可能带 hidden 标记（见 EdgePoint） */
   points: EdgePoint[]
-  /** 过渡窗口直接绑定过渡场景素材，不生成普通 placement。 */
-  transitionWindow?: Vec & { materialId?: string; logicCategory?: '过渡场景' }
+  /** 过渡窗口——仅双向连接有意义，其它方向性下诊断会报 warning */
+  transitionWindow?: Vec
   /** 语义锚点：高地/洼地/中性，仅影响边中点的可视化装饰，不接入玩法逻辑 */
   semanticAnchor?: 'highland' | 'lowland' | 'neutral'
   def?: string
@@ -155,12 +153,9 @@ export interface Terrain {
 export interface Placement {
   id: string
   materialId: string
-  /** 场景外仅表现素材为空字符串。 */
   sceneId: string
   x: number
   y: number
-  logicCategory?: MaterialLogicCategory
-  placementMode?: MaterialPlacementMode
 }
 
 export interface MapDoc {
@@ -210,7 +205,7 @@ export interface MapData {
     to: string
     directionality: EdgeDirectionality
     path: Vec[]
-    transitionWindow?: Vec & { materialId?: string; logicCategory?: '过渡场景' }
+    transitionWindow?: Vec
     visualObstruction?: string[]
     physicalObstruction?: string[]
     semanticAnchor?: 'highland' | 'lowland' | 'neutral'
@@ -241,8 +236,6 @@ export interface MapData {
     sceneId: string
     x: number
     y: number
-    logicCategory?: MaterialLogicCategory
-    placementMode?: MaterialPlacementMode
     overrides?: Record<string, unknown>
     temporaryFree?: boolean
   }>

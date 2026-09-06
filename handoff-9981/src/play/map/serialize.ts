@@ -72,11 +72,7 @@ function serializeEdge(edge: CanonicalMapData['edges'][number]): Record<string, 
   if (edge.visualObstruction !== undefined) record['visualObstruction'] = edge.visualObstruction;
   if (edge.physicalObstruction !== undefined) record['physicalObstruction'] = edge.physicalObstruction;
   if (edge.transitionWindow !== undefined) {
-    record['transitionWindow'] = {
-      control: edge.transitionWindow.control.map((p) => ({ x: p.x, y: p.y })),
-      ...(edge.transitionWindow.materialId !== undefined ? { materialId: edge.transitionWindow.materialId } : {}),
-      ...(edge.transitionWindow.logicCategory !== undefined ? { logicCategory: edge.transitionWindow.logicCategory } : {}),
-    };
+    record['transitionWindow'] = { control: edge.transitionWindow.control.map((p) => ({ x: p.x, y: p.y })) };
   }
   if (edge.semanticAnchor !== undefined) record['semanticAnchor'] = edge.semanticAnchor;
   return record;
@@ -84,9 +80,6 @@ function serializeEdge(edge: CanonicalMapData['edges'][number]): Record<string, 
 
 function serializePlacement(placement: CanonicalMapData['placements'][number]): Record<string, unknown> {
   const record: Record<string, unknown> = { id: placement.id, at: placement.at, def: placement.def };
-  if (placement.logicCategory !== undefined) record['logicCategory'] = placement.logicCategory;
-  if (placement.placementMode !== undefined) record['placementMode'] = placement.placementMode;
-  if (placement.position !== undefined) record['position'] = { x: placement.position.x, y: placement.position.y };
   if (placement.overrides !== undefined) record['overrides'] = placement.overrides;
   if (placement.temporaryFree !== undefined) record['temporaryFree'] = placement.temporaryFree;
   return record;
