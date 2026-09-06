@@ -39,9 +39,24 @@ describe('UI transport envelope', () => {
     expect(execute).toHaveBeenCalledTimes(1)
   })
 
-  it('requests a full snapshot on first connect or revision drift', () => {
+  it('rejects an idempotency key reused by a different request', () => {
+    const ledger = createIdempotencyLedger<{ ok: boolean }>()
+    ledger.resolve(envelope, () => ({ ok: true }))
+    expect(() => ledger.resolve({ ...envelope, requestId: 'request:2' }, () => ({ ok: false }))).toThrow('IDEMPOTENCY_CONFLICT')
+  })
+
+  it('accepts rejected and stale results without a committed revision', () => {
+    for (const status of ['rejected', 'stale'] as const) {
+      const result: ResultEnvelope = { ...envelope, kind: 'result', status, diagnostics: [] }
+      expect(validateTransportEnvelope(result)).toEqual([])
+    }
+  })
+
+  it('requests a full snapshot on first connect, revision gaps, or fingerprint drift', () => {
     const reconnect: ReconnectEnvelope = { ...envelope, kind: 'reconnect', lastObservedRevision: null }
     expect(reconnectNeedsSnapshot(reconnect, revision)).toBe(true)
+    expect(reconnectNeedsSnapshot({ ...reconnect, lastObservedRevision: { sequence: 2, fingerprint: 'state-2' } }, revision)).toBe(true)
+    expect(reconnectNeedsSnapshot({ ...reconnect, lastObservedRevision: { sequence: 3, fingerprint: 'diverged' } }, revision)).toBe(true)
     expect(reconnectNeedsSnapshot({ ...reconnect, lastObservedRevision: revision }, revision)).toBe(false)
   })
 })

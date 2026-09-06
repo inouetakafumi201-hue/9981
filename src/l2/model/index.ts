@@ -29,9 +29,9 @@ export * from './component-alignment';
 export * from './family-component-shapes';
 
 // 空间与物品领域公共面：仅只读目录、纯函数与类型。
-export * from './space-items-domain-ids';
-export * from './space-items-structural-bounds';
-export * from './space-items-numeric-ownership';
-export * from './space-items-diagnostic-categories';
-export * from './space-items-unresolved';
-export * from './space-items-contracts';
+export * from './space-items-domain-ids.js';
+export * from './space-items-structural-bounds.js';
+export * from './space-items-numeric-ownership.js';
+export * from './space-items-diagnostic-categories.js';
+export * from './space-items-unresolved.js';
+export * from './space-items-contracts.js';

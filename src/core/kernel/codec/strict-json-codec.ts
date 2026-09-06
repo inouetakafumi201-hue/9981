@@ -26,6 +26,7 @@ import type {
   StrictJsonCodecPort,
 } from '../ports/index';
 import { DEFAULT_TECHNICAL_QUOTAS } from '../security/index';
+import { hashString } from '../state/hash';
 
 export type JsonObject = Record<string, JsonValue>;
 export type JsonArray = JsonValue[];
@@ -110,10 +111,7 @@ export class StrictJsonCodec implements StrictJsonCodecPort {
     }
 
     // 计算源码整体哈希
-    const contentHash = (() => {
-      const h = input.sourceText.split('').reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 0);
-      return h.toString(16).padStart(16, '0');
-    })();
+    const contentHash = hashString(input.sourceText);
 
     // 解析 JSON
     let value: JsonValue;

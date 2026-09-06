@@ -15,12 +15,12 @@ export * as adapters from './adapters/index';
 export * as testing from './testing/index';
 
 // 空间与物品领域的稳定公共面；与 model namespace 同步转出。
-export * from './model/space-items-domain-ids';
-export * from './model/space-items-structural-bounds';
-export * from './model/space-items-numeric-ownership';
-export * from './model/space-items-diagnostic-categories';
-export * from './model/space-items-unresolved';
-export * from './model/space-items-contracts';
+export * from './model/space-items-domain-ids.js';
+export * from './model/space-items-structural-bounds.js';
+export * from './model/space-items-numeric-ownership.js';
+export * from './model/space-items-diagnostic-categories.js';
+export * from './model/space-items-unresolved.js';
+export * from './model/space-items-contracts.js';
 
 export * from './kernel/kernel-contract';
 export * from './kernel/op-registry-adapter';

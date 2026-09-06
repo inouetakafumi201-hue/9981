@@ -113,9 +113,10 @@ describe('专项 B 组合根 createLoadedMatch 契约', () => {
     expect(nodeIds.some((id) => /^n:\d+$/.test(id))).toBe(true); // 地图节点以 prefab 分配编号落地
   });
 
-  it.each(['residence', 'match'] as const)('%s MapBundle 经过同一组合根完成 compile → spawn → UI projection', (sessionKind) => {
+  it.each(['residence', 'match'] as const)('%s MapBundle 经过同一组合根完成 load → compile → spawn → UI projection', async (sessionKind) => {
     const request = loadedMatchRequest();
-    const result = createLoadedMatch({ ...request, mapBundle: verifiedMapBundle(sessionKind) });
+    const mapBundle = await verifiedMapBundle(sessionKind);
+    const result = createLoadedMatch({ ...request, mapBundle });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.match.ui).not.toBeNull();

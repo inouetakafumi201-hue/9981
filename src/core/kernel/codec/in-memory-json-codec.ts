@@ -20,6 +20,7 @@ import type {
   JsonCodecError,
 } from '../ports/index';
 import { QuotaBudget } from '../ports/quota-contract';
+import { hashString } from '../state/hash';
 
 /**
  * 占位实现（待 Phase 1 迁出完整实现）
@@ -43,10 +44,7 @@ export class InMemoryJsonCodec implements StrictJsonCodecPort {
     }
 
     // 计算源码哈希
-    const contentHash = (() => {
-      const h = input.sourceText.split('').reduce((acc, ch) => ((acc << 5) - acc + ch.charCodeAt(0)) | 0, 0);
-      return h.toString(16).padStart(16, '0');
-    })();
+    const contentHash = hashString(input.sourceText);
     const sourceSliceHash = contentHash; // 简化：整个文档作为一个跨度
 
     // 构建 SourceRecord
