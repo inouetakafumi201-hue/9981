@@ -766,7 +766,7 @@ def _load_registry(path: Path) -> list[dict]:
         provider = ent.get("provider", defaults.get("provider"))
         if provider not in (None, "gpt-image-2", "gemini"):
             errors.append(f"{tag}: provider {provider!r} 必须是 gpt-image-2|gemini")
-            for field in ("cell", "colors"):
+        for field in ("cell", "colors"):
             val = ent.get(field, defaults.get(field, 64 if field == "cell" else 64))
             if not isinstance(val, int) or val <= 0:
                 errors.append(f"{tag}: {field} 必须是正整数")
@@ -1045,7 +1045,7 @@ def main() -> None:
     parser.add_argument("--reference", default=None,
                         help="风格参考图（可选，图生图锁风格）")
     parser.add_argument("--out", default=None, type=Path,
-                        help="输出目录；批量模式忽略（按清单 name 落到清单同目录）")
+                        help="输出目��；批量模式忽略（按清单 name 落到清单同目录）")
     parser.add_argument("--cell", type=int, default=64, help="成品帧尺寸（默认 64）")
     parser.add_argument("--colors", type=int, default=64, help="像素化色彩数（默认 64，32 颗粒感明显）")
     parser.add_argument("--registry", default=None, type=Path,

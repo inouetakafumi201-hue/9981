@@ -43,7 +43,8 @@ import {
   startMaterialDrag,
   moveMaterialDrag,
   endMaterialDrag,
-  addPlacement,
+  edgeIdAtPoint,
+  placeMaterialAtPoint,
 } from '@editor/lib/editor-store'
 import {
   screenToWorld,
@@ -340,7 +341,7 @@ function EdgeInspector({ edge }: { edge: Edge }) {
             if (v === 'on') {
               const mid = edge.points[Math.floor(edge.points.length / 2)]
               if (!mid) return
-              updateEdge(edge.id, { transitionWindow: { x: mid.x, y: mid.y } })
+              updateEdge(edge.id, { transitionWindow: { x: mid.x, y: mid.y, materialId: 'material:楼梯:过渡场景', logicCategory: '过渡场景' } })
             } else {
               updateEdge(edge.id, { transitionWindow: undefined })
             }
@@ -439,7 +440,7 @@ function PlacementInspector({ pl }: { pl: Placement }) {
             {mat?.name ?? '未知素材'}
           </div>
           <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground">
-            {mat?.category}
+            {pl.logicCategory ?? mat?.category} · {pl.placementMode === 'presentation-only' ? '仅表现' : '原生逻辑'}
           </div>
         </div>
       </div>
@@ -591,8 +592,10 @@ function MaterialPalette() {
 
     const move = (ev: PointerEvent) => {
       const w = screenToWorld(ev.clientX, ev.clientY)
-      const overId = w && isOverCanvas(ev.clientX, ev.clientY) ? sceneIdAtPoint(w) : null
-      moveMaterialDrag(ev.clientX, ev.clientY, overId)
+      const overCanvas = w && isOverCanvas(ev.clientX, ev.clientY)
+      const overId = overCanvas ? sceneIdAtPoint(w) : null
+      const overEdge = overCanvas ? edgeIdAtPoint(w) : null
+      moveMaterialDrag(ev.clientX, ev.clientY, overId, overEdge)
     }
     const up = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', move)
@@ -600,9 +603,9 @@ function MaterialPalette() {
       dragging.current = false
       const drag = getState().dragMaterial
       const w = screenToWorld(ev.clientX, ev.clientY)
-      if (drag?.overScene && w) {
-        addPlacement(drag.materialId, drag.overScene, w)
-        playSfx('success')
+      if (drag && w && isOverCanvas(ev.clientX, ev.clientY)) {
+        const result = placeMaterialAtPoint(drag.materialId, w)
+        playSfx(result.kind === 'rejected' ? 'error' : 'success')
       }
       endMaterialDrag()
     }
@@ -668,7 +671,7 @@ function MaterialPalette() {
               key={m.id}
               onPointerDown={(e) => beginDrag(e, m.id)}
               onMouseEnter={() => playSfx('hover')}
-              title={`${m.name} · 拖入场景放置`}
+              title={m.category === '过渡场景' ? `${m.name} · 拖到连线绑定` : `${m.name} · 场景外自动仅表现`}
               className="chamfer-sm chamfer group relative aspect-square touch-none overflow-hidden ring-1 ring-inset ring-border transition-all duration-150 hover:ring-primary active:scale-95"
               style={tileStyle(m.tile)}
               aria-label={`${m.name}，拖入画布放置`}

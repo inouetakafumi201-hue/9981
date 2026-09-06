@@ -202,7 +202,7 @@ describe('Feature: wakeup-engine-layer, Property 7: 地图数据面字段', () =
         path: [],
         visualObstruction: { shape: 'box', height: 2 },
         physicalObstruction: { shape: 'box', height: 3 },
-        transitionWindow: { control: [{ x: 0.7, y: 0.5 }] },
+        transitionWindow: { control: [{ x: 0.7, y: 0.5 }], materialId: 'material:楼梯:过渡场景', logicCategory: '过渡场景' as const },
         semanticAnchor: 'high',
       }],
       placements: [],

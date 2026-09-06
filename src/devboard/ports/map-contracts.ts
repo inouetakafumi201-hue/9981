@@ -12,6 +12,8 @@ export type {
   MapNode,
   MapEdge,
   MapPlacement,
+  MapMaterialLogicCategory,
+  MapMaterialPlacementMode,
   MapBackdrop,
   Vec2,
   ObstructionSpec,

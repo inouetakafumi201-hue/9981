@@ -7,6 +7,20 @@ export type ActorKind = 'player' | 'ai-player' | 'npc' | 'unbound'
 export type TokenCategory = '属性' | '技能' | '状态' | '防御' | '机动'
 export type MaterialSource = 'standard' | 'synthesized'
 
+/** 素材的唯一玩法语义分类；与视觉筛选用 DisplayCategory 解耦。 */
+export type MaterialLogicCategory =
+  | 'AI 单位'
+  | 'NPC'
+  | '载具'
+  | '容器'
+  | '物品'
+  | '机关装置'
+  | '装饰'
+  | '过渡场景'
+
+/** native 会实例化玩法实体；presentation-only 只参与表现与渲染。 */
+export type MaterialPlacementMode = 'native' | 'presentation-only'
+
 export interface AssetRef {
   readonly manifestId: string
   readonly entryId?: string
@@ -32,7 +46,12 @@ export interface MaterialIdentity {
   readonly iconAssetRef?: AssetRef
   readonly textureAssetRef: AssetRef
   readonly quality: 1 | 2 | 3 | 4 | 5
+  /** 纯视觉目录，可自由调整且不得驱动玩法。 */
   readonly displayCategory: DisplayCategory
+  /** 唯一逻辑分类。旧登记缺失时由适配层确定性迁移。 */
+  readonly logicCategory?: MaterialLogicCategory
+  /** 装饰固定为 presentation-only；其他素材放置时可因场景命中降级。 */
+  readonly defaultPlacementMode?: MaterialPlacementMode
   readonly runtimeEntityRef?: RuntimeEntityRef
   readonly actorBinding?: ActorBinding
 }

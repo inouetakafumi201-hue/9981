@@ -378,6 +378,16 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
         });
       }
     }
+    if (edge.transitionWindow !== undefined && !edge.transitionWindow.materialId) {
+      findings.push({
+        code: 'MAP_TRANSITION_MATERIAL_REQUIRED',
+        severity: 'error',
+        path: `${path}/transitionWindow/materialId`,
+        subject: edge.id,
+        message: `连接「${edge.id}」的过渡窗口没有绑定过渡场景素材。`,
+        correction: '从素材库把“过渡场景”分类素材拖到这条连线上。',
+      });
+    }
     findings.push(...validateEdgeDataFields(edge, path));
     // 曲线自身的校验（点数、坐标范围、首尾吸附），反向用例命中的正是这些。
     findings.push(...validateEdgePath(map as MapData, index, nodeById));
@@ -419,7 +429,20 @@ export function validateMapStructure(map: MapDataDocument): readonly MapDiagnost
     }
     seenPlacementIds.add(placement.id);
 
-    if (!nodeById.has(placement.at)) {
+    if (placement.logicCategory === '过渡场景') {
+      findings.push({
+        code: 'MAP_TRANSITION_AS_PLACEMENT', severity: 'error', path: `${path}/logicCategory`, subject: placement.id,
+        message: `过渡场景素材「${placement.id}」被错误保存为普通 placement。`,
+        correction: '删除该 placement，并把过渡场景素材直接拖到地图连线上。',
+      });
+    }
+    if (placement.logicCategory === '装饰' && placement.placementMode !== 'presentation-only') {
+      findings.push({
+        code: 'MAP_DECORATION_MUST_BE_PRESENTATION_ONLY', severity: 'error', path: `${path}/placementMode`, subject: placement.id,
+        message: `装饰素材「${placement.id}」不能声明原生玩法逻辑。`, correction: '把 placementMode 改为 presentation-only。',
+      });
+    }
+    if (!nodeById.has(placement.at) && placement.placementMode !== 'presentation-only') {
       findings.push({
         code: 'MAP_PLACEMENT_HOST_NOT_FOUND',
         severity: 'error',

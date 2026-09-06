@@ -122,6 +122,12 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
       b: e.to,
       directionality: toDirectionality(e),
       path: e.points.map((p) => ({ x: nx(p.x), y: ny(p.y) })),
+      ...(e.transitionWindow !== undefined ? {
+        transitionWindow: {
+          control: [{ x: nx(e.transitionWindow.x), y: ny(e.transitionWindow.y) }],
+          ...(e.transitionWindow.materialId !== undefined ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}),
+        },
+      } : {}),
       ...(e.semanticAnchor !== undefined
         ? { semanticAnchor: (e.semanticAnchor === 'highland' ? 'high' : e.semanticAnchor === 'lowland' ? 'low' : 'neutral') as 'high' | 'low' | 'neutral' }
         : {}),
@@ -133,6 +139,9 @@ export function editorDocToCanonical(doc: MapDoc): CanonicalMapData {
     id: p.id,
     at: p.sceneId,
     def: p.materialId,
+    ...(p.logicCategory !== undefined ? { logicCategory: p.logicCategory } : {}),
+    ...(p.placementMode !== undefined ? { placementMode: p.placementMode } : {}),
+    position: { x: nx(p.x), y: ny(p.y) },
   }))
 
   return {
@@ -201,6 +210,13 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
       to: e.b,
       directionality: fromDirectionality(e.directionality),
       points: e.path.map((p) => ({ x: wx(p.x), y: wy(p.y) })),
+      ...(e.transitionWindow?.control[0] !== undefined ? {
+        transitionWindow: {
+          x: wx(e.transitionWindow.control[0].x),
+          y: wy(e.transitionWindow.control[0].y),
+          ...(e.transitionWindow.materialId !== undefined ? { materialId: e.transitionWindow.materialId, logicCategory: '过渡场景' as const } : {}),
+        },
+      } : {}),
       ...(e.semanticAnchor !== undefined
         ? { semanticAnchor: (e.semanticAnchor === 'high' ? 'highland' : e.semanticAnchor === 'low' ? 'lowland' : 'neutral') as 'highland' | 'lowland' | 'neutral' }
         : {}),
@@ -226,16 +242,16 @@ export function canonicalToEditorDoc(canonical: CanonicalMapData): MapDoc {
   // 放置：canonical placement.at 指向宿主节点；编辑器 placement 需要 sceneId 与坐标。
   const placements = canonical.placements.flatMap((p) => {
     const host = sceneNodes.find((n) => n.id === p.at)
-    if (!host) return []
-    return [
-      {
-        id: p.id,
-        materialId: p.def,
-        sceneId: host.id,
-        x: host.at.x,
-        y: host.at.y,
-      },
-    ]
+    if (!host && p.placementMode !== 'presentation-only') return []
+    return [{
+      id: p.id,
+      materialId: p.def,
+      sceneId: host?.id ?? '',
+      x: p.position ? wx(p.position.x) : (host?.at.x ?? 0),
+      y: p.position ? wy(p.position.y) : (host?.at.y ?? 0),
+      ...(p.logicCategory !== undefined ? { logicCategory: p.logicCategory } : {}),
+      ...(p.placementMode !== undefined ? { placementMode: p.placementMode } : {}),
+    }]
   })
 
   return {

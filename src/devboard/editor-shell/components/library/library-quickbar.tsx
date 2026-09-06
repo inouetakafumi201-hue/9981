@@ -249,7 +249,7 @@ function QuickSlot({
                   openDetail(material.id)
                 }
               }}
-              title={material.name}
+              title={`${material.name} · ${material.category === '装饰' ? '仅表现' : material.category === '过渡场景' ? '绑定连线' : '原生逻辑'}`}
               className="group h-full w-full cursor-pointer"
             >
               <LibTile tile={material.tile} glow={material.glow} className="h-full w-full" />

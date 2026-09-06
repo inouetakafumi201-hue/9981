@@ -102,7 +102,9 @@ export function LibraryDetail({ asset }: { asset: MaterialMeta }) {
         {/* 名称 / 分类 */}
         <div className="mt-3 text-center">
           <h2 className="font-sans text-[24px] font-bold leading-tight text-[color:var(--lib-text)]">{asset.name}</h2>
-          <p className="font-sans text-[13px] text-[color:var(--lib-dim)]">{asset.category}</p>
+          <p className="font-sans text-[13px] text-[color:var(--lib-dim)]">
+            {asset.category} · {asset.category === '装饰' ? '仅表现' : asset.category === '过渡场景' ? '绑定连线' : '原生逻辑'}
+          </p>
         </div>
 
         {/* 五词条槽 */}
