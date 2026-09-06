@@ -1,0 +1,36 @@
+{
+  "id": "decoration-floor-lamp",
+  "name": "落地灯",
+  "type": "decoration",
+  "desc": "提供空间识别的普通家具",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "capabilities": [
+    "readable"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration",
+    "entityRef": "material:decoration-floor-lamp"
+  }
+}

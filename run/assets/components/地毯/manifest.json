@@ -1,0 +1,36 @@
+{
+  "id": "decoration-rug",
+  "name": "地毯",
+  "type": "decoration",
+  "desc": "出租屋与场景均可使用的普通陈设",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "capabilities": [
+    "readable"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration",
+    "entityRef": "material:decoration-rug"
+  }
+}

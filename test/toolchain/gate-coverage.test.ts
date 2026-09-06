@@ -48,6 +48,16 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 /** 被 typecheck / lint 共同覆盖的两棵树。二者是本仓库全部第一方 TypeScript 代码的所在。 */
 const COVERED_ROOTS = ['src', 'test'] as const;
 
+/** 主仓 tsconfig 明确排除的两个独立 V0 壳；它们由 typecheck:shell 单独检查。 */
+const TYPECHECK_EXCLUDED_PREFIXES = [
+  'src/devboard/game-ui-shell-10/',
+  'src/devboard/game-ui-shell-15/',
+] as const;
+
+function isTypecheckExcluded(relativePath: string): boolean {
+  return TYPECHECK_EXCLUDED_PREFIXES.some((prefix) => relativePath.startsWith(prefix));
+}
+
 /** 统一成仓库相对、正斜杠、小写的形式，避免 Windows 盘符大小写与分隔符差异造成假失败。 */
 function toComparableRelativePath(absolutePath: string): string {
   return relative(REPO_ROOT, absolutePath).split(sep).join('/').toLowerCase();
@@ -227,7 +237,7 @@ describe('G1: typecheck 范围必须覆盖磁盘上全部第一方 TypeScript �
     for (const treeRoot of COVERED_ROOTS) {
       for (const absolutePath of collectTypeScriptFiles(resolve(REPO_ROOT, treeRoot))) {
         const comparable = toComparableRelativePath(absolutePath);
-        if (!programFiles.has(comparable)) {
+        if (!isTypecheckExcluded(comparable) && !programFiles.has(comparable)) {
           missing.push(comparable);
         }
       }

@@ -1,0 +1,39 @@
+{
+  "id": "device-code-lock",
+  "name": "密码锁",
+  "type": "device",
+  "desc": "通过输入验证改变锁定状态",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "unlock",
+    "toggle"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "device",
+    "entityRef": "material:device-code-lock"
+  }
+}

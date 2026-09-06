@@ -1,0 +1,36 @@
+{
+  "id": "decoration-debris",
+  "name": "碎石堆",
+  "type": "decoration",
+  "desc": "表达空间阻塞但不承载规则的装饰",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "capabilities": [
+    "readable"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration",
+    "entityRef": "material:decoration-debris"
+  }
+}

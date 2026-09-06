@@ -1,0 +1,39 @@
+{
+  "id": "device-power-generator",
+  "name": "便携发电机",
+  "type": "device",
+  "desc": "改变区域供电状态的装置",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "power",
+    "toggle"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "device",
+    "entityRef": "material:device-power-generator"
+  }
+}

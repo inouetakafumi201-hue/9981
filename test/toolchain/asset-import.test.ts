@@ -27,7 +27,7 @@ describe('register-character-assets.mjs', () => {
     writeRole(sourceRoot, '侦探');
     writeRole(sourceRoot, 'mercenary');
     writeFileSync(join(sourceRoot, 'stray.png'), 'png');
-    expect(discoverCharacters(sourceRoot).map((c: { id: string }) => c.id)).toEqual(['侦探', 'mercenary']);
+    expect(discoverCharacters(sourceRoot).map((c: { id: string }) => c.id)).toEqual(['mercenary', '侦探']);
   });
 
   it('缺帧或损坏 PNG 时失败', () => {

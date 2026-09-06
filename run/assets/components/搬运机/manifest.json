@@ -1,0 +1,40 @@
+{
+  "id": "ai-unit-courier-bot",
+  "name": "搬运机",
+  "type": "ai-unit",
+  "desc": "在节点之间运送物资的 AI 单位",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "downed"
+  ],
+  "capabilities": [
+    "carry",
+    "deliver",
+    "move"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "ai-unit",
+    "entityRef": "material:ai-unit-courier-bot"
+  }
+}

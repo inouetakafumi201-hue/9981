@@ -1,0 +1,19 @@
+{
+  "name": "device-power-generator",
+  "type": "device",
+  "desc": "portable power generator",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "device"
+  }
+}

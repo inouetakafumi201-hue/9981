@@ -1,0 +1,38 @@
+{
+  "id": "item-power-cell",
+  "name": "电池",
+  "type": "item",
+  "desc": "为通用设备提供能量的物品",
+  "perspective": "front",
+  "context": "ui",
+  "states": [
+    "single",
+    "active"
+  ],
+  "capabilities": [
+    "power",
+    "consume"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "inventory-icon",
+    "profileType": "item",
+    "entityRef": "material:item-power-cell"
+  }
+}

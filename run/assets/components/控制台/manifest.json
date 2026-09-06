@@ -1,0 +1,39 @@
+{
+  "id": "device-control-console",
+  "name": "控制台",
+  "type": "device",
+  "desc": "读取并改变系统状态的装置",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "inspect",
+    "toggle"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "device",
+    "entityRef": "material:device-control-console"
+  }
+}

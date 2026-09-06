@@ -1,0 +1,38 @@
+{
+  "id": "item-spare-part",
+  "name": "备用零件",
+  "type": "item",
+  "desc": "装置维修所需的通用零件",
+  "perspective": "front",
+  "context": "ui",
+  "states": [
+    "single",
+    "active"
+  ],
+  "capabilities": [
+    "repair",
+    "consume"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "inventory-icon",
+    "profileType": "item",
+    "entityRef": "material:item-spare-part"
+  }
+}

@@ -13,6 +13,7 @@ import { canSetHeight, visibleLayers } from '../layers/layer-rules.js';
 import type { MapLayer } from '../layers/layer-shapes.js';
 import { overlayOpacity } from '../layers/layer-shapes.js';
 import { createDeveloperHook } from '../ports/material-availability.js';
+import { MATERIALS } from '../editor-shell/lib/materials.js';
 import type { MapData, MapDiagnostic, MapEdge, MapNode, SceneScale, Vec2 } from '../ports/map-contracts.js';
 import { adjacencyOf, connectedGroups } from '../ports/map-contracts.js';
 import { pan, zoomAt, flyTo, defaultCamera, type Camera } from './camera.js';
@@ -23,10 +24,13 @@ import { GameButton, GameInput, GameSelect, GameScrollArea } from '../components
 import './editor.css';
 
 const maps = samples();
-const materials = [
-  ['inst_locker', '储物柜', '装置'], ['inst_lamp', '感应灯', '照明'], ['inst_bench', '长椅', '陈设'], ['inst_signal', '信号灯', '交互'],
-  ['inst_case', '档案箱', '线索'], ['inst_screen', '终端屏', '交互'], ['inst_barrier', '隔离带', '遮挡'], ['inst_bed', '铺位', '陈设'],
-] as const;
+const STANDARD_MATERIAL_COUNTS: Readonly<Record<string, number>> = {
+  'AI 单位': 6, NPC: 6, 载具: 4, 容器: 6, 物品: 12, '机关装置': 6, 装饰: 6, '过渡场景': 2,
+};
+
+const materials = MATERIALS
+  .filter((material) => MATERIALS.filter((candidate) => candidate.category === material.category).indexOf(material) < (STANDARD_MATERIAL_COUNTS[material.category] ?? 0))
+  .map((material) => [material.id, material.name, material.category] as const);
 
 function initialLayers(): readonly MapLayer[] {
   return [{ id: 'layer:ground', name: '地面层', height: 0 }, { id: 'layer:roof', name: '高架层', height: 1 }];
@@ -547,7 +551,7 @@ function EdgeInspector({ edge, update, setVisual, setPhysical, rotateVisual, rot
         <label>Y<GameInput type="number" min="0" max="1" step="0.01" value={Number(w.y.toFixed(3))} onChange={(event) => moveWindow({ x: w.x, y: Math.max(0, Math.min(1, Number(event.target.value))) })} /></label>
       </div>
     ); })() : null}
-    <div className={`obstruction-fields${hasBox ? '' : ' empty'}`}><span className="small-title">遮挡框（半透明，滚轮旋转 10°/格）</span>
+    <div className={`obstruction-fields${hasBox ? '' : ' empty'}`}><span className="small-title">遮挡框（半��明，滚轮旋转 10°/格）</span>
       <label><GameButton variant="ghost" onClick={setVisual}>视觉 +框</GameButton>{edge.visualObstruction ? <span className="two-btn"><GameButton variant="ghost" onClick={() => rotateVisual(10)}>旋转</GameButton><GameButton variant="ghost" onClick={clearVisual}>清除</GameButton></span> : null}</label>
       <label><GameButton variant="ghost" onClick={setPhysical}>物理 +框</GameButton>{edge.physicalObstruction ? <span className="two-btn"><GameButton variant="ghost" onClick={() => rotatePhysical(10)}>旋转</GameButton><GameButton variant="ghost" onClick={clearPhysical}>清除</GameButton></span> : null}</label>
     </div>

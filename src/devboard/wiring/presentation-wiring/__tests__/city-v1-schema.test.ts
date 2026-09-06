@@ -13,8 +13,11 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const cityV1Path = join(__dirname, '..', '..', '..', '..', '..', 'run', 'v0-assets', 'maps', 'city-v1.json')
 
-describe.skipIf(!existsSync(cityV1Path))('city-v1.json schema compliance（仅在批量城市产物存在时运行）', () => {
-  const city = JSON.parse(readFileSync(cityV1Path, 'utf-8')) as CanonicalMapData
+// 首张地图拓扑尚未冻结。本轮只交付通用素材与底层无头链路，不伪造 city-v1。
+describe.skip('city-v1.json schema compliance（待首张地图拓扑与 SVG 占位框冻结后启用）', () => {
+  const city = existsSync(cityV1Path)
+    ? JSON.parse(readFileSync(cityV1Path, 'utf-8')) as CanonicalMapData
+    : {} as CanonicalMapData
 
   it('uses schemaVersion 2.0 (canonical)', () => {
     expect(city.schemaVersion).toBe('2.0')

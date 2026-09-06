@@ -1,0 +1,40 @@
+{
+  "id": "ai-unit-cleaner-swarm",
+  "name": "清扫机群",
+  "type": "ai-unit",
+  "desc": "沿路线移动的群体 AI 单位",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "alert",
+    "downed"
+  ],
+  "capabilities": [
+    "patrol",
+    "move",
+    "block"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "ai-unit",
+    "entityRef": "material:ai-unit-cleaner-swarm"
+  }
+}

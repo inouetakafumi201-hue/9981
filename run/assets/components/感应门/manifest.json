@@ -1,0 +1,39 @@
+{
+  "id": "device-sensor-door",
+  "name": "感应门",
+  "type": "device",
+  "desc": "响应实体进入并切换通行状态",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "trigger",
+    "toggle"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "device",
+    "entityRef": "material:device-sensor-door"
+  }
+}

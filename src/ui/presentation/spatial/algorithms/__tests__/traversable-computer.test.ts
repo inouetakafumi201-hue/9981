@@ -96,7 +96,7 @@ describe('P9 TraversableComputer precompute', () => {
     expect(domain.nodeCells.has('nonexistent')).toBe(false)
   })
 
-  it('precompute 返回冻结对象', () => {
+  it('precompute 返回冻结值', () => {
     const tc = new TraversableComputer()
     const domain = tc.precompute(mapWithCentralNode())
     expect(Object.isFrozen(domain)).toBe(true)

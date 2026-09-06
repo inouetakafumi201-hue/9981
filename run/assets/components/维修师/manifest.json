@@ -1,0 +1,39 @@
+{
+  "id": "npc-repairer",
+  "name": "维修师",
+  "type": "npc",
+  "desc": "维护通用装置的角色",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "talk",
+    "active"
+  ],
+  "capabilities": [
+    "repair",
+    "talk"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "npc",
+    "entityRef": "material:npc-repairer"
+  }
+}

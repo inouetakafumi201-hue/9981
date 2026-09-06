@@ -27,6 +27,17 @@ export const COMPONENT_CATEGORIES = [
   'transition-scene',
 ];
 
+export const STANDARD_COUNTS = Object.freeze({
+  'ai-unit': 6,
+  npc: 6,
+  vehicle: 4,
+  container: 6,
+  item: 12,
+  device: 6,
+  decoration: 6,
+  'transition-scene': 2,
+});
+
 /** D-088 唯一八类逻辑身份。武器/装备/消耗品仅作为 item 能力或展示标签。 */
 export const CATEGORY_SPECS = {
   'ai-unit': { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'alert', 'downed'] },
@@ -56,6 +67,7 @@ export function validateBatchRegistry(data) {
   }
 
   const seen = new Set();
+  const counts = Object.fromEntries(COMPONENT_CATEGORIES.map((category) => [category, 0]));
   data.entries.forEach((entry, idx) => {
     const tag = `entries[${idx}]`;
     if (!entry.name || typeof entry.name !== 'string' || !entry.name.trim()) {
@@ -68,12 +80,30 @@ export function validateBatchRegistry(data) {
 
     if (!COMPONENT_CATEGORIES.includes(entry.type)) {
       errors.push(`${tag}: type "${entry.type}" 不在 8 大类别中: ${COMPONENT_CATEGORIES.join(', ')}`);
+    } else {
+      counts[entry.type] += 1;
     }
 
+    if (!entry.id || typeof entry.id !== 'string') {
+      errors.push(`${tag}: id 必须是稳定的非空字符串`);
+    }
+    if (!Array.isArray(entry.states) || entry.states.length === 0) {
+      errors.push(`${tag}: states 必须是非空数组`);
+    }
+    if (!Array.isArray(entry.capabilities) || entry.capabilities.length === 0) {
+      errors.push(`${tag}: capabilities 必须是非空数组`);
+    }
     if (!entry.desc || typeof entry.desc !== 'string') {
       errors.push(`${tag}: desc 必须是非空描述`);
     }
   });
+
+  for (const category of COMPONENT_CATEGORIES) {
+    if (counts[category] !== STANDARD_COUNTS[category]) {
+      errors.push(`${category}: 需要 ${STANDARD_COUNTS[category]} 件，实际 ${counts[category]} 件`);
+    }
+  }
+  if (data.entries.length !== 48) errors.push(`entries: 标准批次必须恰好 48 件，实际 ${data.entries.length} 件`);
 
   return { ok: errors.length === 0, errors };
 }
@@ -82,24 +112,23 @@ export function validateBatchRegistry(data) {
  * 生成默认样例素材清单（覆盖全 8 类）
  */
 export function generateSampleRegistry() {
+  const entries = COMPONENT_CATEGORIES.flatMap((type) =>
+    Array.from({ length: STANDARD_COUNTS[type] }, (_, index) => ({
+      id: `${type}-sample-${index + 1}`,
+      name: `${type}-sample-${index + 1}`,
+      type,
+      desc: `standard ${type} component ${index + 1}`,
+      context: type === 'item' ? 'ui' : 'map',
+      states: CATEGORY_SPECS[type].defaultStates,
+      capabilities: ['readable'],
+    })),
+  );
   return {
     kind: 'wakeup-batch-manifest',
-    version: 3,
-    defaults: {
-      context: 'map',
-      cell: 64,
-      colors: 32,
-    },
-    entries: [
-      { name: 'actor-dream-guard', type: 'ai-unit', desc: 'autonomous dream guard', context: 'map' },
-      { name: 'npc-night-clerk', type: 'npc', desc: 'interactive night clerk', context: 'map' },
-      { name: 'vehicle-service-cart', type: 'vehicle', desc: 'small service vehicle', context: 'map' },
-      { name: 'container-storage-crate', type: 'container', desc: 'reinforced storage container', context: 'map' },
-      { name: 'item-field-bandage', type: 'item', desc: 'sterile field bandage', context: 'ui' },
-      { name: 'device-power-generator', type: 'device', desc: 'portable power generator', context: 'map' },
-      { name: 'decoration-bench', type: 'decoration', desc: 'weathered station bench', context: 'map' },
-      { name: 'transition-carriage-door', type: 'transition-scene', desc: 'carriage door endpoint scene', context: 'map' },
-    ],
+    version: 4,
+    policy: { assetStatus: 'pending-human-review', sourceStatus: 'design-fragment-only', topologyIndependent: true },
+    defaults: { context: 'map', cell: 64, colors: 32 },
+    entries,
   };
 }
 
@@ -115,10 +144,8 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
     console.log(`[AssetPipeline] 已生成默认 8 类登记清单: ${registryPath}`);
   } else {
     manifestData = JSON.parse(readFileSync(registryPath, 'utf8'));
-    if (manifestData.version !== 3) {
-      manifestData = generateSampleRegistry();
-      writeFileSync(registryPath, JSON.stringify(manifestData, null, 2), 'utf8');
-      console.log(`[AssetPipeline] 已把旧分类清单迁移到 D-088 八类: ${registryPath}`);
+    if (manifestData.version !== 4) {
+      throw new Error(`[AssetPipeline] 仅接受 version=4 的 D-088 标准 48 件清单，实际为 ${manifestData.version}`);
     }
   }
 
@@ -138,18 +165,28 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
     const states = entry.states && entry.states.length > 0 ? entry.states : spec.defaultStates;
 
     const componentManifest = {
+      id: entry.id,
       name: entry.name,
       type: entry.type,
       desc: entry.desc,
       perspective: spec.perspective,
       context: entry.context || spec.context,
       states,
+      capabilities: entry.capabilities,
       cell: entry.cell || manifestData.defaults.cell || 64,
       colors: entry.colors || manifestData.defaults.colors || 32,
+      assets: {
+        sourceRaw: null,
+        sheet: null,
+        frames: [],
+      },
+      qc: { status: 'pending-human-review', automated: false, checksum: null },
+      provenance: { source: manifestData.policy?.sourceStatus ?? 'design-fragment-only', topologyIndependent: manifestData.policy?.topologyIndependent === true },
       runtimeBinding: {
         selectableInEditor: true,
         presentationMount: entry.context === 'map' ? 'scene-object' : 'inventory-icon',
         profileType: entry.type,
+        entityRef: `material:${entry.id}`,
       },
     };
 
@@ -159,8 +196,10 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
 
   const catalog = {
     kind: 'wakeup-component-catalog',
-    version: 3,
+    version: 4,
     count: indexEntries.length,
+    status: 'pending-human-review',
+    categories: STANDARD_COUNTS,
     components: indexEntries,
     updatedAt: new Date().toISOString(),
   };

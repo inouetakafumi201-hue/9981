@@ -1,0 +1,39 @@
+{
+  "id": "vehicle-lift-platform",
+  "name": "升降平台",
+  "type": "vehicle",
+  "desc": "连接不同高度节点的载具",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "transport",
+    "vertical"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "vehicle",
+    "entityRef": "material:vehicle-lift-platform"
+  }
+}

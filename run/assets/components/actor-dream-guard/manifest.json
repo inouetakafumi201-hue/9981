@@ -1,0 +1,19 @@
+{
+  "name": "actor-dream-guard",
+  "type": "ai-unit",
+  "desc": "autonomous dream guard",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "alert",
+    "downed"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "ai-unit"
+  }
+}

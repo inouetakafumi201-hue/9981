@@ -1,0 +1,19 @@
+{
+  "name": "npc-night-clerk",
+  "type": "npc",
+  "desc": "interactive night clerk",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "talk",
+    "active"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "npc"
+  }
+}

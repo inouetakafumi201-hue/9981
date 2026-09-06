@@ -1,0 +1,39 @@
+{
+  "id": "container-safe-box",
+  "name": "保险柜",
+  "type": "container",
+  "desc": "需要钥匙或工具开启的容器",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "closed",
+    "open",
+    "broken"
+  ],
+  "capabilities": [
+    "store",
+    "unlock"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "container",
+    "entityRef": "material:container-safe-box"
+  }
+}

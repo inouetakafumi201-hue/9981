@@ -1,0 +1,39 @@
+{
+  "id": "npc-field-doctor",
+  "name": "现场医生",
+  "type": "npc",
+  "desc": "提供治疗与状态提示的角色",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "talk",
+    "active"
+  ],
+  "capabilities": [
+    "heal",
+    "talk"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "npc",
+    "entityRef": "material:npc-field-doctor"
+  }
+}

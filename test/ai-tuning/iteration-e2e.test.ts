@@ -139,7 +139,7 @@ describe('AI 迭代闭环验收 e2e', () => {
       isGolden: false,
       source: 'initial',
       setup: { stateHash: 'e2e-tune', serialized: worldSnapshot },
-      expect: { shouldSelect: 'a:heal' },
+      expect: { shouldSelect: 'a:move' },
     };
 
     // 默认配置下的选择

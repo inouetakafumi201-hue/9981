@@ -1,0 +1,38 @@
+{
+  "id": "item-signal-flare",
+  "name": "信号棒",
+  "type": "item",
+  "desc": "发出可读位置提示的物品",
+  "perspective": "front",
+  "context": "ui",
+  "states": [
+    "single",
+    "active"
+  ],
+  "capabilities": [
+    "signal",
+    "consume"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "inventory-icon",
+    "profileType": "item",
+    "entityRef": "material:item-signal-flare"
+  }
+}

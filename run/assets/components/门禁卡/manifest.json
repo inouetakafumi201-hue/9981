@@ -1,0 +1,38 @@
+{
+  "id": "item-access-card",
+  "name": "门禁卡",
+  "type": "item",
+  "desc": "验证入口权限的物品",
+  "perspective": "front",
+  "context": "ui",
+  "states": [
+    "single",
+    "active"
+  ],
+  "capabilities": [
+    "authorize",
+    "unlock"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "inventory-icon",
+    "profileType": "item",
+    "entityRef": "material:item-access-card"
+  }
+}

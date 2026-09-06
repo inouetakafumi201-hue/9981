@@ -1,0 +1,19 @@
+{
+  "name": "vehicle-service-cart",
+  "type": "vehicle",
+  "desc": "small service vehicle",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "vehicle"
+  }
+}

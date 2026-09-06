@@ -9,6 +9,7 @@ const SCANNED_EXTENSIONS = new Set(['.ts', '.tsx', '.json']);
 const OBSOLETE_LAYER_TERM = '\u5185\u5bb9\u5c42';
 const OBSOLETE_INSTANCE_WORD = '\u6a21\u677f';
 const OLD_LAYER_PREFIX = 'Layer ';
+const EXCLUDED_SOURCE_PREFIXES = ['devboard/game-ui-shell-10/', 'devboard/game-ui-shell-15/'] as const;
 
 function sourceFiles(root: string): string[] {
   const files: string[] = [];
@@ -18,7 +19,10 @@ function sourceFiles(root: string): string[] {
       files.push(...sourceFiles(path));
       continue;
     }
-    if (entry.isFile() && SCANNED_EXTENSIONS.has(extname(entry.name))) files.push(path);
+    if (entry.isFile() && SCANNED_EXTENSIONS.has(extname(entry.name))) {
+      const relativePath = relative(SRC_ROOT, path).replaceAll('\\', '/');
+      if (!EXCLUDED_SOURCE_PREFIXES.some((prefix) => relativePath.startsWith(prefix))) files.push(path);
+    }
   }
   return files.sort((left, right) => left.localeCompare(right, 'en'));
 }

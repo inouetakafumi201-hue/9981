@@ -134,7 +134,7 @@ describe('Feature: wakeup-ugc, architecture boundary', () => {
       .filter(({ specifier }) => specifier.replace(/\\/g, '/').includes('/l2/'))
       .map(({ file, specifier }) => `${file.relativePath} -> ${specifier}`);
     expect(l2Imports).toEqual([
-      'integration/l2-adapter.ts -> ../../../l2/ugc/ports/index.js',
+      'integration/l2-adapter.ts -> ../../../l2/ugc/ports/index',
     ]);
   });
 });

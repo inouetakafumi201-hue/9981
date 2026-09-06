@@ -1,0 +1,36 @@
+{
+  "id": "decoration-station-bench",
+  "name": "站台长椅",
+  "type": "decoration",
+  "desc": "局内局外均可摆放的普通家具",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "capabilities": [
+    "readable"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration",
+    "entityRef": "material:decoration-station-bench"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "ai-unit-sentry-orb",
+  "name": "哨戒球",
+  "type": "ai-unit",
+  "desc": "维持视野并发出警报的 AI 单位",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "alert",
+    "downed"
+  ],
+  "capabilities": [
+    "observe",
+    "alarm",
+    "move"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "ai-unit",
+    "entityRef": "material:ai-unit-sentry-orb"
+  }
+}

@@ -224,7 +224,7 @@ class KernelSearchSession implements SearchSession {
       actions: actions.map((action) => action.action),
     });
     // Reduce the full digest modulo the tie count without precision loss.
-    const digits = token.slice(token.lastIndexOf(':') + 1);
+    const digits = token.slice(token.lastIndexOf(':') + 1).replace(/[^0-9a-f]/giu, '');
     let draw = 0;
     for (const character of digits) {
       const nibble = Number.parseInt(character, 16);

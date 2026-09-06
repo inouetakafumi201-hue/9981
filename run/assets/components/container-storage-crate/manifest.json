@@ -1,0 +1,19 @@
+{
+  "name": "container-storage-crate",
+  "type": "container",
+  "desc": "reinforced storage container",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "closed",
+    "open",
+    "broken"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "container"
+  }
+}

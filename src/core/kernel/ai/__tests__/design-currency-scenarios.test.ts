@@ -216,7 +216,10 @@ describe('设计货币驱动 AI 的 AP/资源价值判断（真实内核链路�
       track: 'highlight',
       require: true,
       cost: [],
-      effects: [opEffect('prop.set', { path: `entities.${ENTITY}.props.ap`, value: selfApAfter })],
+      effects: [
+        opEffect('prop.set', { path: `world.props.pools.ap.${AGENT}.real`, value: selfApAfter }),
+        opEffect('prop.set', { path: `world.props.pools.ap.${AGENT}.available`, value: selfApAfter }),
+      ],
     };
   }
   const keepAp = resourceAction('a:use-sparingly', 2);  // 保留 AP=2（保有下一步行动力）
@@ -231,6 +234,8 @@ describe('设计货币驱动 AI 的 AP/资源价值判断（真实内核链路�
       world: { ...state.world, agents: { [AGENT]: { ...createAgentShape(AGENT, 'ai', 'ks:ai'), controls: [{ $: ENTITY }], policy: POLICY } } },
       entities: { [ENTITY]: { ...createEntityShape(ENTITY, 'd:fighter'), props: { initiative: 3, vitality: 5, ap: startAp } } },
     };
+    state = setPath(state, `world.props.pools.ap.${AGENT}.real`, startAp as never) as WorldState;
+    state = setPath(state, `world.props.pools.ap.${AGENT}.available`, startAp as never) as WorldState;
     const holder = new WorldStateHolder(state);
     const defRegistry = new DefRegistry();
     defRegistry.register(keepAp as Def);

@@ -1,0 +1,39 @@
+{
+  "id": "vehicle-service-cart",
+  "name": "维修推车",
+  "type": "vehicle",
+  "desc": "运送维修物资的轻型载具",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "transport",
+    "carry"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "vehicle",
+    "entityRef": "material:vehicle-service-cart"
+  }
+}

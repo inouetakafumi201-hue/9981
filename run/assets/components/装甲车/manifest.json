@@ -1,0 +1,39 @@
+{
+  "id": "vehicle-armored-car",
+  "name": "装甲车",
+  "type": "vehicle",
+  "desc": "提供防护并承载角色的载具",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active",
+    "broken"
+  ],
+  "capabilities": [
+    "transport",
+    "cover"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "vehicle",
+    "entityRef": "material:vehicle-armored-car"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "item-notebook",
+  "name": "记录本",
+  "type": "item",
+  "desc": "承载可读文本线索的物品",
+  "perspective": "front",
+  "context": "ui",
+  "states": [
+    "single",
+    "active"
+  ],
+  "capabilities": [
+    "inspect",
+    "read"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "inventory-icon",
+    "profileType": "item",
+    "entityRef": "material:item-notebook"
+  }
+}

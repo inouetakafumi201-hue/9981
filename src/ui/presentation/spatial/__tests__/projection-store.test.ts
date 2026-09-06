@@ -75,7 +75,7 @@ describe('SpatialProjectionStore (R1, R13)', () => {
   it('deepFreeze freezes nested objects and arrays', () => {
     const p = {
       revision: 1,
-      layers: [{ id: 'l1', name: 'Layer 1', height: 0, opacity: 1 }],
+      layers: [{ id: 'l1', name: 'ground', height: 0, opacity: 1 }],
       nodes: [],
       edges: [],
       entities: [],

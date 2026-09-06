@@ -1,0 +1,1866 @@
+{
+  "kind": "wakeup-component-catalog",
+  "version": 4,
+  "count": 48,
+  "status": "pending-human-review",
+  "categories": {
+    "ai-unit": 6,
+    "npc": 6,
+    "vehicle": 4,
+    "container": 6,
+    "item": 12,
+    "device": 6,
+    "decoration": 6,
+    "transition-scene": 2
+  },
+  "components": [
+    {
+      "id": "ai-unit-scout-drone",
+      "name": "侦察无人机",
+      "type": "ai-unit",
+      "desc": "可侦察并标记目标的 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "alert",
+        "downed"
+      ],
+      "capabilities": [
+        "scout",
+        "mark",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-scout-drone"
+      }
+    },
+    {
+      "id": "ai-unit-guard-automaton",
+      "name": "安保自动机",
+      "type": "ai-unit",
+      "desc": "守卫区域并响应威胁的 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "alert",
+        "downed"
+      ],
+      "capabilities": [
+        "guard",
+        "attack",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-guard-automaton"
+      }
+    },
+    {
+      "id": "ai-unit-repair-doll",
+      "name": "维修傀儡",
+      "type": "ai-unit",
+      "desc": "修复装置并搬运资源的 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "downed"
+      ],
+      "capabilities": [
+        "repair",
+        "carry",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-repair-doll"
+      }
+    },
+    {
+      "id": "ai-unit-cleaner-swarm",
+      "name": "清扫机群",
+      "type": "ai-unit",
+      "desc": "沿路线移动的群体 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "alert",
+        "downed"
+      ],
+      "capabilities": [
+        "patrol",
+        "move",
+        "block"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-cleaner-swarm"
+      }
+    },
+    {
+      "id": "ai-unit-sentry-orb",
+      "name": "哨戒球",
+      "type": "ai-unit",
+      "desc": "维持视野并发出警报的 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "alert",
+        "downed"
+      ],
+      "capabilities": [
+        "observe",
+        "alarm",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-sentry-orb"
+      }
+    },
+    {
+      "id": "ai-unit-courier-bot",
+      "name": "搬运机",
+      "type": "ai-unit",
+      "desc": "在节点之间运送物资的 AI 单位",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "downed"
+      ],
+      "capabilities": [
+        "carry",
+        "deliver",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "ai-unit",
+        "entityRef": "material:ai-unit-courier-bot"
+      }
+    },
+    {
+      "id": "npc-night-clerk",
+      "name": "夜班站务员",
+      "type": "npc",
+      "desc": "提供路线与任务信息的服务角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "talk",
+        "active"
+      ],
+      "capabilities": [
+        "talk",
+        "trade"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-night-clerk"
+      }
+    },
+    {
+      "id": "npc-field-doctor",
+      "name": "现场医生",
+      "type": "npc",
+      "desc": "提供治疗与状态提示的角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "talk",
+        "active"
+      ],
+      "capabilities": [
+        "heal",
+        "talk"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-field-doctor"
+      }
+    },
+    {
+      "id": "npc-repairer",
+      "name": "维修师",
+      "type": "npc",
+      "desc": "维护通用装置的角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "talk",
+        "active"
+      ],
+      "capabilities": [
+        "repair",
+        "talk"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-repairer"
+      }
+    },
+    {
+      "id": "npc-quartermaster",
+      "name": "补给官",
+      "type": "npc",
+      "desc": "管理补给与交换的角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "talk",
+        "active"
+      ],
+      "capabilities": [
+        "trade",
+        "restock"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-quartermaster"
+      }
+    },
+    {
+      "id": "npc-watch-keeper",
+      "name": "巡守员",
+      "type": "npc",
+      "desc": "守护入口并响应异常的角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "alert",
+        "active"
+      ],
+      "capabilities": [
+        "guard",
+        "talk"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-watch-keeper"
+      }
+    },
+    {
+      "id": "npc-investigator",
+      "name": "调查员",
+      "type": "npc",
+      "desc": "提供线索与可读信息的角色",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "talk",
+        "active"
+      ],
+      "capabilities": [
+        "talk",
+        "inspect"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "npc",
+        "entityRef": "material:npc-investigator"
+      }
+    },
+    {
+      "id": "vehicle-rail-cart",
+      "name": "轨道车",
+      "type": "vehicle",
+      "desc": "沿连接节点运输角色与物品",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "transport",
+        "move"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "vehicle",
+        "entityRef": "material:vehicle-rail-cart"
+      }
+    },
+    {
+      "id": "vehicle-armored-car",
+      "name": "装甲车",
+      "type": "vehicle",
+      "desc": "提供防护并承载角色的载具",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "transport",
+        "cover"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "vehicle",
+        "entityRef": "material:vehicle-armored-car"
+      }
+    },
+    {
+      "id": "vehicle-lift-platform",
+      "name": "升降平台",
+      "type": "vehicle",
+      "desc": "连接不同高度节点的载具",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "transport",
+        "vertical"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "vehicle",
+        "entityRef": "material:vehicle-lift-platform"
+      }
+    },
+    {
+      "id": "vehicle-service-cart",
+      "name": "维修推车",
+      "type": "vehicle",
+      "desc": "运送维修物资的轻型载具",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "transport",
+        "carry"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "vehicle",
+        "entityRef": "material:vehicle-service-cart"
+      }
+    },
+    {
+      "id": "container-supply-crate",
+      "name": "补给箱",
+      "type": "container",
+      "desc": "承载可拾取补给的容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "pickup"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-supply-crate"
+      }
+    },
+    {
+      "id": "container-storage-locker",
+      "name": "储物柜",
+      "type": "container",
+      "desc": "可读写储物关系的容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "search"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-storage-locker"
+      }
+    },
+    {
+      "id": "container-tool-case",
+      "name": "工具箱",
+      "type": "container",
+      "desc": "收纳维修工具的容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "pickup"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-tool-case"
+      }
+    },
+    {
+      "id": "container-document-cabinet",
+      "name": "档案柜",
+      "type": "container",
+      "desc": "承载可读文件与线索的容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "inspect"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-document-cabinet"
+      }
+    },
+    {
+      "id": "container-reinforced-crate",
+      "name": "加固木箱",
+      "type": "container",
+      "desc": "可放置于节点的通用收纳容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "pickup"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-reinforced-crate"
+      }
+    },
+    {
+      "id": "container-safe-box",
+      "name": "保险柜",
+      "type": "container",
+      "desc": "需要钥匙或工具开启的容器",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "closed",
+        "open",
+        "broken"
+      ],
+      "capabilities": [
+        "store",
+        "unlock"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "container",
+        "entityRef": "material:container-safe-box"
+      }
+    },
+    {
+      "id": "item-access-key",
+      "name": "通用钥匙",
+      "type": "item",
+      "desc": "开启通用锁具的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "unlock"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-access-key"
+      }
+    },
+    {
+      "id": "item-field-bandage",
+      "name": "现场绷带",
+      "type": "item",
+      "desc": "恢复生命的消耗品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "heal",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-field-bandage"
+      }
+    },
+    {
+      "id": "item-medkit",
+      "name": "医疗包",
+      "type": "item",
+      "desc": "提供较高治疗量的消耗品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "heal",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-medkit"
+      }
+    },
+    {
+      "id": "item-power-cell",
+      "name": "电池",
+      "type": "item",
+      "desc": "为通用设备提供能量的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "power",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-power-cell"
+      }
+    },
+    {
+      "id": "item-crowbar",
+      "name": "撬棍",
+      "type": "item",
+      "desc": "开启阻塞容器与入口的工具",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "unlock",
+        "tool"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-crowbar"
+      }
+    },
+    {
+      "id": "item-access-card",
+      "name": "门禁卡",
+      "type": "item",
+      "desc": "验证入口权限的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "authorize",
+        "unlock"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-access-card"
+      }
+    },
+    {
+      "id": "item-short-blade",
+      "name": "短刃",
+      "type": "item",
+      "desc": "近距离攻击装备",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "attack",
+        "equip"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-short-blade"
+      }
+    },
+    {
+      "id": "item-signal-flare",
+      "name": "信号棒",
+      "type": "item",
+      "desc": "发出可读位置提示的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "signal",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-signal-flare"
+      }
+    },
+    {
+      "id": "item-repair-kit",
+      "name": "维修套件",
+      "type": "item",
+      "desc": "修理装置与载具的工具",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "repair",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-repair-kit"
+      }
+    },
+    {
+      "id": "item-recorder",
+      "name": "录音带",
+      "type": "item",
+      "desc": "承载可读声音线索的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "inspect",
+        "read"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-recorder"
+      }
+    },
+    {
+      "id": "item-notebook",
+      "name": "记录本",
+      "type": "item",
+      "desc": "承载可读文本线索的物品",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "inspect",
+        "read"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-notebook"
+      }
+    },
+    {
+      "id": "item-spare-part",
+      "name": "备用零件",
+      "type": "item",
+      "desc": "装置维修所需的通用零件",
+      "perspective": "front",
+      "context": "ui",
+      "states": [
+        "single",
+        "active"
+      ],
+      "capabilities": [
+        "repair",
+        "consume"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "inventory-icon",
+        "profileType": "item",
+        "entityRef": "material:item-spare-part"
+      }
+    },
+    {
+      "id": "device-power-generator",
+      "name": "便携发电机",
+      "type": "device",
+      "desc": "改变区域供电状态的装置",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "power",
+        "toggle"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-power-generator"
+      }
+    },
+    {
+      "id": "device-control-console",
+      "name": "控制台",
+      "type": "device",
+      "desc": "读取并改变系统状态的装置",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "inspect",
+        "toggle"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-control-console"
+      }
+    },
+    {
+      "id": "device-water-valve",
+      "name": "水管阀",
+      "type": "device",
+      "desc": "切换通路状态的装置",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "toggle",
+        "block"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-water-valve"
+      }
+    },
+    {
+      "id": "device-security-panel",
+      "name": "安防面板",
+      "type": "device",
+      "desc": "控制入口警戒状态的装置",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "authorize",
+        "toggle"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-security-panel"
+      }
+    },
+    {
+      "id": "device-code-lock",
+      "name": "密码锁",
+      "type": "device",
+      "desc": "通过输入验证改变锁定状态",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "unlock",
+        "toggle"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-code-lock"
+      }
+    },
+    {
+      "id": "device-sensor-door",
+      "name": "感应门",
+      "type": "device",
+      "desc": "响应实体进入并切换通行状态",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active",
+        "broken"
+      ],
+      "capabilities": [
+        "trigger",
+        "toggle"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "device",
+        "entityRef": "material:device-sensor-door"
+      }
+    },
+    {
+      "id": "decoration-station-bench",
+      "name": "站台长椅",
+      "type": "decoration",
+      "desc": "局内局外均可摆放的普通家具",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-station-bench"
+      }
+    },
+    {
+      "id": "decoration-floor-lamp",
+      "name": "落地灯",
+      "type": "decoration",
+      "desc": "提供空间识别的普通家具",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-floor-lamp"
+      }
+    },
+    {
+      "id": "decoration-rug",
+      "name": "地毯",
+      "type": "decoration",
+      "desc": "出租屋与场景均可使用的普通陈设",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-rug"
+      }
+    },
+    {
+      "id": "decoration-potted-plant",
+      "name": "盆栽",
+      "type": "decoration",
+      "desc": "局外空间可自由摆放的普通陈设",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-potted-plant"
+      }
+    },
+    {
+      "id": "decoration-notice-board",
+      "name": "公告板",
+      "type": "decoration",
+      "desc": "承载可读信息的普通陈设",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable",
+        "inspect"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-notice-board"
+      }
+    },
+    {
+      "id": "decoration-debris",
+      "name": "碎石堆",
+      "type": "decoration",
+      "desc": "表达空间阻塞但不承载规则的装饰",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle"
+      ],
+      "capabilities": [
+        "readable"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "decoration",
+        "entityRef": "material:decoration-debris"
+      }
+    },
+    {
+      "id": "transition-generic-door",
+      "name": "通用安全门",
+      "type": "transition-scene",
+      "desc": "MapEdge 端点的通用进出过渡",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active"
+      ],
+      "capabilities": [
+        "enter",
+        "exit"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "transition-scene",
+        "entityRef": "material:transition-generic-door"
+      }
+    },
+    {
+      "id": "transition-stair-endpoint",
+      "name": "楼梯端点",
+      "type": "transition-scene",
+      "desc": "连接高差节点的通用过渡端点",
+      "perspective": "axonometric",
+      "context": "map",
+      "states": [
+        "idle",
+        "active"
+      ],
+      "capabilities": [
+        "enter",
+        "exit",
+        "vertical"
+      ],
+      "cell": 64,
+      "colors": 32,
+      "assets": {
+        "sourceRaw": null,
+        "sheet": null,
+        "frames": []
+      },
+      "qc": {
+        "status": "pending-human-review",
+        "automated": false,
+        "checksum": null
+      },
+      "provenance": {
+        "source": "design-fragment-only",
+        "topologyIndependent": true
+      },
+      "runtimeBinding": {
+        "selectableInEditor": true,
+        "presentationMount": "scene-object",
+        "profileType": "transition-scene",
+        "entityRef": "material:transition-stair-endpoint"
+      }
+    }
+  ],
+  "updatedAt": "2026-09-06T04:22:19.073Z"
+}

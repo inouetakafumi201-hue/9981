@@ -1,0 +1,39 @@
+{
+  "id": "transition-stair-endpoint",
+  "name": "楼梯端点",
+  "type": "transition-scene",
+  "desc": "连接高差节点的通用过渡端点",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active"
+  ],
+  "capabilities": [
+    "enter",
+    "exit",
+    "vertical"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "transition-scene",
+    "entityRef": "material:transition-stair-endpoint"
+  }
+}

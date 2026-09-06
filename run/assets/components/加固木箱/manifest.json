@@ -1,0 +1,39 @@
+{
+  "id": "container-reinforced-crate",
+  "name": "加固木箱",
+  "type": "container",
+  "desc": "可放置于节点的通用收纳容器",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "closed",
+    "open",
+    "broken"
+  ],
+  "capabilities": [
+    "store",
+    "pickup"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "container",
+    "entityRef": "material:container-reinforced-crate"
+  }
+}

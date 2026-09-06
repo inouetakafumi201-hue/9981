@@ -1,0 +1,39 @@
+{
+  "id": "container-supply-crate",
+  "name": "补给箱",
+  "type": "container",
+  "desc": "承载可拾取补给的容器",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "closed",
+    "open",
+    "broken"
+  ],
+  "capabilities": [
+    "store",
+    "pickup"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "container",
+    "entityRef": "material:container-supply-crate"
+  }
+}

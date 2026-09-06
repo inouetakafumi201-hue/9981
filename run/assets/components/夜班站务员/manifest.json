@@ -1,0 +1,39 @@
+{
+  "id": "npc-night-clerk",
+  "name": "夜班站务员",
+  "type": "npc",
+  "desc": "提供路线与任务信息的服务角色",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "talk",
+    "active"
+  ],
+  "capabilities": [
+    "talk",
+    "trade"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "npc",
+    "entityRef": "material:npc-night-clerk"
+  }
+}

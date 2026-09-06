@@ -1,0 +1,17 @@
+{
+  "name": "decoration-bench",
+  "type": "decoration",
+  "desc": "weathered station bench",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration"
+  }
+}

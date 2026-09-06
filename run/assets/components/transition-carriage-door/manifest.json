@@ -1,0 +1,18 @@
+{
+  "name": "transition-carriage-door",
+  "type": "transition-scene",
+  "desc": "carriage door endpoint scene",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "active"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "transition-scene"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "npc-investigator",
+  "name": "调查员",
+  "type": "npc",
+  "desc": "提供线索与可读信息的角色",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle",
+    "talk",
+    "active"
+  ],
+  "capabilities": [
+    "talk",
+    "inspect"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "npc",
+    "entityRef": "material:npc-investigator"
+  }
+}

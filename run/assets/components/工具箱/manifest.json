@@ -1,0 +1,39 @@
+{
+  "id": "container-tool-case",
+  "name": "工具箱",
+  "type": "container",
+  "desc": "收纳维修工具的容器",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "closed",
+    "open",
+    "broken"
+  ],
+  "capabilities": [
+    "store",
+    "pickup"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "container",
+    "entityRef": "material:container-tool-case"
+  }
+}

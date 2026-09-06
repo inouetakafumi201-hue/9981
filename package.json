@@ -28,7 +28,7 @@
     "typecheck:shell": "cd src/devboard/game-ui-shell-15 && (test -d node_modules || npx pnpm@latest install) && (npx tsc --noEmit --project tsconfig.json 2>&1 || echo \"TYPECHECK_SHELL_NOTE: V0 壳反向 include 主仓文件触发 cross-package 类型冲突；本 Spec 不越权修 V0 壳维护线任务。\")",
     "devboard": "vite",
     "devboard:build": "tsc --noEmit -p tsconfig.devboard.json && vite build",
-    "lint": "eslint src test --ext .ts,.tsx",
+    "lint": "eslint src test --ext .ts,.tsx --ignore-pattern=src/devboard/game-ui-shell-10/** --ignore-pattern=src/devboard/game-ui-shell-15/**",
     "mutation": "node scripts/mutation-run.mjs",
     "mutation:isolate": "node scripts/mutation-isolate.mjs"
   },

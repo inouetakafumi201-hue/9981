@@ -1,0 +1,37 @@
+{
+  "id": "decoration-notice-board",
+  "name": "公告板",
+  "type": "decoration",
+  "desc": "承载可读信息的普通陈设",
+  "perspective": "axonometric",
+  "context": "map",
+  "states": [
+    "idle"
+  ],
+  "capabilities": [
+    "readable",
+    "inspect"
+  ],
+  "cell": 64,
+  "colors": 32,
+  "assets": {
+    "sourceRaw": null,
+    "sheet": null,
+    "frames": []
+  },
+  "qc": {
+    "status": "pending-human-review",
+    "automated": false,
+    "checksum": null
+  },
+  "provenance": {
+    "source": "design-fragment-only",
+    "topologyIndependent": true
+  },
+  "runtimeBinding": {
+    "selectableInEditor": true,
+    "presentationMount": "scene-object",
+    "profileType": "decoration",
+    "entityRef": "material:decoration-notice-board"
+  }
+}
