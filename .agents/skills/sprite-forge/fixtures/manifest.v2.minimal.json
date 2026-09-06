@@ -2,7 +2,7 @@
   "schemaVersion": "2.0",
   "id": "sample-door-slanted-45",
   "lane": "component",
-  "componentType": "environment",
+  "componentType": "transition-scene",
   "description": "斜向地铁闸门",
   "status": "ready",
   "states": ["closed", "cracked", "open"],

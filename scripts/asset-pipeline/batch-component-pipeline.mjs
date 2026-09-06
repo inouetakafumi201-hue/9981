@@ -17,26 +17,26 @@ export const DEFAULT_OUTPUT_DIR = resolve(ROOT, 'run/assets/components');
 
 /** 8大标准素材类别契约 */
 export const COMPONENT_CATEGORIES = [
-  'weapon-melee',
-  'weapon-ranged',
-  'weapon-firearm',
-  'item-consumable',
-  'item-tool',
-  'item-equipment',
+  'ai-unit',
+  'npc',
+  'vehicle',
+  'container',
+  'item',
   'device',
-  'environment',
+  'decoration',
+  'transition-scene',
 ];
 
-/** 每种类别的默认透视与上下文 */
+/** D-088 唯一八类逻辑身份。武器/装备/消耗品仅作为 item 能力或展示标签。 */
 export const CATEGORY_SPECS = {
-  'weapon-melee': { context: 'ui', perspective: 'axonometric', defaultStates: ['single', 'equipped'] },
-  'weapon-ranged': { context: 'ui', perspective: 'axonometric', defaultStates: ['single', 'equipped'] },
-  'weapon-firearm': { context: 'ui', perspective: 'axonometric', defaultStates: ['single', 'equipped'] },
-  'item-consumable': { context: 'ui', perspective: 'front', defaultStates: ['single', 'consumed'] },
-  'item-tool': { context: 'ui', perspective: 'front', defaultStates: ['single', 'active'] },
-  'item-equipment': { context: 'ui', perspective: 'front', defaultStates: ['single', 'equipped'] },
-  'device': { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'active', 'broken'] },
-  'environment': { context: 'map', perspective: 'axonometric', defaultStates: ['closed', 'open', 'broken'] },
+  'ai-unit': { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'alert', 'downed'] },
+  npc: { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'talk', 'active'] },
+  vehicle: { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'active', 'broken'] },
+  container: { context: 'map', perspective: 'axonometric', defaultStates: ['closed', 'open', 'broken'] },
+  item: { context: 'ui', perspective: 'front', defaultStates: ['single', 'active'] },
+  device: { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'active', 'broken'] },
+  decoration: { context: 'map', perspective: 'axonometric', defaultStates: ['idle'] },
+  'transition-scene': { context: 'map', perspective: 'axonometric', defaultStates: ['idle', 'active'] },
 };
 
 /**
@@ -84,69 +84,21 @@ export function validateBatchRegistry(data) {
 export function generateSampleRegistry() {
   return {
     kind: 'wakeup-batch-manifest',
-    version: 2,
+    version: 3,
     defaults: {
       context: 'map',
       cell: 64,
       colors: 32,
     },
     entries: [
-      {
-        name: 'wp-iron-knife',
-        type: 'weapon-melee',
-        desc: 'heavy steel combat knife',
-        states: ['single', 'equipped'],
-        context: 'ui',
-      },
-      {
-        name: 'wp-hunting-bow',
-        type: 'weapon-ranged',
-        desc: 'reinforced composite hunting bow',
-        states: ['single', 'equipped'],
-        context: 'ui',
-      },
-      {
-        name: 'wp-service-revolver',
-        type: 'weapon-firearm',
-        desc: 'service revolver caliber 38',
-        states: ['single', 'equipped'],
-        context: 'ui',
-      },
-      {
-        name: 'item-field-bandage',
-        type: 'item-consumable',
-        desc: 'sterile medical compression bandage',
-        states: ['single'],
-        context: 'ui',
-      },
-      {
-        name: 'tool-lockpick-set',
-        type: 'item-tool',
-        desc: 'mechanical tension wrench lockpick set',
-        states: ['single', 'active'],
-        context: 'ui',
-      },
-      {
-        name: 'eq-tactical-vest',
-        type: 'item-equipment',
-        desc: 'tactical body armor plate carrier vest',
-        states: ['single', 'equipped'],
-        context: 'ui',
-      },
-      {
-        name: 'dev-power-generator',
-        type: 'device',
-        desc: 'portable fuel electric generator',
-        states: ['idle', 'active', 'broken'],
-        context: 'map',
-      },
-      {
-        name: 'env-storage-crate',
-        type: 'environment',
-        desc: 'reinforced wooden supply container',
-        states: ['closed', 'open', 'broken'],
-        context: 'map',
-      },
+      { name: 'actor-dream-guard', type: 'ai-unit', desc: 'autonomous dream guard', context: 'map' },
+      { name: 'npc-night-clerk', type: 'npc', desc: 'interactive night clerk', context: 'map' },
+      { name: 'vehicle-service-cart', type: 'vehicle', desc: 'small service vehicle', context: 'map' },
+      { name: 'container-storage-crate', type: 'container', desc: 'reinforced storage container', context: 'map' },
+      { name: 'item-field-bandage', type: 'item', desc: 'sterile field bandage', context: 'ui' },
+      { name: 'device-power-generator', type: 'device', desc: 'portable power generator', context: 'map' },
+      { name: 'decoration-bench', type: 'decoration', desc: 'weathered station bench', context: 'map' },
+      { name: 'transition-carriage-door', type: 'transition-scene', desc: 'carriage door endpoint scene', context: 'map' },
     ],
   };
 }
@@ -163,6 +115,11 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
     console.log(`[AssetPipeline] 已生成默认 8 类登记清单: ${registryPath}`);
   } else {
     manifestData = JSON.parse(readFileSync(registryPath, 'utf8'));
+    if (manifestData.version !== 3) {
+      manifestData = generateSampleRegistry();
+      writeFileSync(registryPath, JSON.stringify(manifestData, null, 2), 'utf8');
+      console.log(`[AssetPipeline] 已把旧分类清单迁移到 D-088 八类: ${registryPath}`);
+    }
   }
 
   const validation = validateBatchRegistry(manifestData);
@@ -192,7 +149,7 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
       runtimeBinding: {
         selectableInEditor: true,
         presentationMount: entry.context === 'map' ? 'scene-object' : 'inventory-icon',
-        profileType: entry.type.startsWith('weapon') ? 'weapon' : entry.type.startsWith('item') ? 'item' : 'scene',
+        profileType: entry.type,
       },
     };
 
@@ -202,7 +159,7 @@ export function buildComponentsManifest(registryPath = DEFAULT_REGISTRY_PATH, ou
 
   const catalog = {
     kind: 'wakeup-component-catalog',
-    version: 2,
+    version: 3,
     count: indexEntries.length,
     components: indexEntries,
     updatedAt: new Date().toISOString(),

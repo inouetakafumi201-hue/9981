@@ -112,7 +112,7 @@ def assert_prompt_contract(sc) -> None:
     # 下列词出现即违规（自身就是旧视角名或第三方案例），无合法肯定性用法。
     forbidden_anywhere = ["front-facing", "cabinet", "cavalier", "among us", "slightly angled"]
     for context in ("map", "ui"):
-        p = sc.build_prompt("environment", "wooden supply crate", ["closed", "open", "broken"], context=context)
+        p = sc.build_prompt("container", "wooden supply crate", ["closed", "open", "broken"], context=context)
         low = p.lower()
         assert "top-down plan view" in low, f"[{context}] 缺少固定口令 top-down plan view"
         # 否定禁令必须带 NO 或 not（NO front face / not isometric 是在禁立面/角度，不是要求）

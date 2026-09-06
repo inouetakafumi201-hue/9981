@@ -1,88 +1,22 @@
 {
-  "schemaVersion": "2.0",
-  "description": "WakeUp Component Types and Perspective Rules Fact Source v2",
+  "schemaVersion": "2.1",
+  "description": "WakeUp D-088 material logic categories and perspective rules",
   "types": [
-    {
-      "id": "weapon-melee",
-      "name": "近战武器",
-      "perspective": "front-top axonometric view",
-      "primaryColor": "coral",
-      "colorSpec": "Primary: CORAL (warm orange-red) for melee attack identity. Secondary: dark steel gray, worn leather grip. Highlight: silver edge.",
-      "description": "近战冷兵器与破坏工具，强调动作感与打击面"
-    },
-    {
-      "id": "weapon-ranged",
-      "name": "远程武器",
-      "perspective": "front-top axonometric view",
-      "primaryColor": "purple",
-      "colorSpec": "Primary: PURPLE accent (long-range / relationship constraint). Secondary: matte dark gray composite, tan strap. Highlight: silver.",
-      "description": "弓弩、投掷类远程武器"
-    },
-    {
-      "id": "weapon-firearm",
-      "name": "枪械武器",
-      "perspective": "front-top axonometric view",
-      "primaryColor": "gunmetal-orange",
-      "colorSpec": "Primary: gunmetal gray-blue with ORANGE accent (consumes AP / ammo). Secondary: dark polymer, brass casing detail. Highlight: silver slide.",
-      "description": "热兵器、枪械与爆炸物发射装置"
-    },
-    {
-      "id": "item-consumable",
-      "name": "消耗品",
-      "perspective": "front view",
-      "primaryColor": "green-orange",
-      "colorSpec": "Primary: GREEN (positive / safe / free) or ORANGE (consumption). Secondary: white bandage / amber liquid / paper wrap. Highlight: bright green accent.",
-      "description": "药剂、食物、燃料等一次性或有耐久的消耗物品"
-    },
-    {
-      "id": "item-tool",
-      "name": "工具",
-      "perspective": "front view",
-      "primaryColor": "orange-yellow",
-      "colorSpec": "Primary: ORANGE (action / in-progress) or YELLOW (senses / attention). Secondary: black rubber grip, steel. Highlight: silver.",
-      "description": "钥匙、撬棍、扳手、探测器等用于检定或交互的手持工具"
-    },
-    {
-      "id": "item-equipment",
-      "name": "装备",
-      "perspective": "front view",
-      "primaryColor": "blue",
-      "colorSpec": "Primary: BLUE (tech / exhaustion-adjacent utility). Secondary: gray fabric, dark straps. Highlight: cyan-blue edge.",
-      "description": "护甲、头盔、腰带、背包等单人佩戴装备"
-    },
-    {
-      "id": "device",
-      "name": "装置设施",
-      "perspective": "front-top axonometric view",
-      "primaryColor": "offwhite-blue",
-      "colorSpec": "Primary: off-white gray (interactive-but-state-bound) with BLUE tech accent. Secondary: dark screen, metal casing. Highlight: white edge glow when active.",
-      "description": "配电箱、终端机、监控雷达、研究台等可交互装置"
-    },
-    {
-      "id": "environment",
-      "name": "环境原生组件",
-      "perspective": "front-top axonometric view",
-      "primaryColor": "muted-gray-brown",
-      "colorSpec": "Primary: muted low-saturation gray/brown matching the sketch-line background, with clear hard silhouette. Secondary: wood / concrete / metal. Highlight: subtle.",
-      "description": "门、闸机、箱柜、落地掩体等固定环境建筑或底图原生组件"
-    }
+    { "id": "ai-unit", "name": "AI 单位", "perspective": "front-top axonometric view", "primaryColor": "coral", "colorSpec": "Coral identity accent, muted uniform materials, silver highlights.", "description": "由 AI 控制、可参与空间与玩法交互的单位" },
+    { "id": "npc", "name": "NPC", "perspective": "front-top axonometric view", "primaryColor": "warm-yellow", "colorSpec": "Warm yellow identity accent, restrained clothing palette.", "description": "叙事或服务型非玩家角色" },
+    { "id": "vehicle", "name": "载具", "perspective": "front-top axonometric view", "primaryColor": "blue-gray", "colorSpec": "Blue-gray body with restrained cyan technical highlights.", "description": "可承载角色或物品的载具" },
+    { "id": "container", "name": "容器", "perspective": "front-top axonometric view", "primaryColor": "muted-brown", "colorSpec": "Muted brown or gray body, clear opening and storage affordance.", "description": "以承载或收纳关系为主要能力的素材" },
+    { "id": "item", "name": "物品", "perspective": "front view", "primaryColor": "green-orange", "colorSpec": "Function-driven green, orange or blue accent with a readable front silhouette.", "description": "武器、消耗品、工具与装备等可持有物品；细分由能力与展示标签表达" },
+    { "id": "device", "name": "机关装置", "perspective": "front-top axonometric view", "primaryColor": "offwhite-blue", "colorSpec": "Off-white gray body with blue technical indicators and visible state changes.", "description": "以触发、控制或改变状态为主要能力的机关装置" },
+    { "id": "decoration", "name": "装饰", "perspective": "front-top axonometric view", "primaryColor": "muted-gray", "colorSpec": "Low-saturation neutral materials with a clear hard silhouette.", "description": "仅表现或不承载原生玩法逻辑的装饰素材" },
+    { "id": "transition-scene", "name": "过渡场景", "perspective": "front-top axonometric view", "primaryColor": "orange", "colorSpec": "Orange transition accent with clear endpoint-facing entry and exit states.", "description": "绑定 MapEdge 端点侧的微型过渡场景" }
   ],
   "perspectiveRules": {
-    "itemLanes": [
-      "item-consumable",
-      "item-tool",
-      "item-equipment"
-    ],
+    "itemLanes": ["item"],
     "itemPerspective": "front view",
-    "itemPerspectiveDescription": "眼平直接正交正视图，强调物品清晰剪影与细节，无俯仰角度、无三维倾斜深度、无侧立面、无透视消失点",
-    "spatialLanes": [
-      "weapon-melee",
-      "weapon-ranged",
-      "weapon-firearm",
-      "device",
-      "environment"
-    ],
+    "itemPerspectiveDescription": "眼平直接正交正视图，强调物品清晰剪影与细节",
+    "spatialLanes": ["ai-unit", "npc", "vehicle", "container", "device", "decoration", "transition-scene"],
     "spatialPerspective": "front-top axonometric view",
-    "spatialPerspectiveDescription": "正面高位斜测轴：顶部与前部可见，侧部与后部隐藏，固定常规斜角，正交投影"
+    "spatialPerspectiveDescription": "正面高位斜测轴：顶部与前部可见，固定正交投影"
   }
 }

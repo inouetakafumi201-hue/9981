@@ -9,9 +9,9 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createPresentationGatewayAdapter } from '../presentation-gateway-adapter'
-import type { PresentationGateway } from '../../../core/kernel/gateway'
-import type { PresentationRuntime } from '../../../ui/presentation/spatial/presentation-runtime'
-import type { EntityPlacePayload } from '../../../ui/presentation/spatial/choreography/event-bridge'
+import type { PresentationGateway } from '../../../../core/kernel/gateway'
+import type { PresentationRuntime } from '../../../../ui/presentation/spatial/presentation-runtime'
+import type { EntityPlacePayload } from '../../../../ui/presentation/spatial/choreography/event-bridge'
 
 function makeFakeGateway() {
   const handlers = new Map<string, Set<(type: string, payload: Record<string, unknown>) => void>>()

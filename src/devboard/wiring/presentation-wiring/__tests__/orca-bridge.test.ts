@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest'
 import { createOrcaBridge, type OrcaBridgeResult } from '../orca-bridge'
-import type { CanonicalMapData } from '../../../play/map/types'
-import type { GameplayEvent } from '../../../ui/presentation/spatial/choreography/event-bridge'
+import type { CanonicalMapData } from '../../../../play/map/types'
+import type { GameplayEvent } from '../../../../ui/presentation/spatial/choreography/event-bridge'
 
 const cityV1Map: CanonicalMapData = {
   schemaVersion: '2.0',
@@ -23,7 +23,7 @@ const cityV1Map: CanonicalMapData = {
   placements: [],
 } as unknown as CanonicalMapData
 
-function makeEvent(type: 'after:entity.place', payload: GameplayEvent['payload']): GameplayEvent {
+function makeEvent(type: 'after:entity.place', payload: Extract<GameplayEvent, { type: 'after:entity.place' }>['payload']): GameplayEvent {
   return { type, payload, revision: 1 }
 }
 

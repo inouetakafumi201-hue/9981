@@ -17,14 +17,14 @@ describe('SVG 底图支持与 8 类素材组件管线测试', () => {
   it('确立 8 大标准素材类别，且包含正确的透视与状态配置', () => {
     expect(COMPONENT_CATEGORIES).toHaveLength(8);
     expect(COMPONENT_CATEGORIES).toEqual([
-      'weapon-melee',
-      'weapon-ranged',
-      'weapon-firearm',
-      'item-consumable',
-      'item-tool',
-      'item-equipment',
+      'ai-unit',
+      'npc',
+      'vehicle',
+      'container',
+      'item',
       'device',
-      'environment',
+      'decoration',
+      'transition-scene',
     ]);
 
     for (const cat of COMPONENT_CATEGORIES) {
@@ -52,7 +52,7 @@ describe('SVG 底图支持与 8 类素材组件管线测试', () => {
   it('buildComponentsManifest 生成并产出合法的 8 类资产目录', () => {
     const catalog = buildComponentsManifest();
     expect(catalog.kind).toBe('wakeup-component-catalog');
-    expect(catalog.version).toBe(2);
+    expect(catalog.version).toBe(3);
     expect(catalog.count).toBe(8);
     expect(catalog.components.every((c) => c.runtimeBinding.selectableInEditor)).toBe(true);
   });

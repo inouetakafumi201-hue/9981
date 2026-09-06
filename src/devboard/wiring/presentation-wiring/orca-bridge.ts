@@ -14,11 +14,11 @@
  */
 
 import { orcaStep, type OrcaAgent } from '../../../ui/presentation/spatial/algorithms/orca-engine'
-import type { MapData } from '../../../play/map/types'
+import type { MapDataDocument } from '../../../play/map/types'
 import type { GameplayEvent } from '../../../ui/presentation/spatial/choreography/event-bridge'
 
 export interface OrcaBridgeDeps {
-  readonly mapData: MapData
+  readonly mapData: MapDataDocument
   readonly playerEntityId?: string
   readonly maxSpeed?: number
   readonly agentRadius?: number
@@ -45,7 +45,7 @@ export function createOrcaBridge(deps: OrcaBridgeDeps): OrcaBridge {
   const maxSpeed = deps.maxSpeed ?? 0.05
   const agentRadius = deps.agentRadius ?? 0.02
 
-  function findNode(nodeId: string): MapData['nodes'][number] | undefined {
+  function findNode(nodeId: string): MapDataDocument['nodes'][number] | undefined {
     return deps.mapData.nodes.find((n) => n.id === nodeId)
   }
 

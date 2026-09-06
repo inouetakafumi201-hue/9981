@@ -28,7 +28,8 @@ export interface PlayTrigger {
 }
 
 export interface PlayFile {
-  readonly schemaVersion: '1.0'
+  /** 1.0 仅用于旧玩法文件；地图包入口必须使用 MapPlay 2.0。 */
+  readonly schemaVersion: '1.0' | '2.0'
   readonly playFileId: string
   readonly requires: readonly ContentReference[]
   readonly mapBinding?: MapBinding
@@ -60,8 +61,8 @@ export interface PlayFileDiagnostic { readonly code: PlayFileDiagnosticCode; rea
 
 export function validatePlayFile(playFile: PlayFile): readonly PlayFileDiagnostic[] {
   const diagnostics: PlayFileDiagnostic[] = []
-  if (playFile.schemaVersion !== '1.0' || !playFile.playFileId || !playFile.scheduleId) {
-    diagnostics.push({ code: 'INVALID_PLAY_FILE', message: '玩法文件缺少 schemaVersion、playFileId 或 scheduleId。' })
+  if (!['1.0', '2.0'].includes(playFile.schemaVersion) || !playFile.playFileId || !playFile.scheduleId) {
+    diagnostics.push({ code: 'INVALID_PLAY_FILE', message: '玩法文件缺少受支持的 schemaVersion、playFileId 或 scheduleId。' })
   }
   const triggerIds = new Set<string>()
   for (const trigger of playFile.triggers) {

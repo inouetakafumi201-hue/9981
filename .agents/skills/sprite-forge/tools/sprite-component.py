@@ -18,18 +18,18 @@ sprite-component.py — WakeUp 组件生成管线（外包化：AI 只需传参�
 
 用法：
   # 单帧组件（钥匙）
-  python sprite-component.py --type item-tool --desc "old brass door key" --out run/assets/key
+  python sprite-component.py --type item --desc "old brass door key" --out run/assets/key
 
   # 多帧组件（箱子三态）
-  python sprite-component.py --type environment --desc "wooden supply crate" \
+  python sprite-component.py --type container --desc "wooden supply crate" \
       --states closed,open,broken --out run/assets/crate
 
   # 指定后端
-  python sprite-component.py --type weapon-firearm --desc "revolver" \
+  python sprite-component.py --type item --desc "firearm revolver" \
       --provider gemini --out run/assets/revolver
 
   # 只打印提示词不调用 API（校对用）
-  PRINT_PROMPT_ONLY=1 python sprite-component.py --type item-consumable --desc "bandage" --out /tmp/x
+  PRINT_PROMPT_ONLY=1 python sprite-component.py --type item --desc "bandage" --out /tmp/x
 
   # 批量模式：读『待生成素材登记清单』逐条生成（失败跳过继续，写批量报告）
   python sprite-component.py --registry run/assets/batch-registry.json --delay 4
@@ -41,8 +41,8 @@ sprite-component.py — WakeUp 组件生成管线（外包化：AI 只需传参�
   { "kind": "wakeup-batch-manifest", "version": 1,
     "defaults": { "context": "map", "provider": null, "cell": 64, "colors": 32 },
     "entries": [
-      { "name": "ui-knife", "type": "weapon-melee", "desc": "rusty combat knife", "context": "ui" },
-      { "name": "crate-supply", "type": "environment", "desc": "wooden supply crate",
+      { "name": "ui-knife", "type": "item", "desc": "rusty combat knife", "context": "ui" },
+      { "name": "crate-supply", "type": "container", "desc": "wooden supply crate",
         "states": ["closed", "open", "broken"] }
     ] }
   name=出图目录名（唯一）；type=8 类组件；desc=描述；states=状态数组（缺省 single）；
@@ -159,39 +159,14 @@ VIEW_RULES = {
 # 语义色表（docs/表现系统/01_图形化与UI.md §五条视觉定律 1）
 # 每个组件族给出主色语义 + 材质倾向；金银只作高光/描边，不构成主色。
 SEMANTIC_COLORS = {
-    "weapon-melee": (
-        "Primary semantic color: CORAL (coral / warm orange-red) for melee attack identity. "
-        "Secondary: dark steel gray, worn leather grip. Highlight: silver edge."
-    ),
-    "weapon-ranged": (
-        "Primary semantic color: PURPLE accent (long-range / relationship constraint). "
-        "Secondary: matte dark gray composite, tan strap. Highlight: silver."
-    ),
-    "weapon-firearm": (
-        "Primary semantic color: gunmetal gray-blue with ORANGE accent (consumes AP / ammo). "
-        "Secondary: dark polymer, brass casing detail. Highlight: silver slide."
-    ),
-    "item-consumable": (
-        "Primary semantic color: GREEN (positive / safe / free) or ORANGE (consumption) "
-        "depending on the item's main function. Secondary: white bandage / amber liquid / paper wrap. "
-        "Highlight: bright green accent."
-    ),
-    "item-tool": (
-        "Primary semantic color: ORANGE (action / in-progress) or YELLOW (senses / attention) "
-        "depending on the tool's main function. Secondary: black rubber grip, steel. Highlight: silver."
-    ),
-    "item-equipment": (
-        "Primary semantic color: BLUE (tech / exhaustion-adjacent utility). "
-        "Secondary: gray fabric, dark straps. Highlight: cyan-blue edge."
-    ),
-    "device": (
-        "Primary semantic color: off-white gray (interactive-but-state-bound) with BLUE tech accent. "
-        "Secondary: dark screen, metal casing. Highlight: white edge glow when active."
-    ),
-    "environment": (
-        "Primary semantic color: muted low-saturation gray/brown matching the sketch-line background, "
-        "with clear hard silhouette. Secondary: wood / concrete / metal. Highlight: subtle."
-    ),
+    "ai-unit": "Primary semantic color: CORAL identity accent with muted uniform materials.",
+    "npc": "Primary semantic color: restrained WARM YELLOW identity accent.",
+    "vehicle": "Primary semantic color: BLUE-GRAY body with restrained cyan technical highlights.",
+    "container": "Primary semantic color: MUTED BROWN or gray with a clear storage affordance.",
+    "item": "Function-driven GREEN, ORANGE or BLUE accent with a readable front silhouette.",
+    "device": "Off-white gray body with BLUE technical indicators and visible state changes.",
+    "decoration": "Low-saturation neutral materials with a clear hard silhouette.",
+    "transition-scene": "ORANGE transition accent with clear endpoint-facing entry and exit states.",
 }
 
 # 状态名 → 提示词里的姿态/状态描述补充
@@ -265,7 +240,7 @@ def pick_grid(state_count: int) -> tuple[int, int]:
 
 def build_prompt(comp_type: str, desc: str, states: list[str], context: str = "map") -> str:
     rows, cols = pick_grid(len(states))
-    color_rule = SEMANTIC_COLORS.get(comp_type, SEMANTIC_COLORS["environment"])
+    color_rule = SEMANTIC_COLORS.get(comp_type, SEMANTIC_COLORS["decoration"])
     view_rule = VIEW_RULES.get(context, VIEW_RULES["map"])
     state_desc = "; ".join(
         f"cell {i + 1} ({name}): {STATE_HINTS.get(name, f'{name} state of the object')}"

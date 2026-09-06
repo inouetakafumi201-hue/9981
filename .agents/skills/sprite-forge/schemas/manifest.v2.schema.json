@@ -29,14 +29,14 @@
     "componentType": {
       "type": "string",
       "enum": [
-        "weapon-melee",
-        "weapon-ranged",
-        "weapon-firearm",
-        "item-consumable",
-        "item-tool",
-        "item-equipment",
+        "ai-unit",
+        "npc",
+        "vehicle",
+        "container",
+        "item",
         "device",
-        "environment"
+        "decoration",
+        "transition-scene"
       ]
     },
     "description": {

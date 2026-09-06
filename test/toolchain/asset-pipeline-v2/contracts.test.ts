@@ -26,27 +26,27 @@ describe('素材生成管线 v2: component-types 事实源', () => {
   it('component-types.v2.json 存在且结构合法', () => {
     expect(existsSync(catalogPath)).toBe(true);
     const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
-    expect(catalog.schemaVersion).toBe('2.0');
+    expect(catalog.schemaVersion).toBe('2.1');
     expect(Array.isArray(catalog.types)).toBe(true);
     expect(catalog.types.length).toBe(8);
 
     const typeIds = catalog.types.map((t: { id: string }) => t.id);
     const expected = [
-      'weapon-melee',
-      'weapon-ranged',
-      'weapon-firearm',
-      'item-consumable',
-      'item-tool',
-      'item-equipment',
+      'ai-unit',
+      'npc',
+      'vehicle',
+      'container',
+      'item',
       'device',
-      'environment',
+      'decoration',
+      'transition-scene',
     ];
     expect(typeIds).toEqual(expected);
   });
 
   it('视角规则严格分流：物品类 front view，其余 front-top axonometric view', () => {
     const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
-    const itemTypes = new Set(['item-consumable', 'item-tool', 'item-equipment']);
+    const itemTypes = new Set(['item']);
 
     for (const item of catalog.types) {
       if (itemTypes.has(item.id)) {

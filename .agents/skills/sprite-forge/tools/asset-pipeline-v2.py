@@ -37,16 +37,16 @@ SKILL_DIR = SCRIPT_DIR.parent
 CATALOG_PATH = SKILL_DIR / "catalogs" / "component-types.v2.json"
 
 VALID_LANES = ["component", "character", "symbol", "backdrop"]
-ITEM_COMPONENT_TYPES = ["item-consumable", "item-tool", "item-equipment"]
+ITEM_COMPONENT_TYPES = ["item"]
 ALL_COMPONENT_TYPES = [
-    "weapon-melee",
-    "weapon-ranged",
-    "weapon-firearm",
-    "item-consumable",
-    "item-tool",
-    "item-equipment",
+    "ai-unit",
+    "npc",
+    "vehicle",
+    "container",
+    "item",
     "device",
-    "environment",
+    "decoration",
+    "transition-scene",
 ]
 
 

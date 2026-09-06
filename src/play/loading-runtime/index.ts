@@ -103,7 +103,9 @@ function mergeInitialWorld(holder: WorldStateHolder, seeded: WorldState): void {
  * 生产组合根。返回 `{ok:false}` 时不做任何半可用装配（不返回部分对象、不保留已写入的状态）。
  */
 export function createLoadedMatch(request: LoadMatchRequest): LoadedMatchResult {
-  const { config, playerEntityIds, map, playpack, npcBudget, profile } = request;
+  const { config, playerEntityIds, playpack, npcBudget } = request;
+  const map = request.mapBundle?.mapData ?? request.map;
+  const profile = request.mapBundle?.presentationProfile ?? request.profile;
   const activePlaypack = playpack ?? CoreMechanicsPlaypack;
   const scheduleId = request.scheduleId;
 

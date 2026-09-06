@@ -70,7 +70,7 @@ describe('realTransportAdapter', () => {
     })
 
     it('sendIntent is called with correctly translated InteractionIntent', async () => {
-      const sendIntent = vi.fn(() => ({ kind: "accepted", committedRevision: 1 } as unknown as SubmissionOutcome))
+      const sendIntent = vi.fn((_intent: InteractionIntent) => ({ kind: "accepted", committedRevision: 1 } as unknown as SubmissionOutcome))
       const uiSystem = { interaction: { sendIntent } } as unknown as UiSystem
       const adapter = createRealTransportAdapter({
         uiSystem,
@@ -99,7 +99,7 @@ describe('realTransportAdapter', () => {
       const uiSystem = makeFakeUiSystem(() => ({
         kind: 'rejected',
         rejection: { kind: 'PERMISSION_DENIED', message: 'forbidden' },
-      } as SubmissionOutcome))
+      } as unknown as SubmissionOutcome))
       const adapter = createRealTransportAdapter({
         uiSystem,
         getCurrentRevision: () => 1,
@@ -118,7 +118,7 @@ describe('realTransportAdapter', () => {
       const uiSystem = makeFakeUiSystem(() => ({
         kind: 'stale',
         rejection: { kind: 'STALE', message: 'obsolete' },
-      } as SubmissionOutcome))
+      } as unknown as SubmissionOutcome))
       const adapter = createRealTransportAdapter({
         uiSystem,
         getCurrentRevision: () => 1,
@@ -151,7 +151,7 @@ describe('realTransportAdapter', () => {
 
   describe('T5: cancel path', () => {
     it('cancel marks inflight as cancelled; subsequent degraded check returns cancelled if pending', async () => {
-      let resolveSleep: (() => void) | null = null
+      let resolveSleep: () => void = () => {}
       const sleepPromise = new Promise<void>((resolve) => { resolveSleep = resolve })
       const uiSystem = makeFakeUiSystem(() => ({ kind: "accepted", committedRevision: 1 } as unknown as SubmissionOutcome))
       const adapter = createRealTransportAdapter({
@@ -167,7 +167,7 @@ describe('realTransportAdapter', () => {
       adapter.cancel('req-cancel')
 
       // Now resolve sleep — adapter should detect cancellation
-      if (resolveSleep) resolveSleep()
+      resolveSleep()
 
       const result = await requestPromise
       expect(result.state).toBe('cancelled')
@@ -232,7 +232,7 @@ describe('realTransportAdapter', () => {
 
     it('accepts custom degradedTimeoutMs', async () => {
       const uiSystem = makeFakeUiSystem(() => ({ kind: "accepted", committedRevision: 1 } as unknown as SubmissionOutcome))
-      const sleep = vi.fn(async () => {})
+      const sleep = vi.fn(async (_milliseconds: number) => {})
       const adapter = createRealTransportAdapter({
         uiSystem,
         getCurrentRevision: () => 1,

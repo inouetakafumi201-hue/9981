@@ -35,6 +35,7 @@ import type { UiSystem } from '../../ui/index';
 import type { PresentationProfile } from '../../ui/model/profile';
 import type { DesignCurrencyConfig } from '../../core/kernel/ai/tuning/config-design-currency';
 import type { PlaypackDef } from '../../core/kernel/schedule/playpack';
+import type { VerifiedMapBundle } from '../content/map-bundle';
 
 /** 出生装配的实体来源。`spawnCandidates` 优先；缺省时回退到 `playerEntityIds`。 */
 export interface SpawnInput {
@@ -64,6 +65,11 @@ export interface LoadedMatchOptions {
    * 规范化为 canonical，legacy floor 只在导入边界出现。
    */
   readonly map?: MapDataDocument;
+  /**
+   * 推荐入口：通过资源与 checksum 门禁的完整地图包。局外驻地与局内对局均使用此字段；
+   * 若同时提供 legacy `map`/`profile`，包内真身优先，禁止宿主拆包后手工替换。
+   */
+  readonly mapBundle?: VerifiedMapBundle;
   /** 可选：AI 预算提供者；不传则本局无 NPC（npcAction 阶段空队列直接通过）。 */
   readonly npcBudget?: () => readonly {
     readonly entry: import('../ai-runtime').NpcEntry;

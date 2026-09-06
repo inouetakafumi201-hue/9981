@@ -23,6 +23,7 @@ import {
   npcBudgetFixture,
 } from './fixtures.js';
 import { getPath } from '../../../src/core/kernel/ops/path.js';
+import { verifiedMapBundle } from './map-bundle-fixtures.js';
 
 beforeEach(() => resetIdCounters());
 
@@ -110,6 +111,15 @@ describe('专项 B 组合根 createLoadedMatch 契约', () => {
     const nodeIds = Object.keys(state.nodes);
     expect(nodeIds.length).toBeGreaterThanOrEqual(4); // 预置 2 + 地图 2
     expect(nodeIds.some((id) => /^n:\d+$/.test(id))).toBe(true); // 地图节点以 prefab 分配编号落地
+  });
+
+  it.each(['residence', 'match'] as const)('%s MapBundle 经过同一组合根完成 compile → spawn → UI projection', (sessionKind) => {
+    const request = loadedMatchRequest();
+    const result = createLoadedMatch({ ...request, mapBundle: verifiedMapBundle(sessionKind) });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.match.ui).not.toBeNull();
+    expect(Object.keys(result.match.getWorldState().nodes).some((id) => /^n:\d+$/.test(id))).toBe(true);
   });
 
   it('演员面：npcBudget 提供时 AI runtime 装配且 NPC 实体/agent 已登记', () => {

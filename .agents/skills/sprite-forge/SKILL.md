@@ -116,7 +116,7 @@ python .agents/skills/sprite-forge/tools/selftest-sprite-pipeline.py
 纯化背景、按固定比例切好、已像素化的成品帧。
 
 > **真实流程（2026-08-16 起）**：出图后不是「直接拿成品」。脚本会先**检测实际品红分隔带**
-> 推导真实网格行/列（不受提示词期望约束），再经过**成品质量��门**——任一帧过小或
+> 推导真实网格行/列（不受提示词期望约束），再经过**成品质�����门**——任一帧过小或
 > 非品红内容占比过低（疑似纯色块）就会整体失败，并在输出目录保留 `raw.png` / `sheet.png`
 > 供重跑或人工排查，**绝不把损坏切格写进 manifest**。切图的布局由检测结果确认，模型未遵守
 > 提示词布局时按检测到的分隔带切，而不是静默产出 1×1 单色块。
@@ -128,28 +128,26 @@ python .agents/skills/sprite-forge/tools/selftest-sprite-pipeline.py
 **用法**：
 ```bash
 # 单帧组件（钥匙）
-python tools/sprite-component.py --type item-tool --desc "old brass door key" --out run/assets/key
+python tools/sprite-component.py --type item --desc "old brass door key" --out run/assets/key
 
 # 多帧组件（箱子三态）
-python tools/sprite-component.py --type environment --desc "wooden supply crate" \
+python tools/sprite-component.py --type container --desc "wooden supply crate" \
     --states closed,open,broken --out run/assets/crate
 
 # 指定后端（默认 gpt-image-2；可选 gemini）
-python tools/sprite-component.py --type weapon-firearm --desc "revolver" \
+python tools/sprite-component.py --type item --desc "firearm revolver" \
     --provider gemini --out run/assets/revolver
 
 # 只打印提示词不调用 API（校对用）
-PRINT_PROMPT_ONLY=1 python tools/sprite-component.py --type item-consumable --desc "bandage" --out /tmp/x
+PRINT_PROMPT_ONLY=1 python tools/sprite-component.py --type item --desc "bandage" --out /tmp/x
 ```
 
-**类型（8 类受控分类，机器事实源 `.agents/skills/sprite-forge/catalogs/component-types.v2.json`）**：
-`weapon-melee`（珊瑚=近战）/ `weapon-ranged`（紫=远程）/ `weapon-firearm`（枪灰+橙=AP 消耗）/
-`item-consumable`（绿=正面或橙=消耗）/ `item-tool`（橙=进行中或黄=感官）/
-`item-equipment`（蓝=科技）/ `device`（灰白=可交互受制状态+蓝科技）/ `environment`（低饱和灰棕=背景素描）
+**类型（D-088 唯一 8 类，机器事实源 `.agents/skills/sprite-forge/catalogs/component-types.v2.json`）**：
+`ai-unit` / `npc` / `vehicle` / `container` / `item` / `device` / `decoration` / `transition-scene`。武器、消耗品、工具和装备由 `item` 的能力与展示标签细分，不再形成第二套生产分类。
 
 **视角规范（分流铁律）**：
-- **物品类序列帧**（`item-consumable` / `item-tool` / `item-equipment`）：采用 **`front view`**（眼平直接正交正视图，强调物品清晰剪影与细节，无俯仰角度、无三维倾斜深度、无侧立面、无透视消失点）。
-- **其余静态组件**（武器类、`device`、`environment`）：采用 **`front-top axonometric view`**（正面高位斜测轴：顶部与前部可见，侧部与后部隐藏，固定常规斜角，正交投影）。
+- **物品类序列帧**（`item`）：采用 **`front view`**。
+- **其余空间素材**：采用 **`front-top axonometric view`**（正面高位斜测轴，固定正交投影）。
 - **底图原生组件（Crop-to-Sprite）**：以切片为母图进行链式图生图（`--reference-crop`），1:1 继承几何包围盒与光影（详见 `docs/创作系统/06_底图原生组件占位切片与图生图替换规范.md`）。
 
 **V0 混合素材生成管线 v2 CLI (`tools/asset-pipeline-v2.py`)**：
@@ -267,4 +265,4 @@ pip install proper-pixel-art
 
 **不做**：色彩量化（保留所有颜色供 UGC 调色板使用）、形态学清理（保留 AI 生成的形状细节）、轮廓描边（不改变原始形状）。
 
-**局限**：无法处理抗锯齿渐变色和亚像素级颜色变化，边缘仍然有杂色。
+**局限**��无法处理抗锯齿渐变色和亚像素级颜色变化，边缘仍然有杂色。

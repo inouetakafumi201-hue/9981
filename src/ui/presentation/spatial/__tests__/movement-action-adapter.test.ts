@@ -34,6 +34,7 @@ describe('MovementActionAdapter (D-090)', () => {
 
     expect(intent.agentId).toBe('agent_player')
     expect(intent.target.kind).toBe('action')
+    if (intent.target.kind !== 'action') throw new Error('expected action intent')
     expect(intent.target.actionId).toBe('action:entity.place')
     expect(intent.bindings['entityId']).toBe('hero')
     expect(intent.bindings['targetNaturalSceneId']).toBe('scene_main')

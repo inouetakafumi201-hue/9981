@@ -15,6 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src/devboard/editor-shell', import.meta.url)),
+      '@editor': fileURLToPath(new URL('./src/devboard/editor-shell', import.meta.url)),
       '@map': fileURLToPath(new URL('./src/play/map', import.meta.url)),
     },
   },

@@ -4,6 +4,7 @@
 > **技术栈**：React 18 + TypeScript + Tailwind CSS，桌面端 1920×1080 优先。可根据审美和质感任意发挥，不要有限制。
 > **本文档只描述需求**，不提供实现代码，让 v0.dev 发挥其组件和特效能力。成熟实现（按钮变灰、悬停发光、脉冲等）不再解释，只写「什么状态显示什么」。
 > **接线前置**：本界面是「检索优先的创作资源入口」，所有素材/词条/蓝本数据来自共享元状态层（`src/meta-state/`）的**只读投影**；界面本地状态只负责筛选/搜索/tab/详情开关/拖拽进行中。写操作只有两个：星标、快捷栏配置。
+> **分类冻结（D-088/D-091）**：AI 单位 / NPC / 载具 / 容器 / 物品 / 机关装置 / 装饰 / 过渡场景是唯一八类逻辑身份；蓝本是独立集合，武器/消耗品/工具/装备仅是物品能力或展示标签，不得形成第二套放置分类。
 > **参考图路径**：`run/ui-mockup/material-library/`（由 `docs/表现系统/PLT-03_素材库UI样图_提示词.md` 出图后放入；出图前以本文档布局架构为唯一基准）。
 
 ---
@@ -242,7 +243,7 @@
 ### 6.1 交互伪代码
 
 ```typescript
-// 点击卡片 → 详情
+// 点击��片 → 详情
 function onCardClick(id) {
   detailOpenId = id;                 // 本地状态
   // 详情数据从投影读：detail = projection.materialDetail(id)
@@ -250,7 +251,7 @@ function onCardClick(id) {
 
 // 点击「绘制贴图」（仅合成物）→ 调出像素绘制器悬浮窗
 function onPaintTexture(id) {
-  painter = { open: true, targetId: id };            // 本地状态
+  painter = { open: true, targetId: id };            // 本地状��
   // initialTexture = projection.materialTexture(id) ?? null（数据层判定）
   // 保存走 actions.materialSetTexture(id, texture)；见 docs/v0-dev-pixel-painter-spec.md
 }

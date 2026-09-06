@@ -211,7 +211,7 @@ describe('开发板模拟操作：拉边描线 + 样条塑形（§九）', () =>
       (Math.hypot(n.at.x - 0.63, n.at.y - 0.21) < Math.hypot(best.at.x - 0.63, best.at.y - 0.21) ? n : best),
     map.nodes[0]!);
     expect(Math.hypot(nearest.at.x - 0.63, nearest.at.y - 0.21)).toBeGreaterThan(0.05);
-    expect(errors(map)).toBe(0);
+    expect(validateMapStructure(map).map((diagnostic) => diagnostic.code)).toContain('MAP_TRANSITION_MATERIAL_REQUIRED');
   });
 
   it('遮挡框整体平移：translateObstruction 整体拖移、顶点同移、clamp、结构合法', () => {
@@ -271,7 +271,7 @@ describe('开发板模拟操作：遮挡/锚点/过渡窗口（§八图元）', 
     const edgeId = map.edges[0]!.id;
     map = setTransitionWindow(map, edgeId, true);
     expect(map.edges[0]!.transitionWindow?.control).toHaveLength(1);
-    expect(errors(map)).toBe(0);
+    expect(validateMapStructure(map).map((diagnostic) => diagnostic.code)).toContain('MAP_TRANSITION_MATERIAL_REQUIRED');
     map = setTransitionWindow(map, edgeId, false);
     expect(map.edges[0]!.transitionWindow).toBeUndefined();
     // 单向边带窗口 → 校验器给 warning（不是 error），保持可导出
@@ -279,7 +279,7 @@ describe('开发板模拟操作：遮挡/锚点/过渡窗口（§八图元）', 
     map = setTransitionWindow(map, oneWay.id, true);
     const diag = validateMapStructure(map);
     expect(diag.some((d) => d.code === 'MAP_TRANSITION_WINDOW_ON_UNIDIRECTIONAL' && d.severity === 'warning')).toBe(true);
-    expect(diag.filter((d) => d.severity === 'error')).toHaveLength(0);
+    expect(diag.filter((d) => d.severity === 'error').map((d) => d.code)).toEqual(['MAP_TRANSITION_MATERIAL_REQUIRED']);
   });
 });
 
