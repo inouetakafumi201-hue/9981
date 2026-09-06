@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'only dark',
+  colorScheme: 'dark',
   themeColor: '#080a0c',
   userScalable: false,
 }

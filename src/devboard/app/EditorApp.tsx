@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useMemo, useState, type JSX, type KeyboardEvent, type PointerEvent } from 'react';
 import { CanvasView } from './CanvasView.js';
 import {
   addEdge, addNode, blankMap, deleteSelection, directions, type EditorMode, floorOf, makeLayerFloors,

@@ -1,4 +1,4 @@
-import type { DragEvent, MouseEvent, PointerEvent } from 'react';
+import type { DragEvent, JSX, MouseEvent, PointerEvent } from 'react';
 import type { EditorMode } from './editor-state.js';
 import type { Camera } from './camera.js';
 import type { MapData, Vec2 } from '../ports/map-contracts.js';

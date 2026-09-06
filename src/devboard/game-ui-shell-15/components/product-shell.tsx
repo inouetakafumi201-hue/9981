@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Check, CheckCircle2, ChevronRight, CircleDot, FlaskConical, Gauge, Loader2, Plug, PlugZap, RotateCcw, ShieldCheck, Unplug, X } from 'lucide-react'
 import { StartupLoading } from '@/components/startup-loading'
@@ -83,6 +83,7 @@ export function ProductShell() { return <UiBackendProvider><ProductShellContent 
 function ProductShellContent() {
   const [wiringMode, setWiringMode] = useState<WiringMode>('mock')
   const [revision, setRevision] = useState(0)
+  const revisionRef = useRef(0)
   const [returnOrigin, setReturnOrigin] = useState<ResidencePosition | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
@@ -96,7 +97,12 @@ function ProductShellContent() {
   const pending = router.transition.state === 'pending'
   const failed = ['rejected', 'stale', 'timeout', 'cancelled'].includes(router.transition.state)
 
-  useEffect(() => { const mode = parseWiringMode(); setWiringMode(mode); installWiringMode(mode, ui.ui ?? null, () => revision) }, [ui.ui, revision])
+  useEffect(() => { revisionRef.current = revision }, [revision])
+  useEffect(() => {
+    const mode = parseWiringMode()
+    setWiringMode((current) => current === mode ? current : mode)
+    installWiringMode(mode, ui.ui ?? null, () => revisionRef.current)
+  }, [ui.ui])
   useEffect(() => { const id = window.setInterval(() => setRevision(getProjectionRevisionFn()?.() ?? 0), 500); return () => window.clearInterval(id) }, [])
   useEffect(() => { const query = window.matchMedia('(prefers-reduced-motion: reduce)'); const sync = () => setReducedMotion(query.matches); sync(); query.addEventListener('change', sync); return () => query.removeEventListener('change', sync) }, [])
   useEffect(() => () => router.cancel(), [router.cancel])

@@ -20,7 +20,9 @@ export function StartupLoading({ onReady }: { onReady?: () => void }) {
       window.clearTimeout(readyTimer)
     }
   }, [])
-  useEffect(() => { if (mode !== 'cold-start' && mode !== 'restore-loading') firstAction.current?.focus() }, [mode])
+  useEffect(() => {
+    if (mode !== 'cold-start' && mode !== 'restore-loading') firstAction.current?.focus()
+  }, [mode])
 
   async function act(intentId: 'startup.retry' | 'startup.cancel' | 'startup.fallback') {
     setBusy(true)
